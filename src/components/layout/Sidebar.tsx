@@ -71,7 +71,8 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
     {
       title: 'Market Research',
       items: [
-        { title: 'Dental Implant Market', path: '/market/dental-implants', icon: <MedicalIcon /> }
+        { title: 'Dental Implant Market', path: '/market/dental-implants', icon: <MedicalIcon /> },
+        { title: 'Practice Interactions', path: '/market/practice-interaction', icon: <BusinessIcon /> }
       ]
     },
     {

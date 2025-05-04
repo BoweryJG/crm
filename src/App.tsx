@@ -14,6 +14,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 // Lazy loaded components for code splitting
 const DentalImplantMarketDashboard = lazy(() => import('./components/marketResearch/DentalImplantMarketDashboard'));
+const PracticeInteractionTracker = lazy(() => import('./components/marketResearch/PracticeInteractionTracker'));
 
 const App: React.FC = () => {
   return (
@@ -38,6 +39,7 @@ const App: React.FC = () => {
               <Route path="call-analysis" element={<div>Call Analysis (Coming Soon)</div>} />
               <Route path="market" element={<div>Market Intelligence (Coming Soon)</div>} />
               <Route path="market/dental-implants" element={<React.Suspense fallback={<div>Loading...</div>}><DentalImplantMarketDashboard /></React.Suspense>} />
+              <Route path="market/practice-interaction" element={<React.Suspense fallback={<div>Loading...</div>}><PracticeInteractionTracker /></React.Suspense>} />
               <Route path="dental" element={<div>Dental Procedures Knowledge Base (Coming Soon)</div>} />
               <Route path="aesthetic" element={<div>Aesthetic Procedures Knowledge Base (Coming Soon)</div>} />
               <Route path="companies" element={<div>Companies Database (Coming Soon)</div>} />
