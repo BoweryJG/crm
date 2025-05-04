@@ -5,34 +5,12 @@ interface LoadingScreenProps {
   message?: string;
 }
 
-const LoadingScreen: React.FC<LoadingScreenProps> = ({ 
-  message = 'Loading...' 
+// Create a separate component for the themed content
+const ThemedLoadingContent: React.FC<LoadingScreenProps & { themeMode: string }> = ({ 
+  message = 'Loading...', 
+  themeMode 
 }) => {
   const theme = useTheme();
-  
-  // Create a custom hook to safely get theme mode
-  const useThemeModeWithFallback = () => {
-    try {
-      // Import at the module level to avoid conditional hook calls
-      const ThemeContextModule = require('../../themes/ThemeContext');
-      if (ThemeContextModule && typeof ThemeContextModule.useThemeContext === 'function') {
-        try {
-          const themeContext = ThemeContextModule.useThemeContext();
-          return themeContext?.themeMode || 'corporate';
-        } catch (error) {
-          console.warn('ThemeContext not available, using default theme');
-          return 'corporate';
-        }
-      }
-      return 'corporate';
-    } catch (error) {
-      console.warn('ThemeContext module not available, using default theme');
-      return 'corporate';
-    }
-  };
-  
-  // Call the hook at the top level
-  const themeMode = useThemeModeWithFallback();
   
   return (
     <Box
@@ -161,6 +139,45 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
       )}
     </Box>
   );
+};
+
+// Main component that decides whether to use ThemeContext or fallback
+const LoadingScreen: React.FC<LoadingScreenProps> = (props) => {
+  // Default theme mode
+  const defaultThemeMode = 'corporate';
+  
+  // Try to import ThemeContext at the module level
+  let ThemeContextModule;
+  try {
+    ThemeContextModule = require('../../themes/ThemeContext');
+  } catch (error) {
+    console.warn('ThemeContext module not available, using default theme');
+  }
+  
+  // If ThemeContext is available, use ThemedLoadingScreen
+  if (ThemeContextModule && typeof ThemeContextModule.useThemeContext === 'function') {
+    return <ThemedLoadingScreenWithContext {...props} ThemeContextModule={ThemeContextModule} />;
+  }
+  
+  // Fallback to default theme
+  return <ThemedLoadingContent {...props} themeMode={defaultThemeMode} />;
+};
+
+// Separate component that uses ThemeContext
+const ThemedLoadingScreenWithContext: React.FC<LoadingScreenProps & { ThemeContextModule: any }> = ({ 
+  ThemeContextModule,
+  ...props 
+}) => {
+  try {
+    const { useThemeContext } = ThemeContextModule;
+    const themeContext = useThemeContext();
+    const themeMode = themeContext?.themeMode || 'corporate';
+    
+    return <ThemedLoadingContent {...props} themeMode={themeMode} />;
+  } catch (error) {
+    console.warn('Error using ThemeContext, falling back to default theme');
+    return <ThemedLoadingContent {...props} themeMode="corporate" />;
+  }
 };
 
 export default LoadingScreen;
