@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import LoadingScreen from '../common/LoadingScreen';
@@ -17,10 +17,28 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children
 }) => {
   const location = useLocation();
+  const [authError, setAuthError] = useState<boolean>(false);
   
-  // In development mode, we'll bypass authentication if there's an error with auth
+  // Always call useAuth hook at the top level
+  let auth;
   try {
-    const { user, loading } = useAuth();
+    auth = useAuth();
+  } catch (error) {
+    console.warn('Auth context error, bypassing authentication in development mode:', error);
+    // Mark that we had an auth error
+    useEffect(() => {
+      setAuthError(true);
+    }, []);
+  }
+  
+  // If we had an auth error, just render the children or outlet
+  if (authError) {
+    return children ? <>{children}</> : <Outlet />;
+  }
+  
+  // If auth is available, use it normally
+  if (auth) {
+    const { user, loading } = auth;
     
     // While auth state is loading, show the loading screen
     if (loading) {
@@ -37,9 +55,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         />
       );
     }
-  } catch (error) {
-    console.warn('Auth context error, bypassing authentication in development mode:', error);
-    // In development, we'll just continue rendering the protected content
   }
 
   // If authenticated, render children or outlet
