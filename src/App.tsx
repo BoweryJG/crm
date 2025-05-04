@@ -6,6 +6,8 @@ import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Auth/Login';
 import Signup from './pages/Auth/Signup';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import ProtectedRoute from './components/routing/ProtectedRoute';
 
 // CSS baseline reset
 import CssBaseline from '@mui/material/CssBaseline';
@@ -20,10 +22,10 @@ const App: React.FC = () => {
             {/* Auth Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<div>Forgot Password (Coming Soon)</div>} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             
-            {/* Protected Routes */}
-            <Route path="/" element={<Layout />}>
+            {/* Protected Routes - wrapped with ProtectedRoute component */}
+            <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
               <Route index element={<Dashboard />} />
               <Route path="contacts" element={<div>Contacts Page (Coming Soon)</div>} />
               <Route path="practices" element={<div>Practices Page (Coming Soon)</div>} />
