@@ -82,7 +82,7 @@ const DentalImplantMarketDashboard: React.FC = () => {
   };
 
   const getImplantSystemDistribution = () => {
-    const counts = {};
+    const counts: Record<string, number> = {};
     
     providers.forEach(provider => {
       provider.implantSystems.forEach(system => {
@@ -94,12 +94,12 @@ const DentalImplantMarketDashboard: React.FC = () => {
   };
 
   const getCBCTManufacturerDistribution = () => {
-    const counts = {};
+    const counts: Record<string, number> = {};
     
     providers
       .filter(p => p.hasCBCT && p.cbctManufacturer)
       .forEach(provider => {
-        counts[provider.cbctManufacturer] = (counts[provider.cbctManufacturer] || 0) + 1;
+        counts[provider.cbctManufacturer as string] = (counts[provider.cbctManufacturer as string] || 0) + 1;
       });
     
     return Object.entries(counts).map(([name, value]) => ({ name, value }));
@@ -159,9 +159,9 @@ const DentalImplantMarketDashboard: React.FC = () => {
         NYC Dental Implant Market Research Dashboard
       </Typography>
 
-      <Grid container spacing={4}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 4 }}>
         {/* Technology Distribution */}
-        <Grid item xs={12} md={6}>
+        <Box>
           <Card sx={{ height: '100%', boxShadow: theme.shadows[3] }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -189,10 +189,10 @@ const DentalImplantMarketDashboard: React.FC = () => {
               </ResponsiveContainer>
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
 
         {/* Implant System Distribution */}
-        <Grid item xs={12} md={6}>
+        <Box>
           <Card sx={{ height: '100%', boxShadow: theme.shadows[3] }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -218,10 +218,10 @@ const DentalImplantMarketDashboard: React.FC = () => {
               </ResponsiveContainer>
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
 
         {/* CBCT Manufacturer Distribution */}
-        <Grid item xs={12} md={6}>
+        <Box>
           <Card sx={{ height: '100%', boxShadow: theme.shadows[3] }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -249,10 +249,10 @@ const DentalImplantMarketDashboard: React.FC = () => {
               </ResponsiveContainer>
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
 
         {/* Full Arch Solutions */}
-        <Grid item xs={12} md={6}>
+        <Box>
           <Card sx={{ height: '100%', boxShadow: theme.shadows[3] }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -278,10 +278,10 @@ const DentalImplantMarketDashboard: React.FC = () => {
               </ResponsiveContainer>
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
 
         {/* Social Media Presence */}
-        <Grid item xs={12}>
+        <Box sx={{ gridColumn: '1 / -1' }}>
           <Card sx={{ boxShadow: theme.shadows[3] }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -309,10 +309,10 @@ const DentalImplantMarketDashboard: React.FC = () => {
               </ResponsiveContainer>
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
         
         {/* Specific Implant System Usage */}
-        <Grid item xs={12}>
+        <Box sx={{ gridColumn: '1 / -1' }}>
           <Card sx={{ boxShadow: theme.shadows[3] }}>
             <CardContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -343,9 +343,9 @@ const DentalImplantMarketDashboard: React.FC = () => {
                   No practices found using this implant system.
                 </Typography>
               ) : (
-                <Grid container spacing={2}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: '1fr 1fr 1fr' }, gap: 2 }}>
                   {getProvidersUsingSelectedImplant().map((provider) => (
-                    <Grid item xs={12} md={6} lg={4} key={provider.id}>
+                    <Box key={provider.id}>
                       <Card variant="outlined" sx={{ height: '100%' }}>
                         <CardContent>
                           <Typography variant="h6" noWrap gutterBottom>
@@ -381,14 +381,14 @@ const DentalImplantMarketDashboard: React.FC = () => {
                           )}
                         </CardContent>
                       </Card>
-                    </Grid>
+                    </Box>
                   ))}
-                </Grid>
+                </Box>
               )}
             </CardContent>
           </Card>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 };
