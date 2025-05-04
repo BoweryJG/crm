@@ -9,16 +9,30 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
   message = 'Loading...' 
 }) => {
   const theme = useTheme();
-  // Use a try-catch to handle the case when ThemeContext is not available
-  let themeMode = 'corporate';
-  try {
-    // Dynamically import to avoid circular dependencies
-    const { useThemeContext } = require('../../themes/ThemeContext');
-    const themeContext = useThemeContext();
-    themeMode = themeContext?.themeMode || 'corporate';
-  } catch (error) {
-    console.warn('ThemeContext not available, using default theme');
-  }
+  
+  // Create a custom hook to safely get theme mode
+  const useThemeModeWithFallback = () => {
+    try {
+      // Import at the module level to avoid conditional hook calls
+      const ThemeContextModule = require('../../themes/ThemeContext');
+      if (ThemeContextModule && typeof ThemeContextModule.useThemeContext === 'function') {
+        try {
+          const themeContext = ThemeContextModule.useThemeContext();
+          return themeContext?.themeMode || 'corporate';
+        } catch (error) {
+          console.warn('ThemeContext not available, using default theme');
+          return 'corporate';
+        }
+      }
+      return 'corporate';
+    } catch (error) {
+      console.warn('ThemeContext module not available, using default theme');
+      return 'corporate';
+    }
+  };
+  
+  // Call the hook at the top level
+  const themeMode = useThemeModeWithFallback();
   
   return (
     <Box
