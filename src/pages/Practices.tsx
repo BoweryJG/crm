@@ -26,7 +26,8 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Tooltip
+  Tooltip,
+  SelectChangeEvent
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -228,12 +229,12 @@ const Practices: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
-  const handleFilterTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setFilterType(event.target.value as string);
+  const handleFilterTypeChange = (event: SelectChangeEvent) => {
+    setFilterType(event.target.value);
   };
 
-  const handleFilterSizeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setFilterSize(event.target.value as string);
+  const handleFilterSizeChange = (event: SelectChangeEvent) => {
+    setFilterSize(event.target.value);
   };
 
   const toggleViewMode = () => {
@@ -293,12 +294,12 @@ const Practices: React.FC = () => {
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
+      <Box sx={{ display: 'grid', gap: 3 }}>
+        <Box>
           <Card variant="outlined">
             <CardContent>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} md={5}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '5fr 3fr 3fr 1fr' }, gap: 2, alignItems: 'center' }}>
+                <Box>
                   <TextField
                     fullWidth
                     placeholder="Search practices..."
@@ -312,8 +313,8 @@ const Practices: React.FC = () => {
                       ),
                     }}
                   />
-                </Grid>
-                <Grid item xs={12} md={3}>
+                </Box>
+                <Box>
                   <FormControl fullWidth>
                     <InputLabel id="filter-type-label">Practice Type</InputLabel>
                     <Select
@@ -327,8 +328,8 @@ const Practices: React.FC = () => {
                       <MenuItem value="aesthetic">Aesthetic</MenuItem>
                     </Select>
                   </FormControl>
-                </Grid>
-                <Grid item xs={12} md={3}>
+                </Box>
+                <Box>
                   <FormControl fullWidth>
                     <InputLabel id="filter-size-label">Practice Size</InputLabel>
                     <Select
@@ -343,20 +344,20 @@ const Practices: React.FC = () => {
                       <MenuItem value="large">Large</MenuItem>
                     </Select>
                   </FormControl>
-                </Grid>
-                <Grid item xs={12} md={1}>
+                </Box>
+                <Box>
                   <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <IconButton color="primary" aria-label="more filters">
                       <FilterListIcon />
                     </IconButton>
                   </Box>
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
 
-        <Grid item xs={12}>
+        <Box>
           <Box sx={{ 
             display: 'flex', 
             justifyContent: 'space-between', 
@@ -405,8 +406,8 @@ const Practices: React.FC = () => {
               <PracticesTableView practices={filteredPractices} />
             )}
           </TabPanel>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 };
@@ -427,9 +428,9 @@ const PracticesCardView: React.FC<PracticesCardViewProps> = ({ practices }) => {
   }
 
   return (
-    <Grid container spacing={2}>
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: '1fr 1fr 1fr' }, gap: 2 }}>
       {practices.map((practice) => (
-        <Grid item xs={12} md={6} lg={4} key={practice.id}>
+        <Box key={practice.id}>
           <Card 
             variant="outlined" 
             sx={{ 
@@ -550,9 +551,9 @@ const PracticesCardView: React.FC<PracticesCardViewProps> = ({ practices }) => {
               </Box>
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
       ))}
-    </Grid>
+    </Box>
   );
 };
 
