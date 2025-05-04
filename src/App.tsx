@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './themes/ThemeContext';
+import { AuthProvider } from './hooks/useAuth';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 
@@ -9,11 +10,12 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider>
-      <CssBaseline />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
+    <AuthProvider>
+      <ThemeProvider>
+        <CssBaseline />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="contacts" element={<div>Contacts Page (Coming Soon)</div>} />
             <Route path="practices" element={<div>Practices Page (Coming Soon)</div>} />
@@ -27,10 +29,11 @@ const App: React.FC = () => {
             <Route path="companies" element={<div>Companies Database (Coming Soon)</div>} />
             <Route path="settings" element={<div>Settings (Coming Soon)</div>} />
             <Route path="*" element={<Navigate to="/" replace />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
 
