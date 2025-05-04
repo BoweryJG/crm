@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, CircularProgress, Typography, useTheme } from '@mui/material';
-import { useThemeContext } from '../../themes/ThemeContext';
 
 interface LoadingScreenProps {
   message?: string;
@@ -10,7 +9,16 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
   message = 'Loading...' 
 }) => {
   const theme = useTheme();
-  const { themeMode } = useThemeContext();
+  // Use a try-catch to handle the case when ThemeContext is not available
+  let themeMode = 'corporate';
+  try {
+    // Dynamically import to avoid circular dependencies
+    const { useThemeContext } = require('../../themes/ThemeContext');
+    const themeContext = useThemeContext();
+    themeMode = themeContext?.themeMode || 'corporate';
+  } catch (error) {
+    console.warn('ThemeContext not available, using default theme');
+  }
   
   return (
     <Box
