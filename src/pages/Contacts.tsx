@@ -19,7 +19,8 @@ import {
   Chip,
   CircularProgress,
   Divider,
-  useTheme
+  useTheme,
+  SelectChangeEvent
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -197,12 +198,12 @@ const Contacts: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
-  const handleFilterTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setFilterType(event.target.value as string);
+  const handleFilterTypeChange = (event: SelectChangeEvent) => {
+    setFilterType(event.target.value);
   };
 
-  const handleFilterSpecialtyChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setFilterSpecialty(event.target.value as string);
+  const handleFilterSpecialtyChange = (event: SelectChangeEvent) => {
+    setFilterSpecialty(event.target.value);
   };
 
   const toggleStarred = (id: string) => {
@@ -288,12 +289,12 @@ const Contacts: React.FC = () => {
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
+      <Box sx={{ display: 'grid', gap: 3 }}>
+        <Box>
           <Card variant="outlined">
             <CardContent>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} md={5}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '5fr 3fr 3fr 1fr' }, gap: 2, alignItems: 'center' }}>
+                  <Box>
                   <TextField
                     fullWidth
                     placeholder="Search contacts..."
@@ -307,8 +308,8 @@ const Contacts: React.FC = () => {
                       ),
                     }}
                   />
-                </Grid>
-                <Grid item xs={12} md={3}>
+                  </Box>
+                  <Box>
                   <FormControl fullWidth>
                     <InputLabel id="filter-type-label">Practice Type</InputLabel>
                     <Select
@@ -322,8 +323,8 @@ const Contacts: React.FC = () => {
                       <MenuItem value="aesthetic">Aesthetic</MenuItem>
                     </Select>
                   </FormControl>
-                </Grid>
-                <Grid item xs={12} md={3}>
+                  </Box>
+                  <Box>
                   <FormControl fullWidth>
                     <InputLabel id="filter-specialty-label">Specialty</InputLabel>
                     <Select
@@ -340,18 +341,18 @@ const Contacts: React.FC = () => {
                       ))}
                     </Select>
                   </FormControl>
-                </Grid>
-                <Grid item xs={12} md={1}>
+                  </Box>
+                  <Box>
                   <IconButton color="primary" aria-label="more filters">
                     <FilterListIcon />
                   </IconButton>
-                </Grid>
-              </Grid>
+                  </Box>
+                </Box>
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
 
-        <Grid item xs={12}>
+        <Box>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs 
               value={tabValue} 
@@ -399,8 +400,8 @@ const Contacts: React.FC = () => {
               getAvatarColor={getAvatarColor}
             />
           </TabPanel>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 };
@@ -429,9 +430,9 @@ const ContactsList: React.FC<ContactsListProps> = ({
   }
 
   return (
-    <Grid container spacing={2}>
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: '1fr 1fr 1fr' }, gap: 2 }}>
       {contacts.map((contact) => (
-        <Grid item xs={12} md={6} lg={4} key={contact.id}>
+        <Box key={contact.id}>
           <Card 
             variant="outlined" 
             sx={{ 
@@ -513,9 +514,9 @@ const ContactsList: React.FC<ContactsListProps> = ({
               </Box>
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
       ))}
-    </Grid>
+    </Box>
   );
 };
 
