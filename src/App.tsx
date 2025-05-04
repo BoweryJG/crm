@@ -1,4 +1,5 @@
 import React, { lazy } from 'react';
+import Contacts from './pages/Contacts';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './themes/ThemeContext';
 import { AuthProvider } from './hooks/useAuth';
@@ -31,7 +32,7 @@ const App: React.FC = () => {
             {/* Protected Routes - wrapped with ProtectedRoute component */}
             <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
               <Route index element={<Dashboard />} />
-              <Route path="contacts" element={<div>Contacts Page (Coming Soon)</div>} />
+              <Route path="contacts" element={<React.Suspense fallback={<div>Loading...</div>}><Contacts /></React.Suspense>} />
               <Route path="practices" element={<div>Practices Page (Coming Soon)</div>} />
               <Route path="analytics" element={<div>Analytics Page (Coming Soon)</div>} />
               <Route path="research" element={<div>Research Module (Coming Soon)</div>} />
