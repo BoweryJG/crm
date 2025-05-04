@@ -353,11 +353,11 @@ const PracticeInteractionTracker: React.FC = () => {
         <Typography variant="h6" gutterBottom>
           Pending Follow-ups
         </Typography>
-        <Grid container spacing={2}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: '1fr 1fr 1fr' }, gap: 2 }}>
           {interactions
             .filter(item => item.followUpDate && !item.followUpCompleted)
             .map(item => (
-              <Grid item xs={12} md={6} lg={4} key={item.id}>
+              <Box key={item.id}>
                 <Card variant="outlined">
                   <CardContent>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
@@ -379,16 +379,16 @@ const PracticeInteractionTracker: React.FC = () => {
                     </Typography>
                   </CardContent>
                 </Card>
-              </Grid>
+              </Box>
             ))}
           {interactions.filter(item => item.followUpDate && !item.followUpCompleted).length === 0 && (
-            <Grid item xs={12}>
+            <Box sx={{ gridColumn: '1 / -1' }}>
               <Typography variant="body1" color="text.secondary" align="center">
                 No pending follow-ups.
               </Typography>
-            </Grid>
+            </Box>
           )}
-        </Grid>
+        </Box>
       </Box>
 
       <Box>
