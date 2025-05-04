@@ -1,4 +1,4 @@
-import React, { lazy } from 'react';
+import React, { lazy, Suspense } from 'react';
 import Contacts from './pages/Contacts';
 import Practices from './pages/Practices';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
@@ -17,6 +17,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 // Lazy loaded components for code splitting
 const DentalImplantMarketDashboard = lazy(() => import('./components/marketResearch/DentalImplantMarketDashboard'));
 const PracticeInteractionTracker = lazy(() => import('./components/marketResearch/PracticeInteractionTracker'));
+const PromptManagement = lazy(() => import('./pages/AI/PromptManagement'));
 
 const App: React.FC = () => {
   return (
@@ -37,7 +38,7 @@ const App: React.FC = () => {
               <Route path="practices" element={<React.Suspense fallback={<div>Loading...</div>}><Practices /></React.Suspense>} />
               <Route path="analytics" element={<div>Analytics Page (Coming Soon)</div>} />
               <Route path="research" element={<div>Research Module (Coming Soon)</div>} />
-              <Route path="content" element={<div>Content Generator (Coming Soon)</div>} />
+              <Route path="content" element={<Suspense fallback={<div>Loading...</div>}><PromptManagement /></Suspense>} />
               <Route path="call-analysis" element={<div>Call Analysis (Coming Soon)</div>} />
               <Route path="market" element={<div>Market Intelligence (Coming Soon)</div>} />
               <Route path="market/dental-implants" element={<React.Suspense fallback={<div>Loading...</div>}><DentalImplantMarketDashboard /></React.Suspense>} />
