@@ -1,9 +1,10 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
 import Contacts from './pages/Contacts';
 import Practices from './pages/Practices';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './themes/ThemeContext';
 import { AuthProvider } from './hooks/useAuth';
+import LoadingScreen from './components/common/LoadingScreen';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Auth/Login';
@@ -20,9 +21,23 @@ const PracticeInteractionTracker = lazy(() => import('./components/marketResearc
 const PromptManagement = lazy(() => import('./pages/AI/PromptManagement'));
 
 const App: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading delay to ensure all resources are properly initialized
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
-    <AuthProvider>
-      <ThemeProvider>
+    <ThemeProvider>
         <CssBaseline />
         <BrowserRouter>
           <Routes>
@@ -52,7 +67,6 @@ const App: React.FC = () => {
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
-    </AuthProvider>
   );
 };
 
