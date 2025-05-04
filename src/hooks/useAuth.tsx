@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { supabase } from '../services/supabase/supabase';
-import { Session, User } from '@supabase/supabase-js';
+import { Session, User, AuthChangeEvent } from '@supabase/supabase-js';
 
 interface AuthState {
   session: Session | null;
@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (_event: AuthChangeEvent, session: Session | null) => {
         setState(prev => ({
           ...prev,
           session,
