@@ -1,3 +1,9 @@
+export enum PracticeSize {
+  SMALL = 'small',
+  MEDIUM = 'medium',
+  LARGE = 'large'
+}
+
 export interface Practice {
   id: string;
   name: string;
