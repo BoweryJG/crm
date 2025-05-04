@@ -135,6 +135,14 @@ export const NYCDentalImplantMarketService = {
   },
   
   /**
+   * Get sample data for demonstration
+   * This is useful for development and testing before actual data is loaded
+   */
+  getNYCDentalImplantProvidersSample(): NYCDentalImplantProvider[] {
+    return getNYCDentalImplantProvidersSample();
+  },
+  
+  /**
    * Get providers by technology
    */
   async getProvidersByTechnology(technology: 'CBCT' | 'IntraoralScanner' | 'SurgicalGuides' | 'InHouseMilling'): Promise<NYCDentalImplantProvider[]> {
