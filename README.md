@@ -1,46 +1,122 @@
-# Getting Started with Create React App
+# RepSpheres CRM
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A visually stunning and comprehensive CRM specifically designed for medical sales representatives in the aesthetic and dental industries.
 
-## Available Scripts
+## Overview
 
-In the project directory, you can run:
+RepSpheres CRM combines an intuitive, space-themed interface with powerful industry-specific features to help sales representatives in the medical field manage their contacts, track practices, monitor sales activity, and access comprehensive knowledge bases for dental and aesthetic procedures.
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- **Visually Stunning Interface**: Space-themed dark mode with vibrant, thrilling colors
+- **Comprehensive Industry Data**: Specialized for dental and aesthetic industries
+- **AI-Enhanced Tools**: Content generation, call analysis, and market intelligence
+- **Advanced Contact & Practice Management**: Track relationships and engagement
+- **Procedure Knowledge Base**: Detailed information on dental and aesthetic procedures
+- **Companies Database**: Comprehensive directory of industry vendors and manufacturers
+- **Sales Performance Tracking**: Monitor goals, achievements, and activities
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Tech Stack
 
-### `npm test`
+- **Frontend**: React 18 with TypeScript, Material UI
+- **Backend**: Supabase (PostgreSQL)
+- **State Management**: React Context API
+- **Styling**: CSS-in-JS with Material UI
+- **Data Visualization**: Recharts (coming soon)
+- **Authentication**: Supabase Auth (coming soon)
+- **Hosting**: GitHub Pages (planned)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Project Structure
 
-### `npm run build`
+```
+/
+├── public/              # Static assets
+├── src/                 # Source code
+│   ├── assets/          # Images, icons, etc.
+│   ├── components/      # Reusable components
+│   │   ├── common/      # Generic UI components
+│   │   ├── dashboard/   # Dashboard-related components
+│   │   └── layout/      # Layout components (header, sidebar, etc.)
+│   ├── hooks/           # Custom React hooks
+│   ├── pages/           # Top-level page components
+│   ├── services/        # API and service integrations
+│   │   └── supabase/    # Supabase integration
+│   ├── themes/          # Theme configurations
+│   ├── types/           # TypeScript type definitions
+│   └── utils/           # Utility functions
+├── supabase/            # Supabase configuration
+│   └── schema.sql       # Database schema
+└── .env.local.example   # Environment variables template
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Getting Started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Prerequisites
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- Node.js (v16+)
+- npm or yarn
+- A Supabase account
 
-### `npm run eject`
+### Installation
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+1. Clone the repository:
+   ```
+   git clone https://github.com/BoweryJG/SphereOsCrM.git
+   cd SphereOsCrM
+   ```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+3. Create a `.env.local` file based on `.env.local.example` and add your Supabase credentials:
+   ```
+   REACT_APP_SUPABASE_URL=your_supabase_url_here
+   REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+   ```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+4. Set up your Supabase database using the schema in `supabase/schema.sql`.
 
-## Learn More
+5. Start the development server:
+   ```
+   npm start
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Database Setup
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+RepSpheres CRM uses Supabase as a backend. The database schema includes:
+
+- **Contacts**: Medical professionals in dental/aesthetic practices
+- **Practices**: Dental and aesthetic clinics/offices
+- **Procedures**: Detailed information on medical procedures
+- **Companies**: Manufacturers and vendors in the industry
+- **Sales Activities**: Call logs, meetings, demos, etc.
+- **Tasks**: Follow-ups and to-dos
+- **Market Intelligence**: Industry trends and insights
+
+Import the schema from `supabase/schema.sql` to set up your database structure.
+
+## Development Roadmap
+
+- [x] Initial UI framework
+- [x] Dashboard design and implementation
+- [x] Supabase database schema
+- [x] Data models and service layer
+- [ ] Authentication and user management
+- [ ] Contacts and practices CRUD operations
+- [ ] Procedures knowledge base
+- [ ] Companies database
+- [ ] Task management
+- [ ] Sales activity tracking
+- [ ] Reporting and analytics
+- [ ] AI-powered features
+- [ ] Mobile optimization
+
+## License
+
+All rights reserved.
+
+## Contact
+
+For more information, visit [repspheres.com](https://www.repspheres.com).
