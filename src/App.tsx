@@ -52,8 +52,8 @@ const App: React.FC = () => {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 
-                {/* Protected Routes - wrapped with ProtectedRoute component */}
-                <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+                {/* Public Routes - no authentication required */}
+                <Route path="/" element={<Layout />}>
               <Route index element={<Dashboard />} />
               <Route path="contacts" element={<React.Suspense fallback={<div>Loading...</div>}><Contacts /></React.Suspense>} />
               <Route path="practices" element={<React.Suspense fallback={<div>Loading...</div>}><Practices /></React.Suspense>} />
