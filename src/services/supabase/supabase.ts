@@ -124,21 +124,33 @@ const createMockClient = (): SupabaseClient => {
 
 // Create a Supabase client with error handling
 let supabase: SupabaseClient;
+
+// Check if using placeholder values
+const isPlaceholderValue = 
+  supabaseUrl === 'https://example.supabase.co' || 
+  supabaseUrl === 'your_supabase_url' ||
+  supabaseAnonKey === 'your_supabase_anon_key' ||
+  supabaseAnonKey === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example';
+
 try {
   // Validate URL format
   new URL(supabaseUrl);
   
-  // Check if using placeholder values
-  if (supabaseUrl === 'https://example.supabase.co' || 
-      supabaseUrl === 'your_supabase_url' ||
-      supabaseAnonKey === 'your_supabase_anon_key' ||
-      supabaseAnonKey === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example') {
-    throw new Error('Using placeholder Supabase credentials');
+  if (isPlaceholderValue) {
+    if (process.env.NODE_ENV === 'production') {
+      // In production, use mock client with placeholder values
+      console.warn('Using mock Supabase client in production due to placeholder credentials');
+      supabase = createMockClient();
+    } else {
+      // In development, warn about placeholder values
+      throw new Error('Using placeholder Supabase credentials in development');
+    }
+  } else {
+    // Use real client with valid credentials
+    supabase = createClient(supabaseUrl, supabaseAnonKey);
   }
-  
-  supabase = createClient(supabaseUrl, supabaseAnonKey);
 } catch (error) {
-  console.error('Invalid Supabase URL:', error);
+  console.error('Supabase client error:', error);
   supabase = createMockClient();
 }
 
