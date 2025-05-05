@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  Grid,
   Card,
   CardContent,
   TextField,
@@ -33,10 +32,7 @@ import {
   Search as SearchIcon,
   Add as AddIcon,
   FilterList as FilterListIcon,
-  Business as BusinessIcon,
   ImportExport as ImportExportIcon,
-  CheckCircle as CheckCircleIcon,
-  Cancel as CancelIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   MoreVert as MoreVertIcon,
@@ -44,7 +40,6 @@ import {
   Phone as PhoneIcon,
   Language as LanguageIcon
 } from '@mui/icons-material';
-import { supabase } from '../services/supabase/supabase';
 import { Practice } from '../types/practices';
 
 // Mock data for development purposes

@@ -11,8 +11,7 @@ import {
   useTheme,
   Tooltip,
   Badge,
-  Divider,
-  Button
+  Divider
 } from '@mui/material';
 import {
   Menu as MenuIcon,

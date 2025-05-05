@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  Grid,
   Card,
   CardContent,
   Button,
@@ -20,7 +19,6 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   Business as BusinessIcon,
-  Schedule as ScheduleIcon,
   Phone as PhoneIcon,
   Email as EmailIcon,
   Videocam as VideocamIcon,
@@ -28,8 +26,7 @@ import {
   NoteAdd as NoteAddIcon,
   FilterList as FilterListIcon
 } from '@mui/icons-material';
-import { format, addMonths } from 'date-fns';
-import { supabase } from '../../services/supabase/supabase';
+import { addMonths } from 'date-fns';
 import { NYCDentalImplantProvider } from '../../services/marketResearch/nycDentalImplantMarket';
 
 // Interaction type enum
@@ -47,19 +44,6 @@ export enum InteractionType {
   OTHER = 'Other'
 }
 
-// Sample technology list for demos
-const technologyOptions = [
-  'CBCT Scanner',
-  'Intraoral Scanner',
-  'Surgical Guide System',
-  'Milling Unit',
-  'Implant System',
-  'Biomaterials',
-  'Prosthetic Components',
-  'Software',
-  'Lasers',
-  'Other'
-];
 
 // Interaction interface
 interface PracticeInteraction {
@@ -92,16 +76,6 @@ interface FilterState {
   pendingFollowUpOnly: boolean;
 }
 
-// Default filter state
-const defaultFilterState: FilterState = {
-  interactionTypes: [],
-  dateFrom: addMonths(new Date(), -3), // Last 3 months by default
-  dateTo: new Date(),
-  technologies: [],
-  followUpOnly: false,
-  pendingFollowUpOnly: false
-};
-
 // Mock user info (would come from auth context in a real app)
 const currentUser = {
   id: 'user123',
@@ -114,10 +88,7 @@ const currentUser = {
 const PracticeInteractionTracker: React.FC = () => {
   const theme = useTheme();
   const [loading, setLoading] = useState<boolean>(true);
-  const [practices, setPractices] = useState<NYCDentalImplantProvider[]>([]);
   const [interactions, setInteractions] = useState<PracticeInteraction[]>([]);
-  const [openFilterDialog, setOpenFilterDialog] = useState<boolean>(false);
-  const [filterState, setFilterState] = useState<FilterState>(defaultFilterState);
 
   // For demonstration purposes, we'll create some mock data
   useEffect(() => {
@@ -262,7 +233,7 @@ const PracticeInteractionTracker: React.FC = () => {
           }
         ];
         
-        setPractices(mockPractices);
+        // We're not using practices directly in the component
         setInteractions(mockInteractions);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -335,7 +306,6 @@ const PracticeInteractionTracker: React.FC = () => {
           <Button 
             variant="outlined" 
             startIcon={<FilterListIcon />}
-            onClick={() => setOpenFilterDialog(true)}
             sx={{ mr: 1 }}
           >
             Filter

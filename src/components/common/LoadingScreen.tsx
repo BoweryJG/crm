@@ -14,9 +14,6 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
 }) => {
   const theme = useTheme();
   
-  // Use a default theme mode
-  const themeMode = 'corporate';
-  
   return (
     <Box
       sx={{

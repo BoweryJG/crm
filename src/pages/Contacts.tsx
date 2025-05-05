@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  Grid,
   Card,
   CardContent,
   TextField,
@@ -28,13 +27,11 @@ import {
   FilterList as FilterListIcon,
   Business as BusinessIcon,
   ImportExport as ImportExportIcon,
-  Person as PersonIcon,
   Phone as PhoneIcon,
   Email as EmailIcon,
   Star as StarIcon,
   StarBorder as StarBorderIcon
 } from '@mui/icons-material';
-import { supabase } from '../services/supabase/supabase';
 import { Contact } from '../types/contacts';
 
 // Mock data for development purposes

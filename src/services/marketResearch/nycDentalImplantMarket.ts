@@ -7,7 +7,7 @@
  */
 
 import { supabase } from '../supabase/supabase';
-import { Practice, PracticeSize } from '../../types/practices';
+import { PracticeSize } from '../../types/practices';
 
 /**
  * Enum for CBCT scanner manufacturers

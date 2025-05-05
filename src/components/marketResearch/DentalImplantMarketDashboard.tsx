@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Typography, 
-  Grid, 
   Card, 
   CardContent, 
   Chip, 
@@ -27,7 +26,7 @@ import {
   ResponsiveContainer,
   Cell
 } from 'recharts';
-import { NYCDentalImplantMarketService, NYCDentalImplantProvider, ImplantSystemManufacturer, CBCTManufacturer } from '../../services/marketResearch/nycDentalImplantMarket';
+import { NYCDentalImplantMarketService, NYCDentalImplantProvider, ImplantSystemManufacturer } from '../../services/marketResearch/nycDentalImplantMarket';
 
 const DentalImplantMarketDashboard: React.FC = () => {
   const theme = useTheme();
@@ -120,14 +119,6 @@ const DentalImplantMarketDashboard: React.FC = () => {
     );
   };
 
-  const getSpecialtyDistribution = () => {
-    return [
-      { name: 'Periodontist', value: providers.filter(p => p.isPeriodontist).length },
-      { name: 'Prosthodontist', value: providers.filter(p => p.isProsthodontist).length },
-      { name: 'Oral Surgeon', value: providers.filter(p => p.isOralSurgeon).length },
-      { name: 'General Dentist', value: providers.filter(p => p.isGeneralDentist).length }
-    ];
-  };
 
   const getSocialMediaMetrics = () => {
     const data = providers

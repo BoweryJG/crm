@@ -11,8 +11,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Chip,
-  Stack,
   useTheme,
   SelectChangeEvent
 } from '@mui/material';
@@ -23,8 +21,7 @@ import {
   Refresh as RefreshIcon
 } from '@mui/icons-material';
 import { openRouterService, extractVariables } from '../../services/ai/openRouterService';
-import { AIPrompt, AIGeneratedAsset } from '../../types/ai';
-// Removed markdown dependencies for now
+import { AIPrompt } from '../../types/ai';
 
 interface PromptTesterProps {
   prompt: AIPrompt;

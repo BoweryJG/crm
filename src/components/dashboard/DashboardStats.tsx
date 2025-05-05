@@ -3,10 +3,8 @@ import {
   Box, 
   Paper, 
   Typography, 
-  Divider, 
   LinearProgress,
-  useTheme,
-  Stack
+  useTheme
 } from '@mui/material';
 import { 
   TrendingUp as TrendingUpIcon,

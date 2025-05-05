@@ -260,7 +260,7 @@ export const getMockDashboardData = () => {
 };
 
 // Export all mock data functions
-export default {
+const mockDataService = {
   generateMockContacts,
   generateMockPractices,
   generateDashboardStats,
@@ -268,3 +268,5 @@ export default {
   generateUpcomingTasks,
   getMockDashboardData
 };
+
+export default mockDataService;

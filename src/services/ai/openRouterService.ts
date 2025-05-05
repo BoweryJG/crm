@@ -1,11 +1,4 @@
-import axios from 'axios';
 import { AIPrompt, AIResponse, AIGeneratedAsset, AIPromptExecutionParams } from '../../types/ai';
-
-// Base URL for OpenRouter API
-const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1';
-
-// API key from environment variables
-const API_KEY = process.env.REACT_APP_OPENROUTER_API_KEY;
 
 // Extract variables from prompt content (format: {{variable_name}})
 export const extractVariables = (promptContent: string): string[] => {
