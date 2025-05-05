@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Typography, 
@@ -9,10 +9,30 @@ import {
 } from '@mui/material';
 import DashboardStats from '../components/dashboard/DashboardStats';
 import { useThemeContext } from '../themes/ThemeContext';
+import { getMockDashboardData } from '../services/mockData/mockDataService';
+
+// Helper function to generate random integers
+const getRandomInt = (min: number, max: number): number => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 
 const Dashboard: React.FC = () => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  
+  // Load mock data on component mount
+  useEffect(() => {
+    const data = getMockDashboardData();
+    setDashboardData(data);
+    
+    // Refresh data every 5 minutes to simulate real-time updates
+    const intervalId = setInterval(() => {
+      setDashboardData(getMockDashboardData());
+    }, 5 * 60 * 1000);
+    
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <Box>
@@ -60,31 +80,36 @@ const Dashboard: React.FC = () => {
                 gap: 2
               }}
             >
-              {/* Activity items would go here */}
-              {[1, 2, 3].map((item) => (
-                <Box
-                  key={item}
-                  sx={{
-                    p: 1.5,
-                    borderRadius: 2,
-                    backgroundColor: themeMode === 'space'
-                      ? 'rgba(10, 14, 23, 0.5)'
-                      : 'rgba(245, 247, 250, 0.5)'
-                  }}
-                >
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" fontWeight={500}>
-                      New contact added
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      2 hours ago
+              {dashboardData ? (
+                dashboardData.recentActivities.map((activity: any) => (
+                  <Box
+                    key={activity.id}
+                    sx={{
+                      p: 1.5,
+                      borderRadius: 2,
+                      backgroundColor: themeMode === 'space'
+                        ? 'rgba(10, 14, 23, 0.5)'
+                        : 'rgba(245, 247, 250, 0.5)'
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" fontWeight={500}>
+                        {activity.type}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {activity.timeAgo}
+                      </Typography>
+                    </Box>
+                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+                      {activity.type.includes('added') ? 'Added ' : ''}{activity.description}
                     </Typography>
                   </Box>
-                  <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
-                    Added Dr. Sarah Johnson to contacts
-                  </Typography>
-                </Box>
-              ))}
+                ))
+              ) : (
+                <Typography variant="body2" color="text.secondary" align="center">
+                  Loading activities...
+                </Typography>
+              )}
             </Box>
           </CardContent>
         </Paper>
@@ -117,31 +142,44 @@ const Dashboard: React.FC = () => {
                 gap: 2
               }}
             >
-              {/* Task items would go here */}
-              {[1, 2, 3].map((item) => (
-                <Box
-                  key={item}
-                  sx={{
-                    p: 1.5,
-                    borderRadius: 2,
-                    backgroundColor: themeMode === 'space'
-                      ? 'rgba(10, 14, 23, 0.5)'
-                      : 'rgba(245, 247, 250, 0.5)'
-                  }}
-                >
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" fontWeight={500}>
-                      Follow up with client
-                    </Typography>
-                    <Typography variant="caption" color={item === 1 ? "error" : "text.secondary"}>
-                      {item === 1 ? 'Today' : 'Tomorrow'}
+              {dashboardData ? (
+                dashboardData.upcomingTasks.map((task: any) => (
+                  <Box
+                    key={task.id}
+                    sx={{
+                      p: 1.5,
+                      borderRadius: 2,
+                      backgroundColor: themeMode === 'space'
+                        ? 'rgba(10, 14, 23, 0.5)'
+                        : 'rgba(245, 247, 250, 0.5)',
+                      borderLeft: task.priority === 'High' ? `4px solid ${theme.palette.error.main}` : 
+                                 task.priority === 'Medium' ? `4px solid ${theme.palette.warning.main}` : 
+                                 `4px solid ${theme.palette.success.main}`
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" fontWeight={500}>
+                        {task.type}
+                      </Typography>
+                      <Typography 
+                        variant="caption" 
+                        color={task.dueDate === 'Today' ? "error.main" : 
+                               task.dueDate === 'Tomorrow' ? "warning.main" : 
+                               "text.secondary"}
+                      >
+                        {task.dueDate}
+                      </Typography>
+                    </Box>
+                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+                      {task.description}
                     </Typography>
                   </Box>
-                  <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
-                    Call Dr. Smith about new product line
-                  </Typography>
-                </Box>
-              ))}
+                ))
+              ) : (
+                <Typography variant="body2" color="text.secondary" align="center">
+                  Loading tasks...
+                </Typography>
+              )}
             </Box>
           </CardContent>
         </Paper>
@@ -169,12 +207,15 @@ const Dashboard: React.FC = () => {
             Market Intelligence
           </Typography>
           <Typography variant="body2" paragraph>
-            Recent trends in the dental implant market show a 15% increase in demand for minimally invasive procedures. 
-            Aesthetic procedures, particularly for injectables, have seen a 23% growth in the last quarter.
+            Recent trends in the dental implant market show a {getRandomInt(12, 18)}% increase in demand for minimally invasive procedures. 
+            Aesthetic procedures, particularly for injectables, have seen a {getRandomInt(20, 25)}% growth in the last quarter.
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="body2" paragraph>
             Key opportunity: Practices in your region are increasingly interested in combined treatment packages that 
             integrate both dental and aesthetic procedures for comprehensive patient care.
+          </Typography>
+          <Typography variant="body2" sx={{ fontStyle: 'italic', mt: 2, color: 'text.secondary' }}>
+            Market data refreshed {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </Typography>
         </Paper>
       </Box>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Paper, 
@@ -17,6 +17,7 @@ import {
   Campaign as CampaignIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
+import { getMockDashboardData } from '../../services/mockData/mockDataService';
 
 interface StatCardProps {
   title: string;
@@ -127,17 +128,50 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, change, color }
 const DashboardStats: React.FC = () => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
+  const [dashboardData, setDashboardData] = useState<any>(null);
   
-  const salesGoalProgress = 68;
+  // Format currency for display
+  const formatCurrency = (value: number): string => {
+    if (value >= 1000000) {
+      return `$${(value / 1000000).toFixed(1)}M`;
+    } else if (value >= 1000) {
+      return `$${(value / 1000).toFixed(0)}K`;
+    }
+    return `$${value}`;
+  };
+  
+  // Load mock data on component mount
+  useEffect(() => {
+    const data = getMockDashboardData();
+    setDashboardData(data);
+    
+    // Refresh data every 5 minutes to simulate real-time updates
+    const intervalId = setInterval(() => {
+      setDashboardData(getMockDashboardData());
+    }, 5 * 60 * 1000);
+    
+    return () => clearInterval(intervalId);
+  }, []);
+  
+  // If data is still loading, show a loading state
+  if (!dashboardData) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+        <Typography>Loading dashboard data...</Typography>
+      </Box>
+    );
+  }
+  
+  const { stats } = dashboardData;
   
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 3 }}>
       <Box>
         <StatCard
           title="Total Contacts"
-          value="1,285"
+          value={stats.totalContacts.toLocaleString()}
           icon={<PersonIcon />}
-          change={{ value: 12.5, trend: 'up' }}
+          change={{ value: stats.contactsChange, trend: stats.contactsChange >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#8860D0' : '#3D52D5'} // Primary color
         />
       </Box>
@@ -145,9 +179,9 @@ const DashboardStats: React.FC = () => {
       <Box>
         <StatCard
           title="Active Practices"
-          value="347"
+          value={stats.activePractices.toLocaleString()}
           icon={<BusinessIcon />}
-          change={{ value: 8.3, trend: 'up' }}
+          change={{ value: stats.practicesChange, trend: stats.practicesChange >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#5CE1E6' : '#44CFCB'} // Secondary color
         />
       </Box>
@@ -155,9 +189,9 @@ const DashboardStats: React.FC = () => {
       <Box>
         <StatCard
           title="Revenue Generated"
-          value="$875K"
+          value={formatCurrency(stats.revenueGenerated)}
           icon={<RevenueIcon />}
-          change={{ value: 5.2, trend: 'down' }}
+          change={{ value: stats.revenueChange, trend: stats.revenueChange >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#FFD700' : '#FFAB4C'} // Warning color
         />
       </Box>
@@ -165,9 +199,9 @@ const DashboardStats: React.FC = () => {
       <Box>
         <StatCard
           title="Active Campaigns"
-          value="24"
+          value={stats.activeCampaigns.toString()}
           icon={<CampaignIcon />}
-          change={{ value: 18.9, trend: 'up' }}
+          change={{ value: stats.campaignsChange, trend: stats.campaignsChange >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#00E676' : '#4CAF50'} // Success color
         />
       </Box>
@@ -194,13 +228,13 @@ const DashboardStats: React.FC = () => {
               Sales Goal Progress
             </Typography>
             <Typography variant="h6" fontWeight={600} color="primary">
-              {salesGoalProgress}%
+              {stats.salesGoalProgress}%
             </Typography>
           </Box>
           
           <LinearProgress
             variant="determinate"
-            value={salesGoalProgress}
+            value={stats.salesGoalProgress}
             sx={{
               height: 8,
               borderRadius: 4,
@@ -224,10 +258,10 @@ const DashboardStats: React.FC = () => {
             }}
           >
             <Typography variant="body2" color="text.secondary">
-              Current: $875K
+              Current: {formatCurrency(stats.currentRevenue)}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Goal: $1.3M
+              Goal: {formatCurrency(stats.salesGoal)}
             </Typography>
           </Box>
         </Paper>
