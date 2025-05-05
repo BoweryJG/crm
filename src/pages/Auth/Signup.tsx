@@ -84,18 +84,26 @@ const Signup: React.FC = () => {
     setError(null);
     
     try {
-      const { success, error } = await signUp(formData.email, formData.password);
-      
-      if (success) {
-        // Would normally create user profile in database here
-        // But for now, just navigate to login
-        navigate('/login', { 
-          state: { 
-            message: 'Registration successful! Please check your email to confirm your account.' 
-          } 
-        });
+      // For demo purposes, always succeed with valid data
+      if (formData.email.includes('@') && formData.password.length >= 6) {
+        const { success, error } = await signUp(formData.email, formData.password);
+        
+        if (success) {
+          // Add a small delay to simulate network request
+          setTimeout(() => {
+            // Would normally create user profile in database here
+            // But for now, just navigate to login
+            navigate('/login', { 
+              state: { 
+                message: 'Registration successful! Please check your email to confirm your account.' 
+              } 
+            });
+          }, 800);
+        } else {
+          setError(error?.message || 'Failed to create account');
+        }
       } else {
-        setError(error?.message || 'Failed to create account');
+        setError('Please enter a valid email and password (min 6 characters)');
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');

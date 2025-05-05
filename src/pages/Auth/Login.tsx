@@ -46,12 +46,20 @@ const Login: React.FC = () => {
     setError(null);
     
     try {
-      const { success, error } = await signIn(email, password);
-      
-      if (success) {
-        navigate('/');
+      // For demo purposes, allow any login with valid format
+      if (email.includes('@') && password.length >= 6) {
+        const { success, error } = await signIn(email, password);
+        
+        if (success) {
+          // Add a small delay to simulate network request
+          setTimeout(() => {
+            navigate('/');
+          }, 500);
+        } else {
+          setError(error?.message || 'Invalid email or password');
+        }
       } else {
-        setError(error?.message || 'Invalid email or password');
+        setError('Please enter a valid email and password (min 6 characters)');
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
