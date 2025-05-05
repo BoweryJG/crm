@@ -60,6 +60,7 @@ const createMockClient = (): SupabaseClient => {
       },
       
       signInWithPassword: ({ email, password }: { email: string; password: string }) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         // Simulate successful login
         currentSession = mockSession;
         
@@ -78,6 +79,7 @@ const createMockClient = (): SupabaseClient => {
       },
       
       signUp: ({ email, password }: { email: string; password: string }) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         // Simulate successful signup
         // In a real app, this would create a new user
         return Promise.resolve({ 
@@ -101,12 +103,18 @@ const createMockClient = (): SupabaseClient => {
         return Promise.resolve({ error: null });
       },
       
-      resetPasswordForEmail: (email: string) => Promise.resolve({ data: {}, error: null })
+      resetPasswordForEmail: (email: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        return Promise.resolve({ data: {}, error: null });
+      }
     },
     
     // Add other methods as needed
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     from: (table: string) => ({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       select: (columns?: string) => ({
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         eq: (column: string, value: any) => ({
           single: () => Promise.resolve({ data: {}, error: null }),
           data: [], 
