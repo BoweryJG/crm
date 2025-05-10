@@ -1,4 +1,8 @@
 import { AIPrompt, AIResponse, AIGeneratedAsset, AIPromptExecutionParams } from '../../types/ai';
+import axios from 'axios';
+
+// Get the backend URL from environment variables
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com';
 
 // Extract variables from prompt content (format: {{variable_name}})
 export const extractVariables = (promptContent: string): string[] => {
@@ -31,7 +35,7 @@ const openRouterService = {
   // Get all prompts
   getPrompts: async (): Promise<{ data: AIPrompt[] | null; error: Error | null }> => {
     try {
-      // In a real implementation, this would fetch from Supabase or another backend
+      // In a real implementation, this would fetch from the backend API
       // For now, we'll return mock data
       const mockPrompts: AIPrompt[] = [
         {
@@ -163,49 +167,110 @@ const openRouterService = {
       // Replace variables in the prompt content
       const processedContent = replaceVariables(prompt.prompt_content, variables);
       
-      // In a real implementation, this would call the OpenRouter API
-      // For now, we'll simulate a response
+      console.log('Sending request to backend:', `${BACKEND_URL}/webhook`);
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Create a mock response
-      const mockResponse: AIResponse = {
-        id: `response-${Date.now()}`,
-        prompt_id: promptId,
-        model_used: modelOverride || prompt.model_used,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        completion_tokens: Math.floor(Math.random() * 1000) + 500,
-        prompt_tokens: processedContent.length / 4,
-        total_tokens: Math.floor(Math.random() * 1000) + 1000,
-        parameters: {
-          temperature: params.temperature || prompt.parameter_defaults?.temperature || 0.7,
-          max_tokens: params.max_tokens || prompt.parameter_defaults?.max_tokens || 1000
+      try {
+        // Make a request to the backend's webhook endpoint
+        const response = await axios.post(`${BACKEND_URL}/webhook`, {
+          prompt: processedContent,
+          model: modelOverride || prompt.model_used,
+          parameters: {
+            temperature: params.temperature || prompt.parameter_defaults?.temperature || 0.7,
+            max_tokens: params.max_tokens || prompt.parameter_defaults?.max_tokens || 1000
+          }
+        });
+        
+        console.log('Backend response:', response.data);
+        
+        // Create a response object from the backend response
+        const aiResponse: AIResponse = {
+          id: `response-${Date.now()}`,
+          prompt_id: promptId,
+          model_used: modelOverride || prompt.model_used,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          completion_tokens: response.data.result?.usage?.completion_tokens || 0,
+          prompt_tokens: response.data.result?.usage?.prompt_tokens || 0,
+          total_tokens: response.data.result?.usage?.total_tokens || 0,
+          parameters: {
+            temperature: params.temperature || prompt.parameter_defaults?.temperature || 0.7,
+            max_tokens: params.max_tokens || prompt.parameter_defaults?.max_tokens || 1000
+          }
+        };
+        
+        // Extract content from the response
+        let content = '';
+        if (response.data.result?.choices && response.data.result.choices.length > 0) {
+          content = response.data.result.choices[0].message.content;
+        } else {
+          content = 'No content was generated from the API.';
         }
-      };
-      
-      // Create a mock generated asset
-      const mockAsset: AIGeneratedAsset = {
-        id: `asset-${Date.now()}`,
-        response_id: mockResponse.id,
-        content: generateMockContent(prompt, variables),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        format: 'text',
-        asset_type: 'content',
-        generated_by: modelOverride || prompt.model_used
-      };
-      
-      // Update usage count (in a real implementation, this would update the database)
-      prompt.usage_count += 1;
-      
-      return {
-        prompt,
-        response: mockResponse,
-        asset: mockAsset,
-        error: null
-      };
+        
+        // Create an asset object
+        const asset: AIGeneratedAsset = {
+          id: `asset-${Date.now()}`,
+          response_id: aiResponse.id,
+          content: content,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          format: 'text',
+          asset_type: 'content',
+          generated_by: modelOverride || prompt.model_used
+        };
+        
+        // Update usage count (in a real implementation, this would update the database)
+        prompt.usage_count += 1;
+        
+        return {
+          prompt,
+          response: aiResponse,
+          asset: asset,
+          error: null
+        };
+      } catch (error) {
+        console.error('Backend API error:', error);
+        
+        // Fallback to mock response if the API call fails
+        console.warn('Falling back to mock data due to API error');
+        
+        // Create a mock response
+        const mockResponse: AIResponse = {
+          id: `response-${Date.now()}`,
+          prompt_id: promptId,
+          model_used: modelOverride || prompt.model_used,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          completion_tokens: Math.floor(Math.random() * 1000) + 500,
+          prompt_tokens: processedContent.length / 4,
+          total_tokens: Math.floor(Math.random() * 1000) + 1000,
+          parameters: {
+            temperature: params.temperature || prompt.parameter_defaults?.temperature || 0.7,
+            max_tokens: params.max_tokens || prompt.parameter_defaults?.max_tokens || 1000
+          }
+        };
+        
+        // Create a mock generated asset
+        const mockAsset: AIGeneratedAsset = {
+          id: `asset-${Date.now()}`,
+          response_id: mockResponse.id,
+          content: generateMockContent(prompt, variables),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          format: 'text',
+          asset_type: 'content',
+          generated_by: modelOverride || prompt.model_used
+        };
+        
+        // Add a warning message to the content
+        mockAsset.content = `⚠️ Connection to backend failed. Showing fallback mock content: ⚠️\n\n${mockAsset.content}`;
+        
+        return {
+          prompt,
+          response: mockResponse,
+          asset: mockAsset,
+          error: null
+        };
+      }
     } catch (error) {
       console.error('Error executing prompt:', error);
       return {
@@ -218,7 +283,7 @@ const openRouterService = {
   }
 };
 
-// Helper function to generate mock content based on the prompt type
+// Helper function to generate mock content based on the prompt type (for fallback)
 const generateMockContent = (prompt: AIPrompt, variables: Record<string, string>): string => {
   // Generate different mock content based on the prompt name
   if (prompt.prompt_name.includes('Consultation Script')) {
