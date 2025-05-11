@@ -25,10 +25,32 @@ const startAutomationWorkflow = async (
     
     if (error) throw error;
     
-    // Here you would trigger the actual automation workflow
-    // This could be a call to an external service, a webhook, etc.
-    // For now, we'll just simulate the workflow with a console log
-    console.log(`Started automation workflow ${workflowId} for document ${documentId}`);
+    // Trigger the actual automation workflow through the backend API
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com';
+      const response = await fetch(`${backendUrl}/api/automation/start`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          documentId,
+          workflowId,
+          contactId,
+          practiceId
+        })
+      });
+      
+      if (!response.ok) {
+        console.warn(`Backend automation trigger returned status ${response.status}`);
+      } else {
+        console.log(`Successfully triggered automation workflow ${workflowId} for document ${documentId}`);
+      }
+    } catch (triggerError) {
+      console.warn('Error triggering backend automation:', triggerError);
+      // We don't throw here because we've already updated the document status
+      // The automation status can be checked later
+    }
     
     return { data, error: null };
   } catch (error) {
@@ -102,8 +124,28 @@ const cancelAutomationWorkflow = async (documentId: string): Promise<{ data: Res
     
     if (error) throw error;
     
-    // Here you would cancel the actual automation workflow if possible
-    console.log(`Cancelled automation workflow for document ${documentId}`);
+    // Call the backend API to cancel the workflow
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com';
+      const response = await fetch(`${backendUrl}/api/automation/cancel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          documentId
+        })
+      });
+      
+      if (!response.ok) {
+        console.warn(`Backend automation cancel returned status ${response.status}`);
+      } else {
+        console.log(`Successfully cancelled automation workflow for document ${documentId}`);
+      }
+    } catch (cancelError) {
+      console.warn('Error cancelling backend automation:', cancelError);
+      // We don't throw here because we've already updated the document status
+    }
     
     return { data, error: null };
   } catch (error) {
@@ -115,27 +157,15 @@ const cancelAutomationWorkflow = async (documentId: string): Promise<{ data: Res
 // Get all available automation workflows
 const getAutomationWorkflows = async (): Promise<{ data: { id: string; name: string; description: string }[] | null; error: Error | null }> => {
   try {
-    // In a real implementation, this would fetch from a workflows table
-    // For now, we'll return some mock data
-    const mockWorkflows = [
-      { 
-        id: '1', 
-        name: 'Contact Follow-up', 
-        description: 'Send research document to contact and schedule follow-up' 
-      },
-      { 
-        id: '2', 
-        name: 'Practice Analysis', 
-        description: 'Add research to practice profile and create action items' 
-      },
-      { 
-        id: '3', 
-        name: 'Market Intelligence', 
-        description: 'Extract insights and update market intelligence database' 
-      }
-    ];
+    // Fetch workflows from the database
+    const { data, error } = await supabase
+      .from('research_automation_workflows')
+      .select('id, name, description')
+      .order('name');
     
-    return { data: mockWorkflows, error: null };
+    if (error) throw error;
+    
+    return { data, error: null };
   } catch (error) {
     console.error('Error fetching automation workflows:', error);
     return { data: null, error: error as Error };

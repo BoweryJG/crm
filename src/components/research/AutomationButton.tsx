@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { supabase } from '../../services/supabase/supabase';
 import {
   Button,
   Dialog,
@@ -69,6 +70,7 @@ const AutomationButton: React.FC<AutomationButtonProps> = ({
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('success');
+  const statusPollingRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch contacts, practices, and workflows when dialog opens
   useEffect(() => {
@@ -77,25 +79,81 @@ const AutomationButton: React.FC<AutomationButtonProps> = ({
     }
   }, [openDialog]);
 
+  // Set up polling for automation status updates
+  useEffect(() => {
+    // Start polling if the document is in progress
+    if (document?.id && document.automation_status === AutomationStatus.IN_PROGRESS) {
+      // Poll every 5 seconds
+      statusPollingRef.current = setInterval(async () => {
+        try {
+          const statusResult = await automationService.getAutomationStatus(document.id!);
+          if (statusResult.error) throw statusResult.error;
+          
+          // If the status has changed from IN_PROGRESS to something else
+          if (statusResult.data?.status !== AutomationStatus.IN_PROGRESS) {
+            // Fetch the updated document
+            const docResult = await supabase
+              .from('research_documents')
+              .select('*')
+              .eq('id', document.id)
+              .single();
+            
+            if (docResult.error) throw docResult.error;
+            
+            // Call the onAutomationComplete callback with the updated document
+            onAutomationComplete(docResult.data as ResearchDocument);
+            
+            // Show a notification
+            if (statusResult.data?.status === AutomationStatus.COMPLETED) {
+              setSnackbarMessage('Automation workflow completed successfully');
+              setSnackbarSeverity('success');
+            } else if (statusResult.data?.status === AutomationStatus.ERROR) {
+              setSnackbarMessage('Automation workflow failed');
+              setSnackbarSeverity('error');
+            }
+            setSnackbarOpen(true);
+            
+            // Clear the polling interval
+            if (statusPollingRef.current) {
+              clearInterval(statusPollingRef.current);
+              statusPollingRef.current = null;
+            }
+          }
+        } catch (error) {
+          console.error('Error polling automation status:', error);
+        }
+      }, 5000);
+      
+      // Clean up the interval when the component unmounts or the document changes
+      return () => {
+        if (statusPollingRef.current) {
+          clearInterval(statusPollingRef.current);
+          statusPollingRef.current = null;
+        }
+      };
+    }
+  }, [document?.id, document?.automation_status, onAutomationComplete]);
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      // In a real implementation, these would be actual API calls
-      // For now, we'll use mock data
+      // Fetch contacts from Supabase
+      const { data: contactsData, error: contactsError } = await supabase
+        .from('contacts')
+        .select('id, first_name, last_name')
+        .order('last_name');
       
-      // Mock contacts
-      setContacts([
-        { id: '1', first_name: 'John', last_name: 'Doe' },
-        { id: '2', first_name: 'Jane', last_name: 'Smith' },
-        { id: '3', first_name: 'Robert', last_name: 'Johnson' }
-      ]);
+      if (contactsError) throw contactsError;
+      setContacts(contactsData || []);
       
-      // Mock practices
-      setPractices([
-        { id: '1', name: 'City Dental Clinic' },
-        { id: '2', name: 'Smile Bright Dental' },
-        { id: '3', name: 'Advanced Dental Care' }
-      ]);
+      // Fetch practices from Supabase
+      const { data: practicesData, error: practicesError } = await supabase
+        .from('practices')
+        .select('id, name')
+        .order('name');
+      
+      if (practicesError) throw practicesError;
+      setPractices(practicesData || []);
       
       // Fetch workflows from the automation service
       const workflowsResult = await automationService.getAutomationWorkflows();
@@ -175,16 +233,8 @@ const AutomationButton: React.FC<AutomationButtonProps> = ({
       // Close the dialog
       handleCloseDialog();
       
-      // Simulate workflow completion after a delay (in a real app, this would be handled by a webhook)
-      setTimeout(async () => {
-        const completeResult = await automationService.completeAutomationWorkflow(document.id!, true);
-        if (completeResult.data) {
-          onAutomationComplete(completeResult.data);
-          setSnackbarMessage('Automation workflow completed successfully');
-          setSnackbarSeverity('success');
-          setSnackbarOpen(true);
-        }
-      }, 5000);
+      // Note: In a production environment, workflow completion would be handled by a webhook
+      // or by polling the backend for status updates
     } catch (error) {
       console.error('Error starting automation:', error);
       setError(error as Error);
