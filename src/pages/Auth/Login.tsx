@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Typography, 
@@ -28,45 +28,32 @@ const Login: React.FC = () => {
   const { signIn } = useAuth();
   const navigate = useNavigate();
   
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('demo@example.com');
+  const [password, setPassword] = useState('password123');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [autoLoginMessage, setAutoLoginMessage] = useState<string | null>(null);
+  
+  // Auto-login effect
+  useEffect(() => {
+    setAutoLoginMessage("Auto-login enabled. Redirecting to dashboard...");
+    setLoading(true);
+    
+    // Simulate login delay
+    const timer = setTimeout(() => {
+      navigate('/');
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, [navigate]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email || !password) {
-      setError('Please enter both email and password');
-      return;
-    }
-    
     setLoading(true);
-    setError(null);
     
-    try {
-      // For demo purposes, allow any login with valid format
-      if (email.includes('@') && password.length >= 6) {
-        const { success, error } = await signIn(email, password);
-        
-        if (success) {
-          // Add a small delay to simulate network request
-          setTimeout(() => {
-            navigate('/');
-          }, 500);
-        } else {
-          setError(error?.message || 'Invalid email or password');
-        }
-      } else {
-        setError('Please enter a valid email and password (min 6 characters)');
-      }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    // Just redirect to dashboard immediately
+    navigate('/');
   };
   
   return (

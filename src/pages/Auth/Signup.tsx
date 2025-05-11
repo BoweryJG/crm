@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Typography, 
@@ -37,19 +37,33 @@ const Signup: React.FC = () => {
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone: '',
-    specialization: '',
+    firstName: 'Demo',
+    lastName: 'User',
+    email: 'demo@example.com',
+    password: 'password123',
+    confirmPassword: 'password123',
+    phone: '555-123-4567',
+    specialization: 'dental',
     role: 'sales_rep' // Default role
   });
   
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [autoSignupMessage, setAutoSignupMessage] = useState<string | null>(null);
+  
+  // Auto-signup effect
+  useEffect(() => {
+    setAutoSignupMessage("Auto-signup enabled. Redirecting to dashboard...");
+    setLoading(true);
+    
+    // Simulate signup delay
+    const timer = setTimeout(() => {
+      navigate('/');
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, [navigate]);
   
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }> | SelectChangeEvent<string>
@@ -63,54 +77,10 @@ const Signup: React.FC = () => {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate form
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
-      setError('Please fill in all required fields');
-      return;
-    }
-    
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
-      return;
-    }
-    
     setLoading(true);
-    setError(null);
     
-    try {
-      // For demo purposes, always succeed with valid data
-      if (formData.email.includes('@') && formData.password.length >= 6) {
-        const { success, error } = await signUp(formData.email, formData.password);
-        
-        if (success) {
-          // Add a small delay to simulate network request
-          setTimeout(() => {
-            // Would normally create user profile in database here
-            // But for now, just navigate to login
-            navigate('/login', { 
-              state: { 
-                message: 'Registration successful! Please check your email to confirm your account.' 
-              } 
-            });
-          }, 800);
-        } else {
-          setError(error?.message || 'Failed to create account');
-        }
-      } else {
-        setError('Please enter a valid email and password (min 6 characters)');
-      }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    // Just redirect to dashboard immediately
+    navigate('/');
   };
   
   return (

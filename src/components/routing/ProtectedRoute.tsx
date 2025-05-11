@@ -1,7 +1,5 @@
 import React from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import LoadingScreen from '../common/LoadingScreen';
+import { Outlet } from 'react-router-dom';
 
 interface ProtectedRouteProps {
   redirectPath?: string;
@@ -9,34 +7,13 @@ interface ProtectedRouteProps {
 }
 
 /**
- * A route wrapper that protects routes requiring authentication.
- * Redirects to login if not authenticated.
+ * A route wrapper that previously protected routes requiring authentication.
+ * Now always allows access without authentication checks.
  */
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
-  redirectPath = '/login',
   children
 }) => {
-  const location = useLocation();
-  const { user, loading } = useAuth();
-  
-  // While auth state is loading, show the loading screen
-  if (loading) {
-    return <LoadingScreen message="Preparing your space..." />;
-  }
-
-  // If not authenticated, redirect to login with return URL
-  if (!user) {
-    console.log('User not authenticated, redirecting to login');
-    return (
-      <Navigate 
-        to={redirectPath} 
-        state={{ from: location.pathname }} 
-        replace 
-      />
-    );
-  }
-
-  // If authenticated, render children or outlet
+  // Always render children or outlet without authentication check
   return children ? <>{children}</> : <Outlet />;
 };
 

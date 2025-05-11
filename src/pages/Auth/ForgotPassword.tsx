@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Typography, 
@@ -25,36 +25,31 @@ const ForgotPassword: React.FC = () => {
   const { resetPassword } = useAuth();
   const navigate = useNavigate();
   
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('demo@example.com');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [autoRedirectMessage, setAutoRedirectMessage] = useState<string | null>(null);
+  
+  // Auto-redirect effect
+  useEffect(() => {
+    setAutoRedirectMessage("Auto-login enabled. Redirecting to dashboard...");
+    setLoading(true);
+    
+    // Simulate a short delay then redirect to dashboard
+    const timer = setTimeout(() => {
+      navigate('/');
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, [navigate]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email) {
-      setError('Please enter your email address');
-      return;
-    }
-    
     setLoading(true);
-    setError(null);
     
-    try {
-      const { success, error } = await resetPassword(email);
-      
-      if (success) {
-        setSuccess(true);
-      } else {
-        setError(error?.message || 'Failed to send password reset email');
-      }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    // Just redirect to dashboard immediately
+    navigate('/');
   };
   
   return (

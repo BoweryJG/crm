@@ -1,6 +1,5 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
-import { supabase } from '../services/supabase/supabase';
-import { Session, User, AuthChangeEvent } from '@supabase/supabase-js';
+import React, { createContext, useContext } from 'react';
+import { Session, User } from '@supabase/supabase-js';
 
 interface AuthState {
   session: Session | null;
@@ -24,6 +23,32 @@ interface AuthContextType extends AuthState {
   }>;
 }
 
+// Create a mock user
+const mockUser: User = {
+  id: 'mock-user-id',
+  email: 'demo@example.com',
+  user_metadata: {
+    first_name: 'Demo',
+    last_name: 'User'
+  },
+  app_metadata: {
+    role: 'admin'
+  },
+  created_at: new Date().toISOString(),
+  aud: 'authenticated',
+  role: ''
+};
+
+// Create a mock session
+const mockSession: Session = {
+  access_token: 'mock-access-token',
+  refresh_token: 'mock-refresh-token',
+  expires_at: Date.now() + 3600000,
+  expires_in: 3600,
+  token_type: 'bearer',
+  user: mockUser
+};
+
 // Create a context for authentication
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -38,102 +63,43 @@ export const useAuth = () => {
 
 // Provider component for authentication
 export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
-  const [state, setState] = useState<AuthState>({
-    session: null,
-    user: null,
-    loading: true,
-  });
-
-  useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setState(prev => ({
-        ...prev,
-        session,
-        user: session?.user ?? null,
-        loading: false,
-      }));
-    };
-
-    getInitialSession();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event: AuthChangeEvent, session: Session | null) => {
-        setState(prev => ({
-          ...prev,
-          session,
-          user: session?.user ?? null,
-        }));
-      }
-    );
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  // Sign in with email and password
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      return {
-        success: !error,
-        error,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error as Error,
-      };
-    }
+  // Always return authenticated state with mock user
+  const state: AuthState = {
+    session: mockSession,
+    user: mockUser,
+    loading: false,
   };
 
-  // Sign up with email and password
-  const signUp = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      return {
-        success: !error,
-        error,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error as Error,
-      };
-    }
+  // Mock sign in - always succeeds
+  const signIn = async (_email: string, _password: string) => {
+    console.log('Mock sign in called');
+    return {
+      success: true,
+      error: null,
+    };
   };
 
-  // Sign out
+  // Mock sign up - always succeeds
+  const signUp = async (_email: string, _password: string) => {
+    console.log('Mock sign up called');
+    return {
+      success: true,
+      error: null,
+    };
+  };
+
+  // Mock sign out - doesn't actually do anything
   const signOut = async () => {
-    await supabase.auth.signOut();
+    console.log('Mock sign out called');
   };
 
-  // Reset password
-  const resetPassword = async (email: string) => {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
-
-      return {
-        success: !error,
-        error,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error as Error,
-      };
-    }
+  // Mock reset password - always succeeds
+  const resetPassword = async (_email: string) => {
+    console.log('Mock reset password called');
+    return {
+      success: true,
+      error: null,
+    };
   };
 
   const value = {

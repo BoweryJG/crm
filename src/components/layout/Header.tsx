@@ -24,6 +24,8 @@ import {
   Person as PersonIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
+import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   onSidebarToggle: () => void;
@@ -33,6 +35,8 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
   const theme = useTheme();
   const { themeMode, toggleTheme } = useThemeContext();
+  const { signOut, user } = useAuth();
+  const navigate = useNavigate();
   
   // User profile menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -44,6 +48,12 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
   
   const handleProfileMenuClose = () => {
     setAnchorEl(null);
+  };
+  
+  const handleLogout = async () => {
+    console.log('Mock logout called');
+    await signOut();
+    // No need to navigate since we're always authenticated
   };
 
   return (
@@ -239,6 +249,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
               }} 
             />
             <MenuItem 
+              onClick={handleLogout}
               sx={{ 
                 py: 1.5,
                 color: theme.palette.error.main,
