@@ -19,6 +19,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 const DentalImplantMarketDashboard = lazy(() => import('./components/marketResearch/DentalImplantMarketDashboard'));
 const PracticeInteractionTracker = lazy(() => import('./components/marketResearch/PracticeInteractionTracker'));
 const PromptManagement = lazy(() => import('./pages/AI/PromptManagement'));
+const Research = lazy(() => import('./pages/Research'));
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -54,7 +55,7 @@ const App: React.FC = () => {
                 <Route path="contacts" element={<React.Suspense fallback={<div>Loading...</div>}><Contacts /></React.Suspense>} />
                 <Route path="practices" element={<React.Suspense fallback={<div>Loading...</div>}><Practices /></React.Suspense>} />
                 <Route path="analytics" element={<div>Analytics Page (Coming Soon)</div>} />
-                <Route path="research" element={<div>Research Module (Coming Soon)</div>} />
+                <Route path="research" element={<Suspense fallback={<div>Loading...</div>}><Research /></Suspense>} />
                 <Route path="content" element={<Suspense fallback={<div>Loading...</div>}><PromptManagement /></Suspense>} />
                 <Route path="call-analysis" element={<div>Call Analysis (Coming Soon)</div>} />
                 <Route path="market" element={<div>Market Intelligence (Coming Soon)</div>} />
