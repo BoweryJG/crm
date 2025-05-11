@@ -212,29 +212,50 @@ const generateMarketAnalysis = async (
   content: string | null;
   error: Error | null;
 }> => {
-  // Mock prompt ID - in a real implementation, this would be a specific prompt for market analysis
-  const promptId = '4'; // Using the competitor analysis prompt as a placeholder
+  try {
+    // Get market analysis prompt from Supabase
+    const { data: prompts, error } = await researchService.getResearchPrompts();
+    
+    if (error) throw error;
+    if (!prompts || prompts.length === 0) throw new Error('No research prompts found');
+    
+    // Find a prompt for market analysis
+    const marketAnalysisPrompt = prompts.find(p => 
+      p.category.toLowerCase().includes('market') || 
+      p.prompt_name.toLowerCase().includes('market analysis')
+    );
+    
+    // If no specific market analysis prompt is found, use the first available prompt
+    const promptId = marketAnalysisPrompt?.id || prompts[0].id;
+    
+    const variables: Record<string, string> = {
+      market_name: marketName,
+      industry: industry,
+      additional_context: additionalContext
+    };
   
-  const variables: Record<string, string> = {
-    practice_name: marketName,
-    competitor_name: industry,
-    additional_context: additionalContext
-  };
-  
-  return generateResearchDocument(
-    promptId,
-    `Market Analysis: ${marketName}`,
-    ResearchDocumentType.MARKET_ANALYSIS,
-    projectId,
-    userId,
-    variables,
-    modelOverride,
-    {
-      temperature: 0.5,
-      max_tokens: 2000
-    },
-    ['market_analysis', industry.toLowerCase()]
-  );
+    return generateResearchDocument(
+      promptId,
+      `Market Analysis: ${marketName}`,
+      ResearchDocumentType.MARKET_ANALYSIS,
+      projectId,
+      userId,
+      variables,
+      modelOverride,
+      {
+        temperature: 0.5,
+        max_tokens: 2000
+      },
+      ['market_analysis', industry.toLowerCase()]
+    );
+  } catch (error) {
+    console.error('Error generating market analysis:', error);
+    return {
+      document: null,
+      content: null,
+      error: error as Error
+    };
+  }
 };
 
 // Generate a competitor profile document
@@ -250,29 +271,50 @@ const generateCompetitorProfile = async (
   content: string | null;
   error: Error | null;
 }> => {
-  // Mock prompt ID - in a real implementation, this would be a specific prompt for competitor profiles
-  const promptId = '4'; // Using the competitor analysis prompt
+  try {
+    // Get competitor profile prompt from Supabase
+    const { data: prompts, error } = await researchService.getResearchPrompts();
+    
+    if (error) throw error;
+    if (!prompts || prompts.length === 0) throw new Error('No research prompts found');
+    
+    // Find a prompt for competitor analysis
+    const competitorPrompt = prompts.find(p => 
+      p.category.toLowerCase().includes('competitor') || 
+      p.prompt_name.toLowerCase().includes('competitor')
+    );
+    
+    // If no specific competitor prompt is found, use the first available prompt
+    const promptId = competitorPrompt?.id || prompts[0].id;
+    
+    const variables: Record<string, string> = {
+      practice_name: practiceName,
+      competitor_name: competitorName,
+      additional_context: additionalContext
+    };
   
-  const variables: Record<string, string> = {
-    practice_name: practiceName,
-    competitor_name: competitorName,
-    additional_context: additionalContext
-  };
-  
-  return generateResearchDocument(
-    promptId,
-    `Competitor Profile: ${competitorName}`,
-    ResearchDocumentType.COMPETITOR_PROFILE,
-    projectId,
-    userId,
-    variables,
-    modelOverride,
-    {
-      temperature: 0.5,
-      max_tokens: 2000
-    },
-    ['competitor_profile', 'analysis']
-  );
+    return generateResearchDocument(
+      promptId,
+      `Competitor Profile: ${competitorName}`,
+      ResearchDocumentType.COMPETITOR_PROFILE,
+      projectId,
+      userId,
+      variables,
+      modelOverride,
+      {
+        temperature: 0.5,
+        max_tokens: 2000
+      },
+      ['competitor_profile', 'analysis']
+    );
+  } catch (error) {
+    console.error('Error generating competitor profile:', error);
+    return {
+      document: null,
+      content: null,
+      error: error as Error
+    };
+  }
 };
 
 // Generate a practice profile document
@@ -289,29 +331,51 @@ const generatePracticeProfile = async (
   content: string | null;
   error: Error | null;
 }> => {
-  // Mock prompt ID - in a real implementation, this would be a specific prompt for practice profiles
-  const promptId = '4'; // Using the competitor analysis prompt as a placeholder
+  try {
+    // Get practice profile prompt from Supabase
+    const { data: prompts, error } = await researchService.getResearchPrompts();
+    
+    if (error) throw error;
+    if (!prompts || prompts.length === 0) throw new Error('No research prompts found');
+    
+    // Find a prompt for practice profiles
+    const practicePrompt = prompts.find(p => 
+      p.category.toLowerCase().includes('practice') || 
+      p.prompt_name.toLowerCase().includes('practice profile')
+    );
+    
+    // If no specific practice prompt is found, use the first available prompt
+    const promptId = practicePrompt?.id || prompts[0].id;
+    
+    const variables: Record<string, string> = {
+      practice_name: practiceName,
+      practice_type: practiceType,
+      location: location,
+      additional_context: additionalContext
+    };
   
-  const variables: Record<string, string> = {
-    practice_name: practiceName,
-    competitor_name: practiceType,
-    additional_context: `Location: ${location}. ${additionalContext}`
-  };
-  
-  return generateResearchDocument(
-    promptId,
-    `Practice Profile: ${practiceName}`,
-    ResearchDocumentType.PRACTICE_PROFILE,
-    projectId,
-    userId,
-    variables,
-    modelOverride,
-    {
-      temperature: 0.5,
-      max_tokens: 2000
-    },
-    ['practice_profile', practiceType.toLowerCase()]
-  );
+    return generateResearchDocument(
+      promptId,
+      `Practice Profile: ${practiceName}`,
+      ResearchDocumentType.PRACTICE_PROFILE,
+      projectId,
+      userId,
+      variables,
+      modelOverride,
+      {
+        temperature: 0.5,
+        max_tokens: 2000
+      },
+      ['practice_profile', practiceType.toLowerCase()]
+    );
+  } catch (error) {
+    console.error('Error generating practice profile:', error);
+    return {
+      document: null,
+      content: null,
+      error: error as Error
+    };
+  }
 };
 
 // Generate a trend analysis document
@@ -328,29 +392,51 @@ const generateTrendAnalysis = async (
   content: string | null;
   error: Error | null;
 }> => {
-  // Mock prompt ID - in a real implementation, this would be a specific prompt for trend analysis
-  const promptId = '4'; // Using the competitor analysis prompt as a placeholder
+  try {
+    // Get trend analysis prompt from Supabase
+    const { data: prompts, error } = await researchService.getResearchPrompts();
+    
+    if (error) throw error;
+    if (!prompts || prompts.length === 0) throw new Error('No research prompts found');
+    
+    // Find a prompt for trend analysis
+    const trendPrompt = prompts.find(p => 
+      p.category.toLowerCase().includes('trend') || 
+      p.prompt_name.toLowerCase().includes('trend')
+    );
+    
+    // If no specific trend prompt is found, use the first available prompt
+    const promptId = trendPrompt?.id || prompts[0].id;
+    
+    const variables: Record<string, string> = {
+      trend_topic: trendTopic,
+      industry: industry,
+      timeframe: timeframe,
+      additional_context: additionalContext
+    };
   
-  const variables: Record<string, string> = {
-    practice_name: trendTopic,
-    competitor_name: industry,
-    additional_context: `Timeframe: ${timeframe}. ${additionalContext}`
-  };
-  
-  return generateResearchDocument(
-    promptId,
-    `Trend Analysis: ${trendTopic} in ${industry}`,
-    ResearchDocumentType.TREND_ANALYSIS,
-    projectId,
-    userId,
-    variables,
-    modelOverride,
-    {
-      temperature: 0.5,
-      max_tokens: 2000
-    },
-    ['trend_analysis', industry.toLowerCase()]
-  );
+    return generateResearchDocument(
+      promptId,
+      `Trend Analysis: ${trendTopic} in ${industry}`,
+      ResearchDocumentType.TREND_ANALYSIS,
+      projectId,
+      userId,
+      variables,
+      modelOverride,
+      {
+        temperature: 0.5,
+        max_tokens: 2000
+      },
+      ['trend_analysis', industry.toLowerCase()]
+    );
+  } catch (error) {
+    console.error('Error generating trend analysis:', error);
+    return {
+      document: null,
+      content: null,
+      error: error as Error
+    };
+  }
 };
 
 // Create a specialized research prompt
