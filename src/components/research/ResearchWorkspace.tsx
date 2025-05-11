@@ -15,13 +15,16 @@ import {
   Folder as FolderIcon,
   Description as DescriptionIcon,
   Assignment as AssignmentIcon,
-  Lightbulb as LightbulbIcon
+  Lightbulb as LightbulbIcon,
+  Analytics as AnalyticsIcon,
+  MenuBook as MenuBookIcon
 } from '@mui/icons-material';
 
 import ResearchProjectManager from './ResearchProjectManager';
 import ResearchDocumentEditor from './ResearchDocumentEditor';
 import AIResearchAssistant from './AIResearchAssistant';
 import MarketDataExplorer from './MarketDataExplorer';
+import ResearchInsights from './ResearchInsights';
 import ResearchLibrary from './ResearchLibrary';
 
 import researchService from '../../services/research/researchService';
@@ -221,12 +224,19 @@ const ResearchWorkspace: React.FC = () => {
   return (
     <Box sx={{ height: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="research workspace tabs">
+        <Tabs 
+          value={tabValue} 
+          onChange={handleTabChange} 
+          aria-label="research workspace tabs"
+          variant="scrollable"
+          scrollButtons="auto"
+        >
           <Tab icon={<FolderIcon />} label="Projects" />
           <Tab icon={<DescriptionIcon />} label="Documents" />
           <Tab icon={<LightbulbIcon />} label="AI Assistant" />
           <Tab icon={<AssignmentIcon />} label="Market Data" />
-          <Tab label="Library" />
+          <Tab icon={<AnalyticsIcon />} label="Insights" />
+          <Tab icon={<MenuBookIcon />} label="Library" />
         </Tabs>
       </Box>
       
@@ -288,6 +298,18 @@ const ResearchWorkspace: React.FC = () => {
             </TabPanel>
             
             <TabPanel value={tabValue} index={4}>
+              <ResearchInsights 
+                project={workspaceState.activeProject}
+                documents={documents}
+                userId={user?.id || ''}
+                onInsightGenerated={(doc) => {
+                  // Add the new document to the list
+                  setDocuments(prev => [doc, ...prev]);
+                }}
+              />
+            </TabPanel>
+            
+            <TabPanel value={tabValue} index={5}>
               <ResearchLibrary 
                 documents={documents}
                 onDocumentSelect={handleDocumentSelect}
