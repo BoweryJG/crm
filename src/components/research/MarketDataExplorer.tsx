@@ -37,6 +37,9 @@ import {
 
 import { ResearchProject, ResearchDocument, ResearchDocumentType } from '../../types/research';
 import { supabase } from '../../services/supabase/supabase';
+import { DentalProceduresService, getDentalImplantInnovations } from '../../services/knowledgeBase/dentalProcedures';
+import { AestheticProceduresService, getAestheticTrends } from '../../services/knowledgeBase/aestheticProcedures';
+import { CompaniesService, getCompanyTrends } from '../../services/knowledgeBase/companiesService';
 
 interface MarketDataExplorerProps {
   project?: ResearchProject;
@@ -111,19 +114,81 @@ const MarketDataExplorer: React.FC<MarketDataExplorerProps> = ({
     setError(null);
     
     try {
-      // Fetch datasets from Supabase
-      const { data, error } = await supabase
-        .from('market_datasets')
-        .select('*')
-        .order('name');
+      // Create synthetic datasets from knowledge base services
+      const datasets: MarketDataset[] = [
+        {
+          id: 'dental-procedures',
+          name: 'Dental Procedures',
+          description: 'Comprehensive data on dental procedures, including costs, equipment, and insurance coverage',
+          category: 'dental',
+          region: 'Global',
+          year: 2025,
+          data_source: 'RepSpheres Knowledge Base',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        },
+        {
+          id: 'aesthetic-procedures',
+          name: 'Aesthetic Procedures',
+          description: 'Data on aesthetic procedures, including popularity, costs, and certification requirements',
+          category: 'aesthetic',
+          region: 'Global',
+          year: 2025,
+          data_source: 'RepSpheres Knowledge Base',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        },
+        {
+          id: 'companies',
+          name: 'Dental & Aesthetic Companies',
+          description: 'Information about companies in the dental and aesthetic industries',
+          category: 'companies',
+          region: 'Global',
+          year: 2025,
+          data_source: 'RepSpheres Knowledge Base',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        },
+        {
+          id: 'dental-innovations',
+          name: 'Dental Implant Innovations',
+          description: 'Latest innovations in dental implant technology',
+          category: 'dental',
+          region: 'Global',
+          year: 2025,
+          data_source: 'RepSpheres Knowledge Base',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        },
+        {
+          id: 'aesthetic-trends',
+          name: 'Aesthetic Treatment Trends',
+          description: 'Current trends in aesthetic treatments and procedures',
+          category: 'aesthetic',
+          region: 'Global',
+          year: 2025,
+          data_source: 'RepSpheres Knowledge Base',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        },
+        {
+          id: 'company-trends',
+          name: 'Industry Trends',
+          description: 'Market trends affecting dental and aesthetic companies',
+          category: 'companies',
+          region: 'Global',
+          year: 2025,
+          data_source: 'RepSpheres Knowledge Base',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+      ];
       
-      if (error) throw error;
-      
-      setDatasets(data || []);
+      setDatasets(datasets);
       
       // Auto-select the first dataset if available
-      if (data && data.length > 0 && !selectedDatasetId) {
-        setSelectedDatasetId(data[0].id);
+      if (datasets.length > 0 && !selectedDatasetId) {
+        setSelectedDatasetId(datasets[0].id);
       }
     } catch (err) {
       console.error('Error fetching market datasets:', err);
@@ -138,16 +203,208 @@ const MarketDataExplorer: React.FC<MarketDataExplorerProps> = ({
     setError(null);
     
     try {
-      // Fetch market data from Supabase
-      const { data, error } = await supabase
-        .from('market_data')
-        .select('*')
-        .eq('dataset_id', datasetId)
-        .order('name');
+      let data: MarketData[] = [];
       
-      if (error) throw error;
+      switch (datasetId) {
+        case 'dental-procedures':
+          const dentalProcedures = await DentalProceduresService.getAllProcedures();
+          
+          // Transform procedures into chart-friendly data
+          const dentalProceduresByCategory = dentalProcedures.reduce((acc, proc) => {
+            if (!acc[proc.category]) {
+              acc[proc.category] = 0;
+            }
+            acc[proc.category]++;
+            return acc;
+          }, {} as Record<string, number>);
+          
+          const dentalProceduresByCost = dentalProcedures.map(proc => ({
+            name: proc.name,
+            cost: proc.averageCost.average
+          }));
+          
+          data = [
+            {
+              id: 'dental-procedures-by-category',
+              name: 'Dental Procedures by Category',
+              description: 'Distribution of dental procedures across categories',
+              data_type: 'pie_chart',
+              data: Object.entries(dentalProceduresByCategory).map(([name, value]) => ({ name, value })),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            },
+            {
+              id: 'dental-procedures-by-cost',
+              name: 'Dental Procedures by Cost',
+              description: 'Average cost of dental procedures',
+              data_type: 'bar_chart',
+              data: dentalProceduresByCost.sort((a, b) => b.cost - a.cost).slice(0, 10),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ];
+          break;
+          
+        case 'aesthetic-procedures':
+          const aestheticProcedures = await AestheticProceduresService.getAllProcedures();
+          
+          // Transform procedures into chart-friendly data
+          const aestheticProceduresByCategory = aestheticProcedures.reduce((acc, proc) => {
+            if (!acc[proc.category]) {
+              acc[proc.category] = 0;
+            }
+            acc[proc.category]++;
+            return acc;
+          }, {} as Record<string, number>);
+          
+          const aestheticProceduresByPopularity = aestheticProcedures.map(proc => ({
+            name: proc.name,
+            popularity: proc.popularity
+          }));
+          
+          data = [
+            {
+              id: 'aesthetic-procedures-by-category',
+              name: 'Aesthetic Procedures by Category',
+              description: 'Distribution of aesthetic procedures across categories',
+              data_type: 'pie_chart',
+              data: Object.entries(aestheticProceduresByCategory).map(([name, value]) => ({ name, value })),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            },
+            {
+              id: 'aesthetic-procedures-by-popularity',
+              name: 'Aesthetic Procedures by Popularity',
+              description: 'Popularity ratings of aesthetic procedures',
+              data_type: 'bar_chart',
+              data: aestheticProceduresByPopularity.sort((a, b) => b.popularity - a.popularity).slice(0, 10),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ];
+          break;
+          
+        case 'companies':
+          const companies = await CompaniesService.getAllCompanies();
+          
+          // Transform companies into chart-friendly data
+          const companiesByIndustry = companies.reduce((acc, company) => {
+            if (!acc[company.industry]) {
+              acc[company.industry] = 0;
+            }
+            acc[company.industry]++;
+            return acc;
+          }, {} as Record<string, number>);
+          
+          const companiesByRevenue = companies.map(company => ({
+            name: company.name,
+            revenue: company.annual_revenue
+          }));
+          
+          data = [
+            {
+              id: 'companies-by-industry',
+              name: 'Companies by Industry',
+              description: 'Distribution of companies across industries',
+              data_type: 'pie_chart',
+              data: Object.entries(companiesByIndustry).map(([name, value]) => ({ name, value })),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            },
+            {
+              id: 'companies-by-revenue',
+              name: 'Companies by Annual Revenue',
+              description: 'Annual revenue of top companies',
+              data_type: 'bar_chart',
+              data: companiesByRevenue
+                .filter(company => company.revenue !== undefined)
+                .sort((a, b) => (b.revenue || 0) - (a.revenue || 0))
+                .slice(0, 10),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ];
+          break;
+          
+        case 'dental-innovations':
+          const dentalInnovations = await getDentalImplantInnovations();
+          
+          data = [
+            {
+              id: 'dental-innovations-list',
+              name: 'Dental Implant Innovations',
+              description: dentalInnovations.description,
+              data_type: 'table',
+              data: dentalInnovations.innovations.map(innovation => ({
+                name: innovation.name,
+                description: innovation.description,
+                year: innovation.yearIntroduced,
+                manufacturer: innovation.manufacturer || 'N/A'
+              })),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ];
+          break;
+          
+        case 'aesthetic-trends':
+          const aestheticTrends = await getAestheticTrends();
+          
+          data = [
+            {
+              id: 'aesthetic-trends-list',
+              name: 'Aesthetic Treatment Trends',
+              description: aestheticTrends.description,
+              data_type: 'table',
+              data: aestheticTrends.trends.map(trend => ({
+                name: trend.name,
+                description: trend.description,
+                popularity: trend.popularity,
+                year: trend.yearIntroduced,
+                category: trend.category
+              })),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ];
+          break;
+          
+        case 'company-trends':
+          const companyTrends = await getCompanyTrends();
+          
+          data = [
+            {
+              id: 'company-trends-list',
+              name: 'Industry Trends',
+              description: companyTrends.description,
+              data_type: 'table',
+              data: companyTrends.trends.map(trend => ({
+                name: trend.name,
+                description: trend.description,
+                companies: trend.companies.join(', '),
+                impact: trend.impact,
+                year: trend.year
+              })),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ];
+          break;
+          
+        default:
+          // Fallback to Supabase for other datasets
+          const { data: supabaseData, error } = await supabase
+            .from('market_data')
+            .select('*')
+            .eq('dataset_id', datasetId)
+            .order('name');
+          
+          if (error) throw error;
+          
+          data = supabaseData as MarketData[];
+      }
       
-      setMarketData(data || []);
+      setMarketData(data);
     } catch (err) {
       console.error('Error fetching market data:', err);
       setError(err as Error);
