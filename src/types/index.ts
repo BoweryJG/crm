@@ -8,6 +8,8 @@
 // Re-export value types
 export * from './contacts';
 export * from './practices';
+export * from './companies';
+export * from './callAnalysis';
 
 // Export value enums from aesthetic procedures
 export { ProcedureCategory as AestheticProcedureCategory } from './procedures/aesthetic';
