@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -27,106 +28,13 @@ import {
   FilterList as FilterListIcon,
   Business as BusinessIcon,
   ImportExport as ImportExportIcon,
-  Phone as PhoneIcon,
   Email as EmailIcon,
   Star as StarIcon,
   StarBorder as StarBorderIcon
 } from '@mui/icons-material';
-import { Contact } from '../types/contacts';
-
-// Mock data for development purposes
-const mockContacts: Contact[] = [
-  {
-    id: '1',
-    firstName: 'Robert',
-    lastName: 'Johnson',
-    email: 'rjohnson@nycimplants.com',
-    phone: '212-555-1234',
-    role: 'Lead Periodontist',
-    practiceId: '1',
-    practiceName: 'NYC Dental Implants Center',
-    practiceType: 'dental',
-    specialty: 'Periodontist',
-    notes: 'Interested in Straumann BLX implant system. Prefers early morning meetings.',
-    isStarred: true,
-    lastContactDate: '2025-04-01T09:30:00Z',
-    tags: ['Implants', 'Surgical'],
-    createdAt: '2025-01-15T14:30:00Z',
-    updatedAt: '2025-04-01T15:45:00Z'
-  },
-  {
-    id: '2',
-    firstName: 'Sarah',
-    lastName: 'Chang',
-    email: 'schang@columbia.edu',
-    phone: '212-305-7676',
-    role: 'Program Director',
-    practiceId: '3',
-    practiceName: 'Columbia Dental Implant Center',
-    practiceType: 'dental',
-    specialty: 'Prosthodontist',
-    notes: 'Very influential in the teaching program. Conducts regular lunch and learns.',
-    isStarred: true,
-    lastContactDate: '2025-03-15T12:00:00Z',
-    tags: ['Academic', 'Implants', 'Prosthetics'],
-    createdAt: '2025-01-10T11:20:00Z',
-    updatedAt: '2025-03-15T14:30:00Z'
-  },
-  {
-    id: '3',
-    firstName: 'Mark',
-    lastName: 'Stein',
-    email: 'mstein@nyoms.com',
-    phone: '212-888-4760',
-    role: 'Oral Surgeon',
-    practiceId: '2',
-    practiceName: 'New York Oral & Maxillofacial Surgery',
-    practiceType: 'dental',
-    specialty: 'Oral Surgeon',
-    notes: 'Interested in guided surgery solutions. Performs zygomatic implants.',
-    isStarred: false,
-    lastContactDate: '2025-03-28T14:00:00Z',
-    tags: ['Implants', 'Surgical', 'Zygomatic'],
-    createdAt: '2025-02-05T09:45:00Z',
-    updatedAt: '2025-03-28T16:30:00Z'
-  },
-  {
-    id: '4',
-    firstName: 'Jennifer',
-    lastName: 'Smith',
-    email: 'jsmith@manhattanaesthetics.com',
-    phone: '212-777-8899',
-    role: 'Lead Injector',
-    practiceId: '4',
-    practiceName: 'Manhattan Aesthetics',
-    practiceType: 'aesthetic',
-    specialty: 'Injector',
-    notes: 'Specializes in facial rejuvenation. Looking for premium filler products.',
-    isStarred: true,
-    lastContactDate: '2025-04-03T11:15:00Z',
-    tags: ['Injectables', 'Fillers', 'Premium'],
-    createdAt: '2025-01-25T13:10:00Z',
-    updatedAt: '2025-04-03T12:30:00Z'
-  },
-  {
-    id: '5',
-    firstName: 'Michael',
-    lastName: 'Reynolds',
-    email: 'mreynolds@nylaserdermatology.com',
-    phone: '212-333-4567',
-    role: 'Medical Director',
-    practiceId: '5',
-    practiceName: 'NY Laser Dermatology',
-    practiceType: 'aesthetic',
-    specialty: 'Dermatologist',
-    notes: 'Interested in next-gen laser technology. High-volume practice.',
-    isStarred: false,
-    lastContactDate: '2025-03-27T15:30:00Z',
-    tags: ['Lasers', 'Technology', 'Skin'],
-    createdAt: '2025-02-12T10:15:00Z',
-    updatedAt: '2025-03-27T16:45:00Z'
-  }
-];
+import CallButton from '../components/contacts/CallButton';
+import { Contact } from '../types/models';
+import { supabase } from '../services/supabase/supabase';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -159,6 +67,7 @@ function a11yProps(index: number) {
 
 const Contacts: React.FC = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(true);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -170,14 +79,38 @@ const Contacts: React.FC = () => {
     const fetchContacts = async () => {
       try {
         setLoading(true);
-        // In a real app, this would be a call to supabase or another API
-        // const { data, error } = await supabase.from('contacts').select('*');
+        // Fetch contacts from the public_contacts table
+        const { data, error } = await supabase
+          .from('public_contacts')
+          .select('*');
         
-        // For now, use mock data
-        setTimeout(() => {
-          setContacts(mockContacts);
-          setLoading(false);
-        }, 600); // Simulate network delay
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          // Map the data to include practice type based on contact type
+          const mappedData = data.map(contact => {
+            // Determine practice type based on contact type
+            let practiceType = 'dental';
+            if (['aesthetic_doctor', 'plastic_surgeon', 'dermatologist', 
+                 'cosmetic_dermatologist', 'nurse_practitioner', 
+                 'physician_assistant', 'aesthetician'].includes(contact.type)) {
+              practiceType = 'aesthetic';
+            }
+            
+            // Map is_starred to isStarred for compatibility with existing code
+            return {
+              ...contact,
+              isStarred: contact.is_starred,
+              practiceType
+            };
+          });
+          
+          setContacts(mappedData);
+        }
+        
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching contacts:', error);
         setLoading(false);
@@ -203,20 +136,39 @@ const Contacts: React.FC = () => {
     setFilterSpecialty(event.target.value);
   };
 
-  const toggleStarred = (id: string) => {
-    setContacts((prevContacts) =>
-      prevContacts.map((contact) =>
-        contact.id === id ? { ...contact, isStarred: !contact.isStarred } : contact
-      )
-    );
+  const toggleStarred = async (id: string) => {
+    try {
+      // Find the contact to toggle
+      const contactToUpdate = contacts.find(c => c.id === id);
+      if (!contactToUpdate) return;
+
+      // Update the contact in the database
+      const { error } = await supabase
+        .from('public_contacts')
+        .update({ is_starred: !contactToUpdate.isStarred })
+        .eq('id', id);
+
+      if (error) {
+        throw error;
+      }
+
+      // Update the local state
+      setContacts((prevContacts) =>
+        prevContacts.map((contact) =>
+          contact.id === id ? { ...contact, isStarred: !contact.isStarred } : contact
+        )
+      );
+    } catch (error) {
+      console.error('Error toggling starred status:', error);
+    }
   };
 
   const filteredContacts = contacts.filter((contact) => {
     const matchesSearch =
       searchTerm === '' ||
-      `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.practiceName.toLowerCase().includes(searchTerm.toLowerCase());
+      `${contact.first_name} ${contact.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (contact.email && contact.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (contact.practice_name && contact.practice_name.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesTab =
       (tabValue === 0) || // All contacts
@@ -227,14 +179,18 @@ const Contacts: React.FC = () => {
     const matchesType =
       filterType === 'all' || contact.practiceType === filterType;
 
+    // For specialty, we'll use the contact type as a fallback
+    const contactSpecialty = contact.specialization || contact.type;
     const matchesSpecialty =
-      filterSpecialty === 'all' || contact.specialty === filterSpecialty;
+      filterSpecialty === 'all' || contactSpecialty === filterSpecialty;
 
     return matchesSearch && matchesTab && matchesType && matchesSpecialty;
   });
 
   // Extract unique specialties for filter dropdown
-  const specialties = Array.from(new Set(contacts.map((contact) => contact.specialty)));
+  const specialties = Array.from(new Set(contacts.map((contact) => 
+    contact.specialization || contact.type
+  )));
 
   const getContactInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -333,7 +289,7 @@ const Contacts: React.FC = () => {
                       <MenuItem value="all">All Specialties</MenuItem>
                       {specialties.map((specialty) => (
                         <MenuItem key={specialty} value={specialty}>
-                          {specialty}
+                          {specialty ? specialty.replace('_', ' ') : 'Unknown'}
                         </MenuItem>
                       ))}
                     </Select>
@@ -416,6 +372,11 @@ const ContactsList: React.FC<ContactsListProps> = ({
   getContactInitials,
   getAvatarColor
 }) => {
+  const navigate = useNavigate();
+  
+  const handleContactClick = (id: string) => {
+    navigate(`/contacts/${id}`);
+  };
   const theme = useTheme();
 
   if (contacts.length === 0) {
@@ -437,9 +398,11 @@ const ContactsList: React.FC<ContactsListProps> = ({
               transition: 'all 0.2s ease-in-out',
               '&:hover': {
                 boxShadow: theme.shadows[4],
-                transform: 'translateY(-2px)'
+                transform: 'translateY(-2px)',
+                cursor: 'pointer'
               }
             }}
+            onClick={() => handleContactClick(contact.id)}
           >
             <CardContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
@@ -450,18 +413,23 @@ const ContactsList: React.FC<ContactsListProps> = ({
                       bgcolor: getAvatarColor(contact.id),
                     }}
                   >
-                    {getContactInitials(contact.firstName, contact.lastName)}
+                    {getContactInitials(contact.first_name, contact.last_name)}
                   </Avatar>
                   <Box>
                     <Typography variant="h6">
-                      {contact.firstName} {contact.lastName}
+                      {contact.first_name} {contact.last_name}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {contact.role}
+                      {contact.title}
                     </Typography>
                   </Box>
                 </Box>
-                <IconButton onClick={() => toggleStarred(contact.id)}>
+                <IconButton 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleStarred(contact.id);
+                  }}
+                >
                   {contact.isStarred ? (
                     <StarIcon sx={{ color: theme.palette.warning.main }} />
                   ) : (
@@ -473,15 +441,19 @@ const ContactsList: React.FC<ContactsListProps> = ({
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <BusinessIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
                 <Typography variant="body2" color="text.secondary">
-                  {contact.practiceName}
+                  {contact.practice_name}
                 </Typography>
               </Box>
 
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <PhoneIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
-                <Typography variant="body2">
-                  {contact.phone}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Box onClick={(e) => e.stopPropagation()}>
+                    <CallButton contact={contact} />
+                  </Box>
+                  <Typography variant="body2" sx={{ ml: 1 }}>
+                    {contact.phone}
+                  </Typography>
+                </Box>
               </Box>
 
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>

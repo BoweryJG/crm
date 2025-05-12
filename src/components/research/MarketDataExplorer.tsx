@@ -39,7 +39,7 @@ import { ResearchProject, ResearchDocument, ResearchDocumentType } from '../../t
 import { supabase } from '../../services/supabase/supabase';
 import { DentalProceduresService, getDentalImplantInnovations } from '../../services/knowledgeBase/dentalProcedures';
 import { AestheticProceduresService, getAestheticTrends } from '../../services/knowledgeBase/aestheticProcedures';
-import { CompaniesService, getCompanyTrends } from '../../services/knowledgeBase/companiesService';
+import { CompaniesService } from '../../services/knowledgeBase/companiesService';
 
 interface MarketDataExplorerProps {
   project?: ResearchProject;
@@ -370,20 +370,20 @@ const MarketDataExplorer: React.FC<MarketDataExplorerProps> = ({
           break;
           
         case 'company-trends':
-          const companyTrends = await getCompanyTrends();
+          const companyTrends = await CompaniesService.getCompanyTrends();
           
           data = [
             {
               id: 'company-trends-list',
               name: 'Industry Trends',
-              description: companyTrends.description,
+              description: 'Market trends affecting dental and aesthetic companies',
               data_type: 'table',
-              data: companyTrends.trends.map(trend => ({
-                name: trend.name,
-                description: trend.description,
-                companies: trend.companies.join(', '),
-                impact: trend.impact,
-                year: trend.year
+              data: companyTrends.map((trend: any) => ({
+                name: trend.name || 'Unknown',
+                description: trend.description || 'No description available',
+                companies: trend.companies ? trend.companies.join(', ') : 'N/A',
+                impact: trend.impact || 'Unknown',
+                year: trend.year || 'N/A'
               })),
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
