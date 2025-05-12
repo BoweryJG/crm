@@ -16,12 +16,27 @@ export interface Contact extends BaseModel {
   email: string;
   phone: string;
   profile_image_url?: string;
-  specialization: 'dental' | 'aesthetic' | 'both' | 'other';
-  practice_id: string;
+  specialization?: 'dental' | 'aesthetic' | 'both' | 'other';
+  practice_id?: string;
+  practice_name?: string;
   notes?: string;
   last_contacted?: string; // Date
-  status: 'active' | 'inactive' | 'lead' | 'prospect';
+  last_interaction_date?: string;
+  last_interaction_type?: string;
+  status: 'active' | 'inactive' | 'lead' | 'prospect' | 'customer' | 'do_not_contact';
   tags?: string[];
+  type?: string;
+  decision_maker?: boolean;
+  influencer?: boolean;
+  purchaser?: boolean;
+  birthday?: string;
+  custom?: any;
+  created_by?: string;
+  assigned_to?: string;
+  is_starred?: boolean;
+  // Properties for UI compatibility
+  isStarred?: boolean;
+  practiceType?: 'dental' | 'aesthetic' | 'both' | 'other';
 }
 
 // Practice Types

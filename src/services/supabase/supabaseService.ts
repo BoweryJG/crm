@@ -10,6 +10,19 @@ import {
   UserProfile
 } from '../../types/models';
 
+// Interface for call activity data
+export interface CallActivityData {
+  contact_id: string;
+  practice_id: string;
+  date: string;
+  duration?: number;
+  notes: string;
+  outcome: 'successful' | 'unsuccessful' | 'follow_up_required' | 'no_decision';
+  call_sid?: string;
+  call_status?: string;
+  next_steps?: string;
+}
+
 // Generic type for database fetching functions
 type FetchResult<T> = {
   data: T[] | null;
@@ -184,6 +197,67 @@ export const fetchMarketIntelligenceByCategory = async (category: string): Promi
     .select('*')
     .eq('category', category)
     .order('publication_date', { ascending: false });
+    
+  return { data, error };
+};
+
+// Sales Activities for calls
+export const createCallActivity = async (
+  callData: CallActivityData
+): Promise<{ data: SalesActivity | null; error: Error | null }> => {
+  const salesActivity: Omit<SalesActivity, 'id' | 'created_at' | 'updated_at'> = {
+    type: 'call',
+    contact_id: callData.contact_id,
+    practice_id: callData.practice_id,
+    date: callData.date,
+    duration: callData.duration,
+    notes: callData.notes,
+    outcome: callData.outcome,
+    next_steps: callData.next_steps,
+    // Additional metadata can be stored in the notes field if needed
+  };
+
+  const { data, error } = await supabase
+    .from('sales_activities')
+    .insert(salesActivity)
+    .select()
+    .single();
+    
+  return { data, error };
+};
+
+export const updateCallActivity = async (
+  id: string, 
+  updates: Partial<CallActivityData>
+): Promise<{ data: SalesActivity | null; error: Error | null }> => {
+  const { data, error } = await supabase
+    .from('sales_activities')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+    
+  return { data, error };
+};
+
+export const fetchCallActivities = async (contactId: string): Promise<FetchResult<SalesActivity>> => {
+  const { data, error } = await supabase
+    .from('sales_activities')
+    .select('*')
+    .eq('contact_id', contactId)
+    .eq('type', 'call')
+    .order('date', { ascending: false });
+    
+  return { data, error };
+};
+
+export const fetchRecentCallActivities = async (limit: number = 10): Promise<FetchResult<SalesActivity>> => {
+  const { data, error } = await supabase
+    .from('sales_activities')
+    .select('*')
+    .eq('type', 'call')
+    .order('date', { ascending: false })
+    .limit(limit);
     
   return { data, error };
 };
