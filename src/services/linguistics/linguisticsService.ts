@@ -1,142 +1,253 @@
-/**
- * RepSpheres CRM - Linguistics Service
- * 
- * This service interfaces with the external linguistics module at
- * https://linguistics.repspheres.com/ to provide linguistic analysis
- * of sales calls.
- */
-
-import axios from 'axios';
+import { supabase } from '../supabase/supabase';
 import { LinguisticsAnalysis } from '../../types';
 
-// Base URL for the linguistics API
-const LINGUISTICS_API_URL = 'https://linguistics.repspheres.com/api';
+export class LinguisticsService {
+  /**
+   * Get all linguistics analyses
+   */
+  static async getAllLinguisticsAnalyses(): Promise<LinguisticsAnalysis[]> {
+    try {
+      const { data, error } = await supabase
+        .from('linguistics_analyses')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-/**
- * Service for linguistics analysis operations
- */
-export const LinguisticsService = {
-  /**
-   * Get linguistics analysis for a call
-   */
-  async getAnalysisById(analysisId: string): Promise<LinguisticsAnalysis | null> {
-    try {
-      const response = await axios.get(`${LINGUISTICS_API_URL}/analysis/${analysisId}`);
-      return response.data as LinguisticsAnalysis;
+      if (error) {
+        throw new Error(`Error fetching linguistics analyses: ${error.message}`);
+      }
+
+      return data || [];
     } catch (error) {
-      console.error(`Error fetching linguistics analysis ${analysisId}:`, error);
-      return null;
+      console.error('Error in getAllLinguisticsAnalyses:', error);
+      return [];
     }
-  },
-  
+  }
+
   /**
-   * Submit a call recording for analysis
+   * Get a linguistics analysis by ID
    */
-  async submitCallForAnalysis(callId: string, recordingUrl: string, transcript?: string): Promise<{ analysisId: string } | null> {
+  static async getLinguisticsAnalysisById(id: string): Promise<LinguisticsAnalysis | null> {
     try {
-      const response = await axios.post(`${LINGUISTICS_API_URL}/analyze`, {
-        call_id: callId,
-        recording_url: recordingUrl,
-        transcript: transcript
-      });
-      
-      return {
-        analysisId: response.data.analysis_id
-      };
+      const { data, error } = await supabase
+        .from('linguistics_analyses')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        throw new Error(`Error fetching linguistics analysis: ${error.message}`);
+      }
+
+      return data;
     } catch (error) {
-      console.error('Error submitting call for linguistics analysis:', error);
-      return null;
-    }
-  },
-  
-  /**
-   * Get analysis status
-   */
-  async getAnalysisStatus(analysisId: string): Promise<'pending' | 'processing' | 'completed' | 'failed'> {
-    try {
-      const response = await axios.get(`${LINGUISTICS_API_URL}/analysis/${analysisId}/status`);
-      return response.data.status;
-    } catch (error) {
-      console.error(`Error fetching linguistics analysis status for ${analysisId}:`, error);
-      return 'failed';
-    }
-  },
-  
-  /**
-   * Get key phrases from a call analysis
-   */
-  async getKeyPhrases(analysisId: string): Promise<LinguisticsAnalysis['key_phrases'] | null> {
-    try {
-      const response = await axios.get(`${LINGUISTICS_API_URL}/analysis/${analysisId}/key-phrases`);
-      return response.data.key_phrases;
-    } catch (error) {
-      console.error(`Error fetching key phrases for analysis ${analysisId}:`, error);
-      return null;
-    }
-  },
-  
-  /**
-   * Get sentiment analysis from a call analysis
-   */
-  async getSentimentAnalysis(analysisId: string): Promise<LinguisticsAnalysis['sentiment_analysis'] | null> {
-    try {
-      const response = await axios.get(`${LINGUISTICS_API_URL}/analysis/${analysisId}/sentiment`);
-      return response.data.sentiment_analysis;
-    } catch (error) {
-      console.error(`Error fetching sentiment analysis for analysis ${analysisId}:`, error);
-      return null;
-    }
-  },
-  
-  /**
-   * Get action items from a call analysis
-   */
-  async getActionItems(analysisId: string): Promise<LinguisticsAnalysis['action_items'] | null> {
-    try {
-      const response = await axios.get(`${LINGUISTICS_API_URL}/analysis/${analysisId}/action-items`);
-      return response.data.action_items;
-    } catch (error) {
-      console.error(`Error fetching action items for analysis ${analysisId}:`, error);
-      return null;
-    }
-  },
-  
-  /**
-   * Get questions from a call analysis
-   */
-  async getQuestions(analysisId: string): Promise<LinguisticsAnalysis['questions_asked'] | null> {
-    try {
-      const response = await axios.get(`${LINGUISTICS_API_URL}/analysis/${analysisId}/questions`);
-      return response.data.questions;
-    } catch (error) {
-      console.error(`Error fetching questions for analysis ${analysisId}:`, error);
-      return null;
-    }
-  },
-  
-  /**
-   * Get language metrics from a call analysis
-   */
-  async getLanguageMetrics(analysisId: string): Promise<LinguisticsAnalysis['language_metrics'] | null> {
-    try {
-      const response = await axios.get(`${LINGUISTICS_API_URL}/analysis/${analysisId}/metrics`);
-      return response.data.language_metrics;
-    } catch (error) {
-      console.error(`Error fetching language metrics for analysis ${analysisId}:`, error);
-      return null;
-    }
-  },
-  
-  /**
-   * Get topic segments from a call analysis
-   */
-  async getTopicSegments(analysisId: string): Promise<LinguisticsAnalysis['topic_segments'] | null> {
-    try {
-      const response = await axios.get(`${LINGUISTICS_API_URL}/analysis/${analysisId}/topics`);
-      return response.data.topic_segments;
-    } catch (error) {
-      console.error(`Error fetching topic segments for analysis ${analysisId}:`, error);
+      console.error('Error in getLinguisticsAnalysisById:', error);
       return null;
     }
   }
-};
+
+  /**
+   * Create a new linguistics analysis
+   */
+  static async createLinguisticsAnalysis(analysis: Omit<LinguisticsAnalysis, 'id'>): Promise<LinguisticsAnalysis | null> {
+    try {
+      const { data, error } = await supabase
+        .from('linguistics_analyses')
+        .insert([analysis])
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(`Error creating linguistics analysis: ${error.message}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in createLinguisticsAnalysis:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Update a linguistics analysis
+   */
+  static async updateLinguisticsAnalysis(id: string, updates: Partial<LinguisticsAnalysis>): Promise<LinguisticsAnalysis | null> {
+    try {
+      const { data, error } = await supabase
+        .from('linguistics_analyses')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(`Error updating linguistics analysis: ${error.message}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in updateLinguisticsAnalysis:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Delete a linguistics analysis
+   */
+  static async deleteLinguisticsAnalysis(id: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('linguistics_analyses')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        throw new Error(`Error deleting linguistics analysis: ${error.message}`);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in deleteLinguisticsAnalysis:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get linguistics analyses by call ID
+   */
+  static async getLinguisticsAnalysesByCallId(callId: string): Promise<LinguisticsAnalysis[]> {
+    try {
+      const { data, error } = await supabase
+        .from('linguistics_analyses')
+        .select('*')
+        .eq('call_id', callId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw new Error(`Error fetching linguistics analyses by call ID: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getLinguisticsAnalysesByCallId:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get linguistics sentiment trends
+   */
+  static async getSentimentTrends(timeframe: 'day' | 'week' | 'month' = 'week'): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .rpc('get_sentiment_trends', { timeframe_param: timeframe });
+
+      if (error) {
+        throw new Error(`Error fetching sentiment trends: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getSentimentTrends:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get key phrase frequency
+   */
+  static async getKeyPhraseFrequency(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .rpc('get_key_phrase_frequency');
+
+      if (error) {
+        throw new Error(`Error fetching key phrase frequency: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getKeyPhraseFrequency:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Submit a call for linguistics analysis
+   */
+  static async submitCallForAnalysis(callId: string, audioUrl: string, transcript?: string): Promise<{ analysisId: string; status: string }> {
+    try {
+      // Create a new analysis request in the database
+      const { data, error } = await supabase
+        .from('linguistics_analysis_queue')
+        .insert([
+          { 
+            call_id: callId, 
+            audio_url: audioUrl,
+            transcript: transcript,
+            status: 'pending'
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(`Error submitting call for analysis: ${error.message}`);
+      }
+
+      return {
+        analysisId: data.id,
+        status: data.status
+      };
+    } catch (error) {
+      console.error('Error in submitCallForAnalysis:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get analysis by ID
+   */
+  static async getAnalysisById(analysisId: string): Promise<any> {
+    try {
+      const { data, error } = await supabase
+        .from('linguistics_analysis_queue')
+        .select('*, linguistics_analyses(*)')
+        .eq('id', analysisId)
+        .single();
+
+      if (error) {
+        throw new Error(`Error fetching analysis: ${error.message}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in getAnalysisById:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get analysis status
+   */
+  static async getAnalysisStatus(analysisId: string): Promise<'pending' | 'processing' | 'completed' | 'failed' | 'not_found'> {
+    try {
+      const { data, error } = await supabase
+        .from('linguistics_analysis_queue')
+        .select('status')
+        .eq('id', analysisId)
+        .single();
+
+      if (error) {
+        console.error(`Error fetching analysis status: ${error.message}`);
+        return 'not_found';
+      }
+
+      // Ensure the status is one of the expected values
+      const status = data.status as 'pending' | 'processing' | 'completed' | 'failed';
+      return status || 'not_found';
+    } catch (error) {
+      console.error('Error in getAnalysisStatus:', error);
+      return 'not_found';
+    }
+  }
+}

@@ -20,6 +20,8 @@ const DentalImplantMarketDashboard = lazy(() => import('./components/marketResea
 const PracticeInteractionTracker = lazy(() => import('./components/marketResearch/PracticeInteractionTracker'));
 const PromptManagement = lazy(() => import('./pages/AI/PromptManagement'));
 const Research = lazy(() => import('./pages/Research'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+const CallAnalysis = lazy(() => import('./pages/CallAnalysis'));
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -54,10 +56,10 @@ const App: React.FC = () => {
                 <Route index element={<Dashboard />} />
                 <Route path="contacts" element={<React.Suspense fallback={<div>Loading...</div>}><Contacts /></React.Suspense>} />
                 <Route path="practices" element={<React.Suspense fallback={<div>Loading...</div>}><Practices /></React.Suspense>} />
-                <Route path="analytics" element={<div>Analytics Page (Coming Soon)</div>} />
+                <Route path="analytics" element={<Suspense fallback={<div>Loading...</div>}><Analytics /></Suspense>} />
                 <Route path="research" element={<Suspense fallback={<div>Loading...</div>}><Research /></Suspense>} />
                 <Route path="content" element={<Suspense fallback={<div>Loading...</div>}><PromptManagement /></Suspense>} />
-                <Route path="call-analysis" element={<div>Call Analysis (Coming Soon)</div>} />
+                <Route path="call-analysis" element={<Suspense fallback={<div>Loading...</div>}><CallAnalysis /></Suspense>} />
                 <Route path="market" element={<div>Market Intelligence (Coming Soon)</div>} />
                 <Route path="market/dental-implants" element={<React.Suspense fallback={<div>Loading...</div>}><DentalImplantMarketDashboard /></React.Suspense>} />
                 <Route path="market/practice-interaction" element={<React.Suspense fallback={<div>Loading...</div>}><PracticeInteractionTracker /></React.Suspense>} />
