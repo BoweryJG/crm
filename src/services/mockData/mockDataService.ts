@@ -182,9 +182,13 @@ export const generateMockContacts = (count: number = 20): Contact[] => {
       ? dentalRoles[getRandomInt(0, dentalRoles.length - 1)]
       : aestheticRoles[getRandomInt(0, aestheticRoles.length - 1)];
     
-    const specialty = practiceType === 'dental'
+    // Get a detailed specialty for notes/display purposes
+    const specialtyDetail = practiceType === 'dental'
       ? dentalSpecialties[getRandomInt(0, dentalSpecialties.length - 1)]
       : aestheticSpecialties[getRandomInt(0, aestheticSpecialties.length - 1)];
+      
+    // Use proper specialization type for Contact interface
+    const specialization = practiceType as 'dental' | 'aesthetic' | 'both' | 'other';
     
     // Choose practice name based on type
     const practiceNames = practiceType === 'dental' ? dentalPracticeNames : aestheticPracticeNames;
@@ -198,7 +202,7 @@ export const generateMockContacts = (count: number = 20): Contact[] => {
     // Generate appropriate notes based on industry
     let notes = '';
     if (practiceType === 'dental') {
-      notes = `${firstName} is a ${role} specializing in ${specialty}. `;
+      notes = `${firstName} is a ${role} specializing in ${specialtyDetail}. `;
       notes += [
         'Interested in digital scanning technology.',
         'Looking to expand practice with additional chair.',
@@ -209,7 +213,7 @@ export const generateMockContacts = (count: number = 20): Contact[] => {
         'Recently renovated office space.'
       ][getRandomInt(0, 6)];
     } else {
-      notes = `${firstName} is a ${role} specializing in ${specialty}. `;
+      notes = `${firstName} is a ${role} specializing in ${specialtyDetail}. `;
       notes += [
         'Interested in new injectable products.',
         'Looking to add body contouring services.',
@@ -224,6 +228,10 @@ export const generateMockContacts = (count: number = 20): Contact[] => {
     // Add location context to notes
     notes += ` Based in ${location.city}, ${location.state}.`;
     
+    // Define possible statuses as the required string literals
+    const statuses: Array<'active' | 'inactive' | 'lead' | 'prospect' | 'customer' | 'do_not_contact'> = 
+      ['active', 'inactive', 'lead', 'prospect', 'customer', 'do_not_contact'];
+    
     return {
       id: `contact-${i + 1}`,
       first_name: firstName,
@@ -233,17 +241,18 @@ export const generateMockContacts = (count: number = 20): Contact[] => {
       title: role,
       practice_id: practiceId,
       practice_name: practiceName,
-      practiceType,
-      specialization: specialty,
+      specialization: specialization,
+      // Store practiceType as a tag for reference
+      tags: Array.from({ length: getRandomInt(1, 4) }, () => 
+        ['VIP', 'New', 'Follow-up', 'Potential', 'Key Decision Maker', 'Influencer', 
+         'Tech Adopter', 'Budget Conscious', 'Growth Focused', location.state, practiceType][getRandomInt(0, 10)]
+      ),
       is_starred: Math.random() > 0.7, // 30% chance of being starred
       last_contacted: getRandomDate(30),
       notes,
-      tags: Array.from({ length: getRandomInt(1, 4) }, () => 
-        ['VIP', 'New', 'Follow-up', 'Potential', 'Key Decision Maker', 'Influencer', 
-         'Tech Adopter', 'Budget Conscious', 'Growth Focused', location.state][getRandomInt(0, 9)]
-      ),
       created_at: getRandomDate(365),
       updated_at: getRandomDate(30),
+      status: statuses[getRandomInt(0, statuses.length - 1)], // Add required status field
     };
   });
 };
@@ -500,7 +509,7 @@ export const generateRecentActivities = (count: number = 5) => {
     switch (activityType) {
       case 'New contact added':
       case 'Contact updated':
-        description = `Dr. ${contact.firstName} ${contact.lastName} to contacts`;
+        description = `Dr. ${contact.first_name} ${contact.last_name} to contacts`;
         break;
       case 'New practice added':
       case 'Practice updated':
@@ -508,10 +517,10 @@ export const generateRecentActivities = (count: number = 5) => {
         break;
       case 'Call scheduled':
       case 'Meeting completed':
-        description = `with Dr. ${contact.firstName} ${contact.lastName}`;
+        description = `with Dr. ${contact.first_name} ${contact.last_name}`;
         break;
       case 'Email sent':
-        description = `to Dr. ${contact.firstName} ${contact.lastName}`;
+        description = `to Dr. ${contact.first_name} ${contact.last_name}`;
         break;
       case 'Contract signed':
         description = `with ${generateMockPractices(1)[0].name}`;
@@ -551,7 +560,7 @@ export const generateUpcomingTasks = (count: number = 5) => {
     return {
       id: `task-${i + 1}`,
       type: taskType,
-      description: `Dr. ${contact.lastName} about ${taskType.toLowerCase().includes('product') ? 'new product line' : 'recent inquiry'}`,
+      description: `Dr. ${contact.last_name} about ${taskType.toLowerCase().includes('product') ? 'new product line' : 'recent inquiry'}`,
       dueDate,
       priority: ['High', 'Medium', 'Low'][getRandomInt(0, 2)]
     };
@@ -576,8 +585,8 @@ export const generateMockCallAnalyses = (count: number = 10): CallAnalysis[] => 
   
   for (let i = 0; i < count; i++) {
     const contactIndex = getRandomInt(0, mockContacts.length - 1);
-    const contact = mockContacts[contactIndex];
-    const contactId = contact.id;
+    const selectedContact = mockContacts[contactIndex];
+    const contactId = selectedContact.id;
     
     // Create a call date within the last 30 days
     const callDate = getRandomDate(30);
@@ -671,19 +680,18 @@ export const generateMockCallAnalyses = (count: number = 10): CallAnalysis[] => 
       }
     }
     
-    // Get the contact to reference in the title
-    const contact = mockContacts[contactIndex];
+    // Use the already referenced contact
     
     analyses.push({
       id: `call-${i}-${Date.now()}`,
-      title: `Call with ${contact.firstName} ${contact.lastName} - ${new Date(callDate).toLocaleDateString()}`,
+      title: `Call with ${selectedContact.first_name} ${selectedContact.last_name} - ${new Date(callDate).toLocaleDateString()}`,
       call_date: callDate,
       duration: getRandomInt(60, 1800), // 1-30 minutes in seconds
       contact_id: contactId,
       practice_id: `practice-${getRandomInt(1, 10)}`,
       recording_url: `https://example.com/recordings/call-${i}.mp3`,
       transcript: `This is a mock transcript for call ${i}. It would contain the full conversation text.`,
-      summary: `Mock summary of call with ${contact.firstName} ${contact.lastName} discussing ${keyTopics.join(', ')}.`,
+      summary: `Mock summary of call with ${selectedContact.first_name} ${selectedContact.last_name} discussing ${keyTopics.join(', ')}.`,
       sentiment_score: sentimentScore,
       linguistics_analysis_id: `ling-analysis-${i}-${Date.now()}`,
       tags: [...keyTopics.slice(0, 2), sentimentScore > 0.3 ? 'positive' : sentimentScore < -0.3 ? 'negative' : 'neutral'],
@@ -706,7 +714,7 @@ export const generateMockCallAnalyses = (count: number = 10): CallAnalysis[] => 
 export const generateMockLinguisticsAnalyses = (callAnalyses: CallAnalysis[]): LinguisticsAnalysis[] => {
   return callAnalyses.map(call => ({
     id: `ling-${call.id}`,
-    call_id: call.call_id,
+    call_id: call.id, // Use the call's ID since call_id doesn't exist
     analysis_date: new Date(new Date(call.call_date).getTime() + 1000 * 60 * 60).toISOString(), // 1 hour after call
     sentiment_score: call.sentiment_score || 0,
     key_topics: call.key_topics || [],
@@ -749,7 +757,7 @@ export const generateMockSalesActivities = (count: number = 20): SalesActivity[]
       type,
       date,
       duration,
-      notes: `Mock ${type} with ${contact.firstName} ${contact.lastName}`,
+      notes: `Mock ${type} with ${contact.first_name} ${contact.last_name}`,
       outcome: type === 'call' || type === 'meeting' ? ['Positive', 'Neutral', 'Needs Follow-up'][getRandomInt(0, 2)] : undefined,
       created_at: date,
       updated_at: date
