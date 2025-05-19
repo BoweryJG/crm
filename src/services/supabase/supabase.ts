@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient, Session, User, AuthChangeEvent } from '@supabase/supabase-js';
+import { generateMockContacts, generateMockPractices } from '../mockData/mockDataService';
 
 // Replace these with your Supabase credentials
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://example.supabase.co';
@@ -109,24 +110,214 @@ const createMockClient = (): SupabaseClient => {
       }
     },
     
-    // Add other methods as needed
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    from: (table: string) => ({
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      select: (columns?: string) => ({
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        eq: (column: string, value: any) => ({
-          single: () => Promise.resolve({ data: {}, error: null }),
-          data: [], 
-          error: null
-        }),
-        data: [], 
-        error: null
-      }),
-      insert: (data: any) => Promise.resolve({ data, error: null }),
-      update: (data: any) => Promise.resolve({ data, error: null }),
-      delete: () => Promise.resolve({ data: null, error: null })
-    })
+    // Mock database with our enhanced mock data
+    from: (table: string) => {
+      // Generate mock data for tables and transform field names to match database conventions
+      const transformContactToDatabaseFormat = (contact: any) => ({
+        id: contact.id,
+        first_name: contact.firstName,
+        last_name: contact.lastName,
+        email: contact.email,
+        phone: contact.phone,
+        role: contact.role,
+        practice_id: contact.practiceId,
+        practice_name: contact.practiceName,
+        practice_type: contact.practiceType,
+        specialty: contact.specialty,
+        is_starred: contact.isStarred,
+        last_contact_date: contact.lastContactDate,
+        notes: contact.notes,
+        tags: contact.tags,
+        created_at: contact.createdAt,
+        updated_at: contact.updatedAt
+      });
+      
+      const transformPracticeToDatabaseFormat = (practice: any) => ({
+        id: practice.id,
+        name: practice.name,
+        address: practice.address,
+        city: practice.city,
+        state: practice.state,
+        zip_code: practice.zipCode,
+        phone: practice.phone,
+        email: practice.email,
+        website: practice.website,
+        type: practice.type,
+        size: practice.size,
+        is_dso: practice.isDSO,
+        num_practitioners: practice.numPractitioners,
+        specialties: practice.specialties,
+        technologies: practice.technologies,
+        procedures: practice.procedures,
+        notes: practice.notes,
+        last_contact_date: practice.lastContactDate,
+        created_at: practice.createdAt,
+        updated_at: practice.updatedAt
+      });
+      
+      // Generate and transform mock data
+      const mockContacts = generateMockContacts(20).map(transformContactToDatabaseFormat);
+      const mockPractices = generateMockPractices(20).map(transformPracticeToDatabaseFormat);
+      
+      const mockData: Record<string, any[]> = {
+        contacts: mockContacts,
+        practices: mockPractices,
+        public_contacts: mockContacts, // For compatibility with Contacts.tsx
+        // Add other tables as needed
+      };
+      
+      // Get data for the requested table
+      const tableData = mockData[table] || [];
+      
+      return {
+        select: (columns?: string) => {
+          let queryBuilder = {
+            data: tableData,
+            error: null,
+            
+            // Filter by equality
+            eq: (column: string, value: any) => {
+              const filteredData = tableData.filter(item => item[column] === value);
+              
+              return {
+                ...queryBuilder,
+                data: filteredData,
+                
+                // Return single result
+                single: () => {
+                  return Promise.resolve({
+                    data: filteredData.length > 0 ? filteredData[0] : null,
+                    error: null
+                  });
+                },
+                
+                // Add order method to maintain chainability
+                order: (_column: string, _options: { ascending: boolean }) => {
+                  return {
+                    ...queryBuilder,
+                    data: filteredData
+                  };
+                }
+              };
+            },
+            
+            // Filter by inclusion in array
+            in: (column: string, values: any[]) => {
+              const filteredData = tableData.filter(item => values.includes(item[column]));
+              
+              return {
+                ...queryBuilder,
+                data: filteredData,
+                
+                // Add order method to maintain chainability
+                order: (_column: string, _options: { ascending: boolean }) => {
+                  return {
+                    ...queryBuilder,
+                    data: filteredData
+                  };
+                }
+              };
+            },
+            
+            // Order results
+            order: (column: string, options: { ascending: boolean }) => {
+              const sortedData = [...tableData].sort((a, b) => {
+                if (options.ascending) {
+                  return a[column] < b[column] ? -1 : a[column] > b[column] ? 1 : 0;
+                } else {
+                  return a[column] > b[column] ? -1 : a[column] < b[column] ? 1 : 0;
+                }
+              });
+              
+              return {
+                ...queryBuilder,
+                data: sortedData
+              };
+            },
+            
+            // Limit results
+            limit: (limit: number) => {
+              return {
+                ...queryBuilder,
+                data: tableData.slice(0, limit)
+              };
+            }
+          };
+          
+          return queryBuilder;
+        },
+        
+        // Insert data
+        insert: (data: any) => {
+          const newData = Array.isArray(data) ? data : [data];
+          const insertedData = newData.map((item, index) => ({
+            ...item,
+            id: item.id || `${table}-${tableData.length + index + 1}`,
+            created_at: item.created_at || new Date().toISOString(),
+            updated_at: item.updated_at || new Date().toISOString()
+          }));
+          
+          // Return the inserted data
+          return Promise.resolve({
+            data: insertedData.length === 1 ? insertedData[0] : insertedData,
+            error: null,
+            select: () => Promise.resolve({
+              data: insertedData.length === 1 ? insertedData[0] : insertedData,
+              error: null,
+              single: () => Promise.resolve({
+                data: insertedData.length > 0 ? insertedData[0] : null,
+                error: null
+              })
+            })
+          });
+        },
+        
+        // Update data
+        update: (updates: any) => {
+          return {
+            eq: (column: string, value: any) => {
+              const index = tableData.findIndex(item => item[column] === value);
+              let updatedItem: any = null;
+              
+              if (index !== -1) {
+                updatedItem = {
+                  ...tableData[index],
+                  ...updates,
+                  updated_at: new Date().toISOString()
+                };
+              }
+              
+              return Promise.resolve({
+                data: updatedItem,
+                error: null,
+                select: () => Promise.resolve({
+                  data: updatedItem,
+                  error: null,
+                  single: () => Promise.resolve({
+                    data: updatedItem,
+                    error: null
+                  })
+                })
+              });
+            }
+          };
+        },
+        
+        // Delete data
+        delete: () => {
+          return {
+            eq: (column: string, value: any) => {
+              const index = tableData.findIndex(item => item[column] === value);
+              
+              return Promise.resolve({
+                data: index !== -1 ? tableData[index] : null,
+                error: null
+              });
+            }
+          };
+        }
+      };
+    }
   } as unknown as SupabaseClient;
 };
 

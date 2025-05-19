@@ -51,9 +51,10 @@ function TabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`contacts-tabpanel-${index}`}
       aria-labelledby={`contacts-tab-${index}`}
+      style={{ height: '100%', overflow: 'auto' }}
       {...other}
     >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ py: 3, height: '100%' }}>{children}</Box>}
     </div>
   );
 }
@@ -305,7 +306,7 @@ const Contacts: React.FC = () => {
           </Card>
         </Box>
 
-        <Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, overflow: 'hidden', height: 'calc(100vh - 250px)' }}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs 
               value={tabValue} 
@@ -321,38 +322,40 @@ const Contacts: React.FC = () => {
             </Tabs>
           </Box>
 
-          <TabPanel value={tabValue} index={0}>
-            <ContactsList 
-              contacts={filteredContacts} 
-              toggleStarred={toggleStarred}
-              getContactInitials={getContactInitials}
-              getAvatarColor={getAvatarColor}
-            />
-          </TabPanel>
-          <TabPanel value={tabValue} index={1}>
-            <ContactsList 
-              contacts={filteredContacts} 
-              toggleStarred={toggleStarred}
-              getContactInitials={getContactInitials}
-              getAvatarColor={getAvatarColor}
-            />
-          </TabPanel>
-          <TabPanel value={tabValue} index={2}>
-            <ContactsList 
-              contacts={filteredContacts} 
-              toggleStarred={toggleStarred}
-              getContactInitials={getContactInitials}
-              getAvatarColor={getAvatarColor}
-            />
-          </TabPanel>
-          <TabPanel value={tabValue} index={3}>
-            <ContactsList 
-              contacts={filteredContacts} 
-              toggleStarred={toggleStarred}
-              getContactInitials={getContactInitials}
-              getAvatarColor={getAvatarColor}
-            />
-          </TabPanel>
+          <Box sx={{ flexGrow: 1, overflow: 'auto', height: 'calc(100% - 48px)' }}>
+            <TabPanel value={tabValue} index={0}>
+              <ContactsList 
+                contacts={filteredContacts} 
+                toggleStarred={toggleStarred}
+                getContactInitials={getContactInitials}
+                getAvatarColor={getAvatarColor}
+              />
+            </TabPanel>
+            <TabPanel value={tabValue} index={1}>
+              <ContactsList 
+                contacts={filteredContacts} 
+                toggleStarred={toggleStarred}
+                getContactInitials={getContactInitials}
+                getAvatarColor={getAvatarColor}
+              />
+            </TabPanel>
+            <TabPanel value={tabValue} index={2}>
+              <ContactsList 
+                contacts={filteredContacts} 
+                toggleStarred={toggleStarred}
+                getContactInitials={getContactInitials}
+                getAvatarColor={getAvatarColor}
+              />
+            </TabPanel>
+            <TabPanel value={tabValue} index={3}>
+              <ContactsList 
+                contacts={filteredContacts} 
+                toggleStarred={toggleStarred}
+                getContactInitials={getContactInitials}
+                getAvatarColor={getAvatarColor}
+              />
+            </TabPanel>
+          </Box>
         </Box>
       </Box>
     </Box>
@@ -388,7 +391,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
   }
 
   return (
-    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: '1fr 1fr 1fr' }, gap: 2 }}>
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: '1fr 1fr 1fr' }, gap: 2, pb: 4 }}>
       {contacts.map((contact) => (
         <Box key={contact.id}>
           <Card 
