@@ -56,7 +56,7 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
         { title: 'Dashboard', path: '/', icon: <DashboardIcon /> },
         { title: 'Contacts', path: '/contacts', icon: <PersonIcon /> },
         { title: 'Practices', path: '/practices', icon: <BusinessIcon /> },
-        { title: 'Analytics', path: '/analytics', icon: <AssessmentIcon /> },
+        { title: 'Region Analytics', path: '/analytics', icon: <AssessmentIcon /> },
         { title: 'Rep Analytics', path: '/rep-analytics', icon: <AssessmentIcon /> }
       ]
     },
