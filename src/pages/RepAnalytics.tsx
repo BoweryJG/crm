@@ -3,38 +3,43 @@ import {
   Box,
   Typography,
   Paper,
-  Grid as MuiGrid,
+  Button,
   Card,
   CardContent,
-  Tabs,
-  Tab,
-  CircularProgress,
-  useTheme,
-  Button,
+  CardActions,
   Chip,
+  Divider,
   FormControl,
   InputLabel,
-  Select,
   MenuItem,
+  Select,
+  Stack,
+  Tab,
+  Tabs,
   TextField,
+  useTheme,
+  CircularProgress,
   IconButton,
-  Divider,
-  Stack
+  Grid as MuiGrid
 } from '@mui/material';
 import {
   Search as SearchIcon,
   FilterList as FilterListIcon,
   Refresh as RefreshIcon,
   TrendingUp as TrendingUpIcon,
-  MoreVert as MoreVertIcon,
   Insights as InsightsIcon,
   LocationOn as LocationIcon,
   Phone as PhoneIcon,
   Business as BusinessIcon,
-  Notifications as NotificationsIcon
+  Notifications as NotificationsIcon,
+  ArrowForward as ArrowForwardIcon,
+  Alarm as AlarmIcon,
+  Timer as TimerIcon,
+  Bolt as BoltIcon
 } from '@mui/icons-material';
 
 import { useThemeContext } from '../themes/ThemeContext';
+import { supabase } from '../services/supabase/supabase';
 
 // Create a Grid component that works with the expected props
 const Grid = (props: any) => <MuiGrid {...props} />;
@@ -42,6 +47,51 @@ const Grid = (props: any) => <MuiGrid {...props} />;
 // For now, we'll use the types defined in this file to avoid import errors
 type InsightPriority = 'high' | 'medium' | 'low';
 type InsightCategory = 'visit' | 'follow_up' | 'connect' | 'trend' | 'news' | 'opportunity';
+
+// UrgentAction types and mock service
+type UrgentActionProps = {
+  id: string;
+  title: string;
+  description: string;
+  timeRemaining?: string;
+  expiresAt?: string;
+  source: 'website_activity' | 'call_analysis' | 'market_intelligence' | 'social_media' | 'competitor_activity';
+  sourceDetail?: string;
+  actionText?: string;
+  targetId?: string;
+  targetType?: 'practice' | 'contact' | 'company';
+  onActionClick?: () => void;
+  onDismiss?: () => void;
+};
+
+// Mock UrgentActionService
+const UrgentActionService = {
+  async getUrgentActions(userId: string): Promise<UrgentActionProps[]> {
+    // This would be implemented to fetch real urgent actions
+    return [
+      {
+        id: `website-urgent-${Date.now()}`,
+        title: 'High-Value Prospect on Website Now',
+        description: 'Dr. Sarah Johnson from Bright Smiles Dental is currently browsing our implant solutions page for the 3rd time today. Our AI predicts a 85% chance of purchase intent.',
+        timeRemaining: '15 minutes',
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+        source: 'website_activity',
+        sourceDetail: 'Real-time website analytics',
+        actionText: 'Call Now',
+        targetId: 'contact-123',
+        targetType: 'contact'
+      }
+    ];
+  },
+  async markActionCompleted(actionId: string, userId: string): Promise<boolean> {
+    console.log(`Marking action ${actionId} as completed by user ${userId}`);
+    return true;
+  },
+  async dismissAction(actionId: string, userId: string): Promise<boolean> {
+    console.log(`Dismissing action ${actionId} by user ${userId}`);
+    return true;
+  }
+};
 
 interface ActionableInsightProps {
   id: string;
@@ -102,7 +152,6 @@ const RepInsightsService = {
     return [];
   }
 };
-import { supabase } from '../services/supabase/supabase';
 
 // Mock territories data
 const mockTerritories: Territory[] = [
@@ -151,6 +200,8 @@ const RepAnalytics: React.FC = () => {
   const [selectedPriorities, setSelectedPriorities] = useState<InsightPriority[]>([]);
   const [activeTab, setActiveTab] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
+  const [urgentActions, setUrgentActions] = useState<UrgentActionProps[]>([]);
+  const [loadingUrgentActions, setLoadingUrgentActions] = useState(false);
 
   // Fetch user ID on component mount
   useEffect(() => {
@@ -168,6 +219,7 @@ const RepAnalytics: React.FC = () => {
   useEffect(() => {
     if (userId) {
       fetchInsights();
+      fetchUrgentActions();
     }
   }, [userId, selectedTerritory]);
 
@@ -254,6 +306,40 @@ const RepAnalytics: React.FC = () => {
 
   const handleRefresh = () => {
     fetchInsights();
+    fetchUrgentActions();
+  };
+
+  const fetchUrgentActions = async () => {
+    if (!userId) return;
+    
+    setLoadingUrgentActions(true);
+    
+    try {
+      const actions = await UrgentActionService.getUrgentActions(userId);
+      setUrgentActions(actions);
+    } catch (err) {
+      console.error('Error fetching urgent actions:', err);
+    } finally {
+      setLoadingUrgentActions(false);
+    }
+  };
+  
+  const handleUrgentAction = async (actionId: string) => {
+    try {
+      await UrgentActionService.markActionCompleted(actionId, userId || '');
+      setUrgentActions(urgentActions.filter(action => action.id !== actionId));
+    } catch (err) {
+      console.error('Error handling urgent action:', err);
+    }
+  };
+  
+  const handleDismissUrgentAction = async (actionId: string) => {
+    try {
+      await UrgentActionService.dismissAction(actionId, userId || '');
+      setUrgentActions(urgentActions.filter(action => action.id !== actionId));
+    } catch (err) {
+      console.error('Error dismissing urgent action:', err);
+    }
   };
 
   const handleMarkComplete = (insightId: string) => {
@@ -302,6 +388,175 @@ const RepAnalytics: React.FC = () => {
         <InsightsIcon sx={{ mr: 1 }} />
         Rep Analytics
       </Typography>
+      
+      {/* Do This Now Section */}
+      {urgentActions.length > 0 && (
+        <Paper 
+          elevation={3}
+          sx={{ 
+            mb: 4, 
+            borderRadius: 2,
+            overflow: 'hidden',
+            border: '1px solid',
+            borderColor: 'error.main'
+          }}
+        >
+          <Box 
+            sx={{ 
+              bgcolor: 'error.main', 
+              color: 'white', 
+              py: 1.5, 
+              px: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <AlarmIcon sx={{ mr: 1 }} />
+              <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
+                DO THIS NOW
+              </Typography>
+            </Box>
+            <Button 
+              size="small" 
+              variant="outlined" 
+              startIcon={<RefreshIcon />}
+              onClick={fetchUrgentActions}
+              sx={{ 
+                color: 'white', 
+                borderColor: 'white',
+                '&:hover': {
+                  borderColor: 'white',
+                  bgcolor: 'rgba(255, 255, 255, 0.1)'
+                }
+              }}
+            >
+              Refresh
+            </Button>
+          </Box>
+          
+          <Box sx={{ p: 2 }}>
+            {loadingUrgentActions ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                <CircularProgress color="error" />
+              </Box>
+            ) : (
+              <Grid container spacing={2}>
+                {urgentActions.map((action) => (
+                  <Grid item xs={12} key={action.id}>
+                    <Card 
+                      sx={{ 
+                        mb: 2, 
+                        borderRadius: 2,
+                        backgroundColor: themeMode === 'space'
+                          ? 'rgba(220, 53, 69, 0.15)'
+                          : 'rgba(220, 53, 69, 0.08)',
+                        border: '1px solid',
+                        borderColor: 'error.main',
+                        boxShadow: `0 4px 12px ${
+                          themeMode === 'space'
+                            ? 'rgba(220, 53, 69, 0.25)'
+                            : 'rgba(220, 53, 69, 0.15)'
+                        }`,
+                        position: 'relative',
+                        overflow: 'visible'
+                      }}
+                    >
+                      {/* Urgent badge */}
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: -10,
+                          right: 20,
+                          backgroundColor: 'error.main',
+                          color: 'white',
+                          fontSize: '0.75rem',
+                          height: '22px',
+                          minWidth: '80px',
+                          borderRadius: '11px',
+                          fontWeight: 'bold',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          px: 1
+                        }}
+                      >
+                        <AlarmIcon fontSize="small" sx={{ mr: 0.5 }} />
+                        DO THIS NOW
+                      </Box>
+                      
+                      <CardContent sx={{ pt: 3 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1 }}>
+                          <Typography variant="h6" component="h3" sx={{ fontWeight: 600, color: 'error.main' }}>
+                            {action.title}
+                          </Typography>
+                          <Chip 
+                            label={action.source.replace('_', ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} 
+                            size="small" 
+                            color="error"
+                            icon={<BoltIcon fontSize="small" />}
+                            sx={{ ml: 1 }}
+                          />
+                        </Box>
+                        
+                        <Typography variant="body1" sx={{ mb: 1.5 }}>
+                          {action.description}
+                        </Typography>
+                        
+                        {action.sourceDetail && (
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontStyle: 'italic' }}>
+                            Source: {action.sourceDetail}
+                          </Typography>
+                        )}
+                        
+                        {action.timeRemaining && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+                            <TimerIcon fontSize="small" color="error" sx={{ mr: 1 }} />
+                            <Typography 
+                              variant="body2" 
+                              color="error.main"
+                              fontWeight="bold"
+                            >
+                              Time remaining: {action.timeRemaining}
+                            </Typography>
+                          </Box>
+                        )}
+                      </CardContent>
+                      
+                      <Divider />
+                      
+                      <CardActions sx={{ justifyContent: 'space-between', px: 2, py: 1.5 }}>
+                        <Button 
+                          size="small" 
+                          onClick={() => handleDismissUrgentAction(action.id)}
+                          color="inherit"
+                        >
+                          Dismiss
+                        </Button>
+                        
+                        <Button 
+                          variant="contained"
+                          color="error"
+                          size="medium" 
+                          endIcon={<ArrowForwardIcon />} 
+                          onClick={() => handleUrgentAction(action.id)}
+                          sx={{ ml: 'auto', fontWeight: 'bold' }}
+                        >
+                          {action.actionText || 'Take Action Now'}
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+          </Box>
+        </Paper>
+      )}
+      
       
       {/* TerritorySelector would be used here */}
       <Paper sx={{ p: 2, mb: 3, borderRadius: 2 }}>
@@ -490,7 +745,6 @@ const RepAnalytics: React.FC = () => {
             <Grid container spacing={2}>
               {filteredInsights.map((insight) => (
                 <Grid item xs={12} md={6} key={insight.id}>
-                  {/* ActionableInsightCard would be used here */}
                   <Card sx={{ mb: 2, borderLeft: '4px solid #f50057', borderRadius: 2 }}>
                     <CardContent>
                       <Typography variant="h6">{insight.title}</Typography>
