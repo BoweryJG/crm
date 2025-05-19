@@ -5,9 +5,11 @@ import {
   Paper, 
   CardHeader,
   CardContent,
-  useTheme
+  useTheme,
+  Grid
 } from '@mui/material';
 import DashboardStats from '../components/dashboard/DashboardStats';
+import QuickCallWidget from '../components/dashboard/QuickCallWidget';
 import { useThemeContext } from '../themes/ThemeContext';
 import { getMockDashboardData } from '../services/mockData/mockDataService';
 
@@ -48,6 +50,18 @@ const Dashboard: React.FC = () => {
       {/* Stats Cards */}
       <Box sx={{ mb: 4 }}>
         <DashboardStats />
+      </Box>
+
+      {/* Quick Actions and Communications */}
+      <Box sx={{ mb: 4 }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' }, gap: 3 }}>
+          <Box>
+            <QuickCallWidget />
+          </Box>
+          <Box>
+            {/* Additional widgets can go here */}
+          </Box>
+        </Box>
       </Box>
 
       {/* Recent Activities and Upcoming Tasks */}

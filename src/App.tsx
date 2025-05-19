@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Auth/Login';
 import Signup from './pages/Auth/Signup';
 import ForgotPassword from './pages/Auth/ForgotPassword';
+import GlobalCallPanel from './components/communications/GlobalCallPanel';
 
 // CSS baseline reset
 import CssBaseline from '@mui/material/CssBaseline';
@@ -72,6 +73,9 @@ const App: React.FC = () => {
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
             </Routes>
+            
+            {/* Global Call Panel - Available on all authenticated pages */}
+            <GlobalCallPanel />
           </BrowserRouter>
         </AuthProvider>
       </ErrorBoundary>
