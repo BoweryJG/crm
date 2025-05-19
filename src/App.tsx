@@ -23,6 +23,7 @@ const PracticeInteractionTracker = lazy(() => import('./components/marketResearc
 const PromptManagement = lazy(() => import('./pages/AI/PromptManagement'));
 const Research = lazy(() => import('./pages/Research'));
 const Analytics = lazy(() => import('./pages/Analytics'));
+const RepAnalytics = lazy(() => import('./pages/RepAnalytics'));
 const CallAnalysis = lazy(() => import('./pages/CallAnalysis'));
 
 const App: React.FC = () => {
@@ -60,6 +61,7 @@ const App: React.FC = () => {
                 <Route path="contacts/:id" element={<React.Suspense fallback={<div>Loading...</div>}><ContactDetail /></React.Suspense>} />
                 <Route path="practices" element={<React.Suspense fallback={<div>Loading...</div>}><Practices /></React.Suspense>} />
                 <Route path="analytics" element={<Suspense fallback={<div>Loading...</div>}><Analytics /></Suspense>} />
+                <Route path="rep-analytics" element={<Suspense fallback={<div>Loading...</div>}><RepAnalytics /></Suspense>} />
                 <Route path="research" element={<Suspense fallback={<div>Loading...</div>}><Research /></Suspense>} />
                 <Route path="content" element={<Suspense fallback={<div>Loading...</div>}><PromptManagement /></Suspense>} />
                 <Route path="call-analysis" element={<Suspense fallback={<div>Loading...</div>}><CallAnalysis /></Suspense>} />
