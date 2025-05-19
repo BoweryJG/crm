@@ -27,9 +27,10 @@ interface StatCardProps {
     trend: 'up' | 'down' | 'neutral';
   };
   color?: string;
+  orbIndex?: number;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon, change, color }) => {
+const StatCard: React.FC<StatCardProps> = ({ title, value, icon, change, color, orbIndex }) => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
   
@@ -89,16 +90,15 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, change, color }
             width: 48,
             height: 48,
             borderRadius: 2,
-            backgroundColor: color || 
-              (themeMode === 'space' 
-                ? 'rgba(138, 96, 208, 0.15)' 
-                : 'rgba(61, 82, 213, 0.08)'),
-            color: color || 
-              (themeMode === 'space' 
-                ? '#8860D0' 
-                : '#3D52D5'),
+            overflow: 'hidden',
+            position: 'relative'
           }}
         >
+          {/* Replace colored box with animated orb */}
+          <AnimatedOrbHeroBG 
+            style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} 
+            childIndex={orbIndex !== undefined ? orbIndex : 0} 
+          />
           {icon}
         </Box>
       </Box>
@@ -172,8 +172,8 @@ const DashboardStats: React.FC = () => {
           icon={<PersonIcon />}
           change={{ value: stats.contactsChange, trend: stats.contactsChange >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#8860D0' : '#3D52D5'} // Primary color
+          orbIndex={0}
         />
-        <AnimatedOrbHeroBG style={{ width: 100, height: 100 }} childIndex={0} />
       </Box>
       
       <Box>
@@ -183,8 +183,8 @@ const DashboardStats: React.FC = () => {
           icon={<BusinessIcon />}
           change={{ value: stats.practicesChange, trend: stats.practicesChange >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#5CE1E6' : '#44CFCB'} // Secondary color
+          orbIndex={1}
         />
-        <AnimatedOrbHeroBG style={{ width: 100, height: 100 }} childIndex={1} />
       </Box>
       
       <Box>
@@ -194,8 +194,8 @@ const DashboardStats: React.FC = () => {
           icon={<RevenueIcon />}
           change={{ value: stats.revenueChange, trend: stats.revenueChange >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#FFD700' : '#FFAB4C'} // Warning color
+          orbIndex={2}
         />
-        <AnimatedOrbHeroBG style={{ width: 100, height: 100 }} childIndex={2} />
       </Box>
       
       <Box>
@@ -205,8 +205,8 @@ const DashboardStats: React.FC = () => {
           icon={<CampaignIcon />}
           change={{ value: stats.campaignsChange, trend: stats.campaignsChange >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#00E676' : '#4CAF50'} // Success color
+          orbIndex={3}
         />
-        <AnimatedOrbHeroBG style={{ width: 100, height: 100 }} childIndex={3} />
       </Box>
       
       <Box sx={{ gridColumn: '1 / -1' }}>
