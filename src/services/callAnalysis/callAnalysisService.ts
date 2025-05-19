@@ -20,7 +20,7 @@ export const CallAnalysisService = {
   async getAllCallAnalyses(): Promise<CallAnalysis[]> {
     try {
       const { data, error } = await supabase
-        .from('call_analyses')
+        .from('call_analysis')
         .select('*')
         .order('call_date', { ascending: false });
       
@@ -45,7 +45,7 @@ export const CallAnalysisService = {
    */
   async getCallAnalyses(filters: CallAnalysisFilterOptions): Promise<CallAnalysis[]> {
     let query = supabase
-      .from('call_analyses')
+      .from('call_analysis')
       .select('*');
     
     // Apply filters
@@ -109,7 +109,7 @@ export const CallAnalysisService = {
    */
   async getCallAnalysisById(id: string): Promise<CallAnalysis | null> {
     const { data, error } = await supabase
-      .from('call_analyses')
+      .from('call_analysis')
       .select('*')
       .eq('id', id)
       .single();
@@ -127,7 +127,7 @@ export const CallAnalysisService = {
    */
   async createCallAnalysis(callAnalysis: Omit<CallAnalysis, 'id' | 'created_at' | 'updated_at'>): Promise<CallAnalysis | null> {
     const { data, error } = await supabase
-      .from('call_analyses')
+      .from('call_analysis')
       .insert([callAnalysis])
       .select()
       .single();
@@ -145,7 +145,7 @@ export const CallAnalysisService = {
    */
   async updateCallAnalysis(id: string, updates: Partial<CallAnalysis>): Promise<CallAnalysis | null> {
     const { data, error } = await supabase
-      .from('call_analyses')
+      .from('call_analysis')
       .update(updates)
       .eq('id', id)
       .select()
@@ -164,7 +164,7 @@ export const CallAnalysisService = {
    */
   async deleteCallAnalysis(id: string): Promise<boolean> {
     const { error } = await supabase
-      .from('call_analyses')
+      .from('call_analysis')
       .delete()
       .eq('id', id);
     
@@ -189,7 +189,7 @@ export const CallAnalysisService = {
     
     // Update the call analysis with the linguistics analysis ID
     const { error } = await supabase
-      .from('call_analyses')
+      .from('call_analysis')
       .update({ linguistics_analysis_id: result.analysisId })
       .eq('id', callId);
     
@@ -207,7 +207,7 @@ export const CallAnalysisService = {
   async getLinguisticsAnalysis(callId: string): Promise<LinguisticsAnalysis | null> {
     // First get the call analysis to find the linguistics analysis ID
     const { data: callAnalysis, error: callError } = await supabase
-      .from('call_analyses')
+      .from('call_analysis')
       .select('linguistics_analysis_id')
       .eq('id', callId)
       .single();
@@ -227,7 +227,7 @@ export const CallAnalysisService = {
   async getLinguisticsAnalysisStatus(callId: string): Promise<'pending' | 'processing' | 'completed' | 'failed' | 'not_found'> {
     // First get the call analysis to find the linguistics analysis ID
     const { data: callAnalysis, error: callError } = await supabase
-      .from('call_analyses')
+      .from('call_analysis')
       .select('linguistics_analysis_id')
       .eq('id', callId)
       .single();
@@ -246,7 +246,7 @@ export const CallAnalysisService = {
    */
   async getRecentCallsForContact(contactId: string, limit: number = 5): Promise<CallAnalysis[]> {
     const { data, error } = await supabase
-      .from('call_analyses')
+      .from('call_analysis')
       .select('*')
       .eq('contact_id', contactId)
       .order('call_date', { ascending: false })
@@ -265,7 +265,7 @@ export const CallAnalysisService = {
    */
   async getRecentCallsForPractice(practiceId: string, limit: number = 5): Promise<CallAnalysis[]> {
     const { data, error } = await supabase
-      .from('call_analyses')
+      .from('call_analysis')
       .select('*')
       .eq('practice_id', practiceId)
       .order('call_date', { ascending: false })
@@ -284,7 +284,7 @@ export const CallAnalysisService = {
    */
   async getCallsByTag(tag: string): Promise<CallAnalysis[]> {
     const { data, error } = await supabase
-      .from('call_analyses')
+      .from('call_analysis')
       .select('*')
       .contains('tags', [tag])
       .order('call_date', { ascending: false });
@@ -302,7 +302,7 @@ export const CallAnalysisService = {
    */
   async getCallsWithHighSentiment(threshold: number = 0.7, limit: number = 10): Promise<CallAnalysis[]> {
     const { data, error } = await supabase
-      .from('call_analyses')
+      .from('call_analysis')
       .select('*')
       .gte('sentiment_score', threshold)
       .order('sentiment_score', { ascending: false })
@@ -321,7 +321,7 @@ export const CallAnalysisService = {
    */
   async getCallsWithLowSentiment(threshold: number = -0.3, limit: number = 10): Promise<CallAnalysis[]> {
     const { data, error } = await supabase
-      .from('call_analyses')
+      .from('call_analysis')
       .select('*')
       .lte('sentiment_score', threshold)
       .order('sentiment_score', { ascending: true })

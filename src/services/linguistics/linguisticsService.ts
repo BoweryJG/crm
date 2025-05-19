@@ -8,7 +8,7 @@ export class LinguisticsService {
   static async getAllLinguisticsAnalyses(): Promise<LinguisticsAnalysis[]> {
     try {
       const { data, error } = await supabase
-        .from('linguistics_analyses')
+        .from('linguistics_analysis')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -29,7 +29,7 @@ export class LinguisticsService {
   static async getLinguisticsAnalysisById(id: string): Promise<LinguisticsAnalysis | null> {
     try {
       const { data, error } = await supabase
-        .from('linguistics_analyses')
+        .from('linguistics_analysis')
         .select('*')
         .eq('id', id)
         .single();
@@ -51,7 +51,7 @@ export class LinguisticsService {
   static async createLinguisticsAnalysis(analysis: Omit<LinguisticsAnalysis, 'id'>): Promise<LinguisticsAnalysis | null> {
     try {
       const { data, error } = await supabase
-        .from('linguistics_analyses')
+        .from('linguistics_analysis')
         .insert([analysis])
         .select()
         .single();
@@ -73,7 +73,7 @@ export class LinguisticsService {
   static async updateLinguisticsAnalysis(id: string, updates: Partial<LinguisticsAnalysis>): Promise<LinguisticsAnalysis | null> {
     try {
       const { data, error } = await supabase
-        .from('linguistics_analyses')
+        .from('linguistics_analysis')
         .update(updates)
         .eq('id', id)
         .select()
@@ -96,7 +96,7 @@ export class LinguisticsService {
   static async deleteLinguisticsAnalysis(id: string): Promise<boolean> {
     try {
       const { error } = await supabase
-        .from('linguistics_analyses')
+        .from('linguistics_analysis')
         .delete()
         .eq('id', id);
 
@@ -117,7 +117,7 @@ export class LinguisticsService {
   static async getLinguisticsAnalysesByCallId(callId: string): Promise<LinguisticsAnalysis[]> {
     try {
       const { data, error } = await supabase
-        .from('linguistics_analyses')
+        .from('linguistics_analysis')
         .select('*')
         .eq('call_id', callId)
         .order('created_at', { ascending: false });
@@ -178,7 +178,7 @@ export class LinguisticsService {
     try {
       // Create a new analysis request in the database
       const { data, error } = await supabase
-        .from('linguistics_analysis_queue')
+        .from('linguistics_analysis')
         .insert([
           { 
             call_id: callId, 
@@ -210,8 +210,8 @@ export class LinguisticsService {
   static async getAnalysisById(analysisId: string): Promise<any> {
     try {
       const { data, error } = await supabase
-        .from('linguistics_analysis_queue')
-        .select('*, linguistics_analyses(*)')
+        .from('linguistics_analysis')
+        .select('*, linguistics_analysis(*)')
         .eq('id', analysisId)
         .single();
 
@@ -232,7 +232,7 @@ export class LinguisticsService {
   static async getAnalysisStatus(analysisId: string): Promise<'pending' | 'processing' | 'completed' | 'failed' | 'not_found'> {
     try {
       const { data, error } = await supabase
-        .from('linguistics_analysis_queue')
+        .from('linguistics_analysis')
         .select('status')
         .eq('id', analysisId)
         .single();

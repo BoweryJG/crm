@@ -1,9 +1,20 @@
 import { createClient, SupabaseClient, Session, User, AuthChangeEvent } from '@supabase/supabase-js';
 import { generateMockContacts, generateMockPractices } from '../mockData/mockDataService';
 
+// Environment variables for Supabase
+console.log('Environment Variables:', {
+  'REACT_APP_SUPABASE_URL': process.env.REACT_APP_SUPABASE_URL ? 'Set' : 'Not Set',
+  'REACT_APP_SUPABASE_ANON_KEY': process.env.REACT_APP_SUPABASE_ANON_KEY ? 'Set' : 'Not Set',
+  'NODE_ENV': process.env.NODE_ENV || 'development'
+});
+
 // Replace these with your Supabase credentials
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://example.supabase.co';
 const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example';
+
+// Log the values being used
+console.log('Supabase URL being used:', supabaseUrl);
+console.log('Supabase Anon Key being used:', supabaseAnonKey ? '***' + supabaseAnonKey.slice(-4) : 'Not Set');
 
 // Create a mock Supabase client for development when URL is invalid
 const createMockClient = (): SupabaseClient => {
@@ -107,6 +118,19 @@ const createMockClient = (): SupabaseClient => {
       resetPasswordForEmail: (email: string) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         return Promise.resolve({ data: {}, error: null });
+      },
+
+      getUser: () => {
+        // Simulate fetching the current user based on the session
+        if (currentSession && currentSession.user) {
+          return Promise.resolve({ data: { user: currentSession.user }, error: null });
+        } else {
+          // Try to provide a mock user even if session is null for basic functionality
+          // In a real scenario, if no session, user would be null.
+          // For mock, let's assume mockUser is always available if needed, 
+          // or adjust based on desired mock behavior (e.g., return null if currentSession is null)
+          return Promise.resolve({ data: { user: mockUser }, error: null }); // Or: data: { user: null } if currentSession is null
+        }
       }
     },
     
