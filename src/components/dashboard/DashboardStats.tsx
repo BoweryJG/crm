@@ -16,6 +16,7 @@ import {
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { getMockDashboardData } from '../../services/mockData/mockDataService';
+import AnimatedOrbHeroBG from './AnimatedOrbHeroBG'; // Ensure this path is correct
 
 interface StatCardProps {
   title: string;
@@ -172,6 +173,7 @@ const DashboardStats: React.FC = () => {
           change={{ value: stats.contactsChange, trend: stats.contactsChange >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#8860D0' : '#3D52D5'} // Primary color
         />
+        <AnimatedOrbHeroBG style={{ width: 100, height: 100 }} childIndex={0} />
       </Box>
       
       <Box>
@@ -182,6 +184,7 @@ const DashboardStats: React.FC = () => {
           change={{ value: stats.practicesChange, trend: stats.practicesChange >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#5CE1E6' : '#44CFCB'} // Secondary color
         />
+        <AnimatedOrbHeroBG style={{ width: 100, height: 100 }} childIndex={1} />
       </Box>
       
       <Box>
@@ -192,6 +195,7 @@ const DashboardStats: React.FC = () => {
           change={{ value: stats.revenueChange, trend: stats.revenueChange >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#FFD700' : '#FFAB4C'} // Warning color
         />
+        <AnimatedOrbHeroBG style={{ width: 100, height: 100 }} childIndex={2} />
       </Box>
       
       <Box>
@@ -202,6 +206,7 @@ const DashboardStats: React.FC = () => {
           change={{ value: stats.campaignsChange, trend: stats.campaignsChange >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#00E676' : '#4CAF50'} // Success color
         />
+        <AnimatedOrbHeroBG style={{ width: 100, height: 100 }} childIndex={3} />
       </Box>
       
       <Box sx={{ gridColumn: '1 / -1' }}>
