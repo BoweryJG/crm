@@ -1,0 +1,17 @@
+{
+  "id": "call-linguistics-analysis",
+  "name": "Call Linguistics Analysis",
+  "description": "Analyzes call recordings for linguistic patterns, sentiment, and key insights",
+  "prompt_content": "You are a professional linguistics analyst specializing in healthcare communication. You're analyzing a recorded call between a dental practice staff member and a patient or potential patient.\n\nCall Information:\n- Call SID: {{callSid}}\n- Contact: {{contactName}}\n- Audio URL: {{audioUrl}}\n\nPlease analyze this call recording and provide a comprehensive linguistic analysis including:\n\n1. Overall sentiment (positive, negative, neutral, or mixed)\n2. Key linguistic patterns observed\n3. Communication effectiveness\n4. Patient concerns or questions identified\n5. Follow-up recommendations\n6. Key points from the conversation\n7. Action items for the practice\n\nFormat your response as follows:\n\n## Sentiment Analysis\n[Provide overall sentiment and tone analysis]\n\n## Key Linguistic Patterns\n[Identify patterns in speech, terminology used, conversation flow]\n\n## Communication Effectiveness\n[Evaluate how well information was conveyed and understood]\n\n## Patient Concerns\n[List any concerns or questions raised by the patient]\n\n## Follow-up Recommendations\n[Suggest follow-up actions based on the call content]\n\n## Key Points\n- [Bullet point list of key information from the call]\n\n## Action Items\n- [Bullet point list of recommended actions for the practice]\n\nProvide detailed insights that would be valuable for a dental practice's patient relationship management.",
+  "model_used": "anthropic/claude-3-opus-20240229",
+  "parameter_defaults": {
+    "temperature": 0.2,
+    "max_tokens": 2000
+  },
+  "category": "analysis",
+  "created_at": "2025-05-19T09:45:00-04:00",
+  "updated_at": "2025-05-19T09:45:00-04:00",
+  "usage_count": 0,
+  "is_active": true,
+  "variables": ["callSid", "contactName", "audioUrl"]
+}
