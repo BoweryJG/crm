@@ -38,62 +38,61 @@ const QuickCallWidget: React.FC = () => {
       try {
         setLoading(true);
         
-        // Fetch recent contacts from Supabase
-        // This query gets contacts who were recently called or interacted with
-        const { data, error } = await supabase
+        // STEP 1: First, get recent call activities
+        const { data: activityData, error: activityError } = await supabase
           .from('sales_activities')
-          .select('contact_id, contacts(*)')
+          .select('contact_id')
           .eq('type', 'call')
           .order('date', { ascending: false })
           .limit(5);
-          
-        // Define the type for the activity data
-        interface ActivityWithContact {
-          contact_id: string;
-          contacts: Contact;
-        }
         
-        if (error) {
-          console.error('Error fetching recent contacts from sales_activities:', error);
+        if (activityError) {
+          console.error('Error fetching sales activities:', activityError);
           console.log('Falling back to mock contacts data for QuickCallWidget');
-          // Use mock data if the table doesn't exist (404) or there's another error
           const mockContacts = mockDataService.generateMockContacts(5);
           setRecentContacts(mockContacts);
           return;
         }
         
-        if (data && data.length > 0) {
-          // Extract unique contacts
-          const uniqueContacts: Contact[] = [];
-          const contactIds = new Set();
-          
-          // Type check and process each activity
-          data.forEach((activity: any) => {
-            // Make sure contacts is an object with an id property
-            if (activity.contacts && 
-                typeof activity.contacts === 'object' && 
-                !Array.isArray(activity.contacts) && 
-                'id' in activity.contacts) {
-              
-              const contact = activity.contacts as Contact;
-              if (!contactIds.has(contact.id)) {
-                contactIds.add(contact.id);
-                uniqueContacts.push(contact);
-              }
-            }
-          });
-          
-          if (uniqueContacts.length > 0) {
-            setRecentContacts(uniqueContacts);
-          } else {
-            // No valid contacts found in the data, use mock data
-            console.log('No valid contacts found in sales_activities, using mock data');
-            const mockContacts = mockDataService.generateMockContacts(5);
-            setRecentContacts(mockContacts);
-          }
+        if (!activityData || activityData.length === 0) {
+          console.log('No call activities found, using mock data');
+          const mockContacts = mockDataService.generateMockContacts(5);
+          setRecentContacts(mockContacts);
+          return;
+        }
+        
+        // Extract unique contact IDs
+        const uniqueContactIds = Array.from(new Set(
+          activityData
+            .filter(activity => activity.contact_id) // Filter out null/undefined
+            .map(activity => activity.contact_id)
+        ));
+        
+        if (uniqueContactIds.length === 0) {
+          console.log('No valid contact IDs found, using mock data');
+          const mockContacts = mockDataService.generateMockContacts(5);
+          setRecentContacts(mockContacts);
+          return;
+        }
+        
+        // STEP 2: Now fetch the actual contacts using the IDs
+        const { data: contactsData, error: contactsError } = await supabase
+          .from('public_contacts')  // Use the correct table name
+          .select('*')
+          .in('id', uniqueContactIds);
+        
+        if (contactsError) {
+          console.error('Error fetching contacts:', contactsError);
+          console.log('Falling back to mock contacts data for QuickCallWidget');
+          const mockContacts = mockDataService.generateMockContacts(5);
+          setRecentContacts(mockContacts);
+          return;
+        }
+        
+        if (contactsData && contactsData.length > 0) {
+          setRecentContacts(contactsData as Contact[]);
         } else {
-          // No data returned, use mock data
-          console.log('No data returned from sales_activities, using mock data');
+          console.log('No contacts found for the given IDs, using mock data');
           const mockContacts = mockDataService.generateMockContacts(5);
           setRecentContacts(mockContacts);
         }
