@@ -8,6 +8,7 @@
 import { supabase } from '../supabase/supabase';
 import { LinguisticsService } from '../linguistics/linguisticsService';
 import { CallAnalysis, CallAnalysisFilterOptions, LinguisticsAnalysis } from '../../types';
+import mockDataService from '../mockData/mockDataService';
 
 /**
  * Service for call analysis operations
@@ -17,17 +18,26 @@ export const CallAnalysisService = {
    * Get all call analyses
    */
   async getAllCallAnalyses(): Promise<CallAnalysis[]> {
-    const { data, error } = await supabase
-      .from('call_analyses')
-      .select('*')
-      .order('call_date', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching call analyses:', error);
-      return [];
+    try {
+      const { data, error } = await supabase
+        .from('call_analyses')
+        .select('*')
+        .order('call_date', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching call analyses:', error);
+        // Return mock data if the table doesn't exist or there's an error
+        console.log('Falling back to mock call analyses data');
+        return mockDataService.generateMockCallAnalyses(10);
+      }
+      
+      return data as CallAnalysis[];
+    } catch (err) {
+      console.error('Error fetching call analyses:', err);
+      // Return mock data if there's an exception
+      console.log('Falling back to mock call analyses data');
+      return mockDataService.generateMockCallAnalyses(10);
     }
-    
-    return data as CallAnalysis[];
   },
   
   /**

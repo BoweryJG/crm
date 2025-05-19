@@ -1,5 +1,58 @@
-import { Contact } from '../../types/contacts';
+import { Contact } from '../../types/models';
 import { Practice, PracticeSize } from '../../types/practices';
+
+// Import types or define interfaces for call analysis data
+interface CallAnalysis {
+  id: string;
+  title: string;
+  call_date: string;
+  duration: number; // in seconds
+  contact_id?: string;
+  practice_id?: string;
+  recording_url?: string;
+  transcript?: string;
+  summary?: string;
+  sentiment_score?: number; // -1 to 1, negative to positive
+  linguistics_analysis_id?: string; // Reference to linguistics module analysis
+  tags?: string[];
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+  // Additional fields for mock data
+  key_topics?: string[];
+  action_items?: string[];
+  buying_signals?: string[];
+  objections?: string[];
+  next_steps?: string[];
+}
+
+interface LinguisticsAnalysis {
+  id: string;
+  call_id: string;
+  analysis_date: string;
+  sentiment_score: number;
+  key_topics: string[];
+  buying_signals: string[];
+  objections: string[];
+  action_items: string[];
+  next_steps: string[];
+  summary: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface SalesActivity {
+  id: string;
+  user_id: string;
+  contact_id: string;
+  type: 'call' | 'email' | 'meeting' | 'note' | 'task';
+  date: string;
+  duration?: number;
+  notes?: string;
+  outcome?: string;
+  created_at: string;
+  updated_at: string;
+}
 
 // Generate a random number between min and max (inclusive)
 const getRandomInt = (min: number, max: number): number => {
@@ -173,24 +226,24 @@ export const generateMockContacts = (count: number = 20): Contact[] => {
     
     return {
       id: `contact-${i + 1}`,
-      firstName,
-      lastName,
+      first_name: firstName,
+      last_name: lastName,
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${practiceName.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`,
       phone: `(${getRandomInt(100, 999)}) ${getRandomInt(100, 999)}-${getRandomInt(1000, 9999)}`,
-      role,
-      practiceId,
-      practiceName,
+      title: role,
+      practice_id: practiceId,
+      practice_name: practiceName,
       practiceType,
-      specialty,
-      isStarred: Math.random() > 0.7, // 30% chance of being starred
-      lastContactDate: getRandomDate(30),
+      specialization: specialty,
+      is_starred: Math.random() > 0.7, // 30% chance of being starred
+      last_contacted: getRandomDate(30),
       notes,
       tags: Array.from({ length: getRandomInt(1, 4) }, () => 
         ['VIP', 'New', 'Follow-up', 'Potential', 'Key Decision Maker', 'Influencer', 
          'Tech Adopter', 'Budget Conscious', 'Growth Focused', location.state][getRandomInt(0, 9)]
       ),
-      createdAt: getRandomDate(365),
-      updatedAt: getRandomDate(30),
+      created_at: getRandomDate(365),
+      updated_at: getRandomDate(30),
     };
   });
 };
@@ -514,6 +567,221 @@ export const getMockDashboardData = () => {
   };
 };
 
+// Generate mock call analyses
+export const generateMockCallAnalyses = (count: number = 10): CallAnalysis[] => {
+  const analyses: CallAnalysis[] = [];
+  
+  // Generate mock contacts first to reference their IDs
+  const mockContacts = generateMockContacts(15);
+  
+  for (let i = 0; i < count; i++) {
+    const contactIndex = getRandomInt(0, mockContacts.length - 1);
+    const contact = mockContacts[contactIndex];
+    const contactId = contact.id;
+    
+    // Create a call date within the last 30 days
+    const callDate = getRandomDate(30);
+    
+    // Generate a random sentiment score between -1 and 1
+    const sentimentScore = parseFloat((Math.random() * 2 - 1).toFixed(2));
+    
+    // Generate random key topics based on dental industry
+    const allTopics = [
+      'implants', 'veneers', 'whitening', 'invisalign', 'crowns', 'bridges',
+      'dentures', 'root canal', 'extraction', 'cleaning', 'checkup', 'x-rays',
+      'insurance', 'financing', 'emergency', 'pain', 'cosmetic', 'pediatric'
+    ];
+    
+    // Randomly select 2-5 topics
+    const topicCount = getRandomInt(2, 5);
+    const keyTopics: string[] = [];
+    for (let j = 0; j < topicCount; j++) {
+      const randomTopic = allTopics[getRandomInt(0, allTopics.length - 1)];
+      if (!keyTopics.includes(randomTopic)) {
+        keyTopics.push(randomTopic);
+      }
+    }
+    
+    // Generate random buying signals
+    const allBuyingSignals = [
+      'asked about pricing', 'requested a demo', 'inquired about availability',
+      'mentioned timeline', 'discussed budget', 'asked about implementation',
+      'compared to competitors', 'mentioned decision maker', 'asked about warranty',
+      'requested references', 'discussed ROI', 'mentioned urgent need'
+    ];
+    
+    // Randomly select 0-3 buying signals
+    const buyingSignalCount = getRandomInt(0, 3);
+    const buyingSignals: string[] = [];
+    for (let j = 0; j < buyingSignalCount; j++) {
+      const randomSignal = allBuyingSignals[getRandomInt(0, allBuyingSignals.length - 1)];
+      if (!buyingSignals.includes(randomSignal)) {
+        buyingSignals.push(randomSignal);
+      }
+    }
+    
+    // Generate random objections
+    const allObjections = [
+      'price too high', 'need to consult partners', 'using competitor product',
+      'not the right time', 'budget constraints', 'need more information',
+      'concerned about training', 'worried about implementation', 'need approval'
+    ];
+    
+    // Randomly select 0-2 objections
+    const objectionCount = getRandomInt(0, 2);
+    const objections: string[] = [];
+    for (let j = 0; j < objectionCount; j++) {
+      const randomObjection = allObjections[getRandomInt(0, allObjections.length - 1)];
+      if (!objections.includes(randomObjection)) {
+        objections.push(randomObjection);
+      }
+    }
+    
+    // Generate random action items
+    const allActionItems = [
+      'send follow-up email', 'schedule demo', 'provide pricing information',
+      'send case studies', 'connect with decision maker', 'prepare proposal',
+      'address objections', 'provide technical specifications', 'offer trial'
+    ];
+    
+    // Randomly select 1-3 action items
+    const actionItemCount = getRandomInt(1, 3);
+    const actionItems: string[] = [];
+    for (let j = 0; j < actionItemCount; j++) {
+      const randomAction = allActionItems[getRandomInt(0, allActionItems.length - 1)];
+      if (!actionItems.includes(randomAction)) {
+        actionItems.push(randomAction);
+      }
+    }
+    
+    // Generate random next steps
+    const allNextSteps = [
+      'follow up in 3 days', 'schedule product demo', 'send proposal',
+      'arrange meeting with team', 'provide additional information',
+      'address specific concerns', 'offer special pricing', 'check back next quarter'
+    ];
+    
+    // Randomly select 1-2 next steps
+    const nextStepCount = getRandomInt(1, 2);
+    const nextSteps: string[] = [];
+    for (let j = 0; j < nextStepCount; j++) {
+      const randomStep = allNextSteps[getRandomInt(0, allNextSteps.length - 1)];
+      if (!nextSteps.includes(randomStep)) {
+        nextSteps.push(randomStep);
+      }
+    }
+    
+    // Get the contact to reference in the title
+    const contact = mockContacts[contactIndex];
+    
+    analyses.push({
+      id: `call-${i}-${Date.now()}`,
+      title: `Call with ${contact.firstName} ${contact.lastName} - ${new Date(callDate).toLocaleDateString()}`,
+      call_date: callDate,
+      duration: getRandomInt(60, 1800), // 1-30 minutes in seconds
+      contact_id: contactId,
+      practice_id: `practice-${getRandomInt(1, 10)}`,
+      recording_url: `https://example.com/recordings/call-${i}.mp3`,
+      transcript: `This is a mock transcript for call ${i}. It would contain the full conversation text.`,
+      summary: `Mock summary of call with ${contact.firstName} ${contact.lastName} discussing ${keyTopics.join(', ')}.`,
+      sentiment_score: sentimentScore,
+      linguistics_analysis_id: `ling-analysis-${i}-${Date.now()}`,
+      tags: [...keyTopics.slice(0, 2), sentimentScore > 0.3 ? 'positive' : sentimentScore < -0.3 ? 'negative' : 'neutral'],
+      notes: `Mock notes for call ${i}. These would be manually added by the user.`,
+      created_at: new Date(Date.now() - getRandomInt(1, 30) * 24 * 60 * 60 * 1000).toISOString(),
+      updated_at: new Date().toISOString(),
+      // Additional fields for mock data
+      key_topics: keyTopics,
+      action_items: actionItems,
+      buying_signals: buyingSignals,
+      objections: objections,
+      next_steps: nextSteps
+    });
+  }
+  
+  return analyses;
+};
+
+// Generate mock linguistics analyses
+export const generateMockLinguisticsAnalyses = (callAnalyses: CallAnalysis[]): LinguisticsAnalysis[] => {
+  return callAnalyses.map(call => ({
+    id: `ling-${call.id}`,
+    call_id: call.call_id,
+    analysis_date: new Date(new Date(call.call_date).getTime() + 1000 * 60 * 60).toISOString(), // 1 hour after call
+    sentiment_score: call.sentiment_score || 0,
+    key_topics: call.key_topics || [],
+    buying_signals: call.buying_signals || [],
+    objections: call.objections || [],
+    action_items: call.action_items || [],
+    next_steps: call.next_steps || [],
+    summary: `This call with ${call.contact_id} lasted ${Math.floor(call.duration / 60)} minutes. ` +
+             `The conversation focused on ${(call.key_topics || []).join(', ')}. ` +
+             `The prospect showed interest by ${(call.buying_signals || []).join(', ')}. ` +
+             `Some concerns raised were ${(call.objections || []).join(', ')}. ` +
+             `Recommended next steps include ${(call.next_steps || []).join(', ')}.`,
+    created_at: new Date(new Date(call.call_date).getTime() + 1000 * 60 * 70).toISOString(),
+    updated_at: new Date().toISOString()
+  }));
+};
+
+// Generate mock sales activities
+export const generateMockSalesActivities = (count: number = 20): SalesActivity[] => {
+  const activities: SalesActivity[] = [];
+  const mockContacts = generateMockContacts(10);
+  const activityTypes: Array<'call' | 'email' | 'meeting' | 'note' | 'task'> = ['call', 'email', 'meeting', 'note', 'task'];
+  
+  for (let i = 0; i < count; i++) {
+    const contactIndex = getRandomInt(0, mockContacts.length - 1);
+    const contact = mockContacts[contactIndex];
+    const type = activityTypes[getRandomInt(0, activityTypes.length - 1)];
+    
+    let duration: number | undefined;
+    if (type === 'call' || type === 'meeting') {
+      duration = getRandomInt(5, 60); // 5-60 minutes
+    }
+    
+    const date = getRandomDate(30); // Within the last 30 days
+    
+    activities.push({
+      id: `activity-${i}-${Date.now()}`,
+      user_id: `user-${getRandomInt(1, 5)}`,
+      contact_id: contact.id,
+      type,
+      date,
+      duration,
+      notes: `Mock ${type} with ${contact.firstName} ${contact.lastName}`,
+      outcome: type === 'call' || type === 'meeting' ? ['Positive', 'Neutral', 'Needs Follow-up'][getRandomInt(0, 2)] : undefined,
+      created_at: date,
+      updated_at: date
+    });
+  }
+  
+  return activities;
+};
+
+// Generate mock public contacts
+export const generateMockPublicContacts = (count: number = 15): Contact[] => {
+  // Reuse the existing contact generator but mark them as public
+  const contacts = generateMockContacts(count);
+  return contacts.map(contact => ({
+    ...contact,
+    is_public: true
+  }));
+};
+
+// Generate a single mock call analysis
+export const generateMockCallAnalysis = (): CallAnalysis => {
+  const analyses = generateMockCallAnalyses(1);
+  return analyses[0];
+};
+
+// Generate a single mock linguistics analysis
+export const generateMockLinguisticsAnalysis = (): LinguisticsAnalysis => {
+  const callAnalysis = generateMockCallAnalysis();
+  const analyses = generateMockLinguisticsAnalyses([callAnalysis]);
+  return analyses[0];
+};
+
 // Export all mock data functions
 const mockDataService = {
   generateMockContacts,
@@ -521,7 +789,13 @@ const mockDataService = {
   generateDashboardStats,
   generateRecentActivities,
   generateUpcomingTasks,
-  getMockDashboardData
+  getMockDashboardData,
+  generateMockCallAnalyses,
+  generateMockLinguisticsAnalyses,
+  generateMockSalesActivities,
+  generateMockPublicContacts,
+  generateMockCallAnalysis,
+  generateMockLinguisticsAnalysis
 };
 
 export default mockDataService;
