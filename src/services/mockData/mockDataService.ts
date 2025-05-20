@@ -1,5 +1,16 @@
 import { Contact } from '../../types/models';
 import { Practice, PracticeSize } from '../../types/practices';
+import {
+  ResearchProject,
+  ResearchDocument,
+  ResearchTask,
+  ResearchPrompt,
+  ResearchNote,
+  ResearchDataQuery,
+  ResearchProjectStatus,
+  ResearchDocumentType,
+  ResearchTaskStatus
+} from '../../types/research';
 
 // Import types or define interfaces for call analysis data
 interface CallAnalysis {
@@ -777,6 +788,150 @@ export const generateMockPublicContacts = (count: number = 15): Contact[] => {
   }));
 };
 
+// ---------- Research Module Mock Data ----------
+
+export const generateMockResearchProjects = (
+  count: number = 5,
+  userId = 'mock-user-id'
+): ResearchProject[] => {
+  const statuses = Object.values(ResearchProjectStatus);
+  return Array.from({ length: count }, (_, i) => {
+    const created = getRandomDate(30);
+    return {
+      id: `project-${i + 1}`,
+      title: `Sample Research Project ${i + 1}`,
+      description: `Exploring market opportunities ${i + 1}`,
+      status: statuses[getRandomInt(0, statuses.length - 1)] as ResearchProjectStatus,
+      created_by: userId,
+      tags: ['demo', 'sample'],
+      priority: getRandomInt(1, 5),
+      progress: getRandomInt(0, 100),
+      created_at: created,
+      updated_at: created
+    } as ResearchProject;
+  });
+};
+
+export const generateMockResearchDocuments = (
+  projects: ResearchProject[],
+  countPerProject = 2,
+  userId = 'mock-user-id'
+): ResearchDocument[] => {
+  const types = Object.values(ResearchDocumentType);
+  const docs: ResearchDocument[] = [];
+  projects.forEach((project, pIndex) => {
+    for (let i = 0; i < countPerProject; i++) {
+      const created = getRandomDate(20);
+      docs.push({
+        id: `doc-${pIndex + 1}-${i + 1}`,
+        project_id: project.id,
+        title: `${project.title} Doc ${i + 1}`,
+        content: `Sample content for document ${i + 1} of ${project.title}.`,
+        document_type: types[getRandomInt(0, types.length - 1)] as ResearchDocumentType,
+        created_by: userId,
+        is_ai_generated: false,
+        version: 1,
+        tags: ['demo'],
+        created_at: created,
+        updated_at: created
+      } as ResearchDocument);
+    }
+  });
+  return docs;
+};
+
+export const generateMockResearchTasks = (
+  projects: ResearchProject[],
+  countPerProject = 3,
+  userId = 'mock-user-id'
+): ResearchTask[] => {
+  const statuses = Object.values(ResearchTaskStatus);
+  const tasks: ResearchTask[] = [];
+  projects.forEach((project, pIndex) => {
+    for (let i = 0; i < countPerProject; i++) {
+      const created = getRandomDate(15);
+      tasks.push({
+        id: `task-${pIndex + 1}-${i + 1}`,
+        project_id: project.id,
+        title: `Task ${i + 1} for ${project.title}`,
+        description: `Detailed task description ${i + 1}`,
+        status: statuses[getRandomInt(0, statuses.length - 1)] as ResearchTaskStatus,
+        assigned_to: userId,
+        priority: getRandomInt(1, 5),
+        created_at: created,
+        updated_at: created
+      } as ResearchTask);
+    }
+  });
+  return tasks;
+};
+
+export const generateMockResearchPrompts = (
+  count: number = 3,
+  userId = 'mock-user-id'
+): ResearchPrompt[] => {
+  return Array.from({ length: count }, (_, i) => {
+    const created = getRandomDate(40);
+    return {
+      id: `prompt-${i + 1}`,
+      prompt_name: `Research Prompt ${i + 1}`,
+      prompt_content: `Write a detailed analysis about topic ${i + 1}.`,
+      description: 'Demo prompt',
+      category: 'analysis',
+      model_used: 'gpt-4',
+      parameter_defaults: {},
+      created_by: userId,
+      usage_count: 0,
+      tags: ['demo'],
+      created_at: created,
+      updated_at: created
+    } as ResearchPrompt;
+  });
+};
+
+export const generateMockResearchNotes = (
+  projects: ResearchProject[],
+  countPerProject = 1,
+  userId = 'mock-user-id'
+): ResearchNote[] => {
+  const notes: ResearchNote[] = [];
+  projects.forEach((project, pIndex) => {
+    for (let i = 0; i < countPerProject; i++) {
+      const created = getRandomDate(10);
+      notes.push({
+        id: `note-${pIndex + 1}-${i + 1}`,
+        project_id: project.id,
+        content: `Quick note ${i + 1} for ${project.title}.`,
+        created_by: userId,
+        tags: ['demo'],
+        created_at: created,
+        updated_at: created
+      } as ResearchNote);
+    }
+  });
+  return notes;
+};
+
+export const generateMockResearchDataQueries = (
+  count: number = 2,
+  userId = 'mock-user-id'
+): ResearchDataQuery[] => {
+  return Array.from({ length: count }, (_, i) => {
+    const created = getRandomDate(25);
+    return {
+      id: `query-${i + 1}`,
+      name: `Market Query ${i + 1}`,
+      description: `Sample data query ${i + 1}`,
+      query_type: 'sql',
+      query_parameters: {},
+      created_by: userId,
+      is_public: false,
+      created_at: created,
+      updated_at: created
+    } as ResearchDataQuery;
+  });
+};
+
 // Generate a single mock call analysis
 export const generateMockCallAnalysis = (): CallAnalysis => {
   const analyses = generateMockCallAnalyses(1);
@@ -803,7 +958,13 @@ const mockDataService = {
   generateMockSalesActivities,
   generateMockPublicContacts,
   generateMockCallAnalysis,
-  generateMockLinguisticsAnalysis
+  generateMockLinguisticsAnalysis,
+  generateMockResearchProjects,
+  generateMockResearchDocuments,
+  generateMockResearchTasks,
+  generateMockResearchPrompts,
+  generateMockResearchNotes,
+  generateMockResearchDataQueries
 };
 
 export default mockDataService;
