@@ -1,5 +1,14 @@
 import { createClient, SupabaseClient, Session, User, AuthChangeEvent } from '@supabase/supabase-js';
-import { generateMockContacts, generateMockPractices } from '../mockData/mockDataService';
+import {
+  generateMockContacts,
+  generateMockPractices,
+  generateMockResearchProjects,
+  generateMockResearchDocuments,
+  generateMockResearchTasks,
+  generateMockResearchPrompts,
+  generateMockResearchNotes,
+  generateMockResearchDataQueries
+} from '../mockData/mockDataService';
 
 // Environment variables for Supabase
 console.log('Environment Variables:', {
@@ -182,12 +191,24 @@ const createMockClient = (): SupabaseClient => {
       // Generate and transform mock data
       const mockContacts = generateMockContacts(20).map(transformContactToDatabaseFormat);
       const mockPractices = generateMockPractices(20).map(transformPracticeToDatabaseFormat);
-      
+
+      const mockProjects = generateMockResearchProjects(5);
+      const mockDocuments = generateMockResearchDocuments(mockProjects, 2);
+      const mockTasks = generateMockResearchTasks(mockProjects, 3);
+      const mockPrompts = generateMockResearchPrompts(3);
+      const mockNotes = generateMockResearchNotes(mockProjects, 1);
+      const mockQueries = generateMockResearchDataQueries(2);
+
       const mockData: Record<string, any[]> = {
         contacts: mockContacts,
         practices: mockPractices,
         public_contacts: mockContacts, // For compatibility with Contacts.tsx
-        // Add other tables as needed
+        research_projects: mockProjects,
+        research_documents: mockDocuments,
+        research_tasks: mockTasks,
+        research_prompts: mockPrompts,
+        research_notes: mockNotes,
+        research_data_queries: mockQueries
       };
       
       // Get data for the requested table
