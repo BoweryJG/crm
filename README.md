@@ -92,8 +92,10 @@ RepSpheres CRM uses Supabase as a backend. The database schema includes:
 - **Procedures**: Detailed information on medical procedures
 - **Companies**: Manufacturers and vendors in the industry
 - **Sales Activities**: Call logs, meetings, demos, etc.
+- **Call Analysis**: Recorded calls with sentiment and transcript data
 - **Tasks**: Follow-ups and to-dos
 - **Market Intelligence**: Industry trends and insights
+- **Public Contacts**: Demo contacts available to all users
 
 Import the schema from `supabase/schema.sql` to set up your database structure.
 
