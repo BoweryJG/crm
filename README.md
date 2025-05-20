@@ -53,7 +53,7 @@ RepSpheres CRM combines an intuitive, space-themed interface with powerful indus
 
 ### Prerequisites
 
-- Node.js (v16+)
+- Node.js (v18+)
 - npm or yarn
 - A Supabase account
 

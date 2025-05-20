@@ -35,6 +35,11 @@ import { AestheticProceduresService } from '../services/knowledgeBase/aestheticP
 import { CompaniesService } from '../services/knowledgeBase/companiesService';
 import { CallAnalysisService } from '../services/callAnalysis/callAnalysisService';
 import { LinguisticsService } from '../services/linguistics/linguisticsService';
+import { fetchMarketIntelligence } from '../services/supabase/supabaseService';
+import {
+  NYCDentalImplantMarketService,
+  NYCDentalImplantProvider
+} from '../services/marketResearch/nycDentalImplantMarket';
 import { 
   DentalProcedure, 
   DentalProcedureCategory,
@@ -42,7 +47,8 @@ import {
   AestheticProcedureCategory,
   Company,
   CallAnalysis,
-  LinguisticsAnalysis
+  LinguisticsAnalysis,
+  MarketIntelligence
 } from '../types';
 
 // Create a Grid component that works with the expected props
@@ -61,6 +67,9 @@ const Analytics: React.FC = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [recentCalls, setRecentCalls] = useState<CallAnalysis[]>([]);
   const [linguisticsData, setLinguisticsData] = useState<LinguisticsAnalysis | null>(null);
+  const [marketInsights, setMarketInsights] = useState<MarketIntelligence[]>([]);
+  const [companyTrends, setCompanyTrends] = useState<any[]>([]);
+  const [providers, setProviders] = useState<NYCDentalImplantProvider[]>([]);
   
   // Filter states
   const [dentalCategory, setDentalCategory] = useState<DentalProcedureCategory | ''>('');
@@ -78,17 +87,35 @@ const Analytics: React.FC = () => {
     
     try {
       // Fetch all data in parallel
-      const [dentalData, aestheticData, companiesData, callsData] = await Promise.all([
+      const [
+        dentalData,
+        aestheticData,
+        companiesData,
+        callsData,
+        marketIntelligenceResult,
+        trendsData,
+        providerData
+      ] = await Promise.all([
         DentalProceduresService.getAllProcedures(),
         AestheticProceduresService.getAllProcedures(),
         CompaniesService.getAllCompanies(),
-        CallAnalysisService.getAllCallAnalyses()
+        CallAnalysisService.getAllCallAnalyses(),
+        fetchMarketIntelligence(),
+        CompaniesService.getCompanyTrends(),
+        NYCDentalImplantMarketService.getAllProviders()
       ]);
       
       setDentalProcedures(dentalData);
       setAestheticProcedures(aestheticData);
       setCompanies(companiesData);
       setRecentCalls(callsData.slice(0, 5)); // Get 5 most recent calls
+      setProviders(providerData);
+
+      if (marketIntelligenceResult.data) {
+        setMarketInsights(marketIntelligenceResult.data);
+      }
+
+      setCompanyTrends(trendsData);
       
       // If there are calls with linguistics analysis, fetch the first one
       if (callsData.length > 0 && callsData[0].linguistics_analysis_id) {
@@ -112,7 +139,7 @@ const Analytics: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
-        Industry Knowledge Analytics
+        Region Analytics
       </Typography>
       
       <Paper 
@@ -133,6 +160,7 @@ const Analytics: React.FC = () => {
       >
         <Box sx={{ borderBottom: 1, borderColor: 'divider', display: 'flex', alignItems: 'center', px: 2 }}>
           <Tabs value={activeTab} onChange={handleTabChange} aria-label="analytics tabs">
+            <Tab label="Overview" />
             <Tab label="Dental Procedures" />
             <Tab label="Aesthetic Procedures" />
             <Tab label="Companies" />
@@ -167,16 +195,63 @@ const Analytics: React.FC = () => {
           ) : (
             <>
               {activeTab === 0 && (
-                <Typography>Dental Procedures Analytics</Typography>
+                <Box>
+                  <Typography variant="h6" gutterBottom>
+                    Market Insights
+                  </Typography>
+                  {marketInsights.slice(0, 3).map((insight) => (
+                    <Typography key={insight.id} variant="body2" sx={{ mb: 1 }}>
+                      - {insight.title}
+                    </Typography>
+                  ))}
+
+                  <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+                    Market Size
+                  </Typography>
+                  <Typography variant="body2">
+                    {providers.length} providers in this region
+                  </Typography>
+
+                  <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+                    Company Trends
+                  </Typography>
+                  {companyTrends.slice(0, 3).map((trend: any, index: number) => (
+                    <Typography key={index} variant="body2" sx={{ mb: 1 }}>
+                      - {trend.name || 'Trend'}
+                    </Typography>
+                  ))}
+                </Box>
               )}
               {activeTab === 1 && (
-                <Typography>Aesthetic Procedures Analytics</Typography>
+                <Typography>Dental Procedures Analytics</Typography>
               )}
               {activeTab === 2 && (
-                <Typography>Companies Analytics</Typography>
+                <Typography>Aesthetic Procedures Analytics</Typography>
               )}
               {activeTab === 3 && (
-                <Typography>Call Analysis with Linguistics</Typography>
+                <Typography>Companies Analytics</Typography>
+              )}
+              {activeTab === 4 && (
+                <Box>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Recent Calls
+                  </Typography>
+                  {recentCalls.map((call) => (
+                    <Typography key={call.id} variant="body2" sx={{ mb: 0.5 }}>
+                      {call.title}
+                    </Typography>
+                  ))}
+                  {linguisticsData && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="subtitle1" gutterBottom>
+                        Linguistics Summary
+                      </Typography>
+                      <Typography variant="body2">
+                        Speaking pace: {linguisticsData.language_metrics.speaking_pace} wpm
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
               )}
             </>
           )}
