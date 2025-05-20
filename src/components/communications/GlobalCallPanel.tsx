@@ -24,9 +24,11 @@ import {
 } from '@mui/icons-material';
 import { formatPhoneNumber, initiateCall } from '../../services/twilio/twilioService';
 import { useAuth } from '../../hooks/useAuth';
+import { useThemeContext } from '../../themes/ThemeContext';
 
 const GlobalCallPanel: React.FC = () => {
   const theme = useTheme();
+  const { themeMode } = useThemeContext();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -157,7 +159,17 @@ const GlobalCallPanel: React.FC = () => {
           '& .MuiDrawer-paper': {
             width: 350,
             padding: 2,
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            backgroundColor:
+              themeMode === 'space'
+                ? 'rgba(22, 27, 44, 0.7)'
+                : 'rgba(255,255,255,0.7)',
+            backdropFilter: 'blur(8px)',
+            border: `1px solid ${
+              themeMode === 'space'
+                ? 'rgba(255, 255, 255, 0.08)'
+                : 'rgba(0, 0, 0, 0.06)'
+            }`
           }
         }}
       >
