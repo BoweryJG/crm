@@ -4,7 +4,8 @@
   functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "16"
+  # React Router v7 requires Node 20 or newer
+  NODE_VERSION = "20"
 
 [[redirects]]
   from = "/*"
