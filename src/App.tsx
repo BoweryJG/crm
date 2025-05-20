@@ -25,6 +25,7 @@ const Research = lazy(() => import('./pages/Research'));
 const Analytics = lazy(() => import('./pages/Analytics'));
 const RepAnalytics = lazy(() => import('./pages/RepAnalytics'));
 const CallAnalysis = lazy(() => import('./pages/CallAnalysis'));
+const MarketIntelligence = lazy(() => import("./pages/MarketIntelligence"));
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -65,7 +66,7 @@ const App: React.FC = () => {
                 <Route path="research" element={<Suspense fallback={<div>Loading...</div>}><Research /></Suspense>} />
                 <Route path="content" element={<Suspense fallback={<div>Loading...</div>}><PromptManagement /></Suspense>} />
                 <Route path="call-analysis" element={<Suspense fallback={<div>Loading...</div>}><CallAnalysis /></Suspense>} />
-                <Route path="market" element={<div>Market Intelligence (Coming Soon)</div>} />
+                <Route path="market" element={<Suspense fallback={<div>Loading...</div>}><MarketIntelligence /></Suspense>} />
                 <Route path="market/dental-implants" element={<React.Suspense fallback={<div>Loading...</div>}><DentalImplantMarketDashboard /></React.Suspense>} />
                 <Route path="market/practice-interaction" element={<React.Suspense fallback={<div>Loading...</div>}><PracticeInteractionTracker /></React.Suspense>} />
                 <Route path="dental" element={<div>Dental Procedures Knowledge Base (Coming Soon)</div>} />
