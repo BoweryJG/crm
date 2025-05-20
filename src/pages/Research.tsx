@@ -1,20 +1,49 @@
-import React from 'react';
-import { Box, Typography, Container } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { useAuth } from '../hooks/useAuth';
+import React, { useEffect, useState } from 'react';
+import { Box, Container } from '@mui/material';
 import ResearchWorkspace from '../components/research/ResearchWorkspace';
+import ResearchHero from '../components/research/ResearchHero';
+import ResearchOverview from '../components/research/ResearchOverview';
+import researchService from '../services/research/researchService';
+import { ResearchProject, ResearchDocument } from '../types/research';
 
 const Research: React.FC = () => {
-  const theme = useTheme();
-  const { user } = useAuth();
+  const [projects, setProjects] = useState<ResearchProject[]>([]);
+  const [documents, setDocuments] = useState<ResearchDocument[]>([]);
+
+  useEffect(() => {
+    const fetchOverviewData = async () => {
+      try {
+        const { data: projData } = await researchService.getResearchProjects();
+        if (projData) setProjects(projData);
+        const { data: docData } = await researchService.getResearchDocuments();
+        if (docData) setDocuments(docData);
+      } catch (err) {
+        console.error('Error loading research overview data', err);
+      }
+    };
+
+    fetchOverviewData();
+  }, []);
+
+  const scrollToWorkspace = (tabIndex?: number) => {
+    if (tabIndex !== undefined) {
+      const tabs = document.querySelectorAll('[role="tab"]');
+      if (tabs[tabIndex]) (tabs[tabIndex] as HTMLElement).click();
+    }
+    const el = document.getElementById('research-module-workspace');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 2, mb: 2, height: 'calc(100vh - 140px)' }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Research Module
-      </Typography>
-      
-      <Box sx={{ height: 'calc(100% - 60px)' }}>
+    <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
+      <ResearchHero />
+      <ResearchOverview
+        projects={projects}
+        documents={documents}
+        onNewProject={() => scrollToWorkspace(0)}
+        onRunPrompt={() => scrollToWorkspace(2)}
+      />
+      <Box id="research-module-workspace">
         <ResearchWorkspace />
       </Box>
     </Container>
