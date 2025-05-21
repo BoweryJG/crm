@@ -1,10 +1,10 @@
 [build]
-  command = "CI=false npm run build"
+  command = "CI=false npm ci --no-scripts && npm run build"
   publish = "build"
   functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "16"
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/*"
