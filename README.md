@@ -75,8 +75,17 @@ RepSpheres CRM combines an intuitive, space-themed interface with powerful indus
    REACT_APP_SUPABASE_URL=your_supabase_url_here
    REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key_here
    ```
+4. (Optional) Configure Twilio by adding these variables to `.env.local`:
+   ```
+   REACT_APP_TWILIO_FUNCTION_URL=http://localhost:8888/.netlify/functions
+   REACT_APP_TWILIO_API_KEY=your_twilio_function_api_key_here
+   REACT_APP_TWILIO_PHONE_NUMBER=+1234567890
+   TWILIO_ACCOUNT_SID=your_twilio_account_sid_here
+   TWILIO_AUTH_TOKEN=your_twilio_auth_token_here
+   TWILIO_FUNCTION_SECRET=your_twilio_function_api_key_here
+   ```
 
-4. Set up your Supabase database using the schema in `supabase/schema.sql`.
+5. Set up your Supabase database using the schema in `supabase/schema.sql`.
 
 5. Start the development server:
    ```
