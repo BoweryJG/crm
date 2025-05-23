@@ -78,6 +78,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({ title, value, icon, orbInde
 };
 
 const ResearchOverview: React.FC<ResearchOverviewProps> = ({ projects, documents, onNewProject, onRunPrompt }) => {
+  const { themeMode } = useThemeContext();
   const activeProjects = projects.filter(p => p.status === ResearchProjectStatus.ACTIVE).length;
   const recentDocuments = documents.filter(d => {
     const updated = d.updated_at || d.created_at;
