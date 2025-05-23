@@ -69,14 +69,24 @@ export const initiateCall = async (params: CallParams): Promise<CallResponse> =>
       throw new Error(data.error || 'Failed to initiate call');
     }
 
-    // Log call activity in Supabase
+    // Log technical call details in twilio_calls
     await logCallActivity({
       contactId: params.contactId,
       practiceId: params.practiceId,
       userId: params.userId,
       callSid: data.callSid,
-      status: 'initiated',
-      phoneNumber: formattedTo
+      status: 'initiated', // Twilio call status, e.g., 'initiated', 'ringing', 'answered', 'completed'
+      fromNumber: params.from, // The number calling from (your Twilio number)
+      toNumber: formattedTo,   // The number being called
+      direction: 'outbound'    // Since this is an app-initiated call
+    });
+    
+    // Also create a higher-level activity record in sales_activities table
+    // This keeps the app's activity tracking system consistent
+    await logSalesActivity({
+      contactId: params.contactId,
+      notes: `Outbound call to ${formattedTo}`,
+      callSid: data.callSid  // Store callSid in notes for reference
     });
 
     return {
@@ -93,7 +103,7 @@ export const initiateCall = async (params: CallParams): Promise<CallResponse> =>
 };
 
 /**
- * Updates call status in the database
+ * Updates call status in the twilio_calls table
  * @param update Call status update information
  * @returns Success status
  */
@@ -101,11 +111,12 @@ export const updateCallStatus = async (update: CallStatusUpdate): Promise<boolea
   try {
     const { callSid, status, duration } = update;
 
+    // Maps to 'status' and 'duration' columns in 'twilio_calls' table
     const { error } = await supabase
-      .from('sales_activities')
+      .from('twilio_calls') // Changed table name
       .update({
-        call_status: status,
-        call_duration: duration || 0,
+        status: status,       // Maps to 'status' column in twilio_calls
+        duration: duration || 0, // Maps to 'duration' column in twilio_calls
         updated_at: new Date().toISOString()
       })
       .eq('call_sid', callSid);
@@ -122,36 +133,56 @@ export const updateCallStatus = async (update: CallStatusUpdate): Promise<boolea
 };
 
 /**
- * Logs a call activity in the database
+ * Logs a call activity in the twilio_calls table (technical Twilio details)
  * @param params Call activity parameters
  * @returns Success status
  */
 interface LogCallActivityParams {
-  contactId: string;
-  practiceId: string;
-  userId: string;
-  callSid: string;
-  status: string;
-  phoneNumber: string;
-  notes?: string;
+  contactId: string;         // Will be stored in metadata
+  practiceId: string;        // Will be stored in metadata
+  userId: string;            // Maps to user_id
+  callSid: string;           // Maps to call_sid
+  status: string;            // Maps to status (e.g., 'initiated', 'completed')
+  fromNumber: string;        // Maps to from_number
+  toNumber: string;          // Maps to to_number
+  direction: 'inbound' | 'outbound'; // Maps to direction
+  notes?: string;            // Will be stored in metadata
 }
 
 export const logCallActivity = async (params: LogCallActivityParams): Promise<boolean> => {
   try {
-    const { contactId, practiceId, userId, callSid, status, phoneNumber, notes } = params;
+    const { 
+      contactId, 
+      practiceId, 
+      userId, 
+      callSid, 
+      status, 
+      fromNumber, 
+      toNumber, 
+      direction, 
+      notes 
+    } = params;
+
+    const metadata = {
+      contact_id: contactId,
+      practice_id: practiceId,
+      notes: notes || 'Phone call initiated by application.',
+      // any other details from original 'details: { phoneNumber }' can be added if needed
+    };
 
     const { error } = await supabase
-      .from('sales_activities')
+      .from('twilio_calls') // Changed table name
       .insert({
-        contact_id: contactId,
-        practice_id: practiceId,
-        user_id: userId,
-        type: 'call',
-        date: new Date().toISOString(),
         call_sid: callSid,
-        call_status: status,
-        notes: notes || 'Phone call',
-        details: { phoneNumber }
+        from_number: fromNumber,
+        to_number: toNumber,
+        direction: direction,
+        status: status,
+        user_id: userId, // Assuming this is the application user who initiated
+        metadata: metadata,
+        // 'created_at' and 'updated_at' should have default values in DB
+        // 'duration' will be updated later by webhook
+        // 'phone_number_sid', 'recording_url', 'recording_sid', 'transcription_id' are nullable or set later
       });
 
     if (error) {
@@ -223,8 +254,60 @@ export const callContact = async (contact: Contact, userId: string): Promise<Cal
  * @param contactId Contact ID
  * @returns Call history
  */
+/**
+ * Logs a general sales activity in the sales_activities table (for general activity tracking)
+ * @param params Parameters for the sales activity
+ * @returns Success status
+ */
+interface SalesActivityParams {
+  contactId: string;
+  notes?: string;
+  callSid?: string; // Optional, to reference the related twilio_calls record
+  outcome?: string;
+  duration?: number;
+}
+
+export const logSalesActivity = async (params: SalesActivityParams): Promise<boolean> => {
+  try {
+    const { contactId, notes, callSid, outcome, duration } = params;
+    
+    // Format notes to include callSid reference if provided
+    const formattedNotes = callSid 
+      ? `${notes || 'Phone call'} (Call ID: ${callSid})`
+      : notes || 'Phone call';
+    
+    const { error } = await supabase
+      .from('sales_activities')
+      .insert({
+        type: 'call',
+        contact_id: contactId,
+        date: new Date().toISOString(),
+        duration: duration,
+        notes: formattedNotes,
+        outcome: outcome
+        // created_at and updated_at will use DB defaults
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error logging sales activity:', error);
+    return false;
+  }
+};
+
+/**
+ * Fetches call history for a contact
+ * @param contactId Contact ID
+ * @returns Call history
+ */
 export const fetchCallHistory = async (contactId: string) => {
   try {
+    // Query the sales_activities table for call activities
+    // This matches the original behavior and works with QuickCallWidget
     const { data, error } = await supabase
       .from('sales_activities')
       .select('*')
