@@ -49,7 +49,8 @@ export const initiateCall = async (params: CallParams): Promise<CallResponse> =>
     }
 
     // Make API call to Twilio Function
-    const response = await fetch(`${TWILIO_FUNCTION_URL}/initiate-call`, {
+    // TWILIO_FUNCTION_URL should be the complete URL to the Netlify function
+    const response = await fetch(TWILIO_FUNCTION_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
