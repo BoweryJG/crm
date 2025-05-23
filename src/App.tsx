@@ -25,6 +25,9 @@ const Research = lazy(() => import('./pages/Research'));
 const Analytics = lazy(() => import('./pages/Analytics'));
 const RepAnalytics = lazy(() => import('./pages/RepAnalytics'));
 const CallAnalysis = lazy(() => import('./pages/CallAnalysis'));
+const Subscribe = lazy(() => import('./pages/Subscribe'));
+const SubscribeSuccess = lazy(() => import('./pages/SubscribeSuccess'));
+const SubscribeCancel = lazy(() => import('./pages/SubscribeCancel'));
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -71,6 +74,9 @@ const App: React.FC = () => {
                 <Route path="dental" element={<div>Dental Procedures Knowledge Base (Coming Soon)</div>} />
                 <Route path="aesthetic" element={<div>Aesthetic Procedures Knowledge Base (Coming Soon)</div>} />
                 <Route path="companies" element={<div>Companies Database (Coming Soon)</div>} />
+                <Route path="subscribe" element={<Suspense fallback={<div>Loading...</div>}><Subscribe /></Suspense>} />
+                <Route path="subscribe/success" element={<Suspense fallback={<div>Loading...</div>}><SubscribeSuccess /></Suspense>} />
+                <Route path="subscribe/cancel" element={<Suspense fallback={<div>Loading...</div>}><SubscribeCancel /></Suspense>} />
                 <Route path="settings" element={<div>Settings (Coming Soon)</div>} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
