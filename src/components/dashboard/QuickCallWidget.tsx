@@ -46,16 +46,19 @@ const QuickCallWidget: React.FC = () => {
           .order('date', { ascending: false })
           .limit(5);
         
+        // Log the raw response for sales_activities
+        console.log('QuickCallWidget: sales_activities query result:', { activityData, activityError });
+
         if (activityError) {
-          console.error('Error fetching sales activities:', activityError);
-          console.log('Falling back to mock contacts data for QuickCallWidget');
+          console.error('Error fetching sales activities:', activityError.message, activityError);
+          console.log('Falling back to mock contacts data for QuickCallWidget due to activityError.');
           const mockContacts = mockDataService.generateMockContacts(5);
           setRecentContacts(mockContacts);
           return;
         }
         
         if (!activityData || activityData.length === 0) {
-          console.log('No call activities found, using mock data');
+          console.log('No call activities found (activityData is null or empty), using mock data. ActivityData:', activityData);
           const mockContacts = mockDataService.generateMockContacts(5);
           setRecentContacts(mockContacts);
           return;
