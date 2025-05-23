@@ -1,6 +1,25 @@
 import { Handler, HandlerEvent } from '@netlify/functions';
 import twilio from 'twilio';
 
+// Helper function to format phone numbers to E.164
+const formatPhoneNumber = (phoneNumber: string): string | null => {
+  if (!phoneNumber) return null;
+  const digitsOnly = phoneNumber.replace(/\D/g, '');
+  if (digitsOnly.length < 10) {
+    return null;
+  }
+  if (digitsOnly.length === 10) { // Assuming US number if 10 digits
+    return `+1${digitsOnly}`;
+  }
+  if (digitsOnly.startsWith('1') && digitsOnly.length === 11) { // US number with 1 prefix
+    return `+${digitsOnly}`;
+  }
+  if (digitsOnly.length > 10) { // International number already with country code
+    return `+${digitsOnly}`;
+  }
+  return null;
+};
+
 export const handler: Handler = async (event: HandlerEvent) => {
   if (event.httpMethod !== 'POST') {
     return {
@@ -9,13 +28,22 @@ export const handler: Handler = async (event: HandlerEvent) => {
     };
   }
 
-  const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER, NETLIFY_SITE_URL } = process.env;
+  const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER: rawTwilioPhoneNumber, NETLIFY_SITE_URL } = process.env;
 
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE_NUMBER) {
-    console.error('Twilio environment variables not set for initiate-twilio-call function');
+  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !rawTwilioPhoneNumber) {
+    console.error('Core Twilio environment variables (ACCOUNT_SID, AUTH_TOKEN, PHONE_NUMBER) not set for initiate-twilio-call function');
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Twilio configuration error on server.' }),
+      body: JSON.stringify({ error: 'Twilio configuration error on server: Missing core credentials.' }),
+    };
+  }
+
+  const fromNumberE164 = formatPhoneNumber(rawTwilioPhoneNumber);
+  if (!fromNumberE164) {
+    console.error(`Invalid TWILIO_PHONE_NUMBER format after attempting to normalize: ${rawTwilioPhoneNumber}`);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Twilio configuration error on server: Invalid FROM phone number format.' }),
     };
   }
 
@@ -39,9 +67,9 @@ export const handler: Handler = async (event: HandlerEvent) => {
     };
   }
 
-  // Use the environment variable TWILIO_PHONE_NUMBER as the 'from' number.
+  // Use the environment variable TWILIO_PHONE_NUMBER (now formatted) as the 'from' number.
   // The 'fromFrontend' can be ignored or used for logging if needed, but calls must originate from a verified Twilio number.
-  const fromNumber = TWILIO_PHONE_NUMBER;
+  const fromNumber = fromNumberE164;
 
   const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
