@@ -28,13 +28,19 @@ export const handler: Handler = async (event: HandlerEvent) => {
     };
   }
 
-  const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER: rawTwilioPhoneNumber, NETLIFY_SITE_URL } = process.env;
+  const { 
+    TWILIO_ACCOUNT_SID, 
+    TWILIO_AUTH_TOKEN, 
+    TWILIO_PHONE_NUMBER: rawTwilioPhoneNumber, 
+    NETLIFY_SITE_URL,
+    TWILIO_CALL_HANDLER_URL // New environment variable for the TwiML URL
+  } = process.env;
 
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !rawTwilioPhoneNumber) {
-    console.error('Core Twilio environment variables (ACCOUNT_SID, AUTH_TOKEN, PHONE_NUMBER) not set for initiate-twilio-call function');
+  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !rawTwilioPhoneNumber || !TWILIO_CALL_HANDLER_URL) {
+    console.error('Core Twilio environment variables (ACCOUNT_SID, AUTH_TOKEN, PHONE_NUMBER, TWILIO_CALL_HANDLER_URL) not set for initiate-twilio-call function');
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Twilio configuration error on server: Missing core credentials.' }),
+      body: JSON.stringify({ error: 'Twilio configuration error on server: Missing core credentials or TwiML handler URL.' }),
     };
   }
 
@@ -89,13 +95,14 @@ export const handler: Handler = async (event: HandlerEvent) => {
     const call = await client.calls.create({
       to: to,
       from: fromNumber,
+      url: TWILIO_CALL_HANDLER_URL, // URL for TwiML instructions
       // The statusCallback will send updates (e.g., completed, busy, failed) to your twilio-webhook function.
       statusCallback: statusCallbackUrl,
       statusCallbackEvent: ['initiated', 'ringing', 'answered', 'completed'], // Specify desired events
       statusCallbackMethod: 'POST',
     });
 
-    console.log('Twilio call initiated successfully. Call SID:', call.sid);
+    console.log('Twilio call initiated successfully. Call SID:', call.sid, 'TwiML URL used:', TWILIO_CALL_HANDLER_URL);
 
     // Note: The frontend's twilioService.ts is already responsible for logging the 'initiated'
     // status to sales_activities AFTER this function returns successfully with a callSid.
