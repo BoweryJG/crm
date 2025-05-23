@@ -11,23 +11,25 @@ import {
 } from '../mockData/mockDataService';
 
 // Environment variables for Supabase
-console.log('Environment Variables:', {
-  'REACT_APP_SUPABASE_URL': process.env.REACT_APP_SUPABASE_URL ? 'Set' : 'Not Set',
-  'REACT_APP_SUPABASE_ANON_KEY': process.env.REACT_APP_SUPABASE_ANON_KEY ? 'Set' : 'Not Set',
-  'NODE_ENV': process.env.NODE_ENV || 'development'
-});
+console.log('NODE_ENV:', process.env.NODE_ENV || 'development');
+
+const rawSupabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const rawSupabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+
+console.log('Raw REACT_APP_SUPABASE_URL:', rawSupabaseUrl ? `Set (ends with "${rawSupabaseUrl.slice(-10)}")` : 'Not Set');
+console.log('Raw REACT_APP_SUPABASE_ANON_KEY:', rawSupabaseAnonKey ? `Set (starts with "${rawSupabaseAnonKey.substring(0, 10)}...", ends with "${rawSupabaseAnonKey.slice(-4)}")` : 'Not Set');
 
 // Replace these with your Supabase credentials
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://example.supabase.co';
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example';
+const supabaseUrl = rawSupabaseUrl || 'https://example.supabase.co';
+const supabaseAnonKey = rawSupabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example';
 
 // Log the values being used
-console.log('Supabase URL being used:', supabaseUrl);
-console.log('Supabase Anon Key being used:', supabaseAnonKey ? '***' + supabaseAnonKey.slice(-4) : 'Not Set');
+console.log('Effective Supabase URL being used:', supabaseUrl);
+console.log('Effective Supabase Anon Key being used:', supabaseAnonKey ? `Starts with "${supabaseAnonKey.substring(0, 10)}...", ends with "${supabaseAnonKey.slice(-4)}"` : 'Not Set');
 
 // Create a mock Supabase client for development when URL is invalid
 const createMockClient = (): SupabaseClient => {
-  console.warn('Using mock Supabase client due to invalid URL or key');
+  console.warn('FALLBACK: Using mock Supabase client due to invalid/placeholder credentials or other error.');
   
   // Mock user data
   const mockUser: User = {
