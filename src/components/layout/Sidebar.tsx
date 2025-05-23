@@ -23,7 +23,8 @@ import {
   MedicalInformation as MedicalIcon,
   BiotechOutlined as BiotechIcon,
   Science as ScienceIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  CreditCard as CreditCardIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -82,6 +83,12 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
         { title: 'Dental Procedures', path: '/dental', icon: <MedicalIcon /> },
         { title: 'Aesthetic Procedures', path: '/aesthetic', icon: <BiotechIcon /> },
         { title: 'Companies', path: '/companies', icon: <ScienceIcon /> }
+      ]
+    },
+    {
+      title: 'Membership',
+      items: [
+        { title: 'Subscribe', path: '/subscribe', icon: <CreditCardIcon /> }
       ]
     }
   ];

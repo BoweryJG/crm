@@ -15,6 +15,7 @@ RepSpheres CRM combines an intuitive, space-themed interface with powerful indus
 - **Procedure Knowledge Base**: Detailed information on dental and aesthetic procedures
 - **Companies Database**: Comprehensive directory of industry vendors and manufacturers
 - **Sales Performance Tracking**: Monitor goals, achievements, and activities
+- **Stripe Billing**: Simple monthly membership payments
 
 ## Tech Stack
 
@@ -74,6 +75,11 @@ RepSpheres CRM combines an intuitive, space-themed interface with powerful indus
    ```
    REACT_APP_SUPABASE_URL=your_supabase_url_here
    REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+   STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key_here
+   STRIPE_SECRET_KEY=your_stripe_secret_key_here
+   STRIPE_PRICE_ID=your_stripe_price_id_here
+   STRIPE_SUCCESS_URL=http://localhost:3000/subscribe/success
+   STRIPE_CANCEL_URL=http://localhost:3000/subscribe/cancel
    ```
 
 4. Set up your Supabase database using the schema in `supabase/schema.sql`.
