@@ -647,7 +647,7 @@ const RepAnalytics: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, height: '100%', overflow: 'auto' }}>
       <Typography variant="h4" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
         <InsightsIcon sx={{ mr: 1 }} />
         Rep Analytics
