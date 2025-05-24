@@ -173,51 +173,54 @@ interface InsightFilterOptions {
   categories?: InsightCategory[];
   priorities?: InsightPriority[];
   sourceTypes?: ('crm' | 'call_analysis' | 'linguistics' | 'website_visit' | 'market_intelligence' | 'social_media')[];
+  // Pagination parameters
+  page?: number;
+  limit?: number;
 }
 
 const RepInsightsService = {
   async getInsights(userId: string, filters?: InsightFilterOptions): Promise<RepInsight[]> {
     try {
       console.log('Fetching insights from call_analysis table...');
-    // Fetch real data from call_analysis table with proper joins
-    const { data, error } = await supabase
-      .from('call_analysis')
-      .select(`
-        *,
-        contacts:contact_id(first_name, last_name)
-      `)
-      .order('call_date', { ascending: false });
       
-    // If we have data, fetch the linguistics analysis separately for each call
+      // Set default pagination values if not provided
+      const page = filters?.page || 1;
+      const limit = filters?.limit || 10;
+      const offset = (page - 1) * limit;
+      
+      console.log(`Pagination: page ${page}, limit ${limit}, offset ${offset}`);
+      
+      // Fetch real data from call_analysis table with proper joins
+      const { data, error } = await supabase
+        .from('call_analysis')
+        .select(`
+          *,
+          contacts:contact_id(first_name, last_name)
+        `)
+        .order('call_date', { ascending: false })
+        .range(offset, offset + limit - 1); // Apply pagination
+      
+    // If we have data, use the proper join to get linguistics data
     if (!error && data && data.length > 0) {
-      // Get all linguistics_analysis_ids that are not null
-      const linguisticsIds = data
-        .filter(call => call.linguistics_analysis_id)
-        .map(call => call.linguistics_analysis_id);
-        
-      if (linguisticsIds.length > 0) {
-        // Fetch all linguistics analyses in one query
-        const { data: linguisticsData, error: linguisticsError } = await supabase
-          .from('linguistics_analysis')
-          .select('*')
-          .in('id', linguisticsIds);
-          
-        if (!linguisticsError && linguisticsData) {
-          // Create a map of linguistics data by ID for quick lookup
-          const linguisticsMap = linguisticsData.reduce((map, item) => {
-            map[item.id] = item;
-            return map;
-          }, {});
-          
-          // Attach linguistics data to each call
-          data.forEach(call => {
-            if (call.linguistics_analysis_id && linguisticsMap[call.linguistics_analysis_id]) {
-              call.linguistics_analysis = linguisticsMap[call.linguistics_analysis_id];
-            }
-          });
-        } else {
-          console.error('Error fetching linguistics data:', linguisticsError);
-        }
+      console.log('Successfully fetched call analyses, now fetching linguistics data...');
+      
+      // Use a proper join to get linguistics data
+      const { data: callsWithLinguistics, error: joinError } = await supabase
+        .from('call_analysis')
+        .select(`
+          *,
+          contacts:contact_id(first_name, last_name),
+          linguistics:linguistics_analysis_id(*)
+        `)
+        .in('id', data.map(call => call.id))
+        .order('call_date', { ascending: false });
+      
+      if (!joinError && callsWithLinguistics) {
+        console.log(`Successfully fetched ${callsWithLinguistics.length} call analyses with linguistics data`);
+        // Replace the data with the joined data
+        data = callsWithLinguistics;
+      } else {
+        console.error('Error fetching call analyses with linguistics data:', joinError);
       }
     }
         
@@ -310,16 +313,16 @@ const RepInsightsService = {
       
       // Extract linguistics data if available
       let linguisticsData = null;
-      if (call.linguistics_analysis) {
+      if (call.linguistics) {
         console.log('Linguistics data found for call:', call.id);
         linguisticsData = {
-          sentiment_score: call.linguistics_analysis.sentiment_score,
-          key_phrases: call.linguistics_analysis.key_phrases || call.linguistics_analysis.key_topics,
-          transcript: call.linguistics_analysis.transcript,
-          analysis_result: call.linguistics_analysis.analysis_result,
-          language_metrics: call.linguistics_analysis.analysis_result?.language_metrics || {},
-          topic_segments: call.linguistics_analysis.analysis_result?.topic_segments || [],
-          action_items: call.linguistics_analysis.action_items || call.linguistics_analysis.analysis_result?.action_items || []
+          sentiment_score: call.linguistics.sentiment_score,
+          key_phrases: call.linguistics.key_phrases || call.linguistics.key_topics,
+          transcript: call.linguistics.transcript,
+          analysis_result: call.linguistics.analysis_result,
+          language_metrics: call.linguistics.analysis_result?.language_metrics || {},
+          topic_segments: call.linguistics.analysis_result?.topic_segments || [],
+          action_items: call.linguistics.action_items || call.linguistics.analysis_result?.action_items || []
         };
       } else {
         console.log('No linguistics data available for call:', call.id);
@@ -394,7 +397,13 @@ const RepAnalytics: React.FC = () => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const itemsPerPage = 10; // Limit to 10 items per page
   const [selectedTerritory, setSelectedTerritory] = useState<string | null>(null);
   const [insights, setInsights] = useState<RepInsight[]>([]);
   const [filteredInsights, setFilteredInsights] = useState<RepInsight[]>([]);
@@ -442,7 +451,7 @@ const RepAnalytics: React.FC = () => {
   // Fetch insights when user ID or territory changes
   useEffect(() => {
     if (userId) {
-      fetchInsights();
+      fetchInsights(1, false); // Reset to page 1 when territory changes
       fetchUrgentActions();
     }
   }, [userId, selectedTerritory]);
@@ -452,10 +461,14 @@ const RepAnalytics: React.FC = () => {
     filterInsights();
   }, [insights, searchTerm, selectedCategories, selectedPriorities]);
 
-  const fetchInsights = async () => {
+  const fetchInsights = async (page: number = 1, loadMore: boolean = false) => {
     if (!userId) return;
     
-    setIsLoading(true);
+    if (loadMore) {
+      setIsLoadingMore(true);
+    } else {
+      setIsLoading(true);
+    }
     setError(null);
     
     try {
@@ -465,14 +478,40 @@ const RepAnalytics: React.FC = () => {
         filters.territory = selectedTerritory;
       }
       
+      // Add pagination parameters
+      filters.page = page;
+      filters.limit = itemsPerPage;
+      
       const insightData = await RepInsightsService.getInsights(userId, filters);
-      setInsights(insightData);
+      
+      // Check if we've reached the end of the data
+      if (insightData.length < itemsPerPage) {
+        setHasMoreData(false);
+      } else {
+        setHasMoreData(true);
+      }
+      
+      if (loadMore) {
+        // Append new data to existing insights
+        setInsights(prevInsights => [...prevInsights, ...insightData]);
+      } else {
+        // Replace existing data
+        setInsights(insightData);
+        setCurrentPage(1);
+      }
     } catch (err) {
       console.error('Error fetching insights:', err);
       setError(err as Error);
     } finally {
       setIsLoading(false);
+      setIsLoadingMore(false);
     }
+  };
+  
+  const handleLoadMore = () => {
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    fetchInsights(nextPage, true);
   };
 
   const filterInsights = () => {
@@ -529,7 +568,8 @@ const RepAnalytics: React.FC = () => {
   };
 
   const handleRefresh = () => {
-    fetchInsights();
+    setCurrentPage(1);
+    fetchInsights(1, false);
     fetchUrgentActions();
   };
 
@@ -966,68 +1006,87 @@ const RepAnalytics: React.FC = () => {
               </Button>
             </Box>
           ) : (
-            <Grid container spacing={2}>
-              {filteredInsights.map((insight) => (
-                <Grid item xs={12} md={6} key={insight.id}>
-                  <Card sx={{ mb: 2, borderLeft: '4px solid #f50057', borderRadius: 2 }}>
-                    <CardContent>
-                      <Typography variant="h6">{insight.title}</Typography>
-                      <Typography variant="body2">{insight.description}</Typography>
-                      
-                      {/* Display linguistics data if available */}
-                      {insight.linguistics && (
-                        <Box sx={{ mt: 2, p: 1, bgcolor: 'rgba(0, 0, 0, 0.03)', borderRadius: 1 }}>
-                          <Typography variant="subtitle2" gutterBottom>
-                            Linguistics Analysis
-                          </Typography>
-                          
-                          {insight.linguistics.sentiment_score !== undefined && (
-                            <Typography variant="body2">
-                              <strong>Sentiment Score:</strong> {insight.linguistics.sentiment_score.toFixed(2)}
+            <>
+              <Grid container spacing={2}>
+                {filteredInsights.map((insight) => (
+                  <Grid item xs={12} md={6} key={insight.id}>
+                    <Card sx={{ mb: 2, borderLeft: '4px solid #f50057', borderRadius: 2 }}>
+                      <CardContent>
+                        <Typography variant="h6">{insight.title}</Typography>
+                        <Typography variant="body2">{insight.description}</Typography>
+                        
+                        {/* Display linguistics data if available */}
+                        {insight.linguistics && (
+                          <Box sx={{ mt: 2, p: 1, bgcolor: 'rgba(0, 0, 0, 0.03)', borderRadius: 1 }}>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Linguistics Analysis
                             </Typography>
-                          )}
-                          
-                          {insight.linguistics.key_phrases && insight.linguistics.key_phrases.length > 0 && (
-                            <Typography variant="body2">
-                              <strong>Key Phrases:</strong> {insight.linguistics.key_phrases.slice(0, 3).join(', ')}
-                              {insight.linguistics.key_phrases.length > 3 && '...'}
-                            </Typography>
-                          )}
-                          
-                          {insight.linguistics.language_metrics && (
-                            <>
-                              {insight.linguistics.language_metrics.speaking_pace && (
-                                <Typography variant="body2">
-                                  <strong>Speaking Pace:</strong> {insight.linguistics.language_metrics.speaking_pace} WPM
-                                </Typography>
-                              )}
-                              
-                              {insight.linguistics.language_metrics.talk_to_listen_ratio && (
-                                <Typography variant="body2">
-                                  <strong>Talk/Listen Ratio:</strong> {insight.linguistics.language_metrics.talk_to_listen_ratio.toFixed(2)}
-                                </Typography>
-                              )}
-                            </>
-                          )}
-                          
-                          {insight.linguistics.action_items && insight.linguistics.action_items.length > 0 && (
-                            <Typography variant="body2">
-                              <strong>Action Items:</strong> {insight.linguistics.action_items.length} identified
-                            </Typography>
-                          )}
+                            
+                            {insight.linguistics.sentiment_score !== undefined && (
+                              <Typography variant="body2">
+                                <strong>Sentiment Score:</strong> {insight.linguistics.sentiment_score.toFixed(2)}
+                              </Typography>
+                            )}
+                            
+                            {insight.linguistics.key_phrases && insight.linguistics.key_phrases.length > 0 && (
+                              <Typography variant="body2">
+                                <strong>Key Phrases:</strong> {insight.linguistics.key_phrases.slice(0, 3).join(', ')}
+                                {insight.linguistics.key_phrases.length > 3 && '...'}
+                              </Typography>
+                            )}
+                            
+                            {insight.linguistics.language_metrics && (
+                              <>
+                                {insight.linguistics.language_metrics.speaking_pace && (
+                                  <Typography variant="body2">
+                                    <strong>Speaking Pace:</strong> {insight.linguistics.language_metrics.speaking_pace} WPM
+                                  </Typography>
+                                )}
+                                
+                                {insight.linguistics.language_metrics.talk_to_listen_ratio && (
+                                  <Typography variant="body2">
+                                    <strong>Talk/Listen Ratio:</strong> {insight.linguistics.language_metrics.talk_to_listen_ratio.toFixed(2)}
+                                  </Typography>
+                                )}
+                              </>
+                            )}
+                            
+                            {insight.linguistics.action_items && insight.linguistics.action_items.length > 0 && (
+                              <Typography variant="body2">
+                                <strong>Action Items:</strong> {insight.linguistics.action_items.length} identified
+                              </Typography>
+                            )}
+                          </Box>
+                        )}
+                        
+                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                          <Button size="small" onClick={() => handleAction(insight.id)}>
+                            {insight.actionText || 'View Details'}
+                          </Button>
                         </Box>
-                      )}
-                      
-                      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                        <Button size="small" onClick={() => handleAction(insight.id)}>
-                          {insight.actionText || 'View Details'}
-                        </Button>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+              
+              {/* Load More Button */}
+              {hasMoreData && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                  {isLoadingMore ? (
+                    <CircularProgress size={24} sx={{ my: 1 }} />
+                  ) : (
+                    <Button 
+                      variant="outlined" 
+                      onClick={handleLoadMore}
+                      startIcon={<RefreshIcon />}
+                    >
+                      Load More
+                    </Button>
+                  )}
+                </Box>
+              )}
+            </>
           )}
         </Box>
       </Paper>
