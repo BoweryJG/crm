@@ -12,6 +12,12 @@ import {
   ResearchTaskStatus
 } from '../../types/research';
 
+// Import the actual array generators from mockLinguisticsData.ts
+import { 
+  generateMultipleMockLinguisticsAnalyses, 
+  generateMultipleMockCallAnalysesWithLinguistics 
+} from './mockLinguisticsData';
+
 // Import types or define interfaces for call analysis data
 interface CallAnalysis {
   id: string;
@@ -949,12 +955,6 @@ export const generateSingleMockLinguisticsAnalysis = (): LinguisticsAnalysis => 
   const analyses = generateMockLinguisticsAnalyses([callAnalysis]); 
   return analyses[0];
 };
-
-// Import the actual array generators from mockLinguisticsData.ts
-import { 
-  generateMultipleMockLinguisticsAnalyses, 
-  generateMultipleMockCallAnalysesWithLinguistics 
-} from './mockLinguisticsData';
 
 const allLinguisticsData = generateMultipleMockLinguisticsAnalyses(50); 
 const getLinguisticsAnalysis = () => allLinguisticsData;
