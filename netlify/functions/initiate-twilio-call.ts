@@ -1,8 +1,15 @@
 import { Handler, HandlerEvent } from '@netlify/functions';
 import twilio from 'twilio';
 
-// Hardcoded TwiML URL - no environment variable needed
-const TWILIO_CALL_HANDLER_URL = 'https://osbackend-zl1h.onrender.com/twilio/voice';
+// Instead of using backend TwiML, define our own simple TwiML directly
+const SIMPLE_TWIML = `
+<Response>
+  <Say voice="alice">Thank you for answering. This is a call from the SphereOS CRM system.</Say>
+  <Pause length="1"/>
+  <Say voice="alice">The call is now complete. Goodbye.</Say>
+  <Hangup/>
+</Response>
+`;
 
 // Helper function to format phone numbers to E.164
 const formatPhoneNumber = (phoneNumber: string): string | null => {
@@ -97,14 +104,14 @@ export const handler: Handler = async (event: HandlerEvent) => {
     const call = await client.calls.create({
       to: to,
       from: fromNumber,
-      url: TWILIO_CALL_HANDLER_URL, // URL for TwiML instructions
+      twiml: SIMPLE_TWIML, // Use inline TwiML instead of a URL
       // The statusCallback will send updates (e.g., completed, busy, failed) to your twilio-webhook function.
       statusCallback: statusCallbackUrl,
       statusCallbackEvent: ['initiated', 'ringing', 'answered', 'completed'], // Specify desired events
       statusCallbackMethod: 'POST',
     });
 
-    console.log('Twilio call initiated successfully. Call SID:', call.sid, 'TwiML URL used (hardcoded):', TWILIO_CALL_HANDLER_URL);
+    console.log('Twilio call initiated successfully. Call SID:', call.sid, 'Using inline TwiML');
 
     // Note: The frontend's twilioService.ts is already responsible for logging the 'initiated'
     // status to sales_activities AFTER this function returns successfully with a callSid.
