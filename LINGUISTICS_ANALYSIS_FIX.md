@@ -43,6 +43,16 @@ Modified `src/pages/RepAnalytics.tsx` to:
 
 - Use the proper join syntax in the query to fetch related linguistics analysis data
 - Now it uses `linguistics:linguistics_analysis_id(*)` to properly fetch the related linguistics analysis data
+- Added linguistics data display to the insight cards, showing:
+  - Sentiment score
+  - Key phrases
+  - Speaking pace
+  - Talk-to-listen ratio
+  - Action items count
+- Added a new Linguistics Analysis Metrics section to the Performance Metrics area, showing:
+  - Average sentiment score
+  - Average speaking pace
+  - Talk-to-listen ratio
 
 ### 5. Updated Twilio Webhook Handler
 

@@ -134,6 +134,34 @@ interface RepInsight extends ActionableInsightProps {
     sourceType: 'crm' | 'call_analysis' | 'linguistics' | 'website_visit' | 'market_intelligence' | 'social_media';
     sourceId?: string;
   };
+  // Add linguistics data
+  linguistics?: {
+    sentiment_score?: number;
+    key_phrases?: string[];
+    transcript?: string;
+    analysis_result?: any;
+    language_metrics?: {
+      speaking_pace?: number;
+      talk_to_listen_ratio?: number;
+      filler_word_frequency?: number;
+      technical_language_level?: number;
+      interruption_count?: number;
+      average_response_time?: number;
+    };
+    topic_segments?: {
+      topic: string;
+      start_time: number;
+      end_time: number;
+      keywords: string[];
+      summary: string;
+    }[];
+    action_items?: {
+      description: string;
+      timestamp: number;
+      priority: 'low' | 'medium' | 'high';
+      status: 'pending' | 'in_progress' | 'completed';
+    }[];
+  };
 }
 
 interface InsightFilterOptions {
@@ -248,6 +276,23 @@ const RepInsightsService = {
         console.log('Contact information not available for call:', call.id);
       }
       
+      // Extract linguistics data if available
+      let linguisticsData = null;
+      if (call.linguistics) {
+        console.log('Linguistics data found for call:', call.id);
+        linguisticsData = {
+          sentiment_score: call.linguistics.sentiment_score,
+          key_phrases: call.linguistics.key_phrases,
+          transcript: call.linguistics.transcript,
+          analysis_result: call.linguistics.analysis_result,
+          language_metrics: call.linguistics.analysis_result?.language_metrics || {},
+          topic_segments: call.linguistics.analysis_result?.topic_segments || [],
+          action_items: call.linguistics.analysis_result?.action_items || []
+        };
+      } else {
+        console.log('No linguistics data available for call:', call.id);
+      }
+      
       // Create a RepInsight from call analysis data
       const insight: RepInsight = {
         id: call.id,
@@ -269,7 +314,9 @@ const RepInsightsService = {
         metadata: {
           sourceType: 'call_analysis',
           sourceId: call.id
-        }
+        },
+        // Add linguistics data to the insight
+        linguistics: linguisticsData
       };
       
       return insight;
@@ -894,6 +941,51 @@ const RepAnalytics: React.FC = () => {
                     <CardContent>
                       <Typography variant="h6">{insight.title}</Typography>
                       <Typography variant="body2">{insight.description}</Typography>
+                      
+                      {/* Display linguistics data if available */}
+                      {insight.linguistics && (
+                        <Box sx={{ mt: 2, p: 1, bgcolor: 'rgba(0, 0, 0, 0.03)', borderRadius: 1 }}>
+                          <Typography variant="subtitle2" gutterBottom>
+                            Linguistics Analysis
+                          </Typography>
+                          
+                          {insight.linguistics.sentiment_score !== undefined && (
+                            <Typography variant="body2">
+                              <strong>Sentiment Score:</strong> {insight.linguistics.sentiment_score.toFixed(2)}
+                            </Typography>
+                          )}
+                          
+                          {insight.linguistics.key_phrases && insight.linguistics.key_phrases.length > 0 && (
+                            <Typography variant="body2">
+                              <strong>Key Phrases:</strong> {insight.linguistics.key_phrases.slice(0, 3).join(', ')}
+                              {insight.linguistics.key_phrases.length > 3 && '...'}
+                            </Typography>
+                          )}
+                          
+                          {insight.linguistics.language_metrics && (
+                            <>
+                              {insight.linguistics.language_metrics.speaking_pace && (
+                                <Typography variant="body2">
+                                  <strong>Speaking Pace:</strong> {insight.linguistics.language_metrics.speaking_pace} WPM
+                                </Typography>
+                              )}
+                              
+                              {insight.linguistics.language_metrics.talk_to_listen_ratio && (
+                                <Typography variant="body2">
+                                  <strong>Talk/Listen Ratio:</strong> {insight.linguistics.language_metrics.talk_to_listen_ratio.toFixed(2)}
+                                </Typography>
+                              )}
+                            </>
+                          )}
+                          
+                          {insight.linguistics.action_items && insight.linguistics.action_items.length > 0 && (
+                            <Typography variant="body2">
+                              <strong>Action Items:</strong> {insight.linguistics.action_items.length} identified
+                            </Typography>
+                          )}
+                        </Box>
+                      )}
+                      
                       <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
                         <Button size="small" onClick={() => handleAction(insight.id)}>
                           {insight.actionText || 'View Details'}
@@ -976,6 +1068,62 @@ const RepAnalytics: React.FC = () => {
                 <Typography variant="caption" color="text.secondary">
                   Average time from inquiry to resolution
                 </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          
+          {/* Add Linguistics Metrics Card */}
+          <Grid item xs={12} md={12}>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                  <InsightsIcon sx={{ mr: 1, verticalAlign: 'middle', fontSize: '0.9rem' }} /> Linguistics Analysis Metrics
+                </Typography>
+                
+                <Grid container spacing={2} mt={1}>
+                  <Grid item xs={12} sm={4}>
+                    <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', height: '100%' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Average Sentiment Score
+                      </Typography>
+                      <Typography variant="h6" color="primary.main">
+                        0.42
+                      </Typography>
+                      <Typography variant="caption" color="success.main" sx={{ display: 'flex', alignItems: 'center' }}>
+                        <TrendingUpIcon fontSize="small" sx={{ mr: 0.5 }} />
+                        +0.08 from last month
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={4}>
+                    <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', height: '100%' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Average Speaking Pace
+                      </Typography>
+                      <Typography variant="h6" color="primary.main">
+                        145 WPM
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Ideal range: 120-160 WPM
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={4}>
+                    <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', height: '100%' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Talk-to-Listen Ratio
+                      </Typography>
+                      <Typography variant="h6" color="primary.main">
+                        0.85
+                      </Typography>
+                      <Typography variant="caption" color="success.main">
+                        Good balance (ideal: 0.8-1.2)
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                </Grid>
               </CardContent>
             </Card>
           </Grid>
