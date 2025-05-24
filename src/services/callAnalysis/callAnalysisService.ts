@@ -205,20 +205,36 @@ export const CallAnalysisService = {
    * Get linguistics analysis for a call
    */
   async getLinguisticsAnalysis(callId: string): Promise<LinguisticsAnalysis | null> {
-    // First get the call analysis to find the linguistics analysis ID
-    const { data: callAnalysis, error: callError } = await supabase
-      .from('call_analysis')
-      .select('linguistics_analysis_id')
-      .eq('id', callId)
-      .single();
-    
-    if (callError || !callAnalysis || !callAnalysis.linguistics_analysis_id) {
-      console.error(`Error fetching linguistics analysis ID for call ${callId}:`, callError);
+    try {
+      // First get the call analysis to find the linguistics analysis ID
+      const { data: callAnalysis, error: callError } = await supabase
+        .from('call_analysis')
+        .select('linguistics_analysis_id')
+        .eq('id', callId)
+        .single();
+      
+      if (callError || !callAnalysis || !callAnalysis.linguistics_analysis_id) {
+        console.error(`Error fetching linguistics analysis ID for call ${callId}:`, callError);
+        return null;
+      }
+      
+      // Then get the linguistics analysis directly from the linguistics_analysis table
+      const { data, error } = await supabase
+        .from('linguistics_analysis')
+        .select('*')
+        .eq('id', callAnalysis.linguistics_analysis_id)
+        .single();
+        
+      if (error) {
+        console.error(`Error fetching linguistics analysis for ID ${callAnalysis.linguistics_analysis_id}:`, error);
+        return null;
+      }
+      
+      return data as LinguisticsAnalysis;
+    } catch (err) {
+      console.error(`Error in getLinguisticsAnalysis for call ${callId}:`, err);
       return null;
     }
-    
-    // Then get the linguistics analysis from the linguistics service
-    return await LinguisticsService.getAnalysisById(callAnalysis.linguistics_analysis_id);
   },
   
   /**

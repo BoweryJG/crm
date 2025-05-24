@@ -154,7 +154,7 @@ const RepInsightsService = {
       // Fetch real data from call_analysis table
       const { data, error } = await supabase
         .from('call_analysis')
-        .select('*, contacts(first_name, last_name)')
+        .select('*, contacts:contact_id(first_name, last_name)')
         .order('call_date', { ascending: false });
         
       if (error) {
