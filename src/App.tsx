@@ -15,6 +15,7 @@ import Signup from './pages/Auth/Signup';
 import ForgotPassword from './pages/Auth/ForgotPassword';
 import GlobalCallPanel from './components/communications/GlobalCallPanel';
 import { SubscriptionUpgradeModal } from './components/common/SubscriptionUpgradeModal';
+import { FeatureUpgradeModal } from './components/common/FeatureUpgradeModal';
 import { DemoModeIndicator } from './components/common/DemoModeIndicator';
 
 // CSS baseline reset
@@ -93,6 +94,7 @@ const App: React.FC = () => {
             
             {/* App Mode Components */}
             <SubscriptionUpgradeModal />
+            <FeatureUpgradeModal />
             <DemoModeIndicator />
           </BrowserRouter>
           </AppModeProvider>

@@ -1,4 +1,4 @@
-import { AppMode, useAppMode } from '../contexts/AppModeContext';
+import { AppMode, FeatureTier, useAppMode } from '../contexts/AppModeContext';
 import * as mockDataService from './mockData/mockDataService';
 import * as mockLinguisticsData from './mockData/mockLinguisticsData';
 import { LinguisticsService } from './linguistics/linguisticsService';
@@ -6,17 +6,19 @@ import { CallAnalysisService } from './callAnalysis/callAnalysisService';
 import { CallAnalysis, LinguisticsAnalysis } from '../types';
 
 /**
- * Service factory that provides mode-aware services
+ * Service factory that provides mode-aware and feature-tier-aware services
  * This factory will return either real or mock services based on the current app mode
+ * and will limit functionality based on the feature tier
  */
-export const createServiceFactory = (mode: AppMode) => {
+export const createServiceFactory = (mode: AppMode, featureTier: FeatureTier) => {
   const isDemo = mode === 'demo';
+  const isPremium = featureTier === 'premium';
   
   // Enhanced linguistics service with mode awareness
   const linguisticsService = {
     getAllLinguisticsAnalyses: async (): Promise<LinguisticsAnalysis[]> => {
       if (isDemo) {
-        return mockLinguisticsData.generateMultipleMockLinguisticsAnalyses(20);
+        return mockLinguisticsData.generateMultipleMockLinguisticsAnalyses(20) as unknown as LinguisticsAnalysis[];
       } else {
         return LinguisticsService.getAllLinguisticsAnalyses();
       }
@@ -25,7 +27,7 @@ export const createServiceFactory = (mode: AppMode) => {
     getLinguisticsAnalysisById: async (id: string): Promise<LinguisticsAnalysis | null> => {
       if (isDemo) {
         const allAnalyses = mockLinguisticsData.generateMultipleMockLinguisticsAnalyses(50);
-        return allAnalyses.find(analysis => analysis.id === id) || null;
+        return (allAnalyses.find(analysis => analysis.id === id) || null) as unknown as LinguisticsAnalysis | null;
       } else {
         return LinguisticsService.getLinguisticsAnalysisById(id);
       }
@@ -38,7 +40,7 @@ export const createServiceFactory = (mode: AppMode) => {
         return {
           ...mockAnalysis,
           ...analysis,
-        };
+        } as unknown as LinguisticsAnalysis;
       } else {
         return LinguisticsService.createLinguisticsAnalysis(analysis);
       }
@@ -52,7 +54,7 @@ export const createServiceFactory = (mode: AppMode) => {
           ...mockAnalysis,
           ...updates,
           id,
-        };
+        } as unknown as LinguisticsAnalysis;
       } else {
         return LinguisticsService.updateLinguisticsAnalysis(id, updates);
       }
@@ -73,20 +75,39 @@ export const createServiceFactory = (mode: AppMode) => {
         return mockLinguisticsData.generateMultipleMockLinguisticsAnalyses(3).map(analysis => ({
           ...analysis,
           call_id: callId,
-        }));
+        })) as unknown as LinguisticsAnalysis[];
       } else {
         return LinguisticsService.getLinguisticsAnalysesByCallId(callId);
       }
     },
     
     getSentimentTrends: async (timeframe: 'day' | 'week' | 'month' = 'week'): Promise<any[]> => {
+      // Check if user has premium access for detailed sentiment trends
+      if (!isPremium) {
+        // For basic tier, return limited data (only 3 days regardless of timeframe)
+        const days = 3;
+        return Array.from({ length: days }, (_, i) => ({
+          date: new Date(Date.now() - (days - i - 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          average_sentiment: parseFloat((Math.random() * 0.8).toFixed(2)), // Less variation in basic tier
+          call_count: Math.floor(Math.random() * 5) + 1, // Fewer calls in basic tier
+          tier: 'basic'
+        }));
+      }
+      
       if (isDemo) {
-        // Generate mock sentiment trends
+        // Generate mock sentiment trends with premium data
         const days = timeframe === 'day' ? 1 : timeframe === 'week' ? 7 : 30;
         return Array.from({ length: days }, (_, i) => ({
           date: new Date(Date.now() - (days - i - 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           average_sentiment: parseFloat((Math.random() * 1.6 - 0.8).toFixed(2)),
           call_count: Math.floor(Math.random() * 10) + 1,
+          sentiment_breakdown: {
+            positive: parseFloat((Math.random() * 0.5 + 0.3).toFixed(2)),
+            neutral: parseFloat((Math.random() * 0.3 + 0.2).toFixed(2)),
+            negative: parseFloat((Math.random() * 0.3).toFixed(2)),
+          },
+          top_topics: ['pricing', 'product features', 'competition', 'implementation'].slice(0, Math.floor(Math.random() * 3) + 1),
+          tier: 'premium'
         }));
       } else {
         return LinguisticsService.getSentimentTrends(timeframe);
@@ -155,7 +176,7 @@ export const createServiceFactory = (mode: AppMode) => {
   const callAnalysisService = {
     getAllCallAnalyses: async (): Promise<CallAnalysis[]> => {
       if (isDemo) {
-        return mockLinguisticsData.generateMultipleMockCallAnalysesWithLinguistics(20);
+        return mockLinguisticsData.generateMultipleMockCallAnalysesWithLinguistics(20) as unknown as CallAnalysis[];
       } else {
         return CallAnalysisService.getAllCallAnalyses();
       }
@@ -183,7 +204,7 @@ export const createServiceFactory = (mode: AppMode) => {
           mockCalls = mockCalls.filter(call => call.practice_id === filters.practiceId);
         }
         
-        return mockCalls.slice(0, 20); // Return at most 20 calls
+        return mockCalls.slice(0, 20) as unknown as CallAnalysis[]; // Return at most 20 calls
       } else {
         return CallAnalysisService.getCallAnalyses(filters);
       }
@@ -192,7 +213,7 @@ export const createServiceFactory = (mode: AppMode) => {
     getCallAnalysisById: async (id: string): Promise<CallAnalysis | null> => {
       if (isDemo) {
         const mockCalls = mockLinguisticsData.generateMultipleMockCallAnalysesWithLinguistics(50);
-        return mockCalls.find(call => call.id === id) || null;
+        return (mockCalls.find(call => call.id === id) || null) as unknown as CallAnalysis | null;
       } else {
         return CallAnalysisService.getCallAnalysisById(id);
       }
@@ -205,7 +226,7 @@ export const createServiceFactory = (mode: AppMode) => {
         return {
           ...mockCall,
           ...callAnalysis,
-        };
+        } as unknown as CallAnalysis;
       } else {
         return CallAnalysisService.createCallAnalysis(callAnalysis);
       }
@@ -219,7 +240,7 @@ export const createServiceFactory = (mode: AppMode) => {
           ...mockCall,
           ...updates,
           id,
-        };
+        } as unknown as CallAnalysis;
       } else {
         return CallAnalysisService.updateCallAnalysis(id, updates);
       }
@@ -250,7 +271,7 @@ export const createServiceFactory = (mode: AppMode) => {
         return {
           ...mockAnalysis,
           call_id: callId,
-        };
+        } as unknown as LinguisticsAnalysis;
       } else {
         return CallAnalysisService.getLinguisticsAnalysis(callId);
       }
@@ -285,7 +306,7 @@ export const createServiceFactory = (mode: AppMode) => {
         return mockCalls.map(call => ({
           ...call,
           contact_id: contactId,
-        }));
+        })) as unknown as CallAnalysis[];
       } else {
         return CallAnalysisService.getRecentCallsForContact(contactId, limit);
       }
@@ -298,7 +319,7 @@ export const createServiceFactory = (mode: AppMode) => {
         return mockCalls.map(call => ({
           ...call,
           practice_id: practiceId,
-        }));
+        })) as unknown as CallAnalysis[];
       } else {
         return CallAnalysisService.getRecentCallsForPractice(practiceId, limit);
       }
@@ -308,10 +329,15 @@ export const createServiceFactory = (mode: AppMode) => {
       if (isDemo) {
         // In demo mode, generate mock calls with this tag
         const mockCalls = mockLinguisticsData.generateMultipleMockCallAnalysesWithLinguistics(10);
-        return mockCalls.map(call => ({
-          ...call,
-          tags: [...(call.tags || []), tag],
-        }));
+        return mockCalls.map(call => {
+          // Create a new object with the tag added
+          const callWithTag = {
+            ...call,
+            // Add a tags property if it doesn't exist
+            tags: [tag]
+          };
+          return callWithTag as unknown as CallAnalysis;
+        });
       } else {
         return CallAnalysisService.getCallsByTag(tag);
       }
@@ -324,7 +350,7 @@ export const createServiceFactory = (mode: AppMode) => {
         return mockCalls.map(call => ({
           ...call,
           sentiment_score: Math.random() * 0.3 + threshold, // Ensure it's above threshold
-        }));
+        })) as unknown as CallAnalysis[];
       } else {
         return CallAnalysisService.getCallsWithHighSentiment(threshold, limit);
       }
@@ -337,7 +363,7 @@ export const createServiceFactory = (mode: AppMode) => {
         return mockCalls.map(call => ({
           ...call,
           sentiment_score: Math.random() * 0.3 + threshold - 0.3, // Ensure it's below threshold
-        }));
+        })) as unknown as CallAnalysis[];
       } else {
         return CallAnalysisService.getCallsWithLowSentiment(threshold, limit);
       }
@@ -353,10 +379,10 @@ export const createServiceFactory = (mode: AppMode) => {
 };
 
 /**
- * React hook to use the service factory with the current app mode
+ * React hook to use the service factory with the current app mode and feature tier
  */
 export const useServiceFactory = () => {
-  // Use the AppMode context to get the current mode
-  const { mode } = useAppMode();
-  return createServiceFactory(mode);
+  // Use the AppMode context to get the current mode and feature tier
+  const { mode, featureTier } = useAppMode();
+  return createServiceFactory(mode, featureTier);
 };

@@ -27,6 +27,7 @@ import { useThemeContext } from '../../themes/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { AppModeToggle } from '../common/AppModeToggle';
+import { FeatureTierToggle } from '../common/FeatureTierToggle';
 
 interface HeaderProps {
   onSidebarToggle: () => void;
@@ -144,6 +145,11 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
         {/* App Mode Toggle */}
         <Box sx={{ mx: 1 }}>
           <AppModeToggle />
+        </Box>
+        
+        {/* Feature Tier Toggle */}
+        <Box sx={{ mx: 1, display: { xs: 'none', md: 'block' } }}>
+          <FeatureTierToggle />
         </Box>
 
         {/* Notifications */}
