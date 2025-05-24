@@ -14,6 +14,8 @@ import {
   Divider,
   Typography,
   Skeleton,
+  Badge,
+  Chip,
   TextField,
   Dialog,
   DialogActions,
@@ -25,10 +27,15 @@ import {
 } from '@mui/material';
 import {
   Phone as PhoneIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
+  CallEnd as CallEndIcon,
+  Mic as MicIcon,
+  MicOff as MicOffIcon,
+  VolumeUp as VolumeUpIcon,
+  VolumeOff as VolumeOffIcon
 } from '@mui/icons-material';
 import { supabase } from '../../services/supabase/supabase';
-import { callContact, initiateCall } from '../../services/twilio/twilioService';
+import { callContact, disconnectCall, initializeTwilioDevice, initiateServerCall } from '../../services/twilio/twilioService';
 import { useAuth } from '../../hooks/useAuth';
 import { Contact } from '../../types/models';
 import mockDataService from '../../services/mockData/mockDataService';
@@ -41,7 +48,43 @@ const QuickCallWidget: React.FC = () => {
   const [calling, setCalling] = useState<string | null>(null);
   const [personalNumberDialogOpen, setPersonalNumberDialogOpen] = useState(false);
   const [personalNumber, setPersonalNumber] = useState<string>('');
+  const [callStatus, setCallStatus] = useState<'idle' | 'connecting' | 'connected' | 'ended'>('idle');
+  const [isMuted, setIsMuted] = useState(false);
+  const [isSpeakerOn, setIsSpeakerOn] = useState(true);
+  const [callDuration, setCallDuration] = useState(0);
+  const [durationInterval, setDurationInterval] = useState<NodeJS.Timeout | null>(null);
   const currentContactRef = useRef<Contact | null>(null);
+
+  // Initialize the Twilio device when the component loads
+  useEffect(() => {
+    if (user) {
+      initializeTwilioDevice(user.id).then(success => {
+        if (!success) {
+          console.error('Failed to initialize Twilio device');
+        } else {
+          console.log('Twilio device initialized successfully');
+        }
+      });
+    }
+    
+    return () => {
+      // Clean up any active calls when component unmounts
+      if (callStatus === 'connected' || callStatus === 'connecting') {
+        disconnectCall();
+      }
+      
+      if (durationInterval) {
+        clearInterval(durationInterval);
+      }
+    };
+  }, [user]);
+
+  // Format duration from seconds to MM:SS
+  const formatDuration = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     const fetchRecentContacts = async () => {
@@ -139,14 +182,83 @@ const QuickCallWidget: React.FC = () => {
     // Store the contact we want to call
     currentContactRef.current = contact;
 
-    // If we don't have a personal number saved yet, ask for it
-    if (!personalNumber) {
-      setPersonalNumberDialogOpen(true);
-      return;
+    // Choose between browser-based call or personal phone call
+    const useBrowserCall = window.confirm("Use browser for calling? Click OK for browser call, or Cancel for phone call");
+    
+    if (useBrowserCall) {
+      // Make browser-based call
+      makeDirectBrowserCall(contact);
+    } else {
+      // If we don't have a personal number saved yet, ask for it
+      if (!personalNumber) {
+        setPersonalNumberDialogOpen(true);
+        return;
+      }
+      
+      // Otherwise proceed with the call to personal phone
+      executeCall(contact, personalNumber);
+    }
+  };
+
+  const makeDirectBrowserCall = async (contact: Contact) => {
+    if (!user) return;
+    
+    setCalling(contact.id);
+    setCallStatus('connecting');
+    
+    try {
+      // Make browser-based call
+      const result = await callContact(contact, user.id);
+      
+      if (!result.success) {
+        alert(`Call failed: ${result.error}`);
+        setCallStatus('idle');
+        setCalling(null);
+        return;
+      }
+      
+      // Start call duration timer
+      setCallStatus('connected');
+      const interval = setInterval(() => {
+        setCallDuration(prev => prev + 1);
+      }, 1000);
+      setDurationInterval(interval);
+      
+    } catch (error) {
+      console.error('Error making call:', error);
+      setCallStatus('idle');
+    }
+  };
+  
+  const handleEndCall = () => {
+    // End the call
+    disconnectCall();
+    
+    // Reset call state
+    setCallStatus('ended');
+    setCalling(null);
+    
+    // Clear the duration timer
+    if (durationInterval) {
+      clearInterval(durationInterval);
+      setDurationInterval(null);
     }
     
-    // Otherwise proceed with the call
-    executeCall(contact, personalNumber);
+    // After a brief delay, reset to idle
+    setTimeout(() => {
+      setCallStatus('idle');
+      setCallDuration(0);
+    }, 2000);
+  };
+  
+  const handleToggleMute = () => {
+    setIsMuted(!isMuted);
+    // In a real implementation, you would call a Twilio method to mute/unmute
+  };
+  
+  const handleToggleSpeaker = () => {
+    setIsSpeakerOn(!isSpeakerOn);
+    // In a real implementation, you would control audio output
   };
 
   const executeCall = async (contact: Contact, phoneNumber: string) => {
@@ -155,7 +267,7 @@ const QuickCallWidget: React.FC = () => {
     setCalling(contact.id);
     try {
       // Pass the personal number to connect the call to
-      const result = await initiateCall({
+      const result = await initiateServerCall({
         to: contact.phone,
         from: process.env.REACT_APP_TWILIO_PHONE_NUMBER || '',
         contactId: contact.id,
@@ -201,7 +313,7 @@ const QuickCallWidget: React.FC = () => {
             type="tel"
             fullWidth
             value={personalNumber}
-            onChange={(e) => setPersonalNumber(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPersonalNumber(e.target.value)}
             placeholder="e.g. +1 415 555 1234"
             variant="outlined"
           />
@@ -216,10 +328,75 @@ const QuickCallWidget: React.FC = () => {
         </DialogActions>
       </Dialog>
 
+      {callStatus === 'connected' && (
+        <Card variant="outlined" sx={{ mb: 2, p: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <Avatar sx={{ width: 60, height: 60, bgcolor: theme.palette.primary.main }}>
+              <PersonIcon sx={{ fontSize: 30 }} />
+            </Avatar>
+            
+            <Typography variant="h6">
+              {currentContactRef.current ? 
+                `${currentContactRef.current.first_name} ${currentContactRef.current.last_name}` : 
+                'Current Call'}
+            </Typography>
+            
+            <Chip 
+              label="Browser Call" 
+              color="primary" 
+              size="small" 
+              sx={{ mb: 1 }} 
+            />
+            
+            <Typography variant="h4" sx={{ fontFamily: 'monospace', my: 1 }}>
+              {formatDuration(callDuration)}
+            </Typography>
+            
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <IconButton 
+                color={isMuted ? 'default' : 'primary'}
+                onClick={handleToggleMute}
+              >
+                {isMuted ? <MicOffIcon /> : <MicIcon />}
+              </IconButton>
+              
+              <IconButton 
+                color="error"
+                onClick={handleEndCall}
+                sx={{ 
+                  backgroundColor: 'error.main',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'error.dark',
+                  }
+                }}
+              >
+                <CallEndIcon />
+              </IconButton>
+              
+              <IconButton 
+                color={isSpeakerOn ? 'primary' : 'default'}
+                onClick={handleToggleSpeaker}
+              >
+                {isSpeakerOn ? <VolumeUpIcon /> : <VolumeOffIcon />}
+              </IconButton>
+            </Box>
+          </Box>
+        </Card>
+      )}
+
       <Card variant="outlined">
         <CardHeader 
           title="Quick Call" 
           titleTypographyProps={{ variant: 'h6' }}
+          action={
+            <Chip 
+              label="Browser calling enabled" 
+              color="success" 
+              size="small" 
+              variant="outlined" 
+            />
+          }
         />
         <Divider />
         <CardContent sx={{ p: 0 }}>

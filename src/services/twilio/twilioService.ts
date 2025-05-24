@@ -1,5 +1,6 @@
 import { supabase } from '../supabase/supabase';
 import { Contact } from '../../types/models';
+import { Device } from '@twilio/voice-sdk';
 
 // Helper function to validate if a string is a valid UUID
 const isValidUUID = (str: string): boolean => {
@@ -11,6 +12,9 @@ const isValidUUID = (str: string): boolean => {
 const TWILIO_FUNCTION_URL = process.env.REACT_APP_TWILIO_FUNCTION_URL || '';
 const TWILIO_API_KEY = process.env.REACT_APP_TWILIO_API_KEY || '';
 
+// Store our Twilio Device instance
+let device: Device | null = null;
+
 /**
  * Interface for call parameters
  */
@@ -21,7 +25,17 @@ interface CallParams {
   practiceId: string;
   userId: string;
   callbackUrl?: string;
-  personalNumber?: string; // Add personal number to connect the call to
+  personalNumber?: string;
+}
+
+/**
+ * Interface for browser call parameters
+ */
+interface BrowserCallParams {
+  to: string;
+  contactId: string;
+  practiceId: string;
+  userId: string;
 }
 
 /**
@@ -238,29 +252,159 @@ export const formatPhoneNumber = (phoneNumber: string): string | null => {
 };
 
 /**
- * Makes a call to a contact
+ * Makes a browser-based call to a contact using Twilio Client
  * @param contact Contact to call
  * @param userId Current user ID
  * @returns Call response
  */
 export const callContact = async (contact: Contact, userId: string): Promise<CallResponse> => {
-  // In a real app, you would get the 'from' number from user settings or environment
-  const fromNumber = process.env.REACT_APP_TWILIO_PHONE_NUMBER || '';
-  
-  if (!fromNumber) {
-    return { 
-      success: false, 
-      error: 'No outbound phone number configured' 
+  try {
+    // Initialize the Device if not already done
+    if (!device) {
+      const initialized = await initializeTwilioDevice(userId);
+      if (!initialized) {
+        return {
+          success: false,
+          error: 'Failed to initialize Twilio device'
+        };
+      }
+    }
+
+    // Ensure the contact has a phone number
+    if (!contact.phone) {
+      return {
+        success: false,
+        error: 'Contact has no phone number'
+      };
+    }
+    
+    // Make the call using the browser
+    return makeCallFromBrowser({
+      to: contact.phone,
+      contactId: contact.id,
+      practiceId: contact.practice_id || 'unknown',
+      userId: userId
+    });
+  } catch (error) {
+    console.error('Error in callContact:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error occurred'
     };
   }
+};
 
-  return initiateCall({
-    to: contact.phone,
-    from: fromNumber,
-    contactId: contact.id,
-    practiceId: contact.practice_id || 'unknown',
-    userId: userId
-  });
+/**
+ * Initialize the Twilio Device for browser-based calling
+ * @param userId User ID for the token
+ * @returns Success flag
+ */
+export const initializeTwilioDevice = async (userId: string): Promise<boolean> => {
+  try {
+    // Get an access token from our backend
+    const response = await fetch('/.netlify/functions/initiate-twilio-call/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identity: userId })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to get access token');
+    }
+    
+    const data = await response.json();
+    const token = data.token;
+    
+    // Initialize the Twilio Device with the token
+    device = new Device(token);
+    
+    // Listen for incoming calls
+    device.on('incoming', (call) => {
+      // Handle incoming calls - you would show a UI to accept/reject the call
+      console.log('Incoming call from:', call.parameters.From);
+      
+      // You could trigger a notification here or update your UI
+      // For now, we'll just auto-accept the call
+      call.accept();
+    });
+    
+    // Add additional event listeners
+    device.on('error', (error) => {
+      console.error('Twilio Device Error:', error);
+    });
+    
+    await device.register();
+    return true;
+  } catch (error) {
+    console.error('Error initializing Twilio device:', error);
+    return false;
+  }
+};
+
+/**
+ * Make a call directly from the browser using Twilio Client
+ * @param params Call parameters
+ * @returns Call response
+ */
+export const makeCallFromBrowser = async (params: BrowserCallParams): Promise<CallResponse> => {
+  try {
+    if (!device) {
+      return {
+        success: false,
+        error: 'Twilio device not initialized'
+      };
+    }
+    
+    // Format the phone number
+    const formattedTo = formatPhoneNumber(params.to);
+    if (!formattedTo) {
+      return {
+        success: false,
+        error: 'Invalid phone number format'
+      };
+    }
+    
+    // Make the call
+    const call = await device.connect({
+      params: {
+        To: formattedTo,
+        ContactId: params.contactId,
+        PracticeId: params.practiceId,
+        UserId: params.userId
+      }
+    });
+    
+    // Log the call in your database
+    logCallActivity({
+      contactId: params.contactId,
+      practiceId: params.practiceId,
+      userId: params.userId,
+      callSid: call.parameters.CallSid || 'browser-call-' + Date.now(),
+      status: 'initiated',
+      fromNumber: 'browser',
+      toNumber: formattedTo,
+      direction: 'outbound'
+    });
+    
+    // Also create a higher-level activity record
+    logSalesActivity({
+      contactId: params.contactId,
+      notes: `Browser-based call to ${formattedTo}`,
+      callSid: call.parameters.CallSid
+    });
+    
+    return {
+      success: true,
+      callSid: call.parameters.CallSid
+    };
+  } catch (error) {
+    console.error('Error making browser call:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error occurred'
+    };
+  }
 };
 
 /**
@@ -324,6 +468,82 @@ export const logSalesActivity = async (params: SalesActivityParams): Promise<boo
  * @param contactId Contact ID
  * @returns Call history
  */
+/**
+ * Disconnect the active browser call
+ */
+export const disconnectCall = (): void => {
+  if (device) {
+    device.disconnectAll();
+  }
+};
+
+/**
+ * The original server-based call initiation (kept for backup/compatibility)
+ */
+export const initiateServerCall = async (params: CallParams): Promise<CallResponse> => {
+  try {
+    // Validate phone number format
+    const formattedTo = formatPhoneNumber(params.to);
+    if (!formattedTo) {
+      return { success: false, error: 'Invalid phone number format' };
+    }
+
+    // Make API call to Twilio Function
+    // TWILIO_FUNCTION_URL should be the complete URL to the Netlify function
+    const TWILIO_FUNCTION_URL = process.env.REACT_APP_TWILIO_FUNCTION_URL || '';
+    const TWILIO_API_KEY = process.env.REACT_APP_TWILIO_API_KEY || '';
+    
+    const response = await fetch(TWILIO_FUNCTION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${TWILIO_API_KEY}`
+      },
+      body: JSON.stringify({
+        to: formattedTo,
+        from: params.from,
+        callbackUrl: params.callbackUrl || `${window.location.origin}/call-callback`,
+        personalNumber: params.personalNumber
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to initiate call');
+    }
+
+    // Log call details
+    await logCallActivity({
+      contactId: params.contactId,
+      practiceId: params.practiceId,
+      userId: params.userId,
+      callSid: data.callSid,
+      status: 'initiated',
+      fromNumber: params.from,
+      toNumber: formattedTo,
+      direction: 'outbound'
+    });
+    
+    await logSalesActivity({
+      contactId: params.contactId,
+      notes: `Outbound call to ${formattedTo}`,
+      callSid: data.callSid
+    });
+
+    return {
+      success: true,
+      callSid: data.callSid
+    };
+  } catch (error) {
+    console.error('Error initiating server call:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error occurred'
+    };
+  }
+};
+
 export const fetchCallHistory = async (contactId: string) => {
   try {
     // Query the sales_activities table for call activities

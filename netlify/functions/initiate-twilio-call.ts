@@ -1,17 +1,97 @@
 import { Handler, HandlerEvent } from '@netlify/functions';
 import twilio from 'twilio';
+const AccessToken = twilio.jwt.AccessToken;
+const VoiceGrant = AccessToken.VoiceGrant;
 
-// Get URL of your personal Twilio voice application
-// This should point to a TwiML app that handles the call on your end
-const PERSONAL_TWIML_APP_URL = process.env.TWILIO_PERSONAL_TWIML_APP || 'https://handler.twilio.com/twiml/EH179be5dbd5c91d93cc8351eba7ab0121';
+// Handle token generation for the browser client
+const generateAccessToken = async (event: HandlerEvent) => {
+  try {
+    // Parse query parameters or body
+    let identity;
+    
+    if (event.queryStringParameters && event.queryStringParameters.identity) {
+      identity = event.queryStringParameters.identity;
+    } else if (event.body) {
+      const body = JSON.parse(event.body);
+      identity = body.identity;
+    }
 
-// When we make an outbound call, we need to generate TwiML that dials your personal number
-// This way, when the recipient answers, they'll be connected to you
-const generateTwiML = (personalNumber) => {
+    if (!identity) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Identity parameter is required' }),
+      };
+    }
+
+    const { 
+      TWILIO_ACCOUNT_SID, 
+      TWILIO_API_KEY, 
+      TWILIO_API_SECRET,
+      TWILIO_TWIML_APP_SID,
+    } = process.env;
+
+    if (!TWILIO_ACCOUNT_SID || !TWILIO_API_KEY || !TWILIO_API_SECRET || !TWILIO_TWIML_APP_SID) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Missing required environment variables for token generation' }),
+      };
+    }
+
+    // Create an access token
+    const token = new AccessToken(
+      TWILIO_ACCOUNT_SID,
+      TWILIO_API_KEY,
+      TWILIO_API_SECRET,
+      { identity }
+    );
+
+    // Create a Voice grant for this token
+    const grant = new VoiceGrant({
+      outgoingApplicationSid: TWILIO_TWIML_APP_SID,
+      incomingAllow: true // Allow incoming calls
+    });
+
+    // Add the grant to the token
+    token.addGrant(grant);
+
+    // Generate the token
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*', // For CORS
+      },
+      body: JSON.stringify({
+        token: token.toJwt(),
+        identity: identity
+      }),
+    };
+  } catch (error) {
+    console.error('Error generating token:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Failed to generate token' }),
+    };
+  }
+};
+
+// This TwiML is used when making calls from the browser
+const generateVoiceTwiML = (to, from) => {
   return `
 <Response>
-  <Dial callerId="${personalNumber}" timeout="30" record="false">
-    <Number>${personalNumber}</Number>
+  <Dial callerId="${from}">
+    <Number>${to}</Number>
+  </Dial>
+</Response>
+`;
+};
+
+// This TwiML handles incoming calls to the browser
+const generateIncomingCallTwiML = (clientName) => {
+  return `
+<Response>
+  <Dial>
+    <Client>${clientName}</Client>
   </Dial>
 </Response>
 `;
@@ -37,6 +117,65 @@ const formatPhoneNumber = (phoneNumber: string): string | null => {
 };
 
 export const handler: Handler = async (event: HandlerEvent) => {
+  // Handle different endpoints
+  const path = event.path.replace('/.netlify/functions/initiate-twilio-call', '');
+  
+  // Generate token for browser client
+  if (path === '/token' || path.includes('/token')) {
+    return generateAccessToken(event);
+  }
+
+  // Handle voice TwiML for browser-to-phone call
+  if (path === '/voice' || path.includes('/voice')) {
+    try {
+      let to = '';
+      let from = '';
+      let clientName = '';
+      
+      // Parse the request body differently depending on HTTP method
+      if (event.httpMethod === 'POST') {
+        if (event.body) {
+          const params = new URLSearchParams(event.body);
+          to = params.get('To') || '';
+          from = params.get('From') || '';
+          clientName = params.get('Client') || '';
+        }
+      } else if (event.httpMethod === 'GET' && event.queryStringParameters) {
+        to = event.queryStringParameters.To || '';
+        from = event.queryStringParameters.From || '';
+        clientName = event.queryStringParameters.Client || '';
+      }
+
+      console.log('Voice TwiML request:', { to, from, clientName });
+
+      // Determine if this is an incoming call to the browser client or outgoing call from browser
+      if (to.startsWith('client:')) {
+        // This is an incoming call to the browser client
+        const client = to.substring(7); // Remove 'client:' prefix
+        return {
+          statusCode: 200,
+          headers: { 'Content-Type': 'application/xml' },
+          body: generateIncomingCallTwiML(client)
+        };
+      } else {
+        // This is an outgoing call from browser to phone number
+        const callerId = process.env.TWILIO_PHONE_NUMBER || from;
+        return {
+          statusCode: 200,
+          headers: { 'Content-Type': 'application/xml' },
+          body: generateVoiceTwiML(to, callerId)
+        };
+      }
+    } catch (error) {
+      console.error('Error generating voice TwiML:', error);
+      return {
+        statusCode: 500,
+        body: 'Error handling voice request'
+      };
+    }
+  }
+  
+  // Handle outbound call initiation (original functionality)
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -47,12 +186,15 @@ export const handler: Handler = async (event: HandlerEvent) => {
   const { 
     TWILIO_ACCOUNT_SID, 
     TWILIO_AUTH_TOKEN, 
-    TWILIO_PHONE_NUMBER: rawTwilioPhoneNumber, 
+    TWILIO_PHONE_NUMBER: rawTwilioPhoneNumber,
+    TWILIO_API_KEY,
+    TWILIO_API_SECRET,
+    TWILIO_TWIML_APP_SID,
     NETLIFY_SITE_URL
   } = process.env;
 
   if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !rawTwilioPhoneNumber) {
-    console.error('Core Twilio environment variables (ACCOUNT_SID, AUTH_TOKEN, PHONE_NUMBER) not set for initiate-twilio-call function');
+    console.error('Core Twilio environment variables not set for initiate-twilio-call function');
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Twilio configuration error on server: Missing core credentials.' }),
@@ -107,29 +249,17 @@ export const handler: Handler = async (event: HandlerEvent) => {
     
     console.log(`Initiating call from ${fromNumber} to ${to}. Status callback: ${statusCallbackUrl}`);
 
-    // Extract the personal number from the request or use a default
-    const personalNumber = requestBody.personalNumber || process.env.PERSONAL_PHONE_NUMBER;
-    
-    if (!personalNumber) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ 
-          error: 'Missing personal phone number. Please provide personalNumber in the request or set PERSONAL_PHONE_NUMBER in environment variables.' 
-        }),
-      };
-    }
-
-    // For a full two-way call, we first call the target number
+    // For a standard call (this will be replaced by browser-based calling)
     const call = await client.calls.create({
-      to: to, // The person you want to call
-      from: fromNumber, // Your Twilio number
-      twiml: generateTwiML(personalNumber), // When they answer, dial your personal number to connect both parties
+      to: to,
+      from: fromNumber,
+      url: `${siteUrl}/.netlify/functions/initiate-twilio-call/voice?To=${to}&From=${fromNumber}`,
       statusCallback: statusCallbackUrl,
       statusCallbackEvent: ['initiated', 'ringing', 'answered', 'completed'],
       statusCallbackMethod: 'POST',
     });
 
-    console.log(`Initiated two-way call from ${fromNumber} to ${to}, connecting to personal number ${personalNumber}. Call SID: ${call.sid}`);
+    console.log(`Initiated call from ${fromNumber} to ${to}. Call SID: ${call.sid}`);
 
     // Note: The frontend's twilioService.ts is already responsible for logging the 'initiated'
     // status to sales_activities AFTER this function returns successfully with a callSid.
