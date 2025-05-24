@@ -1,13 +1,21 @@
 import { Handler, HandlerEvent } from '@netlify/functions';
 import twilio from 'twilio';
 
-// Silent TwiML - doesn't say anything, just connects and hangs up after 3 seconds
-const SIMPLE_TWIML = `
+// Get URL of your personal Twilio voice application
+// This should point to a TwiML app that handles the call on your end
+const PERSONAL_TWIML_APP_URL = process.env.TWILIO_PERSONAL_TWIML_APP || 'https://handler.twilio.com/twiml/EH179be5dbd5c91d93cc8351eba7ab0121';
+
+// When we make an outbound call, we need to generate TwiML that dials your personal number
+// This way, when the recipient answers, they'll be connected to you
+const generateTwiML = (personalNumber) => {
+  return `
 <Response>
-  <Pause length="3"/>
-  <Hangup/>
+  <Dial callerId="${personalNumber}" timeout="30" record="false">
+    <Number>${personalNumber}</Number>
+  </Dial>
 </Response>
 `;
+};
 
 // Helper function to format phone numbers to E.164
 const formatPhoneNumber = (phoneNumber: string): string | null => {
@@ -99,17 +107,29 @@ export const handler: Handler = async (event: HandlerEvent) => {
     
     console.log(`Initiating call from ${fromNumber} to ${to}. Status callback: ${statusCallbackUrl}`);
 
+    // Extract the personal number from the request or use a default
+    const personalNumber = requestBody.personalNumber || process.env.PERSONAL_PHONE_NUMBER;
+    
+    if (!personalNumber) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ 
+          error: 'Missing personal phone number. Please provide personalNumber in the request or set PERSONAL_PHONE_NUMBER in environment variables.' 
+        }),
+      };
+    }
+
+    // For a full two-way call, we first call the target number
     const call = await client.calls.create({
-      to: to,
-      from: fromNumber,
-      twiml: SIMPLE_TWIML, // Use inline TwiML instead of a URL
-      // The statusCallback will send updates (e.g., completed, busy, failed) to your twilio-webhook function.
+      to: to, // The person you want to call
+      from: fromNumber, // Your Twilio number
+      twiml: generateTwiML(personalNumber), // When they answer, dial your personal number to connect both parties
       statusCallback: statusCallbackUrl,
-      statusCallbackEvent: ['initiated', 'ringing', 'answered', 'completed'], // Specify desired events
+      statusCallbackEvent: ['initiated', 'ringing', 'answered', 'completed'],
       statusCallbackMethod: 'POST',
     });
 
-    console.log('Twilio call initiated successfully. Call SID:', call.sid, 'Using inline TwiML');
+    console.log(`Initiated two-way call from ${fromNumber} to ${to}, connecting to personal number ${personalNumber}. Call SID: ${call.sid}`);
 
     // Note: The frontend's twilioService.ts is already responsible for logging the 'initiated'
     // status to sales_activities AFTER this function returns successfully with a callSid.

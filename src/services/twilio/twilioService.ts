@@ -21,6 +21,7 @@ interface CallParams {
   practiceId: string;
   userId: string;
   callbackUrl?: string;
+  personalNumber?: string; // Add personal number to connect the call to
 }
 
 /**
@@ -65,7 +66,8 @@ export const initiateCall = async (params: CallParams): Promise<CallResponse> =>
       body: JSON.stringify({
         to: formattedTo,
         from: params.from,
-        callbackUrl: params.callbackUrl || `${window.location.origin}/call-callback`
+        callbackUrl: params.callbackUrl || `${window.location.origin}/call-callback`,
+        personalNumber: params.personalNumber // Pass the personal number to connect to
       })
     });
 
