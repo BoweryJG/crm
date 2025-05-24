@@ -61,17 +61,47 @@ FOR EACH ROW EXECUTE PROCEDURE update_linguistics_analysis_modified_column();
 -- Enable RLS on linguistics_analysis table
 ALTER TABLE linguistics_analysis ENABLE ROW LEVEL SECURITY;
 
--- Create policy for authenticated users to view linguistics_analysis
-CREATE POLICY "Authenticated users can view linguistics_analysis"
-  ON linguistics_analysis FOR SELECT
-  USING (true);
+-- Create policy for authenticated users to view linguistics_analysis (if it doesn't exist)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'linguistics_analysis' 
+    AND policyname = 'Authenticated users can view linguistics_analysis'
+  ) THEN
+    CREATE POLICY "Authenticated users can view linguistics_analysis"
+      ON linguistics_analysis FOR SELECT
+      USING (true);
+  END IF;
+END
+$$;
 
--- Create policy for authenticated users to insert linguistics_analysis
-CREATE POLICY "Authenticated users can insert linguistics_analysis"
-  ON linguistics_analysis FOR INSERT
-  WITH CHECK (true);
+-- Create policy for authenticated users to insert linguistics_analysis (if it doesn't exist)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'linguistics_analysis' 
+    AND policyname = 'Authenticated users can insert linguistics_analysis'
+  ) THEN
+    CREATE POLICY "Authenticated users can insert linguistics_analysis"
+      ON linguistics_analysis FOR INSERT
+      WITH CHECK (true);
+  END IF;
+END
+$$;
 
--- Create policy for authenticated users to update linguistics_analysis
-CREATE POLICY "Authenticated users can update linguistics_analysis"
-  ON linguistics_analysis FOR UPDATE
-  USING (true);
+-- Create policy for authenticated users to update linguistics_analysis (if it doesn't exist)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'linguistics_analysis' 
+    AND policyname = 'Authenticated users can update linguistics_analysis'
+  ) THEN
+    CREATE POLICY "Authenticated users can update linguistics_analysis"
+      ON linguistics_analysis FOR UPDATE
+      USING (true);
+  END IF;
+END
+$$;
