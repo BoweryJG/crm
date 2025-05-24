@@ -7,17 +7,20 @@ import {
   generateMockResearchTasks,
   generateMockResearchPrompts,
   generateMockResearchNotes,
-  generateMockResearchDataQueries
+  generateMockResearchDataQueries,
+  generateMockCallAnalyses,
+  generateMockLinguisticsAnalyses
 } from '../mockData/mockDataService';
+import { generateMockLinguisticsAnalysis, enhanceMockDataWithLinguistics, generateMockCallAnalysisWithLinguistics } from '../mockData/mockLinguisticsData';
 
 // Environment variables for Supabase
 console.log('NODE_ENV:', process.env.NODE_ENV || 'development');
 
 const rawSupabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-const rawSupabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+const rawSupabaseAnonKey = process.env.REACT_APP_SUPABASE_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY;
 
 console.log('Raw REACT_APP_SUPABASE_URL:', rawSupabaseUrl ? `Set (ends with "${rawSupabaseUrl.slice(-10)}")` : 'Not Set');
-console.log('Raw REACT_APP_SUPABASE_ANON_KEY:', rawSupabaseAnonKey ? `Set (starts with "${rawSupabaseAnonKey.substring(0, 10)}...", ends with "${rawSupabaseAnonKey.slice(-4)}")` : 'Not Set');
+console.log('Raw REACT_APP_SUPABASE_KEY/ANON_KEY:', rawSupabaseAnonKey ? `Set (starts with "${rawSupabaseAnonKey.substring(0, 10)}...", ends with "${rawSupabaseAnonKey.slice(-4)}")` : 'Not Set');
 
 // Replace these with your Supabase credentials
 const supabaseUrl = rawSupabaseUrl || 'https://example.supabase.co';
@@ -200,6 +203,12 @@ const createMockClient = (): SupabaseClient => {
       const mockPrompts = generateMockResearchPrompts(3);
       const mockNotes = generateMockResearchNotes(mockProjects, 1);
       const mockQueries = generateMockResearchDataQueries(2);
+      
+      // Generate mock call analyses and linguistics analyses with proper relationships
+      const enhancedMockData = enhanceMockDataWithLinguistics({});
+      // Use the enhanced mock data that has proper relationships between call_analysis and linguistics_analysis
+      const mockCallAnalyses = enhancedMockData.call_analysis as any[];
+      const mockLinguisticsAnalyses = enhancedMockData.linguistics_analysis as any[];
 
       const mockData: Record<string, any[]> = {
         contacts: mockContacts,
@@ -210,7 +219,9 @@ const createMockClient = (): SupabaseClient => {
         research_tasks: mockTasks,
         research_prompts: mockPrompts,
         research_notes: mockNotes,
-        research_data_queries: mockQueries
+        research_data_queries: mockQueries,
+        call_analysis: mockCallAnalyses,
+        linguistics_analysis: mockLinguisticsAnalyses
       };
       
       // Get data for the requested table

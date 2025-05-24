@@ -184,10 +184,42 @@ const RepInsightsService = {
       .from('call_analysis')
       .select(`
         *,
-        contacts:contact_id(first_name, last_name),
-        linguistics:linguistics_analysis_id(*)
+        contacts:contact_id(first_name, last_name)
       `)
       .order('call_date', { ascending: false });
+      
+    // If we have data, fetch the linguistics analysis separately for each call
+    if (!error && data && data.length > 0) {
+      // Get all linguistics_analysis_ids that are not null
+      const linguisticsIds = data
+        .filter(call => call.linguistics_analysis_id)
+        .map(call => call.linguistics_analysis_id);
+        
+      if (linguisticsIds.length > 0) {
+        // Fetch all linguistics analyses in one query
+        const { data: linguisticsData, error: linguisticsError } = await supabase
+          .from('linguistics_analysis')
+          .select('*')
+          .in('id', linguisticsIds);
+          
+        if (!linguisticsError && linguisticsData) {
+          // Create a map of linguistics data by ID for quick lookup
+          const linguisticsMap = linguisticsData.reduce((map, item) => {
+            map[item.id] = item;
+            return map;
+          }, {});
+          
+          // Attach linguistics data to each call
+          data.forEach(call => {
+            if (call.linguistics_analysis_id && linguisticsMap[call.linguistics_analysis_id]) {
+              call.linguistics_analysis = linguisticsMap[call.linguistics_analysis_id];
+            }
+          });
+        } else {
+          console.error('Error fetching linguistics data:', linguisticsError);
+        }
+      }
+    }
         
       if (error) {
         console.error('Error fetching call analyses:', error);
@@ -278,16 +310,16 @@ const RepInsightsService = {
       
       // Extract linguistics data if available
       let linguisticsData = null;
-      if (call.linguistics) {
+      if (call.linguistics_analysis) {
         console.log('Linguistics data found for call:', call.id);
         linguisticsData = {
-          sentiment_score: call.linguistics.sentiment_score,
-          key_phrases: call.linguistics.key_phrases,
-          transcript: call.linguistics.transcript,
-          analysis_result: call.linguistics.analysis_result,
-          language_metrics: call.linguistics.analysis_result?.language_metrics || {},
-          topic_segments: call.linguistics.analysis_result?.topic_segments || [],
-          action_items: call.linguistics.analysis_result?.action_items || []
+          sentiment_score: call.linguistics_analysis.sentiment_score,
+          key_phrases: call.linguistics_analysis.key_phrases || call.linguistics_analysis.key_topics,
+          transcript: call.linguistics_analysis.transcript,
+          analysis_result: call.linguistics_analysis.analysis_result,
+          language_metrics: call.linguistics_analysis.analysis_result?.language_metrics || {},
+          topic_segments: call.linguistics_analysis.analysis_result?.topic_segments || [],
+          action_items: call.linguistics_analysis.action_items || call.linguistics_analysis.analysis_result?.action_items || []
         };
       } else {
         console.log('No linguistics data available for call:', call.id);
