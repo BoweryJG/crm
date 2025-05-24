@@ -5,6 +5,7 @@ import Practices from './pages/Practices';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './themes/ThemeContext';
 import { AuthProvider } from './hooks/useAuth';
+import { AppModeProvider } from './contexts/AppModeContext';
 import LoadingScreen from './components/common/LoadingScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import Layout from './components/layout/Layout';
@@ -13,6 +14,8 @@ import Login from './pages/Auth/Login';
 import Signup from './pages/Auth/Signup';
 import ForgotPassword from './pages/Auth/ForgotPassword';
 import GlobalCallPanel from './components/communications/GlobalCallPanel';
+import { SubscriptionUpgradeModal } from './components/common/SubscriptionUpgradeModal';
+import { DemoModeIndicator } from './components/common/DemoModeIndicator';
 
 // CSS baseline reset
 import CssBaseline from '@mui/material/CssBaseline';
@@ -50,16 +53,17 @@ const App: React.FC = () => {
     <ThemeProvider>
       <ErrorBoundary>
         <AuthProvider>
-          <CssBaseline />
-          <BrowserRouter>
-            <Routes>
-              {/* Auth Routes - still available but not required */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              
-              {/* All Routes - no authentication required */}
-              <Route path="/" element={<Layout />}>
+          <AppModeProvider>
+            <CssBaseline />
+            <BrowserRouter>
+              <Routes>
+                {/* Auth Routes - still available but not required */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                
+                {/* All Routes - no authentication required */}
+                <Route path="/" element={<Layout />}>
                 <Route index element={<Dashboard />} />
                 <Route path="contacts" element={<React.Suspense fallback={<div>Loading...</div>}><Contacts /></React.Suspense>} />
                 <Route path="contacts/:id" element={<React.Suspense fallback={<div>Loading...</div>}><ContactDetail /></React.Suspense>} />
@@ -86,7 +90,12 @@ const App: React.FC = () => {
             
             {/* Global Call Panel - Available on all authenticated pages */}
             <GlobalCallPanel />
+            
+            {/* App Mode Components */}
+            <SubscriptionUpgradeModal />
+            <DemoModeIndicator />
           </BrowserRouter>
+          </AppModeProvider>
         </AuthProvider>
       </ErrorBoundary>
     </ThemeProvider>

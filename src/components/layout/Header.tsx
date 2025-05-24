@@ -26,6 +26,7 @@ import {
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { AppModeToggle } from '../common/AppModeToggle';
 
 interface HeaderProps {
   onSidebarToggle: () => void;
@@ -139,6 +140,11 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
             {themeMode === 'space' ? <LightModeIcon /> : <DarkModeIcon />}
           </IconButton>
         </Tooltip>
+
+        {/* App Mode Toggle */}
+        <Box sx={{ mx: 1 }}>
+          <AppModeToggle />
+        </Box>
 
         {/* Notifications */}
         <Tooltip title="Notifications">
