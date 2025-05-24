@@ -934,19 +934,59 @@ export const generateMockResearchDataQueries = (
 
 // Generate a single mock call analysis
 export const generateMockCallAnalysis = (): CallAnalysis => {
-  const analyses = generateMockCallAnalyses(1);
+  // Ensure this function returns data matching the CallAnalysis interface,
+  // especially 'title' and 'duration'.
+  // generateMockCallAnalyses (plural) should be used if it's defined to return single items based on count.
+  // For now, let's assume generateMockCallAnalyses(1)[0] is the intended way.
+  const analyses = generateMockCallAnalyses(1); // This generateMockCallAnalyses is from THIS file.
   return analyses[0];
 };
 
 // Generate a single mock linguistics analysis
-export const generateMockLinguisticsAnalysis = (): LinguisticsAnalysis => {
-  const callAnalysis = generateMockCallAnalysis();
-  const analyses = generateMockLinguisticsAnalyses([callAnalysis]);
+export const generateSingleMockLinguisticsAnalysis = (): LinguisticsAnalysis => {
+  const callAnalysis = generateMockCallAnalysis(); // Uses the local single generator
+  // generateMockLinguisticsAnalyses (plural) is from THIS file.
+  const analyses = generateMockLinguisticsAnalyses([callAnalysis]); 
   return analyses[0];
 };
 
+// Import the actual array generators from mockLinguisticsData.ts
+import { 
+  generateMultipleMockLinguisticsAnalyses, 
+  generateMultipleMockCallAnalysesWithLinguistics 
+} from './mockLinguisticsData';
+
+const allLinguisticsData = generateMultipleMockLinguisticsAnalyses(50); 
+const getLinguisticsAnalysis = () => allLinguisticsData;
+
+// generateMultipleMockCallAnalysesWithLinguistics returns CallAnalysis[] compatible objects
+// It already includes title and duration through its own generation logic.
+const allCallAnalysisData = generateMultipleMockCallAnalysesWithLinguistics(50); 
+const getCallAnalyses = () => allCallAnalysisData;
+
+const originalGetData = (tableName: string) => {
+  // Basic original GetData logic placeholder
+  if (tableName === 'contacts') return generateMockContacts();
+  if (tableName === 'practices') return generateMockPractices();
+  return [];
+};
+
+const getData = (tableName: string) => {
+  if (tableName === 'linguistics_analysis') {
+    return getLinguisticsAnalysis();
+  }
+  if (tableName === 'call_analysis') {
+    return getCallAnalyses();
+  }
+  return originalGetData(tableName);
+};
+
+
 // Export all mock data functions
 const mockDataService = {
+  getLinguisticsAnalysis, // Add this
+  getCallAnalyses, // Add this
+  getData, // Add this
   generateMockContacts,
   generateMockPractices,
   generateDashboardStats,
@@ -958,7 +998,7 @@ const mockDataService = {
   generateMockSalesActivities,
   generateMockPublicContacts,
   generateMockCallAnalysis,
-  generateMockLinguisticsAnalysis,
+  generateSingleMockLinguisticsAnalysis, // Renamed
   generateMockResearchProjects,
   generateMockResearchDocuments,
   generateMockResearchTasks,

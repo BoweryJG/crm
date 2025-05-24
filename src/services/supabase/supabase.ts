@@ -7,11 +7,13 @@ import {
   generateMockResearchTasks,
   generateMockResearchPrompts,
   generateMockResearchNotes,
-  generateMockResearchDataQueries,
-  generateMockCallAnalyses,
-  generateMockLinguisticsAnalyses
+  generateMockResearchDataQueries
 } from '../mockData/mockDataService';
-import { generateMockLinguisticsAnalysis, enhanceMockDataWithLinguistics, generateMockCallAnalysisWithLinguistics } from '../mockData/mockLinguisticsData';
+import { 
+  enhanceMockDataWithLinguistics,
+  generateMultipleMockLinguisticsAnalyses,
+  generateMultipleMockCallAnalysesWithLinguistics 
+} from '../mockData/mockLinguisticsData';
 
 // Environment variables for Supabase
 console.log('NODE_ENV:', process.env.NODE_ENV || 'development');

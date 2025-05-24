@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -622,9 +623,10 @@ const RepAnalytics: React.FC = () => {
     console.log('Scheduling follow-up for insight:', insightId);
   };
 
+  const navigate = useNavigate();
+
   const handleAction = (insightId: string) => {
-    // In a real implementation, this would navigate to the relevant page
-    console.log('Taking action on insight:', insightId);
+    navigate(`/rep-analytics/${insightId}`);
   };
 
   const getCategoryIcon = (category: InsightCategory) => {
