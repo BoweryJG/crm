@@ -301,20 +301,45 @@ export const callContact = async (contact: Contact, userId: string): Promise<Cal
  */
 export const initializeTwilioDevice = async (userId: string): Promise<boolean> => {
   try {
-    // Get an access token from our backend
-    const response = await fetch('/.netlify/functions/initiate-twilio-call/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identity: userId })
-    });
+    let tokenData = null;
     
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to get access token');
+    // First try the local development server
+    try {
+      const localResponse = await fetch(`http://localhost:3000/token?identity=${encodeURIComponent(userId)}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (localResponse.ok) {
+        tokenData = await localResponse.json();
+        console.log('Successfully obtained token from local development server');
+      }
+    } catch (localError) {
+      console.log('Local token server not available, falling back to Netlify function');
     }
     
-    const data = await response.json();
-    const token = data.token;
+    // If local server failed, try the Netlify function
+    if (!tokenData) {
+      const netlifyResponse = await fetch('/.netlify/functions/initiate-twilio-call/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identity: userId })
+      });
+      
+      if (!netlifyResponse.ok) {
+        const error = await netlifyResponse.json();
+        throw new Error(error.error || 'Failed to get access token from Netlify function');
+      }
+      
+      tokenData = await netlifyResponse.json();
+      console.log('Successfully obtained token from Netlify function');
+    }
+    
+    if (!tokenData || !tokenData.token) {
+      throw new Error('No token received from any source');
+    }
+    
+    const token = tokenData.token;
     
     // Initialize the Twilio Device with the token
     device = new Device(token);
