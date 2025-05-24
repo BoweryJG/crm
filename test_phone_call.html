@@ -183,8 +183,8 @@
                 getTokenBtn.disabled = true;
                 log(`Getting token for ${identity}...`);
                 
-                // Fetch token from your Netlify function
-                const response = await fetch(`/.netlify/functions/initiate-twilio-call/token?identity=${encodeURIComponent(identity)}`);
+                // Fetch token from local server
+                const response = await fetch(`/token?identity=${encodeURIComponent(identity)}`);
                 const data = await response.json();
                 
                 if (!data.token) {
