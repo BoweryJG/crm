@@ -151,11 +151,15 @@ const RepInsightsService = {
   async getInsights(userId: string, filters?: InsightFilterOptions): Promise<RepInsight[]> {
     try {
       console.log('Fetching insights from call_analysis table...');
-      // Fetch real data from call_analysis table
-      const { data, error } = await supabase
-        .from('call_analysis')
-        .select('*, contacts:contact_id(first_name, last_name)')
-        .order('call_date', { ascending: false });
+    // Fetch real data from call_analysis table with proper joins
+    const { data, error } = await supabase
+      .from('call_analysis')
+      .select(`
+        *,
+        contacts:contact_id(first_name, last_name),
+        linguistics:linguistics_analysis_id(*)
+      `)
+      .order('call_date', { ascending: false });
         
       if (error) {
         console.error('Error fetching call analyses:', error);

@@ -1,5 +1,6 @@
 import { Handler, HandlerEvent } from '@netlify/functions';
 import { storeRecordingMetadata, downloadAndStoreRecording } from '../../src/services/twilio/recordingService';
+import { TwilioLinguisticsService } from '../../src/services/twilio/twilioLinguisticsService';
 import { supabase } from '../../src/services/supabase/supabase';
 
 // Netlify serverless function to handle Twilio webhooks
@@ -81,6 +82,19 @@ async function handleRecordingWebhook(body: any) {
         console.error('Error downloading recording:', err);
       });
       
+      // Process the recording for linguistics analysis asynchronously
+      const recordingUrl = `https://api.twilio.com/2010-04-01/Accounts/${body.AccountSid}/Recordings/${recordingSid}.mp3`;
+      const callTitle = `Call ${callSid} on ${new Date().toLocaleDateString()}`;
+      
+      // We don't await this to respond quickly to Twilio
+      TwilioLinguisticsService.processCallRecording(
+        callSid,
+        recordingUrl,
+        callTitle
+      ).catch(err => {
+        console.error('Error processing recording for linguistics analysis:', err);
+      });
+      
       return {
         statusCode: 200,
         body: JSON.stringify({ success: true })
@@ -125,6 +139,27 @@ async function handleCallStatusWebhook(body: any) {
         updated_at: new Date().toISOString()
       })
       .eq('call_sid', callSid);
+    
+    // Update call_analysis table if this call has been processed
+    if (status === 'completed' && duration > 0) {
+      // Check if we have a call_analysis record for this call
+      const { data: callAnalysis } = await supabase
+        .from('call_analysis')
+        .select('id')
+        .eq('call_sid', callSid)
+        .maybeSingle();
+      
+      if (callAnalysis) {
+        // Update the existing record
+        await supabase
+          .from('call_analysis')
+          .update({
+            duration: duration,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', callAnalysis.id);
+      }
+    }
     
     return {
       statusCode: 200,

@@ -238,6 +238,28 @@ export const CallAnalysisService = {
   },
   
   /**
+   * Link a call analysis to a linguistics analysis
+   */
+  async linkCallToLinguisticsAnalysis(callId: string, linguisticsAnalysisId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('call_analysis')
+        .update({ linguistics_analysis_id: linguisticsAnalysisId })
+        .eq('id', callId);
+      
+      if (error) {
+        console.error(`Error linking call ${callId} to linguistics analysis ${linguisticsAnalysisId}:`, error);
+        return false;
+      }
+      
+      return true;
+    } catch (err) {
+      console.error(`Error in linkCallToLinguisticsAnalysis:`, err);
+      return false;
+    }
+  },
+  
+  /**
    * Get linguistics analysis status for a call
    */
   async getLinguisticsAnalysisStatus(callId: string): Promise<'pending' | 'processing' | 'completed' | 'failed' | 'not_found'> {
