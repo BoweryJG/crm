@@ -1,12 +1,10 @@
 import { Handler, HandlerEvent } from '@netlify/functions';
 import twilio from 'twilio';
 
-// Instead of using backend TwiML, define our own simple TwiML directly
+// Silent TwiML - doesn't say anything, just connects and hangs up after 3 seconds
 const SIMPLE_TWIML = `
 <Response>
-  <Say voice="alice">Thank you for answering. This is a call from the SphereOS CRM system.</Say>
-  <Pause length="1"/>
-  <Say voice="alice">The call is now complete. Goodbye.</Say>
+  <Pause length="3"/>
   <Hangup/>
 </Response>
 `;
