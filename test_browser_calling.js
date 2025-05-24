@@ -1,104 +1,190 @@
 /**
- * Twilio Browser-Based Calling Test
- * 
- * This script allows you to test the browser-based calling functionality
- * without needing real contacts. It provides a simple interface to test
- * token generation and call execution.
+ * Twilio Browser-Based Calling Test Script
+ * This script tests if your Twilio configuration is set up correctly for browser-based calling
  */
 
-// Load required environment variables
 require('dotenv').config({ path: '.env.local' });
 const twilio = require('twilio');
 
-// Twilio configuration
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const apiKey = process.env.TWILIO_API_KEY;
-const apiSecret = process.env.TWILIO_API_SECRET;
-const twimlAppSid = process.env.TWILIO_TWIML_APP_SID;
+// ANSI color codes for terminal output
+const colors = {
+  reset: '\x1b[0m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  cyan: '\x1b[36m',
+  white: '\x1b[37m',
+  bold: '\x1b[1m'
+};
 
-// Create Twilio client
-const client = twilio(accountSid, authToken);
-
-// Print configuration status
-console.log('\n----- Twilio Browser-Based Calling Test -----\n');
-console.log('Checking configuration:');
-console.log('- Account SID: ' + (accountSid ? '✓ Present' : '✗ Missing'));
-console.log('- Auth Token: ' + (authToken ? '✓ Present' : '✗ Missing'));
-console.log('- API Key: ' + (apiKey ? '✓ Present' : '✗ Missing'));
-console.log('- API Secret: ' + (apiSecret ? '✓ Present' : '✗ Missing'));
-console.log('- TwiML App SID: ' + (twimlAppSid ? '✓ Present' : '✗ Missing'));
-
-if (!accountSid || !authToken || !apiKey || !apiSecret || !twimlAppSid) {
-  console.log('\n❌ Missing required configuration. Please check your .env.local file.');
-  process.exit(1);
+// Print colored message
+function print(message, color = colors.white) {
+  console.log(color + message + colors.reset);
 }
 
-async function runTests() {
-  try {
-    console.log('\nRunning tests...');
-    
-    // Test 1: Verify account access
-    console.log('\n1. Verifying Twilio account access...');
-    const account = await client.api.accounts(accountSid).fetch();
-    console.log(`   ✓ Account verified: ${account.friendlyName} (${account.status})`);
+// Print header
+function printHeader(message) {
+  console.log('\n' + colors.bold + colors.blue + '='.repeat(message.length + 4) + colors.reset);
+  console.log(colors.bold + colors.blue + '= ' + message + ' =' + colors.reset);
+  console.log(colors.bold + colors.blue + '='.repeat(message.length + 4) + colors.reset + '\n');
+}
 
-    // Test 2: Generate a token
-    console.log('\n2. Testing token generation...');
-    const AccessToken = twilio.jwt.AccessToken;
-    const VoiceGrant = AccessToken.VoiceGrant;
+// Print success or failure
+function printResult(message, success) {
+  const icon = success ? '✓' : '✗';
+  const color = success ? colors.green : colors.red;
+  console.log(color + icon + ' ' + message + colors.reset);
+}
 
-    // Create an access token
-    const token = new AccessToken(
-      accountSid,
-      apiKey,
-      apiSecret,
-      { identity: 'test-user' }
-    );
-
-    // Create a Voice grant for this token
-    const grant = new VoiceGrant({
-      outgoingApplicationSid: twimlAppSid,
-      incomingAllow: true
-    });
-
-    // Add the grant to the token
-    token.addGrant(grant);
-
-    // Generate the token
-    const tokenString = token.toJwt();
-    console.log(`   ✓ Token generated successfully: ${tokenString.substring(0, 20)}...`);
-
-    // Test 3: Check TwiML app configuration
-    console.log('\n3. Checking TwiML application configuration...');
-    const app = await client.applications(twimlAppSid).fetch();
-    console.log(`   ✓ TwiML application found: ${app.friendlyName}`);
-    console.log(`   - Voice URL: ${app.voiceUrl || 'Not configured'}`);
-    
-    if (!app.voiceUrl) {
-      console.log('\n⚠️ Warning: Voice URL for TwiML application is not configured!');
-      console.log('   You should set this to your Netlify function URL:');
-      console.log('   https://your-site.netlify.app/.netlify/functions/initiate-twilio-call/voice');
-    }
-
-    console.log('\n✅ All tests completed successfully!');
-    console.log('\nHow to test in the browser:');
-    console.log('1. Run your React app (npm start)');
-    console.log('2. Navigate to a page with the QuickCallWidget component');
-    console.log('3. Click on a contact to call and select "Use browser for calling"');
-    console.log('4. If you don\'t have actual contacts, you can temporarily modify');
-    console.log('   the QuickCallWidget to use mock data by ensuring this line exists:');
-    console.log('   const mockContacts = mockDataService.generateMockContacts(5);');
-    console.log('   setRecentContacts(mockContacts);');
-
-  } catch (error) {
-    console.error('\n❌ Test failed:', error.message);
-    if (error.code) {
-      console.error(`   Error code: ${error.code}`);
-    }
-    process.exit(1);
+async function testTwilioConfiguration() {
+  printHeader('Twilio Browser-Based Calling Configuration Test');
+  
+  let hasErrors = false;
+  
+  // 1. Check required environment variables
+  print('Checking environment variables...', colors.cyan);
+  
+  const requiredVars = [
+    'TWILIO_ACCOUNT_SID',
+    'TWILIO_AUTH_TOKEN',
+    'TWILIO_API_KEY',
+    'TWILIO_API_SECRET',
+    'TWILIO_TWIML_APP_SID',
+    'TWILIO_PHONE_NUMBER'
+  ];
+  
+  const missingVars = requiredVars.filter(varName => !process.env[varName]);
+  
+  if (missingVars.length > 0) {
+    printResult(`Missing required environment variables: ${missingVars.join(', ')}`, false);
+    print('\nPlease add these variables to your .env.local file.', colors.yellow);
+    print('You can run ./setup-twilio-calling.sh to set these up automatically.', colors.yellow);
+    hasErrors = true;
+  } else {
+    printResult('All required environment variables are present', true);
   }
+  
+  // If missing any required vars, exit early
+  if (hasErrors) {
+    return false;
+  }
+  
+  // 2. Create Twilio clients
+  try {
+    const mainClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    print('Testing Twilio authentication...', colors.cyan);
+    
+    // Test authentication by making a simple API call
+    try {
+      await mainClient.api.accounts(process.env.TWILIO_ACCOUNT_SID).fetch();
+      printResult('Twilio authentication successful', true);
+    } catch (error) {
+      printResult(`Twilio authentication failed: ${error.message}`, false);
+      hasErrors = true;
+    }
+    
+    // 3. Check if TwiML App exists
+    print('Checking TwiML App configuration...', colors.cyan);
+    try {
+      const app = await mainClient.applications(process.env.TWILIO_TWIML_APP_SID).fetch();
+      printResult(`TwiML App found: ${app.friendlyName}`, true);
+      
+      // Check if Voice URL is configured
+      if (!app.voiceUrl) {
+        printResult('TwiML App has no Voice URL configured', false);
+        print('Your TwiML App should have a Voice URL pointing to your application.', colors.yellow);
+        hasErrors = true;
+      } else {
+        printResult(`Voice URL configured: ${app.voiceUrl}`, true);
+      }
+    } catch (error) {
+      printResult(`TwiML App not found: ${error.message}`, false);
+      hasErrors = true;
+    }
+    
+    // 4. Check if phone number is configured
+    print('Checking phone number configuration...', colors.cyan);
+    try {
+      const phoneNumbers = await mainClient.incomingPhoneNumbers.list({
+        phoneNumber: process.env.TWILIO_PHONE_NUMBER
+      });
+      
+      if (phoneNumbers.length === 0) {
+        printResult(`Phone number ${process.env.TWILIO_PHONE_NUMBER} not found in your account`, false);
+        hasErrors = true;
+      } else {
+        const phoneNumber = phoneNumbers[0];
+        printResult(`Phone number found: ${phoneNumber.friendlyName}`, true);
+        
+        // Check if the phone number is using the TwiML app
+        if (phoneNumber.voiceApplicationSid === process.env.TWILIO_TWIML_APP_SID) {
+          printResult('Phone number is correctly configured to use the TwiML App', true);
+        } else {
+          printResult('Phone number is NOT configured to use your TwiML App', false);
+          print('Please update your phone number to use the TwiML App for Voice calls.', colors.yellow);
+          hasErrors = true;
+        }
+      }
+    } catch (error) {
+      printResult(`Error checking phone number: ${error.message}`, false);
+      hasErrors = true;
+    }
+    
+    // 5. Test token generation
+    print('Testing token generation...', colors.cyan);
+    try {
+      const AccessToken = twilio.jwt.AccessToken;
+      const VoiceGrant = AccessToken.VoiceGrant;
+      
+      // Create an access token
+      const token = new AccessToken(
+        process.env.TWILIO_ACCOUNT_SID,
+        process.env.TWILIO_API_KEY,
+        process.env.TWILIO_API_SECRET,
+        { identity: 'test-user' }
+      );
+      
+      // Create a Voice grant for this token
+      const grant = new VoiceGrant({
+        outgoingApplicationSid: process.env.TWILIO_TWIML_APP_SID,
+        incomingAllow: true
+      });
+      
+      // Add the grant to the token
+      token.addGrant(grant);
+      
+      // Generate the token
+      const jwt = token.toJwt();
+      
+      if (jwt) {
+        printResult('Token generation successful', true);
+      } else {
+        printResult('Token generation failed', false);
+        hasErrors = true;
+      }
+    } catch (error) {
+      printResult(`Error generating token: ${error.message}`, false);
+      hasErrors = true;
+    }
+    
+  } catch (error) {
+    printResult(`Error initializing Twilio client: ${error.message}`, false);
+    hasErrors = true;
+  }
+  
+  // Final result
+  console.log('\n' + '-'.repeat(50));
+  if (hasErrors) {
+    print('\n❌ Some tests failed. Please fix the issues above before testing browser-based calling.', colors.bold + colors.red);
+  } else {
+    print('\n✅ All tests passed! Your Twilio configuration is ready for browser-based calling.', colors.bold + colors.green);
+    print('\nNext steps:', colors.bold + colors.cyan);
+    print('1. Open test_phone_call.html in your browser to test calling', colors.cyan);
+    print('2. Call your Twilio number to test incoming calls', colors.cyan);
+  }
+  
+  return !hasErrors;
 }
 
-// Run the tests
-runTests();
+testTwilioConfiguration();
