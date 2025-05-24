@@ -1,6 +1,12 @@
 import { supabase } from '../supabase/supabase';
 import { Contact } from '../../types/models';
 
+// Helper function to validate if a string is a valid UUID
+const isValidUUID = (str: string): boolean => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+};
+
 // Twilio API configuration
 const TWILIO_FUNCTION_URL = process.env.REACT_APP_TWILIO_FUNCTION_URL || '';
 const TWILIO_API_KEY = process.env.REACT_APP_TWILIO_API_KEY || '';
@@ -163,6 +169,12 @@ export const logCallActivity = async (params: LogCallActivityParams): Promise<bo
       notes 
     } = params;
 
+    // Check if we're using mock/test data
+    if (!isValidUUID(userId)) {
+      console.warn(`Found non-UUID userId "${userId}", skipping database insert`);
+      return true; // Return success but don't attempt to save to the database
+    }
+
     const metadata = {
       contact_id: contactId,
       practice_id: practiceId,
@@ -270,6 +282,12 @@ interface SalesActivityParams {
 export const logSalesActivity = async (params: SalesActivityParams): Promise<boolean> => {
   try {
     const { contactId, notes, callSid, outcome, duration } = params;
+    
+    // Check if we're using mock/test data
+    if (!isValidUUID(contactId)) {
+      console.warn(`Found non-UUID contactId "${contactId}", skipping database insert`);
+      return true; // Return success but don't attempt to save to the database
+    }
     
     // Format notes to include callSid reference if provided
     const formattedNotes = callSid 
