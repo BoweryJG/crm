@@ -132,6 +132,14 @@ export const handler: Handler = async (event: HandlerEvent) => {
       let from = '';
       let clientName = '';
       
+      // Log the request for debugging
+      console.log('Voice endpoint hit:', {
+        method: event.httpMethod,
+        path: event.path,
+        queryParams: event.queryStringParameters,
+        body: event.body
+      });
+      
       // Parse the request body differently depending on HTTP method
       if (event.httpMethod === 'POST') {
         if (event.body) {
@@ -148,8 +156,24 @@ export const handler: Handler = async (event: HandlerEvent) => {
 
       console.log('Voice TwiML request:', { to, from, clientName });
 
+      // Check if this is an incoming call to our Twilio number
+      const twilioNumber = process.env.TWILIO_PHONE_NUMBER;
+      if (twilioNumber && from && to === twilioNumber) {
+        console.log('Incoming call detected to Twilio number');
+        
+        // For incoming calls to the Twilio number, route to the current user
+        // You might want to implement more sophisticated routing logic
+        const defaultClient = 'test-user'; // Or use the most recent user identity
+        
+        console.log(`Routing incoming call from ${from} to client: ${defaultClient}`);
+        return {
+          statusCode: 200,
+          headers: { 'Content-Type': 'application/xml' },
+          body: generateIncomingCallTwiML(defaultClient)
+        };
+      }
       // Determine if this is an incoming call to the browser client or outgoing call from browser
-      if (to.startsWith('client:')) {
+      else if (to.startsWith('client:')) {
         // This is an incoming call to the browser client
         const client = to.substring(7); // Remove 'client:' prefix
         return {
