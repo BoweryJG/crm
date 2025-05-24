@@ -211,7 +211,7 @@ export class LinguisticsService {
     try {
       const { data, error } = await supabase
         .from('linguistics_analysis')
-        .select('*, linguistics_analysis(*)')
+        .select('*')
         .eq('id', analysisId)
         .single();
 
