@@ -1,6 +1,9 @@
 import { Handler, HandlerEvent } from '@netlify/functions';
 import twilio from 'twilio';
 
+// Hardcoded TwiML URL - no environment variable needed
+const TWILIO_CALL_HANDLER_URL = 'https://osbackend-zl1h.onrender.com/twilio/voice';
+
 // Helper function to format phone numbers to E.164
 const formatPhoneNumber = (phoneNumber: string): string | null => {
   if (!phoneNumber) return null;
@@ -32,15 +35,14 @@ export const handler: Handler = async (event: HandlerEvent) => {
     TWILIO_ACCOUNT_SID, 
     TWILIO_AUTH_TOKEN, 
     TWILIO_PHONE_NUMBER: rawTwilioPhoneNumber, 
-    NETLIFY_SITE_URL,
-    TWILIO_CALL_HANDLER_URL // New environment variable for the TwiML URL
+    NETLIFY_SITE_URL
   } = process.env;
 
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !rawTwilioPhoneNumber || !TWILIO_CALL_HANDLER_URL) {
-    console.error('Core Twilio environment variables (ACCOUNT_SID, AUTH_TOKEN, PHONE_NUMBER, TWILIO_CALL_HANDLER_URL) not set for initiate-twilio-call function');
+  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !rawTwilioPhoneNumber) {
+    console.error('Core Twilio environment variables (ACCOUNT_SID, AUTH_TOKEN, PHONE_NUMBER) not set for initiate-twilio-call function');
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Twilio configuration error on server: Missing core credentials or TwiML handler URL.' }),
+      body: JSON.stringify({ error: 'Twilio configuration error on server: Missing core credentials.' }),
     };
   }
 
@@ -102,7 +104,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
       statusCallbackMethod: 'POST',
     });
 
-    console.log('Twilio call initiated successfully. Call SID:', call.sid, 'TwiML URL used:', TWILIO_CALL_HANDLER_URL);
+    console.log('Twilio call initiated successfully. Call SID:', call.sid, 'TwiML URL used (hardcoded):', TWILIO_CALL_HANDLER_URL);
 
     // Note: The frontend's twilioService.ts is already responsible for logging the 'initiated'
     // status to sales_activities AFTER this function returns successfully with a callSid.
