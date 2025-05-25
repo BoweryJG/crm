@@ -18,17 +18,39 @@ const AnimatedOrbHeroBG = ({
 
   useEffect(() => {
     if (!visible) return;
+    const svg = svgRef.current;
+    const group = childrenGroupRef.current;
+    if (!svg || !group) return;
+
+    const paths: SVGPathElement[] = [];
+    const highlights: SVGCircleElement[] = [];
+    for (let i = 0; i < 5; i++) {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('fill', `url(#childGrad${i})`);
+      path.setAttribute('opacity', '0.98');
+      const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      highlight.setAttribute('cx', '42');
+      highlight.setAttribute('cy', '42');
+      highlight.setAttribute('r', '8');
+      highlight.setAttribute('fill', 'rgba(255, 255, 255, 0.25)');
+      highlight.setAttribute('filter', 'blur(3px)');
+      group.appendChild(path);
+      group.appendChild(highlight);
+      paths.push(path);
+      highlights.push(highlight);
+    }
+
     let animationFrame: number;
 
     function generateBlobPath(cx: number, cy: number, radius: number, points: number, time: number): string {
       const pts: Array<{x: number, y: number}> = [];
       for (let i = 0; i < points; i++) {
         const angle = (Math.PI * 2 * i) / points;
-        // Reduced noise amplitude to make orbs more spherical
-        const noise = 
-          Math.sin(angle * 2 + time * 0.4) * 0.8 + 
-          Math.sin(angle * 3 - time * 0.5) * 0.6 + 
-          Math.sin(angle * 5 + time * 0.7) * 0.3;
+        // Softer noise for smoother, more rhythmic motion
+        const noise =
+          Math.sin(angle * 2 + time * 0.3) * 0.6 +
+          Math.sin(angle * 3 - time * 0.4) * 0.4 +
+          Math.sin(angle * 5 + time * 0.6) * 0.2;
         const rad = radius + noise;
         pts.push({
           x: cx + Math.cos(angle) * rad,
@@ -89,10 +111,20 @@ const AnimatedOrbHeroBG = ({
       const now = performance.now();
       const childrenGroup = childrenGroupRef.current;
       if (childrenGroup) {
-        while (childrenGroup.firstChild) childrenGroup.removeChild(childrenGroup.firstChild);
         for (let i = 0; i < 5; i++) {
-          if (childIndex !== null && i !== childIndex) continue;
-          
+          const path = paths[i];
+          const highlight = highlights[i];
+          if (!path || !highlight) continue;
+
+          if (childIndex !== null && i !== childIndex) {
+            path.style.display = 'none';
+            highlight.style.display = 'none';
+            continue;
+          } else {
+            path.style.display = '';
+            highlight.style.display = '';
+          }
+
           // Update gradient colors for color shifting - increased brightness
           const baseHue = (i * 67 + now * 0.018) % 360;
           const hue2 = (baseHue + 40 + 20 * Math.sin(now * 0.0007 + i)) % 360;
@@ -100,30 +132,15 @@ const AnimatedOrbHeroBG = ({
           // Increased lightness values for brighter orbs
           const light1 = 75 + 15 * Math.cos(now * 0.0004 + i * 2);
           const light2 = 45 + 15 * Math.sin(now * 0.0006 + i * 3);
-          
+
           const grad0 = svg.querySelector(`#c${i}s0`);
           const grad1 = svg.querySelector(`#c${i}s1`);
-          
+
           if (grad0) grad0.setAttribute("stop-color", hslToHex(baseHue, sat, light1));
           if (grad1) grad1.setAttribute("stop-color", hslToHex(hue2, sat, light2));
-          
-          // Create blob path
-          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          const blobPath = generateBlobPath(50, 50, 30, 24, now * 0.0005 + i * 10);
-          path.setAttribute("d", blobPath);
-          path.setAttribute("fill", `url(#childGrad${i})`);
-          path.setAttribute("opacity", "0.98"); // Increased opacity for better visibility
-          
-          // Add subtle highlight for enhanced 3D effect
-          const highlight = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-          highlight.setAttribute("cx", "42");
-          highlight.setAttribute("cy", "42");
-          highlight.setAttribute("r", "8");
-          highlight.setAttribute("fill", "rgba(255, 255, 255, 0.25)");
-          highlight.setAttribute("filter", "blur(3px)");
-          
-          childrenGroup.appendChild(path);
-          childrenGroup.appendChild(highlight);
+
+          const blobPath = generateBlobPath(50, 50, 30, 32, now * 0.0003 + i * 10);
+          path.setAttribute('d', blobPath);
         }
       }
 
@@ -133,6 +150,8 @@ const AnimatedOrbHeroBG = ({
     animate();
     return () => {
       if (animationFrame) cancelAnimationFrame(animationFrame);
+      paths.forEach(p => p.remove());
+      highlights.forEach(h => h.remove());
     };
   }, [visible, childIndex]);
 
