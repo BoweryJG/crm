@@ -61,6 +61,7 @@ import {
 import { useThemeContext } from '../themes/ThemeContext';
 import { supabase } from '../services/supabase/supabase';
 import mockDataService from '../services/mockData/mockDataService';
+import { CallAnalysisService } from '../services/callAnalysis/callAnalysisService';
 
 // This would be a real chart component in production
 const SentimentChart = ({ data }) => {
@@ -803,38 +804,35 @@ const CallInsightDetail: React.FC = () => {
       setIsLoading(true);
       setError(null);
       try {
-        // In a real app, fetch from Supabase or your backend
-        // For now, use mock data service
-        const mockInsights = mockDataService.getLinguisticsAnalysis();
-        const foundInsight = mockInsights.find(item => item.id === insightId);
-        
-        if (foundInsight) {
-          setInsight(foundInsight);
-          
-          // Populate mock visualization data based on the insight
-          // This is highly simplified; real data processing would be more complex
+        const callData = await CallAnalysisService.getCallAnalysisById(insightId);
+        const linguisticsData = await CallAnalysisService.getLinguisticsAnalysis(insightId);
+
+        if (callData && linguisticsData) {
+          const combined = { ...callData, analysis_result: linguisticsData };
+          setInsight(combined);
+
           setSentimentData(
-            foundInsight.analysis_result.sentiment_timeline || 
+            linguisticsData.sentiment_timeline ||
             Array.from({ length: 10 }, (_, i) => ({ timestamp: i * 60, value: Math.random() * 2 - 1 }))
           );
           setSpeakingPaceData(
-            foundInsight.analysis_result.speaking_pace_timeline ||
+            linguisticsData.speaking_pace_timeline ||
             Array.from({ length: 10 }, (_, i) => ({ timestamp: i * 60, value: Math.floor(Math.random() * 80 + 120) }))
           );
           setFillerWords(
-            foundInsight.analysis_result.filler_words ||
+            linguisticsData.filler_words ||
             [
               { word: 'um', count: Math.floor(Math.random() * 10) },
               { word: 'uh', count: Math.floor(Math.random() * 8) },
               { word: 'like', count: Math.floor(Math.random() * 12) },
             ]
           );
-          setTopicsTimeline(foundInsight.analysis_result.topic_segments || []);
-          setActionItems(foundInsight.analysis_result.action_items || []);
-          setOpportunityScore(foundInsight.analysis_result.opportunity_score?.score || Math.floor(Math.random() * 100));
-          setCompetitiveIntelligence(foundInsight.analysis_result.competitive_intelligence || []);
-          setNextBestActions(foundInsight.analysis_result.next_best_actions || []);
-          setDealVelocity(foundInsight.analysis_result.deal_velocity || {
+          setTopicsTimeline(linguisticsData.topic_segments || []);
+          setActionItems(linguisticsData.action_items || []);
+          setOpportunityScore(linguisticsData.opportunity_score?.score || Math.floor(Math.random() * 100));
+          setCompetitiveIntelligence(linguisticsData.competitive_intelligence || []);
+          setNextBestActions(linguisticsData.next_best_actions || []);
+          setDealVelocity(linguisticsData.deal_velocity || {
             averageCycle: 30,
             cycleComparison: -10,
             probabilityToClose: 65,
@@ -848,9 +846,51 @@ const CallInsightDetail: React.FC = () => {
               { name: 'Closed Won', percentage: 15, completed: false },
             ]
           });
-
         } else {
-          setError(new Error('Insight not found'));
+          const mockInsights = mockDataService.getLinguisticsAnalysis();
+          const foundInsight = mockInsights.find(item => item.id === insightId);
+
+          if (foundInsight) {
+            setInsight(foundInsight);
+
+            setSentimentData(
+              foundInsight.analysis_result.sentiment_timeline ||
+              Array.from({ length: 10 }, (_, i) => ({ timestamp: i * 60, value: Math.random() * 2 - 1 }))
+            );
+            setSpeakingPaceData(
+              foundInsight.analysis_result.speaking_pace_timeline ||
+              Array.from({ length: 10 }, (_, i) => ({ timestamp: i * 60, value: Math.floor(Math.random() * 80 + 120) }))
+            );
+            setFillerWords(
+              foundInsight.analysis_result.filler_words ||
+              [
+                { word: 'um', count: Math.floor(Math.random() * 10) },
+                { word: 'uh', count: Math.floor(Math.random() * 8) },
+                { word: 'like', count: Math.floor(Math.random() * 12) },
+              ]
+            );
+            setTopicsTimeline(foundInsight.analysis_result.topic_segments || []);
+            setActionItems(foundInsight.analysis_result.action_items || []);
+            setOpportunityScore(foundInsight.analysis_result.opportunity_score?.score || Math.floor(Math.random() * 100));
+            setCompetitiveIntelligence(foundInsight.analysis_result.competitive_intelligence || []);
+            setNextBestActions(foundInsight.analysis_result.next_best_actions || []);
+            setDealVelocity(foundInsight.analysis_result.deal_velocity || {
+              averageCycle: 30,
+              cycleComparison: -10,
+              probabilityToClose: 65,
+              probabilityComparison: 5,
+              estimatedCloseDate: '2025-06-15',
+              stages: [
+                { name: 'Prospecting', percentage: 20, completed: true },
+                { name: 'Qualification', percentage: 20, completed: true },
+                { name: 'Proposal', percentage: 30, completed: false },
+                { name: 'Negotiation', percentage: 15, completed: false },
+                { name: 'Closed Won', percentage: 15, completed: false },
+              ]
+            });
+          } else {
+            setError(new Error('Insight not found'));
+          }
         }
       } catch (err) {
         setError(err as Error);
