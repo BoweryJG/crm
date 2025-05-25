@@ -645,6 +645,19 @@ const RepAnalytics: React.FC = () => {
     navigate(`/rep-analytics/${insightId}`);
   };
 
+  const getPriorityColor = (priority: InsightPriority) => {
+    switch (priority) {
+      case 'high':
+        return theme.palette.error.main;
+      case 'medium':
+        return theme.palette.warning.main;
+      case 'low':
+        return theme.palette.info.main;
+      default:
+        return theme.palette.text.secondary;
+    }
+  };
+
   const getCategoryIcon = (category: InsightCategory) => {
     switch (category) {
       case 'visit':
@@ -1028,9 +1041,20 @@ const RepAnalytics: React.FC = () => {
               <Grid container spacing={2}>
                 {filteredInsights.map((insight) => (
                   <Grid item xs={12} md={6} key={insight.id}>
-                    <Card sx={{ mb: 2, borderLeft: '4px solid #f50057', borderRadius: 2 }}>
+                    <Card sx={{ mb: 2, borderLeft: `4px solid ${getPriorityColor(insight.priority)}`, borderRadius: 2 }}>
                       <CardContent>
-                        <Typography variant="h6">{insight.title}</Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                          <Typography variant="h6">{insight.title}</Typography>
+                          <Chip
+                            label={insight.priority.toUpperCase()}
+                            size="small"
+                            sx={{
+                              bgcolor: getPriorityColor(insight.priority),
+                              color: 'white',
+                              fontWeight: 'bold'
+                            }}
+                          />
+                        </Box>
                         <Typography variant="body2">{insight.description}</Typography>
                         
                         {/* Display linguistics data if available */}
