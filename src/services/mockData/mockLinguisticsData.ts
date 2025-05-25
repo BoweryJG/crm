@@ -13,8 +13,14 @@ export const generateMultipleMockLinguisticsAnalyses = (count: number = 20) => {
     const callId = uuidv4();
     const callDuration = Math.floor(Math.random() * 480 + 120); // 2-10 minutes in seconds
     
+    // Generate personality types and decision styles
+    const personalityTypes = ['Analytical', 'Driver', 'Amiable', 'Expressive'];
+    const discProfiles = ['D', 'I', 'S', 'C', 'DI', 'DC', 'IS', 'SC'];
+    const decisionStyles = ['Analytical', 'Intuitive', 'Collaborative', 'Directive', 'Consensus-driven'];
+    
     return {
       id,
+      call_id: callId,
       title: `Call Analysis ${i + 1}`,
       audio_url: `https://example.com/recordings/${id}.mp3`,
       transcript: `This is a sample transcript for call ${i + 1}. It contains various discussion points about products, pricing, and next steps. We also talked about competitor X and their recent product launch. The client seemed interested in our new financing options.`,
@@ -169,13 +175,142 @@ export const generateMultipleMockLinguisticsAnalyses = (count: number = 20) => {
       sentiment_score: parseFloat((Math.random() * 1.0 - 0.5).toFixed(2)), // -0.5 to 0.5, more centered
       key_phrases: ['dental implants', 'pricing options', 'follow-up demo', 'Competitor A', 'patient outcomes', 'financing plans'],
       status: 'completed',
-      call_id: callId, // This is the foreign key to call_analysis table
       source_type: 'twilio',
       created_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(), // Random date in last 30 days
       updated_at: new Date().toISOString(),
-      // Add contact_name and practice_name for easier display in CallInsightDetail
       contact_name: `Dr. ${['Smith', 'Jones', 'Williams', 'Brown', 'Davis'][i % 5]}`,
-      practice_name: `${['Bright Smiles Dental', 'Modern Dentistry', 'Family Dental Care', 'Advanced Dental Arts', 'Gentle Dental Center'][i % 5]}`
+      practice_name: `${['Bright Smiles Dental', 'Modern Dentistry', 'Family Dental Care', 'Advanced Dental Arts', 'Gentle Dental Center'][i % 5]}`,
+      
+      // New fields from the SQL schema
+      persuasion_techniques: {
+        reciprocity: Math.floor(Math.random() * 10) + 1,
+        commitment_consistency: Math.floor(Math.random() * 10) + 1,
+        social_proof: Math.floor(Math.random() * 10) + 1,
+        authority: Math.floor(Math.random() * 10) + 1,
+        liking: Math.floor(Math.random() * 10) + 1,
+        scarcity: Math.floor(Math.random() * 10) + 1,
+        techniques_used: ['Social proof', 'Authority positioning', 'Scarcity framing'].filter(() => Math.random() > 0.3)
+      },
+      
+      sales_strategy_adherence: {
+        discovery_quality: Math.floor(Math.random() * 10) + 1,
+        value_proposition_clarity: Math.floor(Math.random() * 10) + 1,
+        objection_handling: Math.floor(Math.random() * 10) + 1,
+        closing_technique: Math.floor(Math.random() * 10) + 1,
+        overall_adherence: Math.floor(Math.random() * 10) + 1,
+        improvement_areas: ['Needs discovery', 'Value articulation', 'Closing technique'].filter(() => Math.random() > 0.6)
+      },
+      
+      psychological_profile: {
+        communication_style: personalityTypes[Math.floor(Math.random() * personalityTypes.length)],
+        decision_drivers: ['Value', 'Innovation', 'Reliability', 'Relationship'].filter(() => Math.random() > 0.5),
+        risk_tolerance: Math.floor(Math.random() * 10) + 1,
+        influence_receptivity: Math.floor(Math.random() * 10) + 1
+      },
+      
+      manipulation_detection: {
+        pressure_tactics_used: Math.random() > 0.8,
+        misleading_statements: Math.random() > 0.9 ? ['Exaggerated ROI claims'] : [],
+        ethical_concerns: Math.random() > 0.9 ? ['High-pressure closing'] : []
+      },
+      
+      objection_handling_analysis: {
+        objections_raised: Math.floor(Math.random() * 5) + 1,
+        objections_resolved: Math.floor(Math.random() * 4) + 1,
+        resolution_effectiveness: Math.floor(Math.random() * 10) + 1,
+        common_objections: ['Price', 'Implementation timeline', 'Integration concerns'].filter(() => Math.random() > 0.4)
+      },
+      
+      coaching_recommendations: Math.random() > 0.3 ? 
+        `Focus on improving value articulation and ROI explanation. Practice more effective discovery questions to better understand client needs. Consider using more social proof examples when discussing implementation timeline concerns.` : 
+        `Strong presentation of value proposition. Continue developing objection handling skills, particularly around pricing concerns. Work on smoother transitions between discovery and solution presentation phases.`,
+      
+      buyer_personality_type: personalityTypes[Math.floor(Math.random() * personalityTypes.length)],
+      
+      trust_rapport_score: parseFloat((Math.random() * 5 + 5).toFixed(1)),
+      influence_effectiveness_score: parseFloat((Math.random() * 6 + 4).toFixed(1)),
+      conversation_control_score: parseFloat((Math.random() * 7 + 3).toFixed(1)),
+      
+      harvey_specter_analysis: Math.random() > 0.5 ? 
+        `Strong command of conversation flow and effective use of strategic silence. Good leverage of competitive intelligence. Could improve closing technique with more confidence.` : 
+        `Excellent rapport building and trust establishment. Needs to be more assertive when handling objections. Good use of social proof but could leverage scarcity principles more effectively.`,
+      
+      next_steps_generated: {
+        immediate: ['Send follow-up email with proposal', 'Schedule technical demo'],
+        short_term: ['Prepare ROI analysis', 'Connect with decision maker'],
+        long_term: ['Quarterly business review', 'Expansion opportunity discussion']
+      },
+      
+      buyer_disc_profile: discProfiles[Math.floor(Math.random() * discProfiles.length)],
+      decision_making_style: decisionStyles[Math.floor(Math.random() * decisionStyles.length)],
+      
+      leverage_points: {
+        identified: ['Budget timing', 'Competitive displacement opportunity', 'Pain point: current system reliability'],
+        utilized: ['Budget timing', 'Pain point: current system reliability'],
+        effectiveness: Math.floor(Math.random() * 10) + 1
+      },
+      
+      power_dynamics_analysis: {
+        rep_positioning: Math.floor(Math.random() * 10) + 1,
+        buyer_authority: Math.floor(Math.random() * 10) + 1,
+        negotiation_leverage: Math.floor(Math.random() * 10) + 1,
+        power_shifts: [{
+          timestamp: Math.floor(callDuration * 0.4),
+          description: 'Rep gained leverage by introducing unique feature',
+          impact: 'Positive'
+        }]
+      },
+      
+      emotional_intelligence_score: parseFloat((Math.random() * 4 + 6).toFixed(1)),
+      closing_readiness_score: parseFloat((Math.random() * 6 + 4).toFixed(1)),
+      
+      competitive_positioning: {
+        competitors_mentioned: ['Competitor A', 'Competitor B'].filter(() => Math.random() > 0.5),
+        differentiation_clarity: Math.floor(Math.random() * 10) + 1,
+        competitive_advantages_leveraged: ['Superior support', 'Better integration', 'Higher ROI'].filter(() => Math.random() > 0.4)
+      },
+      
+      risk_assessment: {
+        deal_risks: ['Budget constraints', 'Multiple decision makers', 'Competitive pressure'].filter(() => Math.random() > 0.6),
+        risk_level: ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)],
+        mitigation_strategies: ['ROI focus', 'Executive sponsorship', 'Phased implementation'].filter(() => Math.random() > 0.5)
+      },
+      
+      recommended_follow_up_timing: ['24 hours', '3 days', '1 week', '2 weeks'][Math.floor(Math.random() * 4)],
+      
+      suggested_demo_focus: {
+        key_features: ['Integration capabilities', 'Reporting dashboard', 'Mobile access'].filter(() => Math.random() > 0.4),
+        pain_points_to_address: ['Data accuracy', 'Ease of use', 'Implementation time'].filter(() => Math.random() > 0.5),
+        stakeholders_to_include: ['IT Director', 'Clinical Lead', 'Finance Manager'].filter(() => Math.random() > 0.6)
+      },
+      
+      pricing_sensitivity_analysis: {
+        price_sensitivity: Math.floor(Math.random() * 10) + 1,
+        value_perception: Math.floor(Math.random() * 10) + 1,
+        budget_alignment: ['Under budget', 'Within budget', 'Over budget'][Math.floor(Math.random() * 3)],
+        recommended_approach: ['Value-based pricing', 'Competitive pricing', 'Tiered pricing'][Math.floor(Math.random() * 3)]
+      },
+      
+      stakeholder_influence_map: {
+        decision_makers: [{
+          role: 'Practice Owner',
+          influence: 'High',
+          stance: ['Supportive', 'Neutral', 'Skeptical'][Math.floor(Math.random() * 3)]
+        }],
+        influencers: [{
+          role: 'Office Manager',
+          influence: 'Medium',
+          stance: ['Supportive', 'Neutral', 'Skeptical'][Math.floor(Math.random() * 3)]
+        }]
+      },
+      
+      conversation_momentum_score: parseFloat((Math.random() * 6 + 4).toFixed(1)),
+      
+      ethical_concerns_flagged: Math.random() > 0.9 ? {
+        concerns: ['Potential misrepresentation of capabilities'],
+        severity: 'Low',
+        recommendations: 'Review product capability claims for accuracy'
+      } : {}
     };
   });
 };
