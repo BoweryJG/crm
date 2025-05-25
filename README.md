@@ -75,16 +75,30 @@ RepSpheres CRM combines an intuitive, space-themed interface with powerful indus
    ```
    REACT_APP_SUPABASE_URL=your_supabase_url_here
    REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+   SUPABASE_URL=your_supabase_url_here
+   SUPABASE_SERVICE_KEY=your_supabase_service_role_key_here
+   SUPABASE_DB_HOST=db.your_project_ref.supabase.co
+   SUPABASE_DB_PORT=5432
+   SUPABASE_DB_NAME=postgres
+   SUPABASE_DB_USER=postgres
+   SUPABASE_DB_PASSWORD=your_db_password_here
    STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key_here
    STRIPE_SECRET_KEY=your_stripe_secret_key_here
    STRIPE_PRICE_ID=your_stripe_price_id_here
    STRIPE_SUCCESS_URL=http://localhost:3000/subscribe/success
    STRIPE_CANCEL_URL=http://localhost:3000/subscribe/cancel
    ```
+   The database values can be found in your Supabase dashboard under **Settings → Database → Connection Info**.
 
 4. Set up your Supabase database using the schema in `supabase/schema.sql`.
 
-5. Start the development server:
+5. (Optional) Run the migration script to initialize app mode data:
+   ```bash
+   chmod +x apply_app_mode_migrations.sh  # run once
+   ./apply_app_mode_migrations.sh
+   ```
+
+6. Start the development server:
    ```
    npm start
    ```
