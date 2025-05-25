@@ -70,21 +70,62 @@ type UrgentActionProps = {
 // Mock UrgentActionService
 const UrgentActionService = {
   async getUrgentActions(userId: string): Promise<UrgentActionProps[]> {
-    // This would be implemented to fetch real urgent actions
-    return [
-      {
-        id: `website-urgent-${Date.now()}`,
-        title: 'High-Value Prospect on Website Now',
-        description: 'Dr. Sarah Johnson from Bright Smiles Dental is currently browsing our implant solutions page for the 3rd time today. Our AI predicts a 85% chance of purchase intent.',
+    try {
+      const { data, error } = await supabase
+        .from('public_contacts')
+        .select('id, first_name, last_name, created_at')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) {
+        console.error('Error fetching urgent actions:', error);
+      }
+
+      if (data && data.length > 0) {
+        return data.map((c) => ({
+          id: `contact-urgent-${c.id}`,
+          title: `Follow up with ${c.first_name} ${c.last_name}`,
+          description: `${c.first_name} ${c.last_name} recently interacted with our content and may require immediate attention.`,
+          timeRemaining: '15 minutes',
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+          source: 'website_activity',
+          sourceDetail: 'Recent contact activity',
+          actionText: 'Call Now',
+          targetId: c.id,
+          targetType: 'contact'
+        }));
+      }
+
+      // Fallback to mock data if no records were returned
+      const mockContacts = mockDataService.generateMockContacts(5);
+      return mockContacts.map((c, idx) => ({
+        id: `mock-urgent-${idx}-${Date.now()}`,
+        title: `Follow up with ${c.first_name} ${c.last_name}`,
+        description: `${c.first_name} ${c.last_name} recently interacted with our content and may require immediate attention.`,
         timeRemaining: '15 minutes',
         expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
         source: 'website_activity',
-        sourceDetail: 'Real-time website analytics',
+        sourceDetail: 'Mock contact activity',
         actionText: 'Call Now',
-        targetId: 'contact-123',
+        targetId: c.id,
         targetType: 'contact'
-      }
-    ];
+      }));
+    } catch (err) {
+      console.error('Error fetching urgent actions:', err);
+      const mockContacts = mockDataService.generateMockContacts(5);
+      return mockContacts.map((c, idx) => ({
+        id: `mock-urgent-${idx}-${Date.now()}`,
+        title: `Follow up with ${c.first_name} ${c.last_name}`,
+        description: `${c.first_name} ${c.last_name} recently interacted with our content and may require immediate attention.`,
+        timeRemaining: '15 minutes',
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+        source: 'website_activity',
+        sourceDetail: 'Mock contact activity',
+        actionText: 'Call Now',
+        targetId: c.id,
+        targetType: 'contact'
+      }));
+    }
   },
   async markActionCompleted(actionId: string, userId: string): Promise<boolean> {
     console.log(`Marking action ${actionId} as completed by user ${userId}`);
