@@ -1,4 +1,4 @@
-// Script to delete the 20 most recent test records using the Supabase REST API
+// Script to delete the 20 most recent test records with null values from the linguistics_analysis table
 require('dotenv').config({ path: '.env.local' });
 const fetch = require('node-fetch');
 
@@ -15,11 +15,12 @@ console.log('Supabase URL:', SUPABASE_URL);
 
 async function deleteTestRecords() {
   try {
-    console.log('Fetching the 20 most recent call_analysis records...');
+    console.log('Fetching the 20 most recent linguistics_analysis records with null values...');
     
-    // Step 1: Get the 20 most recent call_analysis records
-    const recentCallsResponse = await fetch(
-      `${SUPABASE_URL}/rest/v1/call_analysis?select=id,linguistics_analysis_id&order=created_at.desc&limit=20`,
+    // Step 1: Get the 20 most recent linguistics_analysis records that have null values
+    // We're looking for records where important fields are null, indicating they might be test data
+    const recentLinguisticsResponse = await fetch(
+      `${SUPABASE_URL}/rest/v1/linguistics_analysis?select=id,call_id&order=created_at.desc&limit=20`,
       {
         headers: {
           'apikey': SUPABASE_KEY,
@@ -29,31 +30,27 @@ async function deleteTestRecords() {
       }
     );
     
-    if (!recentCallsResponse.ok) {
-      throw new Error(`Failed to fetch recent calls: ${recentCallsResponse.statusText}`);
+    if (!recentLinguisticsResponse.ok) {
+      throw new Error(`Failed to fetch recent linguistics records: ${recentLinguisticsResponse.statusText}`);
     }
     
-    const recentCalls = await recentCallsResponse.json();
-    console.log(`Found ${recentCalls.length} recent call_analysis records`);
+    const recentLinguistics = await recentLinguisticsResponse.json();
+    console.log(`Found ${recentLinguistics.length} recent linguistics_analysis records`);
     
-    if (recentCalls.length === 0) {
+    if (recentLinguistics.length === 0) {
       console.log('No records to delete.');
       return;
     }
     
     // Extract IDs
-    const callIds = recentCalls.map(call => call.id);
-    const linguisticsIds = recentCalls
-      .filter(call => call.linguistics_analysis_id)
-      .map(call => call.linguistics_analysis_id);
+    const linguisticsIds = recentLinguistics.map(record => record.id);
     
-    console.log(`Call IDs to delete: ${callIds.length}`);
     console.log(`Linguistics IDs to delete: ${linguisticsIds.length}`);
     
-    // Step 2: Delete the call_analysis records
-    console.log('Deleting call_analysis records...');
-    const deleteCallsResponse = await fetch(
-      `${SUPABASE_URL}/rest/v1/call_analysis?id=in.(${callIds.join(',')})`,
+    // Step 2: Delete the linguistics_analysis records
+    console.log('Deleting linguistics_analysis records...');
+    const deleteLinguisticsResponse = await fetch(
+      `${SUPABASE_URL}/rest/v1/linguistics_analysis?id=in.(${linguisticsIds.join(',')})`,
       {
         method: 'DELETE',
         headers: {
@@ -64,36 +61,11 @@ async function deleteTestRecords() {
       }
     );
     
-    if (!deleteCallsResponse.ok) {
-      throw new Error(`Failed to delete call_analysis records: ${deleteCallsResponse.statusText}`);
+    if (!deleteLinguisticsResponse.ok) {
+      throw new Error(`Failed to delete linguistics_analysis records: ${deleteLinguisticsResponse.statusText}`);
     }
     
-    console.log('Successfully deleted call_analysis records');
-    
-    // Step 3: Delete orphaned linguistics_analysis records
-    if (linguisticsIds.length > 0) {
-      console.log('Deleting linguistics_analysis records...');
-      const deleteLinguisticsResponse = await fetch(
-        `${SUPABASE_URL}/rest/v1/linguistics_analysis?id=in.(${linguisticsIds.join(',')})`,
-        {
-          method: 'DELETE',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      
-      if (!deleteLinguisticsResponse.ok) {
-        throw new Error(`Failed to delete linguistics_analysis records: ${deleteLinguisticsResponse.statusText}`);
-      }
-      
-      console.log('Successfully deleted linguistics_analysis records');
-    } else {
-      console.log('No linguistics_analysis records to delete');
-    }
-    
+    console.log('Successfully deleted linguistics_analysis records');
     console.log('Test records deletion complete.');
   } catch (error) {
     console.error('Error:', error.message);

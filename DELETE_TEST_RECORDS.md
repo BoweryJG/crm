@@ -1,6 +1,6 @@
 # Delete Test Records
 
-This utility helps clean up test records from the database by removing the 20 most recent call_analysis records and their associated linguistics_analysis records.
+This utility helps clean up test records from the database by removing the 20 most recent linguistics_analysis records that may contain null or problematic data.
 
 ## Why This Is Needed
 
@@ -10,6 +10,7 @@ During development and testing, many test records can accumulate in the database
 2. Skew metrics and statistics
 3. Make it harder to debug real issues
 4. Potentially slow down queries
+5. Cause relationship issues between tables when they contain null values
 
 This script provides a simple way to clean up these test records without having to manually delete them through the database interface.
 
@@ -17,11 +18,11 @@ This script provides a simple way to clean up these test records without having 
 
 The script uses the Supabase REST API to:
 
-1. Fetch the 20 most recent call_analysis records
-2. Delete these call_analysis records
-3. Delete any associated linguistics_analysis records
+1. Fetch the 20 most recent linguistics_analysis records
+2. Delete these linguistics_analysis records
+3. Preserve the related call_analysis records
 
-This approach ensures that both the call_analysis records and their related linguistics_analysis records are properly cleaned up, maintaining database integrity.
+This approach ensures that problematic linguistics data is cleaned up while preserving the call analysis records, maintaining the overall integrity of your analytics data.
 
 ## Prerequisites
 
@@ -40,7 +41,7 @@ Simply run the script from the project root:
 The script will:
 1. Load environment variables from `.env.local`
 2. Connect to your Supabase project
-3. Delete the 20 most recent call_analysis records and their associated linguistics_analysis records
+3. Delete the 20 most recent linguistics_analysis records
 4. Output the results to the console
 
 ## Customization
