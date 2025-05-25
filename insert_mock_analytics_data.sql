@@ -57,6 +57,12 @@ DECLARE
     selected_user_id UUID;
     call_start TIMESTAMP WITH TIME ZONE;
     call_duration INTEGER;
+    sentiment_score NUMERIC(3,2);
+    outcome_type TEXT;
+    summary_text TEXT;
+    sentiment_analysis_json JSONB;
+    key_phrases_json JSONB;
+    action_items_json JSONB;
     i INTEGER;
 BEGIN
     -- Fetch existing contact and practice IDs
@@ -86,6 +92,36 @@ BEGIN
         call_duration := floor(random() * (1800 - 60 + 1) + 60)::INTEGER; -- Duration between 1-30 minutes
         call_start := NOW() - (floor(random() * 30) || ' days')::INTERVAL - (floor(random() * 24) || ' hours')::INTERVAL - (floor(random() * 60) || ' minutes')::INTERVAL;
 
+        -- Determine outcome type and sentiment score based on record number for better distribution
+        -- Records 1-7: High Priority (negative sentiment) - sentiment_score < -0.3
+        -- Records 8-14: Medium Priority (neutral sentiment) - sentiment_score between -0.3 and 0.3
+        -- Records 15-20: Low Priority (positive sentiment) - sentiment_score > 0.3
+        IF i <= 7 THEN
+            -- High Priority (negative sentiment)
+            sentiment_score := -0.4 - (random() * 0.6)::NUMERIC(3,2); -- Between -0.4 and -1.0 (ensuring < -0.3)
+            outcome_type := 'Left Voicemail';
+            summary_text := 'Summary of call ' || i || ': Several concerns raised about pricing. Customer expressed frustration with timeline. Urgent follow-up needed.';
+            sentiment_analysis_json := jsonb_build_object('overall_sentiment', 'negative', 'confidence', round(random()::numeric, 2));
+            key_phrases_json := jsonb_build_array('pricing concerns', 'timeline issues', 'budget constraints', 'competitor comparison');
+            action_items_json := jsonb_build_array('Urgent follow-up needed', 'Prepare revised pricing', 'Schedule call with decision maker');
+        ELSIF i <= 14 THEN
+            -- Medium Priority (neutral sentiment)
+            sentiment_score := -0.25 + (random() * 0.5)::NUMERIC(3,2); -- Between -0.25 and 0.25 (ensuring between -0.3 and 0.3)
+            outcome_type := 'Scheduled Follow-up';
+            summary_text := 'Summary of call ' || i || ': Discussed product features and options. Customer requested additional information. Follow-up scheduled.';
+            sentiment_analysis_json := jsonb_build_object('overall_sentiment', 'neutral', 'confidence', round(random()::numeric, 2));
+            key_phrases_json := jsonb_build_array('product features', 'additional information', 'follow-up meeting', 'decision timeline');
+            action_items_json := jsonb_build_array('Send product information', 'Prepare demo for next call', 'Confirm meeting with team');
+        ELSE
+            -- Low Priority (positive sentiment)
+            sentiment_score := 0.4 + (random() * 0.6)::NUMERIC(3,2); -- Between 0.4 and 1.0 (ensuring > 0.3)
+            outcome_type := 'Completed Demo';
+            summary_text := 'Summary of call ' || i || ': Successful product demonstration. Customer expressed strong interest and satisfaction. Moving forward with next steps.';
+            sentiment_analysis_json := jsonb_build_object('overall_sentiment', 'positive', 'confidence', round(random()::numeric, 2));
+            key_phrases_json := jsonb_build_array('positive feedback', 'next steps', 'implementation timeline', 'contract details');
+            action_items_json := jsonb_build_array('Send contract', 'Schedule onboarding', 'Introduce to support team');
+        END IF;
+
         -- Insert into linguistics_analysis FIRST
         INSERT INTO public.linguistics_analysis (
             id, call_id, language_metrics, key_phrases, topic_segments, sentiment_analysis, 
@@ -95,16 +131,21 @@ BEGIN
             linguistics_analysis_uuid, -- This is the PK for linguistics_analysis
             call_analysis_uuid, -- This will be the FK to call_analysis (which we insert next)
             jsonb_build_object('clarity_score', round((random()*0.5+0.5)::numeric, 2), 'talk_listen_ratio', round((random()*0.6+0.2)::numeric, 2)),
-            jsonb_build_array('pricing', 'contract', 'next steps', 'feature ' || i),
+            key_phrases_json,
             jsonb_build_array(
                 jsonb_build_object('topic', 'Introduction', 'start_time', 0, 'end_time', call_duration * 0.2),
                 jsonb_build_object('topic', 'Discussion Point ' || i, 'start_time', call_duration * 0.2, 'end_time', call_duration * 0.8),
                 jsonb_build_object('topic', 'Closing', 'start_time', call_duration * 0.8, 'end_time', call_duration)
             ),
-            jsonb_build_object('overall_sentiment', CASE WHEN random() > 0.5 THEN 'positive' ELSE 'neutral' END, 'confidence', round(random()::numeric, 2)),
-            jsonb_build_array('Follow up on item ' || i, 'Send proposal by EOD'),
-            jsonb_build_array('What are your thoughts on X?', 'Can we move forward with Y?'),
-            'Detailed transcript for call ' || i || '. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+            sentiment_analysis_json,
+            action_items_json,
+            jsonb_build_array('What are your thoughts on our proposal?', 'When would you like to schedule the next meeting?'),
+            'Detailed transcript for call ' || i || '. ' || 
+            CASE 
+                WHEN i <= 7 THEN 'Customer: "I have concerns about the pricing structure. It seems higher than what we discussed initially. And the timeline doesn''t work for us at all." Rep: "I understand your concerns. Let me see what we can do to address these issues."'
+                WHEN i <= 14 THEN 'Customer: "The features look interesting, but I need more information before making a decision. Can you send over some case studies?" Rep: "Absolutely, I''ll prepare those materials and send them over by tomorrow."'
+                ELSE 'Customer: "The demo was excellent! This is exactly what we''ve been looking for. When can we start the implementation process?" Rep: "I''m thrilled to hear that! We can begin as soon as next week if that works for your team."'
+            END,
             'https://example.com/recording_' || call_analysis_uuid || '.mp3',
             'completed',
             (SELECT first_name || ' ' || last_name FROM public.public_contacts WHERE id = selected_contact_id),
@@ -113,7 +154,7 @@ BEGIN
             call_start,
             'Linguistic Analysis for Call ' || i,
             jsonb_build_object('word_count', call_duration * 2, 'filler_words_pct', round((random()*5)::numeric,1)),
-            (random() * 2 - 1)::NUMERIC(3,2),
+            sentiment_score,
             'twilio'
         );
 
@@ -123,21 +164,34 @@ BEGIN
             recording_url, transcript, summary, sentiment_score, linguistics_analysis_id, call_sid, created_at, updated_at, tags
         ) VALUES (
             call_analysis_uuid, -- This is the PK for call_analysis
-            'Call with Contact ' || i,
+            CASE 
+                WHEN i <= 7 THEN 'Urgent: Call with Contact ' || i || ' (High Priority)'
+                WHEN i <= 14 THEN 'Follow-up: Call with Contact ' || i || ' (Medium Priority)'
+                ELSE 'Successful: Call with Contact ' || i || ' (Low Priority)'
+            END,
             call_start,
             call_duration,
             selected_contact_id,
             selected_practice_id,
             selected_user_id,
             'https://example.com/recording_' || call_analysis_uuid || '.mp3',
-            'This is a short mock transcript for call ' || i || '. Discussed various important topics.',
-            'Summary of call ' || i || ': Key points were covered, follow-up scheduled.',
-            (random() * 2 - 1)::NUMERIC(3,2), 
+            'This is a short mock transcript for call ' || i || '. ' || 
+            CASE 
+                WHEN i <= 7 THEN 'Discussion about pricing concerns and timeline issues.'
+                WHEN i <= 14 THEN 'Reviewed product features and next steps.'
+                ELSE 'Successful demo with positive feedback and implementation planning.'
+            END,
+            summary_text,
+            sentiment_score, 
             linguistics_analysis_uuid, -- This is the FK to linguistics_analysis.id
             'CA' || substr(md5(random()::text), 0, 33),
             call_start - INTERVAL '1 minute', 
             call_start,
-            CASE WHEN random() > 0.5 THEN ARRAY['follow-up', 'demo'] ELSE ARRAY['pricing', 'objection'] END
+            CASE 
+                WHEN i <= 7 THEN ARRAY['urgent', 'pricing', 'objection']
+                WHEN i <= 14 THEN ARRAY['follow-up', 'info-request', 'demo']
+                ELSE ARRAY['success', 'implementation', 'contract']
+            END
         );
 
         -- Insert into sales_activities
@@ -150,12 +204,12 @@ BEGIN
             selected_user_id, 
             call_start,
             call_duration,
-            CASE floor(random()*3)::int
-                WHEN 0 THEN 'Completed Demo'
-                WHEN 1 THEN 'Scheduled Follow-up'
-                ELSE 'Left Voicemail'
+            outcome_type,
+            CASE 
+                WHEN i <= 7 THEN 'Customer expressed concerns about pricing and timeline. Need to follow up with revised proposal.'
+                WHEN i <= 14 THEN 'Customer requested additional information. Scheduled follow-up call to discuss further.'
+                ELSE 'Successful demo completed. Customer ready to move forward. Preparing contract and implementation plan.'
             END,
-            'Notes for sales activity related to call ' || i,
             call_analysis_uuid, -- Link to the call_analysis record
             call_start,
             call_start

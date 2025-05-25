@@ -211,7 +211,7 @@ const RepInsightsService = {
         .select(`
           *,
           contacts:contact_id(first_name, last_name),
-          linguistics:linguistics_analysis_id(*)
+          linguistics_analysis:linguistics_analysis_id(*)
         `)
         .in('id', data.map(call => call.id))
         .order('call_date', { ascending: false });
@@ -314,16 +314,16 @@ const RepInsightsService = {
       
       // Extract linguistics data if available
       let linguisticsData = null;
-      if (call.linguistics) {
+      if (call.linguistics_analysis) {
         console.log('Linguistics data found for call:', call.id);
         linguisticsData = {
-          sentiment_score: call.linguistics.sentiment_score,
-          key_phrases: call.linguistics.key_phrases || call.linguistics.key_topics,
-          transcript: call.linguistics.transcript,
-          analysis_result: call.linguistics.analysis_result,
-          language_metrics: call.linguistics.analysis_result?.language_metrics || {},
-          topic_segments: call.linguistics.analysis_result?.topic_segments || [],
-          action_items: call.linguistics.action_items || call.linguistics.analysis_result?.action_items || []
+          sentiment_score: call.linguistics_analysis.sentiment_score,
+          key_phrases: call.linguistics_analysis.key_phrases || call.linguistics_analysis.key_topics,
+          transcript: call.linguistics_analysis.transcript,
+          analysis_result: call.linguistics_analysis.analysis_result,
+          language_metrics: call.linguistics_analysis.analysis_result?.language_metrics || {},
+          topic_segments: call.linguistics_analysis.analysis_result?.topic_segments || [],
+          action_items: call.linguistics_analysis.action_items || call.linguistics_analysis.analysis_result?.action_items || []
         };
       } else {
         console.log('No linguistics data available for call:', call.id);
