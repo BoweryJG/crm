@@ -307,8 +307,27 @@ INSERT INTO call_analysis (
    'https://example.com/calls/18.mp3', 'Transcript 18', 'Summary 18', 0.4, NULL, ARRAY['demo'], 'Sample notes'),
   (uuid_generate_v4(), 'Demo Call 19', NOW() - INTERVAL '12 hours', 600, NULL, NULL,
    'https://example.com/calls/19.mp3', 'Transcript 19', 'Summary 19', -0.1, NULL, ARRAY['demo'], 'Sample notes'),
+
   (uuid_generate_v4(), 'Demo Call 20', NOW() - INTERVAL '6 hours', 510, NULL, NULL,
    'https://example.com/calls/20.mp3', 'Transcript 20', 'Summary 20', 0.3, NULL, ARRAY['demo'], 'Sample notes');
+
+-- Linguistics Analysis
+CREATE TABLE IF NOT EXISTS linguistics_analysis (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  audio_url TEXT NOT NULL,
+  transcript TEXT,
+  analysis_result JSONB,
+  sentiment_score NUMERIC,
+  key_phrases TEXT[],
+  status TEXT NOT NULL CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
+  call_id TEXT,
+  source_type TEXT CHECK (source_type IN ('upload', 'twilio', 'other')),
+  contact_name TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 
 -- Market Intelligence
 CREATE TABLE IF NOT EXISTS market_intelligence (

@@ -9,11 +9,12 @@ import {
   generateMockResearchNotes,
   generateMockResearchDataQueries
 } from '../mockData/mockDataService';
-import { 
+import {
   enhanceMockDataWithLinguistics,
   generateMultipleMockLinguisticsAnalyses,
-  generateMultipleMockCallAnalysesWithLinguistics 
+  generateMultipleMockCallAnalysesWithLinguistics
 } from '../mockData/mockLinguisticsData';
+import mockPublicContacts from '../mockData/mockPublicContacts';
 
 // Environment variables for Supabase
 console.log('NODE_ENV:', process.env.NODE_ENV || 'development');
@@ -152,25 +153,7 @@ const createMockClient = (): SupabaseClient => {
     
     // Mock database with our enhanced mock data
     from: (table: string) => {
-      // Generate mock data for tables and transform field names to match database conventions
-      const transformContactToDatabaseFormat = (contact: any) => ({
-        id: contact.id,
-        first_name: contact.firstName,
-        last_name: contact.lastName,
-        email: contact.email,
-        phone: contact.phone,
-        role: contact.role,
-        practice_id: contact.practiceId,
-        practice_name: contact.practiceName,
-        practice_type: contact.practiceType,
-        specialty: contact.specialty,
-        is_starred: contact.isStarred,
-        last_contact_date: contact.lastContactDate,
-        notes: contact.notes,
-        tags: contact.tags,
-        created_at: contact.createdAt,
-        updated_at: contact.updatedAt
-      });
+      // Generate mock data for tables
       
       const transformPracticeToDatabaseFormat = (practice: any) => ({
         id: practice.id,
@@ -196,7 +179,7 @@ const createMockClient = (): SupabaseClient => {
       });
       
       // Generate and transform mock data
-      const mockContacts = generateMockContacts(20).map(transformContactToDatabaseFormat);
+      const mockContacts = mockPublicContacts;
       const mockPractices = generateMockPractices(20).map(transformPracticeToDatabaseFormat);
 
       const mockProjects = generateMockResearchProjects(5);

@@ -17,10 +17,11 @@ INSERT INTO linguistics_analysis (
   status,
   call_id,
   source_type,
+  contact_name,
   created_at,
   updated_at
 )
-SELECT 
+SELECT
   'Call Analysis for ' || id,
   'https://example.com/recordings/' || id || '.mp3',
   'This is a sample transcript for call ' || id,
@@ -76,6 +77,7 @@ SELECT
   'completed',
   id,
   'twilio',
+  'Demo Contact ' || id,
   NOW(),
   NOW()
 FROM call_ids

@@ -23,6 +23,7 @@ export interface CallAnalysis extends BaseModel {
  */
 export interface LinguisticsAnalysis extends BaseModel {
   call_id: string;
+  contact_name?: string;
   language_metrics: LanguageMetrics;
   key_phrases: KeyPhrase[];
   topic_segments: TopicSegment[];

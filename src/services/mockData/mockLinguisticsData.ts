@@ -1,6 +1,7 @@
 // @ts-ignore
 import { v4 as uuidv4 } from 'uuid';
 import mockDataService from './mockDataService';
+import mockPublicContacts from './mockPublicContacts';
 
 /**
  * Generates multiple mock linguistics analysis data for testing
@@ -13,6 +14,8 @@ export const generateMultipleMockLinguisticsAnalyses = (count: number = 20) => {
     const callId = uuidv4();
     const callDuration = Math.floor(Math.random() * 480 + 120); // 2-10 minutes in seconds
     
+    const contact = mockPublicContacts[i % mockPublicContacts.length];
+
     return {
       id,
       title: `Call Analysis ${i + 1}`,
@@ -173,9 +176,9 @@ export const generateMultipleMockLinguisticsAnalyses = (count: number = 20) => {
       source_type: 'twilio',
       created_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(), // Random date in last 30 days
       updated_at: new Date().toISOString(),
-      // Add contact_name and practice_name for easier display in CallInsightDetail
-      contact_name: `Dr. ${['Smith', 'Jones', 'Williams', 'Brown', 'Davis'][i % 5]}`,
-      practice_name: `${['Bright Smiles Dental', 'Modern Dentistry', 'Family Dental Care', 'Advanced Dental Arts', 'Gentle Dental Center'][i % 5]}`
+      // Map to contact info from public contacts
+      contact_name: `${contact.first_name} ${contact.last_name}`,
+      practice_name: contact.practice_name
     };
   });
 };
@@ -187,15 +190,16 @@ export const generateMultipleMockLinguisticsAnalyses = (count: number = 20) => {
  */
 export const generateMultipleMockCallAnalysesWithLinguistics = (count: number = 20) => {
   const linguisticsData = generateMultipleMockLinguisticsAnalyses(count);
-  
+
   return linguisticsData.map((linguistics, i) => {
+    const contact = mockPublicContacts[i % mockPublicContacts.length];
     return {
       id: linguistics.call_id, // Use the call_id from linguistics as the call analysis id
       call_sid: `CA${Math.random().toString(36).substring(2, 15)}`,
       call_duration: linguistics.analysis_result.topic_segments.reduce((sum, seg) => sum + (seg.end_time - seg.start_time), 0) || Math.floor(Math.random() * 600) + 120, // 2-12 minutes
       call_date: linguistics.created_at,
       call_type: Math.random() > 0.5 ? 'inbound' : 'outbound',
-      contact_id: uuidv4(),
+      contact_id: contact.id,
       contact_name: linguistics.contact_name, // Use from linguistics
       practice_id: uuidv4(),
       practice_name: linguistics.practice_name, // Use from linguistics
