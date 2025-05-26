@@ -5,11 +5,11 @@ import {
   Paper, 
   CardHeader,
   CardContent,
-  useTheme,
-  Grid
+  useTheme
 } from '@mui/material';
 import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
+import NowCardsStack from '../components/dashboard/NowCardsStack'; // Added import
 import { useThemeContext } from '../themes/ThemeContext';
 import { getMockDashboardData } from '../services/mockData/mockDataService';
 
@@ -50,6 +50,11 @@ const Dashboard: React.FC = () => {
       {/* Stats Cards */}
       <Box sx={{ mb: 4 }}>
         <DashboardStats />
+      </Box>
+
+      {/* Now Cards Stack - Added Section */}
+      <Box sx={{ mb: 4 }}>
+        <NowCardsStack />
       </Box>
 
       {/* Quick Actions and Communications */}

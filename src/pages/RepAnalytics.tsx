@@ -43,6 +43,7 @@ import {
 import { useThemeContext } from '../themes/ThemeContext';
 import { supabase } from '../services/supabase/supabase';
 import mockDataService from '../services/mockData/mockDataService';
+import NowCardsStack from '../components/dashboard/NowCardsStack';
 
 // Using the standard Grid from MUI
 
@@ -671,173 +672,10 @@ const RepAnalytics: React.FC = () => {
         Rep Analytics
       </Typography>
       
-      {/* Do This Now Section */}
-      {urgentActions.length > 0 && (
-        <Paper 
-          elevation={3}
-          sx={{ 
-            mb: 4, 
-            borderRadius: 2,
-            overflow: 'hidden',
-            border: '1px solid',
-            borderColor: 'error.main'
-          }}
-        >
-          <Box 
-            sx={{ 
-              bgcolor: 'error.main', 
-              color: 'white', 
-              py: 1.5, 
-              px: 2,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <AlarmIcon sx={{ mr: 1 }} />
-              <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
-                DO THIS NOW
-              </Typography>
-            </Box>
-            <Button 
-              size="small" 
-              variant="outlined" 
-              startIcon={<RefreshIcon />}
-              onClick={fetchUrgentActions}
-              sx={{ 
-                color: 'white', 
-                borderColor: 'white',
-                '&:hover': {
-                  borderColor: 'white',
-                  bgcolor: 'rgba(255, 255, 255, 0.1)'
-                }
-              }}
-            >
-              Refresh
-            </Button>
-          </Box>
-          
-          <Box sx={{ p: 2 }}>
-            {loadingUrgentActions ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
-                <CircularProgress color="error" />
-              </Box>
-            ) : (
-              <Grid container spacing={2}>
-                {urgentActions.map((action) => (
-                  <Grid item xs={12} key={action.id}>
-                    <Card 
-                      sx={{ 
-                        mb: 2, 
-                        borderRadius: 2,
-                        backgroundColor: themeMode === 'space'
-                          ? 'rgba(220, 53, 69, 0.15)'
-                          : 'rgba(220, 53, 69, 0.08)',
-                        border: '1px solid',
-                        borderColor: 'error.main',
-                        boxShadow: `0 4px 12px ${
-                          themeMode === 'space'
-                            ? 'rgba(220, 53, 69, 0.25)'
-                            : 'rgba(220, 53, 69, 0.15)'
-                        }`,
-                        position: 'relative',
-                        overflow: 'visible'
-                      }}
-                    >
-                      {/* Urgent badge */}
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          top: -10,
-                          right: 20,
-                          backgroundColor: 'error.main',
-                          color: 'white',
-                          fontSize: '0.75rem',
-                          height: '22px',
-                          minWidth: '80px',
-                          borderRadius: '11px',
-                          fontWeight: 'bold',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          px: 1
-                        }}
-                      >
-                        <AlarmIcon fontSize="small" sx={{ mr: 0.5 }} />
-                        DO THIS NOW
-                      </Box>
-                      
-                      <CardContent sx={{ pt: 3 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1 }}>
-                          <Typography variant="h6" component="h3" sx={{ fontWeight: 600, color: 'error.main' }}>
-                            {action.title}
-                          </Typography>
-                          <Chip 
-                            label={action.source.replace('_', ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} 
-                            size="small" 
-                            color="error"
-                            icon={<BoltIcon fontSize="small" />}
-                            sx={{ ml: 1 }}
-                          />
-                        </Box>
-                        
-                        <Typography variant="body1" sx={{ mb: 1.5 }}>
-                          {action.description}
-                        </Typography>
-                        
-                        {action.sourceDetail && (
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontStyle: 'italic' }}>
-                            Source: {action.sourceDetail}
-                          </Typography>
-                        )}
-                        
-                        {action.timeRemaining && (
-                          <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                            <TimerIcon fontSize="small" color="error" sx={{ mr: 1 }} />
-                            <Typography 
-                              variant="body2" 
-                              color="error.main"
-                              fontWeight="bold"
-                            >
-                              Time remaining: {action.timeRemaining}
-                            </Typography>
-                          </Box>
-                        )}
-                      </CardContent>
-                      
-                      <Divider />
-                      
-                      <CardActions sx={{ justifyContent: 'space-between', px: 2, py: 1.5 }}>
-                        <Button 
-                          size="small" 
-                          onClick={() => handleDismissUrgentAction(action.id)}
-                          color="inherit"
-                        >
-                          Dismiss
-                        </Button>
-                        
-                        <Button 
-                          variant="contained"
-                          color="error"
-                          size="medium" 
-                          endIcon={<ArrowForwardIcon />} 
-                          onClick={() => handleUrgentAction(action.id)}
-                          sx={{ ml: 'auto', fontWeight: 'bold' }}
-                        >
-                          {action.actionText || 'Take Action Now'}
-                        </Button>
-                      </CardActions>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </Box>
-        </Paper>
-      )}
+      {/* Enhanced AI Insights Cards - Now Cards Stack */}
+      <Box sx={{ mb: 4 }}>
+        <NowCardsStack />
+      </Box>
       
       
       {/* TerritorySelector would be used here */}
