@@ -42,6 +42,7 @@ import {
 
 import { useThemeContext } from '../themes/ThemeContext';
 import { supabase } from '../services/supabase/supabase';
+import { useUserId } from '../hooks/useAuth';
 import mockDataService from '../services/mockData/mockDataService';
 import NowCardsStack from '../components/dashboard/NowCardsStack';
 
@@ -481,42 +482,11 @@ const RepAnalytics: React.FC = () => {
   const [selectedCategories, setSelectedCategories] = useState<InsightCategory[]>([]);
   const [selectedPriorities, setSelectedPriorities] = useState<InsightPriority[]>([]);
   const [activeTab, setActiveTab] = useState(0);
-  const [userId, setUserId] = useState<string | null>(null);
+  const userId = useUserId();
   const [urgentActions, setUrgentActions] = useState<UrgentActionProps[]>([]);
   const [loadingUrgentActions, setLoadingUrgentActions] = useState(false);
 
-  // Fetch user ID on component mount
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const { data, error } = await supabase.auth.getUser();
-        if (error) {
-          console.warn("Auth error:", error.message);
-          // Use a mock user ID for development
-          const mockUserId = '00000000-0000-0000-0000-000000000000';
-          console.log("Using mock user ID for development:", mockUserId);
-          setUserId(mockUserId);
-        } else if (data?.user) {
-          console.log("Authenticated user:", data.user.id);
-          setUserId(data.user.id);
-        } else {
-          console.warn("No user session found or user data unavailable.");
-          // Use a mock user ID for development
-          const mockUserId = '00000000-0000-0000-0000-000000000000';
-          console.log("Using mock user ID for development:", mockUserId);
-          setUserId(mockUserId);
-        }
-      } catch (err) {
-        console.error("Unexpected error during auth:", err);
-        // Use a mock user ID for development
-        const mockUserId = '00000000-0000-0000-0000-000000000000';
-        console.log("Using mock user ID for development:", mockUserId);
-        setUserId(mockUserId);
-      }
-    };
-    
-    fetchUser();
-  }, []);
+
 
   // Fetch insights when user ID or territory changes
   useEffect(() => {

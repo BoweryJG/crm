@@ -1,5 +1,6 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
+import { supabase } from '../services/supabase/supabase';
 
 interface AuthState {
   session: Session | null;
@@ -50,6 +51,10 @@ const mockSession: Session = {
   user: mockUser
 };
 
+const useMockAuth =
+  process.env.REACT_APP_USE_MOCK_AUTH === 'true' ||
+  process.env.NODE_ENV === 'development';
+
 // Create a context for authentication
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -62,54 +67,109 @@ export const useAuth = () => {
   return context;
 };
 
+// Convenience hook to get the current user id
+export const useUserId = () => {
+  const { user } = useAuth();
+  return user?.id || null;
+};
+
 // Provider component for authentication
-export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
-  // Always return authenticated state with mock user
-  const state: AuthState = {
-    session: mockSession,
-    user: mockUser,
-    loading: false,
-  };
-
-  // Mock sign in - always succeeds
-  const signIn = async (_email: string, _password: string) => {
-    console.log('Mock sign in called');
-    return {
-      success: true,
-      error: null,
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  if (useMockAuth) {
+    // Always return authenticated state with mock user
+    const state: AuthState = {
+      session: mockSession,
+      user: mockUser,
+      loading: false,
     };
-  };
 
-  // Mock sign up - always succeeds
-  const signUp = async (_email: string, _password: string) => {
-    console.log('Mock sign up called');
-    return {
-      success: true,
-      error: null,
+    // Mock sign in - always succeeds
+    const signIn = async (_email: string, _password: string) => {
+      console.log('Mock sign in called');
+      return { success: true, error: null };
     };
+
+    // Mock sign up - always succeeds
+    const signUp = async (_email: string, _password: string) => {
+      console.log('Mock sign up called');
+      return { success: true, error: null };
+    };
+
+    // Mock sign out - doesn't actually do anything
+    const signOut = async () => {
+      console.log('Mock sign out called');
+    };
+
+    // Mock reset password - always succeeds
+    const resetPassword = async (_email: string) => {
+      console.log('Mock reset password called');
+      return { success: true, error: null };
+    };
+
+    const value = {
+      ...state,
+      signIn,
+      signUp,
+      signOut,
+      resetPassword,
+    };
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  }
+
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setUser(data.session?.user ?? null);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signIn = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      return { success: false, error };
+    }
+    setSession(data.session);
+    setUser(data.user);
+    return { success: true, error: null };
   };
 
-  // Mock sign out - doesn't actually do anything
+  const signUp = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      return { success: false, error };
+    }
+    setSession(data.session);
+    setUser(data.user);
+    return { success: true, error: null };
+  };
+
   const signOut = async () => {
-    console.log('Mock sign out called');
+    await supabase.auth.signOut();
+    setSession(null);
+    setUser(null);
   };
 
-  // Mock reset password - always succeeds
-  const resetPassword = async (_email: string) => {
-    console.log('Mock reset password called');
-    return {
-      success: true,
-      error: null,
-    };
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    return { success: !error, error: error || null };
   };
 
-  const value = {
-    ...state,
-    signIn,
-    signUp,
-    signOut,
-    resetPassword,
-  };
+  const value = { session, user, loading, signIn, signUp, signOut, resetPassword };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
