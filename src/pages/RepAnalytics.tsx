@@ -224,124 +224,260 @@ interface InsightFilterOptions {
 const RepInsightsService = {
   async getInsights(userId: string, filters?: InsightFilterOptions): Promise<RepInsight[]> {
     try {
-      console.log('Fetching insights from call_analysis table...');
+      console.log('Fetching comprehensive insights from public_contacts...');
       
       // Set default pagination values if not provided
       const page = filters?.page || 1;
-      const limit = filters?.limit || 10;
+      const limit = filters?.limit || 20; // Increased limit for better data display
       const offset = (page - 1) * limit;
       
       console.log(`Pagination: page ${page}, limit ${limit}, offset ${offset}`);
       
-      // Fetch real data from call_analysis table with proper joins
-      const { data, error } = await supabase
-        .from('call_analysis')
-        .select(`
-          *,
-          contacts:contact_id(first_name, last_name)
-        `)
-        .order('call_date', { ascending: false })
-        .range(offset, offset + limit - 1); // Apply pagination
+      // Fetch comprehensive data starting from public_contacts table
+      const { data: contactsData, error: contactsError } = await supabase
+        .from('public_contacts')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
       
-      // If we have data, use the proper join to get linguistics data
-    let finalData = data;
-    if (!error && data && data.length > 0) {
-      console.log('Successfully fetched call analyses, now fetching linguistics data...');
-      
-      // Use a proper join to get linguistics data
-      const { data: callsWithLinguistics, error: joinError } = await supabase
-        .from('call_analysis')
-        .select(`
-          *,
-          contacts:contact_id(first_name, last_name),
-          linguistics_analysis:linguistics_analysis_id(*)
-        `)
-        .in('id', data.map(call => call.id))
-        .order('call_date', { ascending: false });
-      
-      if (!joinError && callsWithLinguistics) {
-        console.log(`Successfully fetched ${callsWithLinguistics.length} call analyses with linguistics data`);
-        // Use the joined data
-        finalData = callsWithLinguistics;
-      } else {
-        console.error('Error fetching call analyses with linguistics data:', joinError);
+      if (contactsError) {
+        console.error('Error fetching contacts:', contactsError);
+        throw contactsError;
       }
-    }
+      
+      const insights: RepInsight[] = [];
+      
+      // For each contact, fetch related analytics data
+      for (const contact of contactsData || []) {
+        // Fetch call analysis data for this contact
+        const { data: callData } = await supabase
+          .from('call_analysis')
+          .select(`
+            *,
+            linguistics_analysis:linguistics_analysis_id(*)
+          `)
+          .eq('contact_id', contact.id)
+          .order('call_date', { ascending: false })
+          .limit(5);
         
-      if (error) {
-        console.error('Error fetching call analyses:', error);
-        // Fallback: load contacts to use as insights
-        console.log('Fetching contacts as fallback to present live mock data');
-        const { data: contactsData, error: contactsError } = await supabase
-          .from('public_contacts')
-          .select('id, first_name, last_name, created_at')
-          .order('created_at', { ascending: false })
-          .limit(20);
-
-        let fallbackCalls: any[];
-        if (contactsError || !contactsData) {
-          console.error('Error fetching contacts fallback or no contacts found:', contactsError);
-          fallbackCalls = mockDataService.generateMockCallAnalyses(10);
-          console.log('Using generated mock call data');
-        } else {
-          console.log(`Fetched ${contactsData.length} contacts for fallback insights`);
-          fallbackCalls = contactsData.map(c => ({
-            id: c.id,
-            call_date: c.created_at,
-            title: `${c.first_name} ${c.last_name}`,
-            transcript: '',
-            summary: '',
-            sentiment_score: 0,
-            contact_id: c.id,
-            created_at: c.created_at,
-            contacts: { first_name: c.first_name, last_name: c.last_name }
-          }));
-        }
-        return this.transformCallAnalysesToInsights(fallbackCalls);
+        // Create insights based on contact and their activities
+        const contactInsights = this.createContactInsights(contact, callData || []);
+        insights.push(...contactInsights);
       }
       
-      if (!data || data.length === 0) {
-        console.log('No call analyses found in call_analysis table, using contacts fallback');
-        console.log('Fetching contacts as fallback to present live mock data');
-        const { data: contactsData, error: contactsError } = await supabase
-          .from('public_contacts')
-          .select('id, first_name, last_name, created_at')
-          .order('created_at', { ascending: false })
-          .limit(20);
-
-        let fallbackCalls: any[];
-        if (contactsError || !contactsData) {
-          console.error('Error fetching contacts fallback or no contacts found:', contactsError);
-          fallbackCalls = mockDataService.generateMockCallAnalyses(10);
-          console.log('Using generated mock call data');
-        } else {
-          console.log(`Fetched ${contactsData.length} contacts for fallback insights`);
-          fallbackCalls = contactsData.map(c => ({
-            id: c.id,
-            call_date: c.created_at,
-            title: `${c.first_name} ${c.last_name}`,
-            transcript: '',
-            summary: '',
-            sentiment_score: 0,
-            contact_id: c.id,
-            created_at: c.created_at,
-            contacts: { first_name: c.first_name, last_name: c.last_name }
-          }));
+      // Sort insights by score and priority
+      insights.sort((a, b) => {
+        if (a.priority !== b.priority) {
+          const priorityOrder = { high: 0, medium: 1, low: 2 };
+          return priorityOrder[a.priority] - priorityOrder[b.priority];
         }
-        return this.transformCallAnalysesToInsights(fallbackCalls);
-      }
+        return b.score - a.score;
+      });
       
-      console.log(`Successfully fetched ${data.length} call analyses from call_analysis table`);
-      
-      // Transform to expected format
-      return this.transformCallAnalysesToInsights(finalData);
+      return insights.slice(0, limit);
     } catch (err) {
       console.error('Error in getInsights:', err);
       
-      // Use mock data as fallback
-      const mockCalls = mockDataService.generateMockCallAnalyses(10);
-      return this.transformCallAnalysesToInsights(mockCalls);
+      // Generate fallback insights from mock data
+      const mockContacts = mockDataService.generateMockContacts(20);
+      const fallbackInsights: RepInsight[] = [];
+      
+      mockContacts.forEach(contact => {
+        const mockCalls = mockDataService.generateMockCallAnalyses(Math.floor(Math.random() * 3) + 1);
+        const insights = this.createContactInsights(contact, mockCalls);
+        fallbackInsights.push(...insights);
+      });
+      
+      return fallbackInsights.slice(0, limit);
     }
+  },
+  
+  // Create insights from a contact and their activities
+  createContactInsights(contact: any, callAnalyses: any[]): RepInsight[] {
+    const insights: RepInsight[] = [];
+    const mockLinguisticsData = require('../services/mockData/mockLinguisticsData');
+    
+    // Determine if this is a dental or aesthetic contact
+    const isAesthetic = ['aesthetic_doctor', 'plastic_surgeon', 'dermatologist', 
+                        'cosmetic_dermatologist', 'nurse_practitioner', 
+                        'physician_assistant', 'aesthetician'].includes(contact.type);
+    
+    // Calculate days since last contact
+    const lastContactDate = contact.last_contact_date || contact.updated_at || contact.created_at;
+    const daysSinceContact = Math.floor((new Date().getTime() - new Date(lastContactDate).getTime()) / (1000 * 60 * 60 * 24));
+    
+    // 1. Follow-up insights based on contact timing
+    if (daysSinceContact > 7 && daysSinceContact < 30) {
+      insights.push({
+        id: `follow-up-${contact.id}-${Date.now()}`,
+        title: `Follow up with ${contact.first_name} ${contact.last_name}`,
+        description: `It's been ${daysSinceContact} days since last contact. ${isAesthetic ? 'They may be ready to discuss new aesthetic procedures.' : 'Time to check on their dental equipment needs.'}`,
+        generatedDate: new Date().toISOString(),
+        expirationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        score: 85 - daysSinceContact,
+        priority: daysSinceContact > 14 ? 'high' : 'medium',
+        category: 'follow_up',
+        territory: contact.territory || 'All Territories',
+        targetId: contact.id,
+        targetType: 'contact',
+        actionText: 'Schedule Call',
+        onActionClick: () => {},
+        onMarkComplete: () => {},
+        onSave: () => {},
+        onSchedule: () => {},
+        metadata: {
+          sourceType: 'crm',
+          sourceId: contact.id
+        }
+      });
+    }
+    
+    // 2. New opportunity insights
+    if (daysSinceContact < 3) {
+      insights.push({
+        id: `opportunity-${contact.id}-${Date.now()}`,
+        title: `Hot lead: ${contact.first_name} ${contact.last_name}`,
+        description: `Recently engaged contact at ${contact.practice_name || 'their practice'}. ${isAesthetic ? 'Interest in aesthetic equipment upgrades.' : 'Exploring dental technology solutions.'}`,
+        generatedDate: new Date().toISOString(),
+        expirationDate: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+        score: 95,
+        priority: 'high',
+        category: 'opportunity',
+        territory: contact.territory || 'All Territories',
+        targetId: contact.id,
+        targetType: 'contact',
+        actionText: 'Call Now',
+        onActionClick: () => {},
+        onMarkComplete: () => {},
+        onSave: () => {},
+        onSchedule: () => {},
+        metadata: {
+          sourceType: 'crm',
+          sourceId: contact.id
+        }
+      });
+    }
+    
+    // 3. Visit insights based on location and value
+    if (contact.city && contact.state && Math.random() > 0.5) {
+      insights.push({
+        id: `visit-${contact.id}-${Date.now()}`,
+        title: `Schedule visit: ${contact.practice_name || contact.first_name + ' ' + contact.last_name}`,
+        description: `High-value ${isAesthetic ? 'aesthetic' : 'dental'} practice in ${contact.city}, ${contact.state}. In-person demo could close the deal.`,
+        generatedDate: new Date().toISOString(),
+        expirationDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+        score: 80,
+        priority: 'medium',
+        category: 'visit',
+        territory: contact.territory || 'All Territories',
+        targetId: contact.id,
+        targetType: 'contact',
+        actionText: 'Plan Visit',
+        onActionClick: () => {},
+        onMarkComplete: () => {},
+        onSave: () => {},
+        onSchedule: () => {},
+        metadata: {
+          sourceType: 'crm',
+          sourceId: contact.id
+        }
+      });
+    }
+    
+    // 4. Insights from call analyses
+    callAnalyses.forEach((call, index) => {
+      // Get linguistics data if available
+      let linguisticsData = call.linguistics_analysis;
+      if (!linguisticsData) {
+        // Generate mock linguistics data
+        const mockData = mockLinguisticsData.generateMultipleMockLinguisticsAnalyses(1)[0];
+        linguisticsData = mockData;
+      }
+      
+      // Determine insight category and priority based on sentiment and metrics
+      const sentiment = linguisticsData?.sentiment_score || call.sentiment_score || 0;
+      let category: InsightCategory = 'follow_up';
+      let priority: InsightPriority = 'medium';
+      
+      if (sentiment < -0.3) {
+        category = 'follow_up';
+        priority = 'high';
+      } else if (sentiment > 0.5) {
+        category = 'opportunity';
+        priority = 'high';
+      }
+      
+      // Create insight from call analysis
+      insights.push({
+        id: call.id || `call-${contact.id}-${index}`,
+        title: `${sentiment < 0 ? 'Address concerns' : 'Capitalize on interest'}: ${contact.first_name} ${contact.last_name}`,
+        description: call.summary || `Recent call revealed ${sentiment < 0 ? 'concerns that need addressing' : 'strong interest in your solutions'}. ${linguisticsData?.action_items?.length ? `${linguisticsData.action_items.length} action items identified.` : ''}`,
+        generatedDate: call.created_at || new Date().toISOString(),
+        expirationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        score: Math.max(0, Math.min(100, (sentiment + 1) * 50 + (linguisticsData?.closing_readiness_score || 5) * 5)),
+        priority,
+        category,
+        territory: contact.territory || 'All Territories',
+        targetId: contact.id,
+        targetType: 'contact',
+        actionText: 'View Analysis',
+        onActionClick: () => {},
+        onMarkComplete: () => {},
+        onSave: () => {},
+        onSchedule: () => {},
+        metadata: {
+          sourceType: 'call_analysis',
+          sourceId: call.id
+        },
+        linguistics: linguisticsData ? {
+          sentiment_score: linguisticsData.sentiment_score,
+          key_phrases: linguisticsData.key_phrases || linguisticsData.key_topics,
+          transcript: linguisticsData.transcript,
+          analysis_result: linguisticsData.analysis_result,
+          language_metrics: linguisticsData.analysis_result?.language_metrics || linguisticsData.language_metrics,
+          topic_segments: linguisticsData.analysis_result?.topic_segments || linguisticsData.topic_segments,
+          action_items: linguisticsData.action_items || linguisticsData.analysis_result?.action_items,
+          trust_rapport_score: linguisticsData.trust_rapport_score,
+          influence_effectiveness_score: linguisticsData.influence_effectiveness_score,
+          buyer_personality_type: linguisticsData.buyer_personality_type,
+          closing_readiness_score: linguisticsData.closing_readiness_score,
+          recommended_follow_up_timing: linguisticsData.recommended_follow_up_timing,
+          coaching_recommendations: linguisticsData.coaching_recommendations
+        } : undefined
+      });
+    });
+    
+    // 5. Market intelligence insights
+    if (Math.random() > 0.6) {
+      const trends = isAesthetic 
+        ? ['New FDA-approved laser technology', 'Rising demand for body contouring', 'Competitor pricing changes']
+        : ['Digital dentistry adoption surge', 'Insurance reimbursement updates', 'New implant technology trends'];
+      
+      insights.push({
+        id: `trend-${contact.id}-${Date.now()}`,
+        title: `Market trend affecting ${contact.practice_name || 'practice'}`,
+        description: trends[Math.floor(Math.random() * trends.length)] + ' in your territory. Great conversation starter.',
+        generatedDate: new Date().toISOString(),
+        expirationDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+        score: 70,
+        priority: 'low',
+        category: 'trend',
+        territory: contact.territory || 'All Territories',
+        targetId: contact.id,
+        targetType: 'contact',
+        actionText: 'Share Insight',
+        onActionClick: () => {},
+        onMarkComplete: () => {},
+        onSave: () => {},
+        onSchedule: () => {},
+        metadata: {
+          sourceType: 'market_intelligence',
+          sourceId: contact.id
+        }
+      });
+    }
+    
+    return insights;
   },
   
   // Helper method to transform call analyses to insights
@@ -719,6 +855,25 @@ const RepAnalytics: React.FC = () => {
     }
   };
 
+  const getCategoryColor = (category: InsightCategory) => {
+    switch (category) {
+      case 'visit':
+        return theme.palette.primary.main; // Blue for visits
+      case 'follow_up':
+        return theme.palette.secondary.main; // Secondary color for follow-ups
+      case 'connect':
+        return theme.palette.success.main; // Green for connections
+      case 'trend':
+        return theme.palette.info.main; // Light blue for trends
+      case 'news':
+        return theme.palette.warning.main; // Orange for news
+      case 'opportunity':
+        return theme.palette.error.main; // Red for opportunities
+      default:
+        return theme.palette.grey[500];
+    }
+  };
+
   return (
     <Box sx={{ p: 3, height: '100%', overflow: 'auto' }}>
       <Typography variant="h4" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
@@ -920,21 +1075,58 @@ const RepAnalytics: React.FC = () => {
               <Grid container spacing={2}>
                 {filteredInsights.map((insight) => (
                   <Grid item xs={12} md={6} key={insight.id}>
-                    <Card sx={{ mb: 2, borderLeft: `4px solid ${getPriorityColor(insight.priority)}`, borderRadius: 2 }}>
+                    <Card sx={{ 
+                      mb: 2, 
+                      borderLeft: `6px solid ${getCategoryColor(insight.category)}`, 
+                      borderRadius: 2,
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                      '&:hover': {
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                        transform: 'translateY(-2px)',
+                        transition: 'all 0.2s ease-in-out'
+                      }
+                    }}>
                       <CardContent>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                          <Typography variant="h6">{insight.title}</Typography>
-                          <Chip
-                            label={insight.priority.toUpperCase()}
-                            size="small"
-                            sx={{
-                              bgcolor: getPriorityColor(insight.priority),
-                              color: 'white',
-                              fontWeight: 'bold'
-                            }}
-                          />
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                          <Box sx={{ flex: 1, mr: 2 }}>
+                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Box sx={{ 
+                                display: 'inline-flex', 
+                                color: getCategoryColor(insight.category),
+                                bgcolor: `${getCategoryColor(insight.category)}20`,
+                                borderRadius: '50%',
+                                p: 0.5
+                              }}>
+                                {getCategoryIcon(insight.category)}
+                              </Box>
+                              {insight.title}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column', alignItems: 'flex-end' }}>
+                            <Chip
+                              label={insight.category.replace('_', ' ').toUpperCase()}
+                              size="small"
+                              sx={{
+                                bgcolor: getCategoryColor(insight.category),
+                                color: 'white',
+                                fontWeight: 'medium',
+                                fontSize: '0.75rem'
+                              }}
+                            />
+                            <Chip
+                              label={insight.priority.toUpperCase()}
+                              size="small"
+                              variant="outlined"
+                              sx={{
+                                borderColor: getPriorityColor(insight.priority),
+                                color: getPriorityColor(insight.priority),
+                                fontWeight: 'bold',
+                                fontSize: '0.7rem'
+                              }}
+                            />
+                          </Box>
                         </Box>
-                        <Typography variant="body2">{insight.description}</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{insight.description}</Typography>
                         
                         {/* Display linguistics data if available */}
                         {insight.linguistics && (

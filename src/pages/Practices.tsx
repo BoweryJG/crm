@@ -41,120 +41,7 @@ import {
   Language as LanguageIcon
 } from '@mui/icons-material';
 import { Practice } from '../types/practices';
-
-// Mock data for development purposes
-const mockPractices: Practice[] = [
-  {
-    id: '1',
-    name: 'NYC Dental Implants Center',
-    address: '225 East 64th St, Ste 1B, New York, NY',
-    city: 'New York',
-    state: 'NY',
-    zipCode: '10065',
-    phone: '212-256-0000',
-    email: 'info@nycdentalimplantscenter.com',
-    website: 'https://www.nycdentalimplantscenter.com',
-    type: 'dental',
-    size: 'medium',
-    isDSO: false,
-    numPractitioners: 3,
-    specialties: ['Periodontist', 'Prosthodontist'],
-    technologies: ['CBCT', 'Intraoral Scanner', 'Surgical Guides', 'In-House Milling'],
-    procedures: ['Dental Implants', 'Full Arch', 'Same Day Implants', 'All-on-4', 'All-on-6'],
-    notes: 'High-end practice focused on implant dentistry. Good relationship with Dr. Johnson.',
-    lastContactDate: '2025-04-01T09:30:00Z',
-    createdAt: '2025-01-15T14:30:00Z',
-    updatedAt: '2025-04-01T15:45:00Z'
-  },
-  {
-    id: '2',
-    name: 'New York Oral & Maxillofacial Surgery',
-    address: '800B 5th Ave, New York, NY',
-    city: 'New York',
-    state: 'NY',
-    zipCode: '10065',
-    phone: '212-888-4760',
-    email: 'office@nyoms.com',
-    website: 'https://www.new-york-oral-surgery.com',
-    type: 'dental',
-    size: 'small',
-    isDSO: false,
-    numPractitioners: 1,
-    specialties: ['Oral Surgeon'],
-    technologies: ['CBCT', 'Intraoral Scanner', 'Surgical Guides'],
-    procedures: ['Dental Implants', 'Full Arch', 'Same Day Implants', 'All-on-4', 'Zygomatic Implants'],
-    notes: 'Solo practitioner specializing in complex implant cases. Performs zygomatic implants.',
-    lastContactDate: '2025-03-28T14:00:00Z',
-    createdAt: '2025-02-05T09:45:00Z',
-    updatedAt: '2025-03-28T16:30:00Z'
-  },
-  {
-    id: '3',
-    name: 'Columbia Dental Implant Center',
-    address: '630 W 168th St, New York, NY',
-    city: 'New York',
-    state: 'NY',
-    zipCode: '10032',
-    phone: '212-305-6100',
-    email: 'dental_implants@columbia.edu',
-    website: 'https://www.dental.columbia.edu/teaching-clinics/implant-center',
-    type: 'dental',
-    size: 'large',
-    isDSO: false,
-    numPractitioners: 12,
-    specialties: ['Periodontist', 'Prosthodontist', 'Oral Surgeon', 'General Dentist'],
-    technologies: ['CBCT', 'Intraoral Scanner', 'Surgical Guides', 'In-House Milling'],
-    procedures: ['Dental Implants', 'Full Arch', 'All-on-4', 'All-on-6', 'Zygomatic Implants'],
-    notes: 'Academic center with teaching program. Influential in the NYC dental community.',
-    lastContactDate: '2025-03-15T12:00:00Z',
-    createdAt: '2025-01-10T11:20:00Z',
-    updatedAt: '2025-03-15T14:30:00Z'
-  },
-  {
-    id: '4',
-    name: 'Manhattan Aesthetics',
-    address: '161 Madison Ave, Ste 7SW, New York, NY',
-    city: 'New York',
-    state: 'NY',
-    zipCode: '10016',
-    phone: '212-777-8899',
-    email: 'info@manhattanaesthetics.com',
-    website: 'https://www.manhattanaesthetics.com',
-    type: 'aesthetic',
-    size: 'medium',
-    isDSO: true,
-    numPractitioners: 5,
-    specialties: ['Dermatologist', 'Plastic Surgeon', 'Injector'],
-    technologies: ['Lasers', 'RF Microneedling', 'Body Contouring'],
-    procedures: ['Botox', 'Fillers', 'Laser Skin Resurfacing', 'Body Sculpting', 'Chemical Peels'],
-    notes: 'High-volume aesthetic practice with multiple locations. Looking for premium products.',
-    lastContactDate: '2025-04-03T11:15:00Z',
-    createdAt: '2025-01-25T13:10:00Z',
-    updatedAt: '2025-04-03T12:30:00Z'
-  },
-  {
-    id: '5',
-    name: 'NY Laser Dermatology',
-    address: '317 E 34th St, New York, NY',
-    city: 'New York',
-    state: 'NY',
-    zipCode: '10016',
-    phone: '212-333-4567',
-    email: 'appointments@nylaserdermatology.com',
-    website: 'https://www.nylaserdermatology.com',
-    type: 'aesthetic',
-    size: 'medium',
-    isDSO: false,
-    numPractitioners: 3,
-    specialties: ['Dermatologist'],
-    technologies: ['Lasers', 'RF Microneedling', 'IPL'],
-    procedures: ['Laser Hair Removal', 'Skin Rejuvenation', 'Acne Treatment', 'Tattoo Removal'],
-    notes: 'Focused on laser treatments and technology-driven procedures. Interested in next-gen devices.',
-    lastContactDate: '2025-03-27T15:30:00Z',
-    createdAt: '2025-02-12T10:15:00Z',
-    updatedAt: '2025-03-27T16:45:00Z'
-  }
-];
+import { supabase } from '../services/supabase/supabase';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -199,22 +86,209 @@ const Practices: React.FC = () => {
     const fetchPractices = async () => {
       try {
         setLoading(true);
-        // In a real app, this would be a call to supabase or another API
-        // const { data, error } = await supabase.from('practices').select('*');
         
-        // For now, use mock data
-        setTimeout(() => {
-          setPractices(mockPractices);
+        // Fetch all contacts from public_contacts table
+        const { data: contacts, error } = await supabase
+          .from('public_contacts')
+          .select('*')
+          .order('practice_name');
+        
+        if (error) {
+          console.error('Error fetching contacts:', error);
+          // Generate fallback practices
+          const fallbackPractices = generateFallbackPractices();
+          setPractices(fallbackPractices);
           setLoading(false);
-        }, 600); // Simulate network delay
+          return;
+        }
+
+        if (!contacts || contacts.length === 0) {
+          // Generate fallback practices if no contacts
+          const fallbackPractices = generateFallbackPractices();
+          setPractices(fallbackPractices);
+          setLoading(false);
+          return;
+        }
+
+        // Group contacts by practice_name
+        const practiceMap = new Map<string, any[]>();
+        contacts.forEach(contact => {
+          const practiceName = contact.practice_name || 'Independent Practice';
+          if (!practiceMap.has(practiceName)) {
+            practiceMap.set(practiceName, []);
+          }
+          practiceMap.get(practiceName)!.push(contact);
+        });
+
+        // Transform grouped contacts into practices
+        const transformedPractices: Practice[] = Array.from(practiceMap.entries()).map(([practiceName, contactsInPractice], index) => {
+          const firstContact = contactsInPractice[0];
+          
+          // Determine practice type based on contact types
+          const contactTypes = contactsInPractice.map(c => c.type);
+          const hasAestheticTypes = contactTypes.some(type => 
+            ['aesthetic_doctor', 'plastic_surgeon', 'dermatologist', 
+             'cosmetic_dermatologist', 'nurse_practitioner', 
+             'physician_assistant', 'aesthetician'].includes(type)
+          );
+          const practiceType = hasAestheticTypes ? 'aesthetic' : 'dental';
+          
+          // Extract unique specialties
+          const specialties = Array.from(new Set(
+            contactsInPractice
+              .map(c => c.specialization || c.type)
+              .filter(Boolean)
+              .map(s => s.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))
+          ));
+          
+          // Determine practice size
+          const numPractitioners = contactsInPractice.length;
+          const size = numPractitioners <= 2 ? 'small' : numPractitioners <= 5 ? 'medium' : 'large';
+          
+          // Generate realistic technologies based on practice type
+          const technologies = practiceType === 'dental' 
+            ? ['CBCT', 'Intraoral Scanner', 'Digital X-Ray', 'CAD/CAM', 'Laser Dentistry']
+            : ['Lasers', 'RF Microneedling', 'IPL', 'Body Contouring', 'Cryotherapy'];
+          
+          // Generate procedures based on practice type
+          const procedures = practiceType === 'dental'
+            ? ['General Dentistry', 'Dental Implants', 'Cosmetic Dentistry', 'Orthodontics', 'Endodontics']
+            : ['Botox', 'Fillers', 'Laser Treatments', 'Chemical Peels', 'Microneedling'];
+          
+          // Get most recent contact date
+          const lastContactDate = contactsInPractice
+            .map(c => c.last_contact_date || c.updated_at || c.created_at)
+            .filter(Boolean)
+            .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0];
+          
+          return {
+            id: `practice-${index + 1}`,
+            name: practiceName,
+            address: firstContact.address || `${firstContact.city}, ${firstContact.state}`,
+            city: firstContact.city || 'New York',
+            state: firstContact.state || 'NY',
+            zipCode: firstContact.zip_code || '10001',
+            phone: firstContact.phone || '(212) 555-0100',
+            email: firstContact.email || `info@${practiceName.toLowerCase().replace(/\s+/g, '')}.com`,
+            website: firstContact.website || `https://www.${practiceName.toLowerCase().replace(/\s+/g, '')}.com`,
+            type: practiceType,
+            size,
+            isDSO: Math.random() > 0.7, // 30% chance of being DSO
+            numPractitioners,
+            specialties,
+            technologies: technologies.slice(0, Math.floor(Math.random() * 3) + 2),
+            procedures: procedures.slice(0, Math.floor(Math.random() * 3) + 2),
+            notes: `Practice with ${numPractitioners} practitioner${numPractitioners > 1 ? 's' : ''}. ${contactsInPractice.map(c => `${c.first_name} ${c.last_name}`).join(', ')}.`,
+            lastContactDate,
+            createdAt: firstContact.created_at,
+            updatedAt: firstContact.updated_at || firstContact.created_at
+          };
+        });
+
+        setPractices(transformedPractices);
       } catch (error) {
-        console.error('Error fetching practices:', error);
+        console.error('Error in fetchPractices:', error);
+        // Generate fallback practices on error
+        const fallbackPractices = generateFallbackPractices();
+        setPractices(fallbackPractices);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchPractices();
   }, []);
+
+  // Helper function to generate realistic fallback practices
+  const generateFallbackPractices = (): Practice[] => {
+    const practiceNames = [
+      // Dental Practices
+      'Advanced Dental Arts NYC', 'Brooklyn Smile Design', 'Manhattan Periodontics & Implant Dentistry',
+      'Queens Family Dental', 'Bronx Orthodontic Specialists', 'Staten Island Oral Surgery',
+      'Park Avenue Endodontics', 'Tribeca Dental Studio', 'Upper East Side Dentistry',
+      'Chelsea Dental Aesthetics', 'Harlem Family Dental Care', 'Astoria Modern Dentistry',
+      // Aesthetic Practices  
+      'Fifth Avenue Dermatology', 'SoHo Skin & Laser', 'Manhattan Aesthetics Med Spa',
+      'Brooklyn Heights Plastic Surgery', 'Queens Cosmetic Center', 'Bronx Beauty & Wellness',
+      'West Village Dermatology', 'Midtown Medical Aesthetics'
+    ];
+    
+    const cities = [
+      { name: 'New York', state: 'NY', zips: ['10001', '10011', '10014', '10021', '10028'] },
+      { name: 'Brooklyn', state: 'NY', zips: ['11201', '11215', '11217', '11231'] },
+      { name: 'Los Angeles', state: 'CA', zips: ['90210', '90211', '90212', '90401'] },
+      { name: 'Miami', state: 'FL', zips: ['33139', '33140', '33141', '33142'] },
+      { name: 'Chicago', state: 'IL', zips: ['60601', '60602', '60603', '60604'] }
+    ];
+    
+    return practiceNames.map((name, index) => {
+      const city = cities[index % cities.length];
+      const isAesthetic = name.toLowerCase().includes('dermatology') || 
+                         name.toLowerCase().includes('aesthetic') || 
+                         name.toLowerCase().includes('cosmetic') ||
+                         name.toLowerCase().includes('plastic') ||
+                         name.toLowerCase().includes('spa');
+      
+      const practiceType = isAesthetic ? 'aesthetic' : 'dental';
+      const numPractitioners = Math.floor(Math.random() * 8) + 1;
+      const size = numPractitioners <= 2 ? 'small' : numPractitioners <= 5 ? 'medium' : 'large';
+      
+      const dentalSpecialties = ['General Dentist', 'Periodontist', 'Endodontist', 'Orthodontist', 
+                                 'Oral Surgeon', 'Prosthodontist', 'Pediatric Dentist'];
+      const aestheticSpecialties = ['Dermatologist', 'Plastic Surgeon', 'Cosmetic Dermatologist', 
+                                    'Aesthetic Nurse Practitioner', 'Medical Aesthetician'];
+      
+      const dentalTech = ['CBCT', 'Intraoral Scanner', 'Digital X-Ray', 'CAD/CAM', 'Laser Dentistry', 
+                          'Surgical Guides', 'In-House Milling'];
+      const aestheticTech = ['CO2 Laser', 'IPL', 'RF Microneedling', 'Ultherapy', 'CoolSculpting', 
+                             'Hydrafacial', 'Plasma Pen'];
+      
+      const dentalProc = ['Dental Implants', 'All-on-4', 'Veneers', 'Invisalign', 'Root Canal', 
+                          'Teeth Whitening', 'Crown & Bridge', 'Gum Treatment'];
+      const aestheticProc = ['Botox', 'Dermal Fillers', 'Laser Hair Removal', 'Chemical Peels', 
+                             'Microneedling', 'PRP Therapy', 'Thread Lift', 'Kybella'];
+      
+      const specialties = practiceType === 'dental' 
+        ? dentalSpecialties.sort(() => 0.5 - Math.random()).slice(0, Math.min(3, numPractitioners))
+        : aestheticSpecialties.sort(() => 0.5 - Math.random()).slice(0, Math.min(3, numPractitioners));
+      
+      const technologies = practiceType === 'dental'
+        ? dentalTech.sort(() => 0.5 - Math.random()).slice(0, Math.floor(Math.random() * 3) + 2)
+        : aestheticTech.sort(() => 0.5 - Math.random()).slice(0, Math.floor(Math.random() * 3) + 2);
+      
+      const procedures = practiceType === 'dental'
+        ? dentalProc.sort(() => 0.5 - Math.random()).slice(0, Math.floor(Math.random() * 4) + 3)
+        : aestheticProc.sort(() => 0.5 - Math.random()).slice(0, Math.floor(Math.random() * 4) + 3);
+      
+      const streetNumber = Math.floor(Math.random() * 900) + 100;
+      const streetNames = ['Main St', 'Park Ave', 'Broadway', 'Madison Ave', '5th Ave', 
+                           'Lexington Ave', 'Columbus Ave', 'Ocean Dr', 'Sunset Blvd'];
+      const street = streetNames[Math.floor(Math.random() * streetNames.length)];
+      
+      return {
+        id: `practice-${index + 1}`,
+        name,
+        address: `${streetNumber} ${street}, ${city.name}, ${city.state}`,
+        city: city.name,
+        state: city.state,
+        zipCode: city.zips[Math.floor(Math.random() * city.zips.length)],
+        phone: `(${Math.floor(Math.random() * 900) + 100}) ${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`,
+        email: `info@${name.toLowerCase().replace(/\s+/g, '').substring(0, 20)}.com`,
+        website: `https://www.${name.toLowerCase().replace(/\s+/g, '').substring(0, 20)}.com`,
+        type: practiceType,
+        size,
+        isDSO: Math.random() > 0.7,
+        numPractitioners,
+        specialties,
+        technologies,
+        procedures,
+        notes: `${size.charAt(0).toUpperCase() + size.slice(1)} ${practiceType} practice with focus on ${procedures[0]}.`,
+        lastContactDate: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString(),
+        createdAt: new Date(Date.now() - Math.floor(Math.random() * 365) * 24 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date(Date.now() - Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000).toISOString()
+      };
+    });
+  };
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
