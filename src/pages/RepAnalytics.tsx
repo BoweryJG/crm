@@ -488,7 +488,18 @@ const RepInsightsService = {
     return calls.map(call => {
       // Extract contact name if available
       let contactName = '';
-      if (call.contacts && call.contacts.first_name && call.contacts.last_name) {
+      if (
+        call.public_contacts &&
+        call.public_contacts.first_name &&
+        call.public_contacts.last_name
+      ) {
+        contactName = `${call.public_contacts.first_name} ${call.public_contacts.last_name}`;
+      } else if (
+        call.contacts &&
+        call.contacts.first_name &&
+        call.contacts.last_name
+      ) {
+        // Fallback if the old contacts alias is returned
         contactName = `${call.contacts.first_name} ${call.contacts.last_name}`;
       } else {
         console.log('Contact information not available for call:', call.id);
@@ -875,7 +886,7 @@ const RepAnalytics: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100%', overflow: 'auto' }}>
+    <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
         <InsightsIcon sx={{ mr: 1 }} />
         Rep Analytics
