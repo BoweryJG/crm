@@ -24,8 +24,9 @@ interface AuthContextType extends AuthState {
 }
 
 // Create a mock user
+const mockUserId = '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd';
 const mockUser: User = {
-  id: 'mock-user-id',
+  id: mockUserId,
   email: 'demo@example.com',
   user_metadata: {
     first_name: 'Demo',

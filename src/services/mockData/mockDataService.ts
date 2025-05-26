@@ -13,10 +13,12 @@ import {
 } from '../../types/research';
 
 // Import the actual array generators from mockLinguisticsData.ts
-import { 
-  generateMultipleMockLinguisticsAnalyses, 
-  generateMultipleMockCallAnalysesWithLinguistics 
+import {
+  generateMultipleMockLinguisticsAnalyses,
+  generateMultipleMockCallAnalysesWithLinguistics
 } from './mockLinguisticsData';
+
+const mockUserId = '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd';
 
 // Import types or define interfaces for call analysis data
 interface CallAnalysis {
@@ -798,7 +800,7 @@ export const generateMockPublicContacts = (count: number = 15): Contact[] => {
 
 export const generateMockResearchProjects = (
   count: number = 5,
-  userId = 'mock-user-id'
+  userId = mockUserId
 ): ResearchProject[] => {
   const statuses = Object.values(ResearchProjectStatus);
   return Array.from({ length: count }, (_, i) => {
@@ -821,7 +823,7 @@ export const generateMockResearchProjects = (
 export const generateMockResearchDocuments = (
   projects: ResearchProject[],
   countPerProject = 2,
-  userId = 'mock-user-id'
+  userId = mockUserId
 ): ResearchDocument[] => {
   const types = Object.values(ResearchDocumentType);
   const docs: ResearchDocument[] = [];
@@ -849,7 +851,7 @@ export const generateMockResearchDocuments = (
 export const generateMockResearchTasks = (
   projects: ResearchProject[],
   countPerProject = 3,
-  userId = 'mock-user-id'
+  userId = mockUserId
 ): ResearchTask[] => {
   const statuses = Object.values(ResearchTaskStatus);
   const tasks: ResearchTask[] = [];
@@ -874,7 +876,7 @@ export const generateMockResearchTasks = (
 
 export const generateMockResearchPrompts = (
   count: number = 3,
-  userId = 'mock-user-id'
+  userId = mockUserId
 ): ResearchPrompt[] => {
   return Array.from({ length: count }, (_, i) => {
     const created = getRandomDate(40);
@@ -898,7 +900,7 @@ export const generateMockResearchPrompts = (
 export const generateMockResearchNotes = (
   projects: ResearchProject[],
   countPerProject = 1,
-  userId = 'mock-user-id'
+  userId = mockUserId
 ): ResearchNote[] => {
   const notes: ResearchNote[] = [];
   projects.forEach((project, pIndex) => {
@@ -920,7 +922,7 @@ export const generateMockResearchNotes = (
 
 export const generateMockResearchDataQueries = (
   count: number = 2,
-  userId = 'mock-user-id'
+  userId = mockUserId
 ): ResearchDataQuery[] => {
   return Array.from({ length: count }, (_, i) => {
     const created = getRandomDate(25);
