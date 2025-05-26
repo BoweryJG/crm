@@ -124,14 +124,29 @@ const Practices: React.FC = () => {
         const transformedPractices: Practice[] = Array.from(practiceMap.entries()).map(([practiceName, contactsInPractice], index) => {
           const firstContact = contactsInPractice[0];
           
-          // Determine practice type based on contact types
+          // Determine practice type based on contact types and practice name
           const contactTypes = contactsInPractice.map(c => c.type);
+          
+          // Check if practice name indicates aesthetic practice
+          const practiceNameLower = practiceName.toLowerCase();
+          const isAestheticByName = practiceNameLower.includes('aesthetic') || 
+                                   practiceNameLower.includes('dermatology') ||
+                                   practiceNameLower.includes('plastic') ||
+                                   practiceNameLower.includes('skin') ||
+                                   practiceNameLower.includes('spa') ||
+                                   practiceNameLower.includes('laser') ||
+                                   practiceNameLower.includes('beauty') ||
+                                   practiceNameLower.includes('cosmetic');
+          
+          // Check if contact types indicate aesthetic practice
           const hasAestheticTypes = contactTypes.some(type => 
             ['aesthetic_doctor', 'plastic_surgeon', 'dermatologist', 
              'cosmetic_dermatologist', 'nurse_practitioner', 
              'physician_assistant', 'aesthetician'].includes(type)
           );
-          const practiceType = hasAestheticTypes ? 'aesthetic' : 'dental';
+          
+          // Determine practice type - use both name and contact type
+          const practiceType = (hasAestheticTypes || isAestheticByName) ? 'aesthetic' : 'dental';
           
           // Extract unique specialties
           const specialties = Array.from(new Set(
