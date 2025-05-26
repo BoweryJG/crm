@@ -238,7 +238,7 @@ const RepInsightsService = {
         .from('call_analysis')
         .select(`
           *,
-          contacts:contact_id(first_name, last_name)
+          public_contacts:contact_id(first_name, last_name)
         `)
         .order('call_date', { ascending: false })
         .range(offset, offset + limit - 1); // Apply pagination
@@ -253,7 +253,7 @@ const RepInsightsService = {
         .from('call_analysis')
         .select(`
           *,
-          contacts:contact_id(first_name, last_name),
+          public_contacts:contact_id(first_name, last_name),
           linguistics_analysis:linguistics_analysis_id(*)
         `)
         .in('id', data.map(call => call.id))
@@ -352,7 +352,18 @@ const RepInsightsService = {
     return calls.map(call => {
       // Extract contact name if available
       let contactName = '';
-      if (call.contacts && call.contacts.first_name && call.contacts.last_name) {
+      if (
+        call.public_contacts &&
+        call.public_contacts.first_name &&
+        call.public_contacts.last_name
+      ) {
+        contactName = `${call.public_contacts.first_name} ${call.public_contacts.last_name}`;
+      } else if (
+        call.contacts &&
+        call.contacts.first_name &&
+        call.contacts.last_name
+      ) {
+        // Fallback if the old contacts alias is returned
         contactName = `${call.contacts.first_name} ${call.contacts.last_name}`;
       } else {
         console.log('Contact information not available for call:', call.id);
