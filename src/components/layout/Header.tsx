@@ -11,7 +11,8 @@ import {
   useTheme,
   Tooltip,
   Badge,
-  Divider
+  Divider,
+  Button
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -27,7 +28,7 @@ import { useThemeContext } from '../../themes/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { AppModeToggle } from '../common/AppModeToggle';
-import { FeatureTierToggle } from '../common/FeatureTierToggle';
+import AuthModal from '../common/AuthModal';
 
 interface HeaderProps {
   onSidebarToggle: () => void;
@@ -39,10 +40,14 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
   const { themeMode, toggleTheme } = useThemeContext();
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
-  
+
   // User profile menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
+  // Auth modal state
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
   
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -147,9 +152,34 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
           <AppModeToggle />
         </Box>
         
-        {/* Feature Tier Toggle */}
-        <Box sx={{ mx: 1, display: { xs: 'none', md: 'block' } }}>
-          <FeatureTierToggle />
+        {/* Auth Buttons */}
+        <Box sx={{ mx: 1, display: { xs: 'none', md: 'flex' }, gap: 1 }}>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => setLoginOpen(true)}
+            sx={{
+              backdropFilter: 'blur(6px)',
+              backgroundColor: themeMode === 'space'
+                ? 'rgba(255, 255, 255, 0.08)'
+                : 'rgba(0,0,0,0.04)',
+              borderColor: themeMode === 'space'
+                ? 'rgba(255, 255, 255, 0.2)'
+                : 'rgba(0,0,0,0.2)'
+            }}
+          >
+            Login
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setSignupOpen(true)}
+            sx={{
+              backdropFilter: 'blur(6px)',
+            }}
+          >
+            Sign Up
+          </Button>
         </Box>
 
         {/* Notifications */}
@@ -278,6 +308,8 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
         </Box>
       </Toolbar>
     </AppBar>
+    <AuthModal open={loginOpen} onClose={() => setLoginOpen(false)} mode="login" />
+    <AuthModal open={signupOpen} onClose={() => setSignupOpen(false)} mode="signup" />
   );
 };
 
