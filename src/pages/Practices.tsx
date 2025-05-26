@@ -138,7 +138,7 @@ const Practices: React.FC = () => {
             contactsInPractice
               .map(c => c.specialization || c.type)
               .filter(Boolean)
-              .map(s => s.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))
+              .map((s: string) => s.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()))
           ));
           
           // Determine practice size
