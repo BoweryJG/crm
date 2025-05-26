@@ -115,6 +115,20 @@ const Contacts: React.FC = () => {
             };
           });
           
+          // Debug: Log the practice type distribution
+          const dentalCount = mappedData.filter(c => c.practiceType === 'dental').length;
+          const aestheticCount = mappedData.filter(c => c.practiceType === 'aesthetic').length;
+          console.log('Contact distribution:', { 
+            total: mappedData.length, 
+            dental: dentalCount, 
+            aesthetic: aestheticCount 
+          });
+          console.log('Sample contacts:', mappedData.slice(0, 5).map(c => ({
+            name: `${c.first_name} ${c.last_name}`,
+            type: c.type,
+            practiceType: c.practiceType
+          })));
+          
           setContacts(mappedData);
         } else {
           // No data returned, use mock data
