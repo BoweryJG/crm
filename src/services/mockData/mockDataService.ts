@@ -138,6 +138,28 @@ export const generateMockContacts = (count: number = 20): Contact[] => {
   ];
   
   const practiceTypes = ['dental', 'aesthetic'] as const;
+
+  const dentalTypes = [
+    'dentist',
+    'oral_surgeon',
+    'periodontist',
+    'orthodontist',
+    'endodontist',
+    'prosthodontist',
+    'pediatric_dentist',
+    'dental_hygienist',
+    'dental_assistant'
+  ];
+
+  const aestheticTypes = [
+    'aesthetic_doctor',
+    'plastic_surgeon',
+    'dermatologist',
+    'cosmetic_dermatologist',
+    'nurse_practitioner',
+    'physician_assistant',
+    'aesthetician'
+  ];
   
   // Expanded practice names for both industries
   const dentalPracticeNames = [
@@ -251,6 +273,10 @@ export const generateMockContacts = (count: number = 20): Contact[] => {
     const statuses: Array<'active' | 'inactive' | 'lead' | 'prospect' | 'customer' | 'do_not_contact'> = 
       ['active', 'inactive', 'lead', 'prospect', 'customer', 'do_not_contact'];
     
+    const contactType = practiceType === 'dental'
+      ? dentalTypes[getRandomInt(0, dentalTypes.length - 1)]
+      : aestheticTypes[getRandomInt(0, aestheticTypes.length - 1)];
+
     return {
       id: `contact-${i + 1}`,
       first_name: firstName,
@@ -258,6 +284,7 @@ export const generateMockContacts = (count: number = 20): Contact[] => {
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${practiceName.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`,
       phone: `(${getRandomInt(100, 999)}) ${getRandomInt(100, 999)}-${getRandomInt(1000, 9999)}`,
       title: role,
+      type: contactType,
       practice_id: practiceId,
       practice_name: practiceName,
       specialization: specialization,
