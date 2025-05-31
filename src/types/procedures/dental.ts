@@ -159,54 +159,60 @@ export interface ProcedureEquipment {
 
 export interface DentalProcedure {
   id: string;
-  name: string;
-  alternateNames: string[];
-  category: DentalProcedureCategory;
-  description: string;
-  insuranceCodes: DentalInsuranceCode[];
-  patientConcerns: string[]; // What patient problems does this address
-  frequency: string; // How common is this procedure in practice
-  averageCost: ProcedureCost;
-  procedureTime: { // Time in minutes
+  name?: string;
+  procedure_name?: string; // Database field name
+  alternateNames?: string[];
+  category?: DentalProcedureCategory | string; // Allow string for database compatibility
+  description?: string;
+  // Database analytics fields (required for analytics)
+  yearly_growth_percentage?: number | null;
+  market_size_usd_millions?: number | null;
+  
+  // Optional detailed fields
+  insuranceCodes?: DentalInsuranceCode[];
+  patientConcerns?: string[]; // What patient problems does this address
+  frequency?: string; // How common is this procedure in practice
+  averageCost?: ProcedureCost;
+  procedureTime?: { // Time in minutes
     min: number;
     max: number;
     avg: number;
   };
-  painLevel: number; // 1-10 scale
-  risks: string[];
-  contraindications: string[];
-  preCareProcedure: string;
-  postCareProcedure: string;
-  results: {
+  painLevel?: number; // 1-10 scale
+  risks?: string[];
+  contraindications?: string[];
+  preCareProcedure?: string;
+  postCareProcedure?: string;
+  results?: {
     durability: string; // How long results typically last
     successRate: string;
     maintenanceNeeded: boolean;
     maintenanceFrequency: string;
   };
   // Training and certification
-  specialtyRequired: boolean; // Is a specialty required to perform this
-  commonPerformers: string[]; // What types of dentists perform this
-  trainingRequired: string[];
+  specialtyRequired?: boolean; // Is a specialty required to perform this
+  commonPerformers?: string[]; // What types of dentists perform this
+  trainingRequired?: string[];
   // Business aspects
-  typicalROI: string; // Return on investment information
-  marketingTips: string[]; // How to market this procedure
-  patientRetention: string; // How this procedure helps retain patients
-  supplies: ProcedureSupplies[];
-  equipment: ProcedureEquipment[];
+  typicalROI?: string; // Return on investment information
+  marketingTips?: string[]; // How to market this procedure
+  patientRetention?: string; // How this procedure helps retain patients
+  supplies?: ProcedureSupplies[];
+  equipment?: ProcedureEquipment[];
   // Related procedures
-  complementaryProcedures: string[]; // IDs of complementary procedures
-  alternativeProcedures: string[]; // IDs of alternative procedures
+  complementaryProcedures?: string[]; // IDs of complementary procedures
+  alternativeProcedures?: string[]; // IDs of alternative procedures
   // Content
-  beforeAfterImages: string[]; // URLs to before/after images
-  videos: string[]; // URLs to procedure videos
-  scientificStudies: string[]; // URLs or references to studies
-  marketingMaterials: string[]; // URLs to marketing materials
-  patientEducationMaterials: string[]; // URLs to patient education materials
-  consentForms: string[]; // URLs to sample consent forms
+  beforeAfterImages?: string[]; // URLs to before/after images
+  videos?: string[]; // URLs to procedure videos
+  scientificStudies?: string[]; // URLs or references to studies
+  marketingMaterials?: string[]; // URLs to marketing materials
+  patientEducationMaterials?: string[]; // URLs to patient education materials
+  consentForms?: string[]; // URLs to sample consent forms
   // Meta information
-  createdAt: string;
-  updatedAt: string;
-  lastReviewedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
+  lastReviewedAt?: string;
 }
 
 export interface DentalProcedureFilterOptions {

@@ -44,54 +44,61 @@ export interface ProcedureEquipment {
 
 export interface AestheticProcedure {
   id: string;
-  name: string;
-  alternateNames: string[];
-  category: ProcedureCategory;
-  description: string;
-  patientConcerns: string[]; // What patient problems does this address
-  popularity: number; // 1-10 scale
-  averageCost: ProcedureCost;
-  procedureTime: { // Time in minutes
+  name?: string;
+  procedure_name?: string; // Database field name
+  alternateNames?: string[];
+  category?: ProcedureCategory | string; // Allow string for database compatibility
+  description?: string;
+  
+  // Database analytics fields (required for analytics)
+  yearly_growth_percentage?: number | null;
+  market_size_usd_millions?: number | null;
+  
+  // Optional detailed fields
+  patientConcerns?: string[]; // What patient problems does this address
+  popularity?: number; // 1-10 scale
+  averageCost?: ProcedureCost;
+  procedureTime?: { // Time in minutes
     min: number;
     max: number;
     avg: number;
   };
-  recoveryTime: string; // e.g. "3-5 days", "2 weeks"
-  painLevel: number; // 1-10 scale
-  risks: string[];
-  contraindications: string[];
-  preCareProcedure: string;
-  postCareProcedure: string;
-  results: {
+  recoveryTime?: string; // e.g. "3-5 days", "2 weeks"
+  painLevel?: number; // 1-10 scale
+  risks?: string[];
+  contraindications?: string[];
+  preCareProcedure?: string;
+  postCareProcedure?: string;
+  results?: {
     duration: string; // How long results typically last
     timeToResults: string; // When results become visible
     maintenanceNeeded: boolean;
     maintenanceFrequency: string;
   };
   // Training and certification
-  trainingRequired: string[];
-  certificationNeeded: boolean;
-  certificationSource: string[];
+  trainingRequired?: string[];
+  certificationNeeded?: boolean;
+  certificationSource?: string[];
   // Business aspects
-  typicalROI: string; // Return on investment information
-  marketingTips: string[]; // How to market this procedure
-  targetDemographic: string[];
-  patientRetention: string; // How this procedure helps retain patients
-  supplies: ProcedureSupplies[];
-  equipment: ProcedureEquipment[];
+  typicalROI?: string; // Return on investment information
+  marketingTips?: string[]; // How to market this procedure
+  targetDemographic?: string[];
+  patientRetention?: string; // How this procedure helps retain patients
+  supplies?: ProcedureSupplies[];
+  equipment?: ProcedureEquipment[];
   // Related procedures
-  complementaryProcedures: string[]; // IDs of complementary procedures
-  alternativeProcedures: string[]; // IDs of alternative procedures
+  complementaryProcedures?: string[]; // IDs of complementary procedures
+  alternativeProcedures?: string[]; // IDs of alternative procedures
   // Content
-  beforeAfterImages: string[]; // URLs to before/after images
-  videos: string[]; // URLs to procedure videos
-  scientificStudies: string[]; // URLs or references to studies
-  marketingMaterials: string[]; // URLs to marketing materials
-  consentForms: string[]; // URLs to sample consent forms
+  beforeAfterImages?: string[]; // URLs to before/after images
+  videos?: string[]; // URLs to procedure videos
+  scientificStudies?: string[]; // URLs or references to studies
+  marketingMaterials?: string[]; // URLs to marketing materials
+  consentForms?: string[]; // URLs to sample consent forms
   // Meta information
-  createdAt: string;
-  updatedAt: string;
-  lastReviewedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
+  lastReviewedAt?: string;
 }
 
 export interface ProcedureFilterOptions {
