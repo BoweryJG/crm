@@ -315,25 +315,23 @@ class RegionalAnalyticsService {
   // Get market trends for dental and aesthetic procedures from database
   async getMarketTrends(city: string, state: string): Promise<MarketTrend[]> {
     try {
-      // Fetch top dental procedures by growth rate
+      // Fetch dental procedures (includes all procedures, not just those with growth data)
       const { data: dentalProcedures, error: dentalError } = await supabase
         .from('dental_procedures')
         .select('procedure_name, yearly_growth_percentage, market_size_usd_millions, category')
-        .not('yearly_growth_percentage', 'is', null)
-        .order('yearly_growth_percentage', { ascending: false })
-        .limit(5);
+        .order('yearly_growth_percentage', { ascending: false, nullsLast: true })
+        .limit(10);
 
       if (dentalError) {
         console.error('Error fetching dental procedures:', dentalError);
       }
 
-      // Fetch top aesthetic procedures by growth rate
+      // Fetch aesthetic procedures (includes all procedures, not just those with growth data)
       const { data: aestheticProcedures, error: aestheticError } = await supabase
         .from('aesthetic_procedures')
         .select('procedure_name, yearly_growth_percentage, market_size_usd_millions, category')
-        .not('yearly_growth_percentage', 'is', null)
-        .order('yearly_growth_percentage', { ascending: false })
-        .limit(5);
+        .order('yearly_growth_percentage', { ascending: false, nullsLast: true })
+        .limit(10);
 
       if (aestheticError) {
         console.error('Error fetching aesthetic procedures:', aestheticError);
@@ -371,10 +369,10 @@ class RegionalAnalyticsService {
         });
       }
 
-      // Sort by growth rate and return top 8
+      // Sort by growth rate and return top 12
       return trends
         .sort((a, b) => b.changePercentage - a.changePercentage)
-        .slice(0, 8);
+        .slice(0, 12);
 
     } catch (error) {
       console.error('Error fetching market trends from database:', error);
