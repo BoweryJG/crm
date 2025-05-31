@@ -97,37 +97,21 @@ const Contacts: React.FC = () => {
         }
 
         if (data && data.length > 0) {
-          // Sort data by created_at to ensure consistent ordering for categorization
-          const sortedData = [...data].sort((a, b) => 
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-          );
-
-          // Map the data to include practice type and corrected contact types
-          const mappedData = sortedData.map((contact, index) => {
-            // Since we can't update the database directly due to RLS policies,
-            // we'll determine practice type and correct contact type based on contact position
+          // Map the data to include practice type based on contact type
+          const mappedData = data.map(contact => {
+            // Determine practice type based on contact type
             let practiceType = 'dental';
-            let correctedType = contact.type;
-            
-            if (index < 20) {
-              // First 20 contacts are dental
-              practiceType = 'dental';
-              const dentalTypes = ['dentist', 'orthodontist', 'endodontist', 'periodontist', 
-                                 'prosthodontist', 'pediatric_dentist', 'oral_surgeon'];
-              correctedType = dentalTypes[index % dentalTypes.length];
-            } else {
-              // Remaining contacts are aesthetic
+            if (['aesthetic_doctor', 'plastic_surgeon', 'dermatologist', 
+                 'cosmetic_dermatologist', 'nurse_practitioner', 
+                 'physician_assistant', 'aesthetician'].includes(contact.type)) {
               practiceType = 'aesthetic';
-              const aestheticTypes = ['aesthetic_doctor', 'plastic_surgeon', 'dermatologist', 'nurse_practitioner'];
-              correctedType = aestheticTypes[(index - 20) % aestheticTypes.length];
             }
             
             // Map is_starred to isStarred for compatibility with existing code
             return {
               ...contact,
               isStarred: contact.is_starred,
-              practiceType,
-              type: correctedType // Use corrected type for proper categorization
+              practiceType
             };
           });
           
