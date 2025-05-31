@@ -19,14 +19,17 @@ import {
   MenuItem,
   SelectChangeEvent,
   TextField,
-  IconButton
+  IconButton,
+  Tooltip,
+  CardActionArea
 } from '@mui/material';
 import {
   Search as SearchIcon,
   FilterList as FilterListIcon,
   Refresh as RefreshIcon,
   TrendingUp as TrendingUpIcon,
-  MoreVert as MoreVertIcon
+  MoreVert as MoreVertIcon,
+  Info as InfoIcon
 } from '@mui/icons-material';
 
 import { useThemeContext } from '../themes/ThemeContext';
@@ -36,6 +39,8 @@ import { CompaniesService } from '../services/knowledgeBase/companiesService';
 import { CallAnalysisService } from '../services/callAnalysis/callAnalysisService';
 import { LinguisticsService } from '../services/linguistics/linguisticsService';
 import RegionalAnalytics from '../components/analytics/RegionalAnalytics';
+import ProcedureDetailModal from '../components/analytics/ProcedureDetailModal';
+import CategoryAnalysisModal from '../components/analytics/CategoryAnalysisModal';
 import { 
   DentalProcedure, 
   DentalProcedureCategory,
@@ -68,6 +73,13 @@ const Analytics: React.FC = () => {
   const [aestheticCategory, setAestheticCategory] = useState<AestheticProcedureCategory | ''>('');
   const [companyIndustry, setCompanyIndustry] = useState<'dental' | 'aesthetic' | 'both' | 'other' | ''>('');
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Modal states
+  const [procedureModalOpen, setProcedureModalOpen] = useState(false);
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [selectedProcedure, setSelectedProcedure] = useState<DentalProcedure | AestheticProcedure | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [modalType, setModalType] = useState<'dental' | 'aesthetic'>('dental');
   
   useEffect(() => {
     fetchData();
@@ -272,7 +284,22 @@ const Analytics: React.FC = () => {
                             .sort((a, b) => (b.yearly_growth_percentage || 0) - (a.yearly_growth_percentage || 0))
                             .slice(0, 8)
                             .map((procedure, index) => (
-                              <Box key={procedure.id} sx={{ mb: 2 }}>
+                              <CardActionArea
+                                key={procedure.id}
+                                onClick={() => {
+                                  setSelectedProcedure(procedure);
+                                  setModalType('dental');
+                                  setProcedureModalOpen(true);
+                                }}
+                                sx={{
+                                  p: 1,
+                                  borderRadius: 2,
+                                  mb: 2,
+                                  '&:hover': {
+                                    backgroundColor: 'action.hover',
+                                  }
+                                }}
+                              >
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
                                     {procedure.procedure_name}
@@ -293,7 +320,7 @@ const Analytics: React.FC = () => {
                                     </Typography>
                                   )}
                                 </Box>
-                              </Box>
+                              </CardActionArea>
                             ))
                           }
                         </CardContent>
@@ -309,8 +336,33 @@ const Analytics: React.FC = () => {
                               const categoryProcedures = dentalProcedures.filter(p => p.category === category && p.category);
                               const avgGrowth = categoryProcedures.reduce((sum, p) => sum + (p.yearly_growth_percentage || 0), 0) / categoryProcedures.length;
                               
+                              const totalMarketSize = categoryProcedures.reduce((sum, p) => sum + (p.market_size_usd_millions || 0), 0);
+                              
                               return (
-                                <Box key={category} sx={{ mb: 2 }}>
+                                <CardActionArea
+                                  key={category}
+                                  onClick={() => {
+                                    setSelectedCategory({
+                                      name: category,
+                                      procedureCount: categoryProcedures.length,
+                                      averageGrowth: avgGrowth,
+                                      totalMarketSize,
+                                      topProcedures: categoryProcedures.slice(0, 5).map(p => p.procedure_name),
+                                      competitionLevel: avgGrowth > 15 ? 'high' : avgGrowth > 8 ? 'medium' : 'low',
+                                      investmentPotential: Math.min(5, Math.max(1, Math.ceil((avgGrowth + 10) / 5)))
+                                    });
+                                    setModalType('dental');
+                                    setCategoryModalOpen(true);
+                                  }}
+                                  sx={{
+                                    p: 1,
+                                    borderRadius: 2,
+                                    mb: 2,
+                                    '&:hover': {
+                                      backgroundColor: 'action.hover',
+                                    }
+                                  }}
+                                >
                                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                     <Typography variant="body2" sx={{ fontWeight: 500 }}>
                                       {category}
@@ -329,7 +381,7 @@ const Analytics: React.FC = () => {
                                       size="small"
                                     />
                                   </Box>
-                                </Box>
+                                </CardActionArea>
                               );
                             })
                           }
@@ -404,7 +456,22 @@ const Analytics: React.FC = () => {
                             .sort((a, b) => (b.yearly_growth_percentage || 0) - (a.yearly_growth_percentage || 0))
                             .slice(0, 8)
                             .map((procedure, index) => (
-                              <Box key={procedure.id} sx={{ mb: 2 }}>
+                              <CardActionArea
+                                key={procedure.id}
+                                onClick={() => {
+                                  setSelectedProcedure(procedure);
+                                  setModalType('aesthetic');
+                                  setProcedureModalOpen(true);
+                                }}
+                                sx={{
+                                  p: 1,
+                                  borderRadius: 2,
+                                  mb: 2,
+                                  '&:hover': {
+                                    backgroundColor: 'action.hover',
+                                  }
+                                }}
+                              >
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
                                     {procedure.procedure_name}
@@ -428,7 +495,7 @@ const Analytics: React.FC = () => {
                                     <Chip label="🔥 Hot" size="small" color="error" />
                                   )}
                                 </Box>
-                              </Box>
+                              </CardActionArea>
                             ))
                           }
                         </CardContent>
@@ -446,7 +513,30 @@ const Analytics: React.FC = () => {
                               const totalMarketSize = categoryProcedures.reduce((sum, p) => sum + (p.market_size_usd_millions || 0), 0);
                               
                               return (
-                                <Box key={category} sx={{ mb: 2 }}>
+                                <CardActionArea
+                                  key={category}
+                                  onClick={() => {
+                                    setSelectedCategory({
+                                      name: category,
+                                      procedureCount: categoryProcedures.length,
+                                      averageGrowth: avgGrowth,
+                                      totalMarketSize,
+                                      topProcedures: categoryProcedures.slice(0, 5).map(p => p.procedure_name),
+                                      competitionLevel: avgGrowth > 20 ? 'high' : avgGrowth > 12 ? 'medium' : 'low',
+                                      investmentPotential: Math.min(5, Math.max(1, Math.ceil((avgGrowth + 5) / 8)))
+                                    });
+                                    setModalType('aesthetic');
+                                    setCategoryModalOpen(true);
+                                  }}
+                                  sx={{
+                                    p: 1,
+                                    borderRadius: 2,
+                                    mb: 2,
+                                    '&:hover': {
+                                      backgroundColor: 'action.hover',
+                                    }
+                                  }}
+                                >
                                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                     <Typography variant="body2" sx={{ fontWeight: 500 }}>
                                       {category}
@@ -470,7 +560,7 @@ const Analytics: React.FC = () => {
                                       size="small"
                                     />
                                   </Box>
-                                </Box>
+                                </CardActionArea>
                               );
                             })
                           }
@@ -914,6 +1004,21 @@ const Analytics: React.FC = () => {
           )}
         </Box>
       </Paper>
+      
+      {/* Modal Components */}
+      <ProcedureDetailModal
+        open={procedureModalOpen}
+        onClose={() => setProcedureModalOpen(false)}
+        procedure={selectedProcedure}
+        type={modalType}
+      />
+      
+      <CategoryAnalysisModal
+        open={categoryModalOpen}
+        onClose={() => setCategoryModalOpen(false)}
+        category={selectedCategory}
+        type={modalType}
+      />
     </Box>
   );
 };
