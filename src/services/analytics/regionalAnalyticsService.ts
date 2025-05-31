@@ -103,8 +103,8 @@ class RegionalAnalyticsService {
         demographics
       };
 
-      // Store insights in database
-      await this.storeRegionalInsight(insight);
+      // Store insights in database (disabled for now due to table structure)
+      // await this.storeRegionalInsight(insight);
 
       return insight;
     } catch (error) {

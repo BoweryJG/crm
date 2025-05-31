@@ -80,8 +80,10 @@ export const AppModeProvider: React.FC<{children: React.ReactNode}> = ({ childre
           .eq('user_id', user.id)
           .single();
           
-        if (settingsError && settingsError.code !== 'PGRST116') {
-          console.error('Error fetching app settings:', settingsError);
+        if (settingsError) {
+          if (settingsError.code !== 'PGRST116') {
+            console.warn('App settings table not accessible, using defaults:', settingsError.message);
+          }
         }
         
         // Only set to live mode if user has an active subscription
