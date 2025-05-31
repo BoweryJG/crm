@@ -35,6 +35,7 @@ import { AestheticProceduresService } from '../services/knowledgeBase/aestheticP
 import { CompaniesService } from '../services/knowledgeBase/companiesService';
 import { CallAnalysisService } from '../services/callAnalysis/callAnalysisService';
 import { LinguisticsService } from '../services/linguistics/linguisticsService';
+import RegionalAnalytics from '../components/analytics/RegionalAnalytics';
 import { 
   DentalProcedure, 
   DentalProcedureCategory,
@@ -133,6 +134,7 @@ const Analytics: React.FC = () => {
       >
         <Box sx={{ borderBottom: 1, borderColor: 'divider', display: 'flex', alignItems: 'center', px: 2 }}>
           <Tabs value={activeTab} onChange={handleTabChange} aria-label="analytics tabs">
+            <Tab label="Regional Analytics" />
             <Tab label="Dental Procedures" />
             <Tab label="Aesthetic Procedures" />
             <Tab label="Companies" />
@@ -167,15 +169,18 @@ const Analytics: React.FC = () => {
           ) : (
             <>
               {activeTab === 0 && (
-                <Typography>Dental Procedures Analytics</Typography>
+                <RegionalAnalytics />
               )}
               {activeTab === 1 && (
-                <Typography>Aesthetic Procedures Analytics</Typography>
+                <Typography>Dental Procedures Analytics</Typography>
               )}
               {activeTab === 2 && (
-                <Typography>Companies Analytics</Typography>
+                <Typography>Aesthetic Procedures Analytics</Typography>
               )}
               {activeTab === 3 && (
+                <Typography>Companies Analytics</Typography>
+              )}
+              {activeTab === 4 && (
                 <Typography>Call Analysis with Linguistics</Typography>
               )}
             </>

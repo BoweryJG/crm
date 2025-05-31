@@ -3,9 +3,10 @@ import { ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import spaceTheme from './spaceTheme';
 import corporateTheme from './corporateTheme';
+import luxuryTheme from './luxuryTheme';
 
 // Define theme types
-export type ThemeMode = 'space' | 'corporate';
+export type ThemeMode = 'space' | 'corporate' | 'luxury';
 
 // Define context interface
 interface ThemeContextType {
@@ -28,12 +29,24 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   // Toggle between themes
   const toggleTheme = () => {
-    setThemeMode((prevMode) => (prevMode === 'space' ? 'corporate' : 'space'));
+    setThemeMode((prevMode) => {
+      switch (prevMode) {
+        case 'space': return 'corporate';
+        case 'corporate': return 'luxury';
+        case 'luxury': return 'space';
+        default: return 'space';
+      }
+    });
   };
 
   // Memoize the current theme to prevent unnecessary re-renders
   const currentTheme = useMemo(() => {
-    return themeMode === 'space' ? spaceTheme : corporateTheme;
+    switch (themeMode) {
+      case 'space': return spaceTheme;
+      case 'corporate': return corporateTheme;
+      case 'luxury': return luxuryTheme;
+      default: return spaceTheme;
+    }
   }, [themeMode]);
 
   // Create the context value

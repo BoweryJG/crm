@@ -44,6 +44,13 @@ import { useThemeContext } from '../themes/ThemeContext';
 import { supabase } from '../services/supabase/supabase';
 import mockDataService from '../services/mockData/mockDataService';
 import NowCardsStack from '../components/dashboard/NowCardsStack';
+import advancedLinguisticsService, { 
+  ComprehensiveLinguisticsAnalysis,
+  PsychologicalProfile,
+  ConversationDynamics,
+  PowerAnalysis,
+  SalesInsights
+} from '../services/linguistics/advancedLinguisticsService';
 
 // Using the standard Grid from MUI
 
