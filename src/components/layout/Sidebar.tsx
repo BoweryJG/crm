@@ -24,7 +24,9 @@ import {
   BiotechOutlined as BiotechIcon,
   Science as ScienceIcon,
   Settings as SettingsIcon,
-  CreditCard as CreditCardIcon
+  CreditCard as CreditCardIcon,
+  School as SchoolIcon,
+  LocalHospital as HospitalIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -78,11 +80,11 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
       ]
     },
     {
-      title: 'Industry Knowledge',
+      title: 'Knowledge Academy',
       items: [
-        { title: 'Dental Procedures', path: '/dental', icon: <MedicalIcon /> },
-        { title: 'Aesthetic Procedures', path: '/aesthetic', icon: <BiotechIcon /> },
-        { title: 'Companies', path: '/companies', icon: <ScienceIcon /> }
+        { title: 'Dental Procedures', path: '/knowledge/dental', icon: <HospitalIcon /> },
+        { title: 'Aesthetic Procedures', path: '/knowledge/aesthetic', icon: <BiotechIcon /> },
+        { title: 'Learning Center', path: '/knowledge', icon: <SchoolIcon /> }
       ]
     },
     {

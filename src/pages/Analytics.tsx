@@ -39,9 +39,6 @@ import { CompaniesService } from '../services/knowledgeBase/companiesService';
 import { CallAnalysisService } from '../services/callAnalysis/callAnalysisService';
 import { LinguisticsService } from '../services/linguistics/linguisticsService';
 import RegionalAnalytics from '../components/analytics/RegionalAnalytics';
-import ProcedureDetailModal from '../components/analytics/ProcedureDetailModal';
-import CategoryAnalysisModal from '../components/analytics/CategoryAnalysisModal';
-import ProcedureLibrary from '../components/analytics/ProcedureLibrary';
 import { 
   DentalProcedure, 
   DentalProcedureCategory,
@@ -75,12 +72,6 @@ const Analytics: React.FC = () => {
   const [companyIndustry, setCompanyIndustry] = useState<'dental' | 'aesthetic' | 'both' | 'other' | ''>('');
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Modal states
-  const [procedureModalOpen, setProcedureModalOpen] = useState(false);
-  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
-  const [selectedProcedure, setSelectedProcedure] = useState<DentalProcedure | AestheticProcedure | null>(null);
-  const [selectedCategory] = useState<any>(null);
-  const [modalType, setModalType] = useState<'dental' | 'aesthetic'>('dental');
   
   useEffect(() => {
     fetchData();
@@ -143,7 +134,7 @@ const Analytics: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
-        Industry Knowledge Analytics
+        Business Analytics Dashboard
       </Typography>
       
       <Paper 
@@ -165,8 +156,6 @@ const Analytics: React.FC = () => {
         <Box sx={{ borderBottom: 1, borderColor: 'divider', display: 'flex', alignItems: 'center', px: 2 }}>
           <Tabs value={activeTab} onChange={handleTabChange} aria-label="analytics tabs">
             <Tab label="Regional Analytics" />
-            <Tab label="Dental Procedures" />
-            <Tab label="Aesthetic Procedures" />
             <Tab label="Companies" />
             <Tab label="Call Analysis" />
           </Tabs>
@@ -221,28 +210,6 @@ const Analytics: React.FC = () => {
                 </Box>
               )}
               {activeTab === 1 && (
-                <ProcedureLibrary
-                  procedures={dentalProcedures}
-                  type="dental"
-                  onProcedureClick={(procedure) => {
-                    setSelectedProcedure(procedure);
-                    setModalType('dental');
-                    setProcedureModalOpen(true);
-                  }}
-                />
-              )}
-              {activeTab === 2 && (
-                <ProcedureLibrary
-                  procedures={aestheticProcedures}
-                  type="aesthetic"
-                  onProcedureClick={(procedure) => {
-                    setSelectedProcedure(procedure);
-                    setModalType('aesthetic');
-                    setProcedureModalOpen(true);
-                  }}
-                />
-              )}
-              {activeTab === 3 && (
                 <Box sx={{ p: 2 }}>
                   {/* Companies Overview */}
                   <Grid container spacing={3} sx={{ mb: 3 }}>
@@ -442,7 +409,7 @@ const Analytics: React.FC = () => {
                   </Grid>
                 </Box>
               )}
-              {activeTab === 4 && (
+              {activeTab === 2 && (
                 <Box sx={{ p: 2 }}>
                   {/* Call Analysis Overview */}
                   <Grid container spacing={3} sx={{ mb: 3 }}>
@@ -676,21 +643,6 @@ const Analytics: React.FC = () => {
           )}
         </Box>
       </Paper>
-      
-      {/* Modal Components */}
-      <ProcedureDetailModal
-        open={procedureModalOpen}
-        onClose={() => setProcedureModalOpen(false)}
-        procedure={selectedProcedure}
-        type={modalType}
-      />
-      
-      <CategoryAnalysisModal
-        open={categoryModalOpen}
-        onClose={() => setCategoryModalOpen(false)}
-        category={selectedCategory}
-        type={modalType}
-      />
     </Box>
   );
 };
