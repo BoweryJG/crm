@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useMemo, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useMemo, ReactNode, useEffect } from 'react';
 import { ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import spaceTheme from './spaceTheme';
@@ -24,29 +24,51 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  // Default theme mode is 'space'
-  const [themeMode, setThemeMode] = useState<ThemeMode>('space');
+  // Initialize theme from localStorage or default to 'space'
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('crm-theme-mode') as ThemeMode;
+      return (savedTheme && ['space', 'corporate', 'luxury'].includes(savedTheme)) ? savedTheme : 'space';
+    }
+    return 'space';
+  });
+
+  // Save theme to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('crm-theme-mode', themeMode);
+      console.log('🎨 Theme changed to:', themeMode); // Debug log
+    }
+  }, [themeMode]);
 
   // Toggle between themes
   const toggleTheme = () => {
     setThemeMode((prevMode) => {
-      switch (prevMode) {
-        case 'space': return 'corporate';
-        case 'corporate': return 'luxury';
-        case 'luxury': return 'space';
-        default: return 'space';
-      }
+      const nextTheme = (() => {
+        switch (prevMode) {
+          case 'space': return 'corporate';
+          case 'corporate': return 'luxury';
+          case 'luxury': return 'space';
+          default: return 'space';
+        }
+      })();
+      console.log('🔄 Theme toggled from', prevMode, 'to', nextTheme); // Debug log
+      return nextTheme;
     });
   };
 
   // Memoize the current theme to prevent unnecessary re-renders
   const currentTheme = useMemo(() => {
-    switch (themeMode) {
-      case 'space': return spaceTheme;
-      case 'corporate': return corporateTheme;
-      case 'luxury': return luxuryTheme;
-      default: return spaceTheme;
-    }
+    const theme = (() => {
+      switch (themeMode) {
+        case 'space': return spaceTheme;
+        case 'corporate': return corporateTheme;
+        case 'luxury': return luxuryTheme;
+        default: return spaceTheme;
+      }
+    })();
+    console.log('🎯 Current theme object created for mode:', themeMode); // Debug log
+    return theme;
   }, [themeMode]);
 
   // Create the context value
