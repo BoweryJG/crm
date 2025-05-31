@@ -319,7 +319,7 @@ class RegionalAnalyticsService {
       const { data: dentalProcedures, error: dentalError } = await supabase
         .from('dental_procedures')
         .select('procedure_name, yearly_growth_percentage, market_size_usd_millions, category')
-        .order('yearly_growth_percentage', { ascending: false, nullsLast: true })
+        .order('yearly_growth_percentage', { ascending: false, nullsFirst: false })
         .limit(10);
 
       if (dentalError) {
@@ -330,7 +330,7 @@ class RegionalAnalyticsService {
       const { data: aestheticProcedures, error: aestheticError } = await supabase
         .from('aesthetic_procedures')
         .select('procedure_name, yearly_growth_percentage, market_size_usd_millions, category')
-        .order('yearly_growth_percentage', { ascending: false, nullsLast: true })
+        .order('yearly_growth_percentage', { ascending: false, nullsFirst: false })
         .limit(10);
 
       if (aestheticError) {
