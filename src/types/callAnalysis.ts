@@ -7,15 +7,23 @@ export interface CallAnalysis extends BaseModel {
   title: string;
   call_date: string;
   duration: number; // in seconds
+  duration_seconds?: number; // alias for duration
   contact_id?: string;
   practice_id?: string;
   recording_url?: string;
   transcript?: string;
   summary?: string;
   sentiment_score?: number; // -1 to 1, negative to positive
+  sentiment?: string; // 'positive', 'negative', 'neutral' - derived from sentiment_score
+  confidence_score?: number; // 0 to 1
   linguistics_analysis_id?: string; // Reference to linguistics module analysis
   tags?: string[];
   notes?: string;
+  key_topics?: string[]; // Topics discussed in the call
+  action_items?: string[]; // Action items from the call
+  buying_signals?: string[]; // Buying signals detected
+  objections?: string[]; // Objections raised
+  next_steps?: string[]; // Next steps identified
 }
 
 /**
