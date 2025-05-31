@@ -495,7 +495,8 @@ class AdvancedLinguisticsService {
   }
 
   private calculatePersuasionEffectiveness(influenceTechniques: any, powerShifts: any[]): number {
-    const avgInfluence = Object.values(influenceTechniques).reduce((a: any, b: any) => a + b, 0) / 6;
+    const values = Object.values(influenceTechniques) as number[];
+    const avgInfluence = values.reduce((a: number, b: number) => a + b, 0) / 6;
     return Math.round(avgInfluence * 10);
   }
 
