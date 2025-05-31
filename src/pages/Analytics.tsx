@@ -174,22 +174,41 @@ const Analytics: React.FC = () => {
           </Box>
         </Box>
         
-        <Box sx={{ p: 2 }}>
+        <Box sx={{ 
+          height: 'calc(100vh - 200px)', 
+          overflow: 'auto',
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'rgba(0,0,0,0.1)',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: 'rgba(0,0,0,0.3)',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: 'rgba(0,0,0,0.5)',
+          },
+        }}>
           {isLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
               <CircularProgress />
             </Box>
           ) : error ? (
-            <Typography color="error" align="center">
+            <Typography color="error" align="center" sx={{ p: 2 }}>
               Error loading data: {error.message}
             </Typography>
           ) : (
             <>
               {activeTab === 0 && (
-                <RegionalAnalytics />
+                <Box sx={{ p: 2 }}>
+                  <RegionalAnalytics />
+                </Box>
               )}
               {activeTab === 1 && (
-                <Box>
+                <Box sx={{ p: 2 }}>
                   {/* Dental Procedures Overview */}
                   <Grid container spacing={3} sx={{ mb: 3 }}>
                     <Grid item xs={12} sm={6} md={3}>
@@ -321,7 +340,7 @@ const Analytics: React.FC = () => {
                 </Box>
               )}
               {activeTab === 2 && (
-                <Box>
+                <Box sx={{ p: 2 }}>
                   {/* Aesthetic Procedures Overview */}
                   <Grid container spacing={3} sx={{ mb: 3 }}>
                     <Grid item xs={12} sm={6} md={3}>
@@ -462,7 +481,7 @@ const Analytics: React.FC = () => {
                 </Box>
               )}
               {activeTab === 3 && (
-                <Box>
+                <Box sx={{ p: 2 }}>
                   {/* Companies Overview */}
                   <Grid container spacing={3} sx={{ mb: 3 }}>
                     <Grid item xs={12} sm={6} md={3}>
@@ -662,7 +681,7 @@ const Analytics: React.FC = () => {
                 </Box>
               )}
               {activeTab === 4 && (
-                <Box>
+                <Box sx={{ p: 2 }}>
                   {/* Call Analysis Overview */}
                   <Grid container spacing={3} sx={{ mb: 3 }}>
                     <Grid item xs={12} sm={6} md={3}>

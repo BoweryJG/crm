@@ -895,7 +895,25 @@ const RepAnalytics: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ 
+      height: '100vh', 
+      overflow: 'auto',
+      p: 3,
+      '&::-webkit-scrollbar': {
+        width: '8px',
+      },
+      '&::-webkit-scrollbar-track': {
+        background: 'rgba(0,0,0,0.1)',
+        borderRadius: '4px',
+      },
+      '&::-webkit-scrollbar-thumb': {
+        background: 'rgba(0,0,0,0.3)',
+        borderRadius: '4px',
+      },
+      '&::-webkit-scrollbar-thumb:hover': {
+        background: 'rgba(0,0,0,0.5)',
+      },
+    }}>
       <Typography variant="h4" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
         <InsightsIcon sx={{ mr: 1 }} />
         Rep Analytics

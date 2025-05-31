@@ -107,7 +107,7 @@ const RegionalAnalytics: React.FC<RegionalAnalyticsProps> = ({
 
   if (loading) {
     return (
-      <Box sx={{ p: 3 }}>
+      <Box>
         <Typography variant="h6" gutterBottom>Loading Regional Analytics...</Typography>
         <LinearProgress />
       </Box>
@@ -115,7 +115,7 @@ const RegionalAnalytics: React.FC<RegionalAnalyticsProps> = ({
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" fontWeight="bold" sx={{ color: theme.palette.primary.main }}>
