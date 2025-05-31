@@ -194,7 +194,7 @@ const Analytics: React.FC = () => {
                             {dentalProcedures.filter(p => (p.yearly_growth_percentage || 0) > 10).length}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            High Growth (>10%)
+                            High Growth (&gt;10%)
                           </Typography>
                         </CardContent>
                       </Card>
@@ -326,7 +326,7 @@ const Analytics: React.FC = () => {
                             {aestheticProcedures.filter(p => (p.yearly_growth_percentage || 0) > 15).length}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            High Growth (>15%)
+                            High Growth (&gt;15%)
                           </Typography>
                         </CardContent>
                       </Card>
