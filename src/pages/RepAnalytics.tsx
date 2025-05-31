@@ -37,7 +37,8 @@ import {
   ArrowForward as ArrowForwardIcon,
   Alarm as AlarmIcon,
   Timer as TimerIcon,
-  Bolt as BoltIcon
+  Bolt as BoltIcon,
+  Psychology as PsychologyIcon
 } from '@mui/icons-material';
 
 import { useThemeContext } from '../themes/ThemeContext';
@@ -51,6 +52,7 @@ import advancedLinguisticsService, {
   PowerAnalysis,
   SalesInsights
 } from '../services/linguistics/advancedLinguisticsService';
+import LinguisticsAnalysisCard from '../components/linguistics/LinguisticsAnalysisCard';
 
 // Using the standard Grid from MUI
 
@@ -1403,6 +1405,102 @@ const RepAnalytics: React.FC = () => {
           </Grid>
         </Grid>
       </Paper>
+      
+      {/* Advanced Linguistics Analysis Demo */}
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+          <PsychologyIcon sx={{ mr: 1 }} />
+          Advanced Conversational Intelligence
+        </Typography>
+        <LinguisticsAnalysisCard
+          analysis={{
+            overallSentiment: 'positive',
+            confidenceScore: 92.5,
+            psychologicalProfile: {
+              personalityType: 'analytical',
+              decisionMakingStyle: 'deliberate',
+              communicationStyle: 'formal',
+              riskTolerance: 'medium',
+              pricesensitivity: 'medium',
+              trustFactors: ['Social Proof', 'Local References', 'Risk Reduction', 'Expert Authority'],
+              motivationalTriggers: ['ROI Data', 'Peer Success Stories', 'Risk Mitigation', 'Timeline Clarity'],
+              concernsAndObjections: ['Investment Cost', 'Staff Training', 'Technical Support', 'Implementation Timeline']
+            },
+            conversationDynamics: {
+              talkTimeRatio: { rep: 65, prospect: 35 },
+              interruptionPattern: { repInterruptions: 1, prospectInterruptions: 2 },
+              questioningTechnique: { openQuestions: 8, closedQuestions: 3, leadingQuestions: 2 },
+              silenceMoments: [
+                { duration: 3, context: 'After price mention', effectiveness: 'positive' },
+                { duration: 2, context: 'Before objection response', effectiveness: 'neutral' }
+              ],
+              emotionalFlow: [
+                { timestamp: '00:00:32', emotion: 'concern', intensity: 6, speaker: 'prospect' },
+                { timestamp: '00:01:35', emotion: 'interest', intensity: 7, speaker: 'prospect' },
+                { timestamp: '00:03:25', emotion: 'confidence', intensity: 8, speaker: 'prospect' },
+                { timestamp: '00:04:55', emotion: 'excitement', intensity: 8, speaker: 'prospect' }
+              ]
+            },
+            powerAnalysis: {
+              overallPowerDynamic: 'balanced',
+              controlMoments: [
+                { timestamp: '00:01:05', controlShift: 'to_rep', trigger: 'ROI data offer', impact: 'high' },
+                { timestamp: '00:02:02', controlShift: 'to_prospect', trigger: 'Training concern', impact: 'medium' },
+                { timestamp: '00:03:25', controlShift: 'to_rep', trigger: 'Support assurance', impact: 'high' }
+              ],
+              influenceTechniques: {
+                reciprocity: 7,
+                commitment: 9,
+                socialProof: 9,
+                authority: 8,
+                liking: 7,
+                scarcity: 6
+              },
+              persuasionEffectiveness: 85
+            },
+            salesInsights: {
+              callStage: 'closing',
+              buyingSignals: [
+                { signal: 'Asked about installation timeline', strength: 'strong', timestamp: '00:03:38' },
+                { signal: 'Mentioned practice schedule alignment', strength: 'strong', timestamp: '00:03:55' },
+                { signal: 'Requested demonstration', strength: 'strong', timestamp: '00:04:12' },
+                { signal: 'Confirmed meeting availability', strength: 'strong', timestamp: '00:04:32' }
+              ],
+              objections: [
+                { type: 'price', content: 'concerned about the investment required', handled: true, effectiveness: 90 },
+                { type: 'time', content: 'staff training concerns', handled: true, effectiveness: 85 },
+                { type: 'trust', content: 'maintenance and support concerns', handled: true, effectiveness: 95 }
+              ],
+              nextBestActions: [
+                'Confirm Wednesday 2 PM demonstration appointment',
+                'Prepare Dr. Martinez case study and practice-specific ROI projections',
+                'Coordinate with installation team for 3-4 week timeline',
+                'Send follow-up email with meeting confirmation and agenda'
+              ],
+              winProbability: 88,
+              recommendedFollowUp: {
+                timing: 'Within 24 hours',
+                approach: 'Confirmation email with demonstration agenda',
+                keyPoints: ['Meeting confirmation', 'ROI projections', 'Installation timeline', 'Support details']
+              }
+            },
+            keyMoments: [
+              { timestamp: '00:01:05', moment: 'Offered concrete ROI data', significance: 'critical', recommendation: 'Continue leading with data-driven value propositions' },
+              { timestamp: '00:01:35', moment: 'Provided local market references', significance: 'critical', recommendation: 'Always use geographically relevant case studies' },
+              { timestamp: '00:02:45', moment: 'Proactively addressed support concerns', significance: 'important', recommendation: 'Anticipate and address common objections before they become barriers' },
+              { timestamp: '00:03:25', moment: 'Prospect expressed buying intent', significance: 'critical', recommendation: 'Recognize buying signals and move to next steps immediately' },
+              { timestamp: '00:04:12', moment: 'Successfully moved to concrete next steps', significance: 'critical', recommendation: 'Always end with specific, time-bound commitments' }
+            ],
+            coachingOpportunities: [
+              { area: 'Objection Handling', currentLevel: 90, improvement: 'Excellent proactive objection handling demonstrated', priority: 'low' },
+              { area: 'Social Proof Usage', currentLevel: 95, improvement: 'Outstanding use of local references and case studies', priority: 'low' },
+              { area: 'Closing Technique', currentLevel: 85, improvement: 'Strong natural progression to next steps', priority: 'medium' },
+              { area: 'Question Strategy', currentLevel: 80, improvement: 'Good balance of open and closed questions, continue to let prospect talk', priority: 'medium' },
+              { area: 'Value Communication', currentLevel: 88, improvement: 'Excellent ROI focus, maintain data-driven approach', priority: 'low' }
+            ]
+          }}
+        />
+      </Box>
     </Box>
   );
 };
