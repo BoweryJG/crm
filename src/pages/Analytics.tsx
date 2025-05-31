@@ -269,8 +269,8 @@ const Analytics: React.FC = () => {
                         <CardHeader title="Categories Breakdown" />
                         <CardContent>
                           {Array.from(new Set(dentalProcedures.map(p => p.category).filter(Boolean)))
-                            .map(category => {
-                              const categoryProcedures = dentalProcedures.filter(p => p.category === category);
+                            .map((category: string) => {
+                              const categoryProcedures = dentalProcedures.filter(p => p.category === category && p.category);
                               const avgGrowth = categoryProcedures.reduce((sum, p) => sum + (p.yearly_growth_percentage || 0), 0) / categoryProcedures.length;
                               
                               return (
@@ -404,8 +404,8 @@ const Analytics: React.FC = () => {
                         <CardHeader title="Aesthetic Categories Analysis" />
                         <CardContent>
                           {Array.from(new Set(aestheticProcedures.map(p => p.category).filter(Boolean)))
-                            .map(category => {
-                              const categoryProcedures = aestheticProcedures.filter(p => p.category === category);
+                            .map((category: string) => {
+                              const categoryProcedures = aestheticProcedures.filter(p => p.category === category && p.category);
                               const avgGrowth = categoryProcedures.reduce((sum, p) => sum + (p.yearly_growth_percentage || 0), 0) / categoryProcedures.length;
                               const totalMarketSize = categoryProcedures.reduce((sum, p) => sum + (p.market_size_usd_millions || 0), 0);
                               
