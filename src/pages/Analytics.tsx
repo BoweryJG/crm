@@ -41,6 +41,7 @@ import { LinguisticsService } from '../services/linguistics/linguisticsService';
 import RegionalAnalytics from '../components/analytics/RegionalAnalytics';
 import ProcedureDetailModal from '../components/analytics/ProcedureDetailModal';
 import CategoryAnalysisModal from '../components/analytics/CategoryAnalysisModal';
+import ProcedureLibrary from '../components/analytics/ProcedureLibrary';
 import { 
   DentalProcedure, 
   DentalProcedureCategory,
@@ -78,7 +79,7 @@ const Analytics: React.FC = () => {
   const [procedureModalOpen, setProcedureModalOpen] = useState(false);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [selectedProcedure, setSelectedProcedure] = useState<DentalProcedure | AestheticProcedure | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [selectedCategory] = useState<any>(null);
   const [modalType, setModalType] = useState<'dental' | 'aesthetic'>('dental');
   
   useEffect(() => {
@@ -220,355 +221,26 @@ const Analytics: React.FC = () => {
                 </Box>
               )}
               {activeTab === 1 && (
-                <Box sx={{ p: 2 }}>
-                  {/* Dental Procedures Overview */}
-                  <Grid container spacing={3} sx={{ mb: 3 }}>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="h4" color="primary" gutterBottom>
-                            {dentalProcedures.length}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Total Procedures
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="h4" color="success.main" gutterBottom>
-                            {dentalProcedures.filter(p => (p.yearly_growth_percentage || 0) > 10).length}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            High Growth (&gt;10%)
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="h4" color="info.main" gutterBottom>
-                            {Math.round(dentalProcedures.reduce((sum, p) => sum + (p.yearly_growth_percentage || 0), 0) / dentalProcedures.length * 10) / 10}%
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Average Growth Rate
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="h4" color="warning.main" gutterBottom>
-                            {new Set(dentalProcedures.map(p => p.category).filter(Boolean)).size}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Categories
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  </Grid>
-
-                  {/* Top Procedures and Categories */}
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <Card>
-                        <CardHeader title="Top Growth Procedures" />
-                        <CardContent>
-                          {dentalProcedures
-                            .filter(p => p.yearly_growth_percentage != null)
-                            .sort((a, b) => (b.yearly_growth_percentage || 0) - (a.yearly_growth_percentage || 0))
-                            .slice(0, 8)
-                            .map((procedure, index) => (
-                              <CardActionArea
-                                key={procedure.id}
-                                onClick={() => {
-                                  setSelectedProcedure(procedure);
-                                  setModalType('dental');
-                                  setProcedureModalOpen(true);
-                                }}
-                                sx={{
-                                  p: 1,
-                                  borderRadius: 2,
-                                  mb: 2,
-                                  '&:hover': {
-                                    backgroundColor: 'action.hover',
-                                  }
-                                }}
-                              >
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                    {procedure.procedure_name}
-                                  </Typography>
-                                  <Chip 
-                                    label={`+${procedure.yearly_growth_percentage}%`}
-                                    color="success"
-                                    size="small"
-                                  />
-                                </Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {procedure.category || 'General'}
-                                  </Typography>
-                                  {procedure.market_size_usd_millions && (
-                                    <Typography variant="caption" color="text.secondary">
-                                      • ${procedure.market_size_usd_millions}M market
-                                    </Typography>
-                                  )}
-                                </Box>
-                              </CardActionArea>
-                            ))
-                          }
-                        </CardContent>
-                      </Card>
-                    </Grid>
-
-                    <Grid item xs={12} md={6}>
-                      <Card>
-                        <CardHeader title="Categories Breakdown" />
-                        <CardContent>
-                          {Array.from(new Set(dentalProcedures.map(p => p.category).filter(Boolean)))
-                            .map((category) => {
-                              const categoryProcedures = dentalProcedures.filter(p => p.category === category && p.category);
-                              const avgGrowth = categoryProcedures.reduce((sum, p) => sum + (p.yearly_growth_percentage || 0), 0) / categoryProcedures.length;
-                              
-                              const totalMarketSize = categoryProcedures.reduce((sum, p) => sum + (p.market_size_usd_millions || 0), 0);
-                              
-                              return (
-                                <CardActionArea
-                                  key={category}
-                                  onClick={() => {
-                                    setSelectedCategory({
-                                      name: category,
-                                      procedureCount: categoryProcedures.length,
-                                      averageGrowth: avgGrowth,
-                                      totalMarketSize,
-                                      topProcedures: categoryProcedures.slice(0, 5).map(p => p.procedure_name),
-                                      competitionLevel: avgGrowth > 15 ? 'high' : avgGrowth > 8 ? 'medium' : 'low',
-                                      investmentPotential: Math.min(5, Math.max(1, Math.ceil((avgGrowth + 10) / 5)))
-                                    });
-                                    setModalType('dental');
-                                    setCategoryModalOpen(true);
-                                  }}
-                                  sx={{
-                                    p: 1,
-                                    borderRadius: 2,
-                                    mb: 2,
-                                    '&:hover': {
-                                      backgroundColor: 'action.hover',
-                                    }
-                                  }}
-                                >
-                                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                      {category}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                      {categoryProcedures.length} procedures
-                                    </Typography>
-                                  </Box>
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Typography variant="caption" color="text.secondary">
-                                      Avg Growth: {Math.round(avgGrowth * 10) / 10}%
-                                    </Typography>
-                                    <Chip 
-                                      label={avgGrowth > 10 ? 'High Growth' : avgGrowth > 5 ? 'Moderate' : 'Stable'}
-                                      color={avgGrowth > 10 ? 'success' : avgGrowth > 5 ? 'warning' : 'default'}
-                                      size="small"
-                                    />
-                                  </Box>
-                                </CardActionArea>
-                              );
-                            })
-                          }
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  </Grid>
-                </Box>
+                <ProcedureLibrary
+                  procedures={dentalProcedures}
+                  type="dental"
+                  onProcedureClick={(procedure) => {
+                    setSelectedProcedure(procedure);
+                    setModalType('dental');
+                    setProcedureModalOpen(true);
+                  }}
+                />
               )}
               {activeTab === 2 && (
-                <Box sx={{ p: 2 }}>
-                  {/* Aesthetic Procedures Overview */}
-                  <Grid container spacing={3} sx={{ mb: 3 }}>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="h4" color="secondary.main" gutterBottom>
-                            {aestheticProcedures.length}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Total Procedures
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="h4" color="success.main" gutterBottom>
-                            {aestheticProcedures.filter(p => (p.yearly_growth_percentage || 0) > 15).length}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            High Growth (&gt;15%)
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="h4" color="info.main" gutterBottom>
-                            {Math.round(aestheticProcedures.reduce((sum, p) => sum + (p.yearly_growth_percentage || 0), 0) / aestheticProcedures.length * 10) / 10}%
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Average Growth Rate
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="h4" color="warning.main" gutterBottom>
-                            {new Set(aestheticProcedures.map(p => p.category).filter(Boolean)).size}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Categories
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  </Grid>
-
-                  {/* Top Procedures and Market Analysis */}
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <Card>
-                        <CardHeader title="Trending Aesthetic Procedures" />
-                        <CardContent>
-                          {aestheticProcedures
-                            .filter(p => p.yearly_growth_percentage != null)
-                            .sort((a, b) => (b.yearly_growth_percentage || 0) - (a.yearly_growth_percentage || 0))
-                            .slice(0, 8)
-                            .map((procedure, index) => (
-                              <CardActionArea
-                                key={procedure.id}
-                                onClick={() => {
-                                  setSelectedProcedure(procedure);
-                                  setModalType('aesthetic');
-                                  setProcedureModalOpen(true);
-                                }}
-                                sx={{
-                                  p: 1,
-                                  borderRadius: 2,
-                                  mb: 2,
-                                  '&:hover': {
-                                    backgroundColor: 'action.hover',
-                                  }
-                                }}
-                              >
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                    {procedure.procedure_name}
-                                  </Typography>
-                                  <Chip 
-                                    label={`+${procedure.yearly_growth_percentage}%`}
-                                    color={(procedure.yearly_growth_percentage || 0) > 20 ? 'success' : 'primary'}
-                                    size="small"
-                                  />
-                                </Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {procedure.category || 'General'}
-                                  </Typography>
-                                  {procedure.market_size_usd_millions && (
-                                    <Typography variant="caption" color="text.secondary">
-                                      • ${procedure.market_size_usd_millions}M market
-                                    </Typography>
-                                  )}
-                                  {(procedure.yearly_growth_percentage || 0) > 30 && (
-                                    <Chip label="🔥 Hot" size="small" color="error" />
-                                  )}
-                                </Box>
-                              </CardActionArea>
-                            ))
-                          }
-                        </CardContent>
-                      </Card>
-                    </Grid>
-
-                    <Grid item xs={12} md={6}>
-                      <Card>
-                        <CardHeader title="Aesthetic Categories Analysis" />
-                        <CardContent>
-                          {Array.from(new Set(aestheticProcedures.map(p => p.category).filter(Boolean)))
-                            .map((category) => {
-                              const categoryProcedures = aestheticProcedures.filter(p => p.category === category && p.category);
-                              const avgGrowth = categoryProcedures.reduce((sum, p) => sum + (p.yearly_growth_percentage || 0), 0) / categoryProcedures.length;
-                              const totalMarketSize = categoryProcedures.reduce((sum, p) => sum + (p.market_size_usd_millions || 0), 0);
-                              
-                              return (
-                                <CardActionArea
-                                  key={category}
-                                  onClick={() => {
-                                    setSelectedCategory({
-                                      name: category,
-                                      procedureCount: categoryProcedures.length,
-                                      averageGrowth: avgGrowth,
-                                      totalMarketSize,
-                                      topProcedures: categoryProcedures.slice(0, 5).map(p => p.procedure_name),
-                                      competitionLevel: avgGrowth > 20 ? 'high' : avgGrowth > 12 ? 'medium' : 'low',
-                                      investmentPotential: Math.min(5, Math.max(1, Math.ceil((avgGrowth + 5) / 8)))
-                                    });
-                                    setModalType('aesthetic');
-                                    setCategoryModalOpen(true);
-                                  }}
-                                  sx={{
-                                    p: 1,
-                                    borderRadius: 2,
-                                    mb: 2,
-                                    '&:hover': {
-                                      backgroundColor: 'action.hover',
-                                    }
-                                  }}
-                                >
-                                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                      {category}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                      {categoryProcedures.length} procedures
-                                    </Typography>
-                                  </Box>
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                                    <Typography variant="caption" color="text.secondary">
-                                      Growth: {Math.round(avgGrowth * 10) / 10}%
-                                    </Typography>
-                                    {totalMarketSize > 0 && (
-                                      <Typography variant="caption" color="text.secondary">
-                                        • ${totalMarketSize}M market
-                                      </Typography>
-                                    )}
-                                    <Chip 
-                                      label={avgGrowth > 15 ? 'Booming' : avgGrowth > 8 ? 'Growing' : 'Stable'}
-                                      color={avgGrowth > 15 ? 'success' : avgGrowth > 8 ? 'warning' : 'default'}
-                                      size="small"
-                                    />
-                                  </Box>
-                                </CardActionArea>
-                              );
-                            })
-                          }
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  </Grid>
-                </Box>
+                <ProcedureLibrary
+                  procedures={aestheticProcedures}
+                  type="aesthetic"
+                  onProcedureClick={(procedure) => {
+                    setSelectedProcedure(procedure);
+                    setModalType('aesthetic');
+                    setProcedureModalOpen(true);
+                  }}
+                />
               )}
               {activeTab === 3 && (
                 <Box sx={{ p: 2 }}>
