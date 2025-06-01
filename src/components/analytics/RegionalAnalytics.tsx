@@ -36,6 +36,7 @@ import {
 } from '@mui/icons-material';
 import regionalAnalyticsService, { RegionalInsight, MarketTrend, LocalBusinessData } from '../../services/analytics/regionalAnalyticsService';
 import { useThemeContext } from '../../themes/ThemeContext';
+import EliteLoadingScreen from '../common/EliteLoadingScreen';
 
 interface RegionalAnalyticsProps {
   defaultCity?: string;
@@ -107,10 +108,11 @@ const RegionalAnalytics: React.FC<RegionalAnalyticsProps> = ({
 
   if (loading) {
     return (
-      <Box>
-        <Typography variant="h6" gutterBottom>Loading Regional Analytics...</Typography>
-        <LinearProgress />
-      </Box>
+      <EliteLoadingScreen 
+        loadingText="Loading Regional Intelligence"
+        message="Analyzing market data, competitors, and demographics..."
+        showPreview={true}
+      />
     );
   }
 
