@@ -125,29 +125,42 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
           borderBottom: `1px solid ${themeMode === 'space' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`
         }}
       >
-        <Typography
-          variant="h5"
+        <Box
+          onClick={() => window.open('https://repspheres.com', '_blank')}
           sx={{
-            fontWeight: 600,
-            background: themeMode === 'space'
-              ? 'linear-gradient(45deg, #8860D0 0%, #5CE1E6 100%)'
-              : 'linear-gradient(45deg, #3D52D5 0%, #44CFCB 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            marginRight: 1
+            display: 'flex',
+            alignItems: 'center',
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease-in-out',
+            '&:hover': {
+              transform: 'scale(1.05)'
+            }
           }}
         >
-          RepSpheres
-        </Typography>
-        <Typography 
-          variant="h6" 
-          sx={{ 
-            color: theme.palette.text.secondary,
-            fontWeight: 500
-          }}
-        >
-          CRM
-        </Typography>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 600,
+              background: themeMode === 'space'
+                ? 'linear-gradient(45deg, #8860D0 0%, #5CE1E6 100%)'
+                : 'linear-gradient(45deg, #3D52D5 0%, #44CFCB 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              marginRight: 1
+            }}
+          >
+            RepSpheres
+          </Typography>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              color: theme.palette.text.secondary,
+              fontWeight: 500
+            }}
+          >
+            CRM
+          </Typography>
+        </Box>
       </Box>
 
       {navigationSections.map((section, sectionIndex) => (
