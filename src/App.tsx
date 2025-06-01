@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './themes/ThemeContext';
 import { AuthProvider } from './hooks/useAuth';
 import { AppModeProvider } from './contexts/AppModeContext';
-import LoadingScreen from './components/common/LoadingScreen';
+import EliteLoadingScreen from './components/common/EliteLoadingScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
@@ -51,7 +51,13 @@ const App: React.FC = () => {
   }, []);
 
   if (isLoading) {
-    return <LoadingScreen />;
+    return (
+      <EliteLoadingScreen 
+        loadingText="Initializing RepSpheres CRM"
+        message="Loading your elite medical device sales platform..."
+        showPreview={true}
+      />
+    );
   }
 
   return (
@@ -70,12 +76,12 @@ const App: React.FC = () => {
                 {/* All Routes - no authentication required */}
                 <Route path="/" element={<Layout />}>
                 <Route index element={<Dashboard />} />
-                <Route path="contacts" element={<React.Suspense fallback={<div>Loading...</div>}><Contacts /></React.Suspense>} />
-                <Route path="contacts/:id" element={<React.Suspense fallback={<div>Loading...</div>}><ContactDetail /></React.Suspense>} />
-                <Route path="practices" element={<React.Suspense fallback={<div>Loading...</div>}><Practices /></React.Suspense>} />
-                <Route path="analytics" element={<Suspense fallback={<div>Loading...</div>}><Analytics /></Suspense>} />
-                <Route path="rep-analytics" element={<Suspense fallback={<div>Loading...</div>}><RepAnalytics /></Suspense>} />
-                <Route path="rep-analytics/:insightId" element={<Suspense fallback={<div>Loading...</div>}><CallInsightDetail /></Suspense>} />
+                <Route path="contacts" element={<React.Suspense fallback={<EliteLoadingScreen loadingText="Loading Contacts" message="Accessing your contact database..." />}><Contacts /></React.Suspense>} />
+                <Route path="contacts/:id" element={<React.Suspense fallback={<EliteLoadingScreen loadingText="Loading Contact Details" message="Retrieving contact information..." />}><ContactDetail /></React.Suspense>} />
+                <Route path="practices" element={<React.Suspense fallback={<EliteLoadingScreen loadingText="Loading Practices" message="Gathering practice data..." />}><Practices /></React.Suspense>} />
+                <Route path="analytics" element={<Suspense fallback={<EliteLoadingScreen loadingText="Loading Analytics" message="Preparing regional intelligence..." />}><Analytics /></Suspense>} />
+                <Route path="rep-analytics" element={<Suspense fallback={<EliteLoadingScreen loadingText="Loading Rep Analytics" message="Generating elite performance insights..." />}><RepAnalytics /></Suspense>} />
+                <Route path="rep-analytics/:insightId" element={<Suspense fallback={<EliteLoadingScreen loadingText="Loading Call Insights" message="Analyzing call data..." />}><CallInsightDetail /></Suspense>} />
                 <Route path="research" element={<Suspense fallback={<div>Loading...</div>}><Research /></Suspense>} />
                 <Route path="content" element={<Suspense fallback={<div>Loading...</div>}><PromptManagement /></Suspense>} />
                 <Route path="call-analysis" element={<Suspense fallback={<div>Loading...</div>}><CallAnalysis /></Suspense>} />
