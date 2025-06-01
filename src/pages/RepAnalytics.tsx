@@ -1,1524 +1,944 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
-  Paper,
-  Button,
+  Grid,
   Card,
   CardContent,
-  CardActions,
+  CardHeader,
+  LinearProgress,
   Chip,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
   Divider,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  Tab,
-  Tabs,
-  TextField,
+  Avatar,
+  Button,
+  IconButton,
+  Paper,
   useTheme,
   CircularProgress,
-  IconButton
+  Tabs,
+  Tab,
+  Badge
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import {
-  Search as SearchIcon,
-  FilterList as FilterListIcon,
-  Refresh as RefreshIcon,
   TrendingUp as TrendingUpIcon,
-  Insights as InsightsIcon,
-  LocationOn as LocationIcon,
+  TrendingDown as TrendingDownIcon,
   Phone as PhoneIcon,
+  Email as EmailIcon,
+  Event as EventIcon,
+  Person as PersonIcon,
   Business as BusinessIcon,
-  Notifications as NotificationsIcon,
-  ArrowForward as ArrowForwardIcon,
-  Alarm as AlarmIcon,
-  Timer as TimerIcon,
-  Bolt as BoltIcon,
-  Psychology as PsychologyIcon
+  AttachMoney as MoneyIcon,
+  Speed as SpeedIcon,
+  Timeline as TimelineIcon,
+  Star as StarIcon,
+  Warning as WarningIcon,
+  CheckCircle as CheckCircleIcon,
+  Schedule as ScheduleIcon,
+  Analytics as AnalyticsIcon,
+  Assignment as AssignmentIcon,
+  Assessment as AssessmentIcon,
+  LocationOn as LocationIcon,
+  CompareArrows as CompareIcon,
+  Insights as InsightsIcon,
+  AccountTree as NetworkIcon,
+  PsychologyAlt as AIIcon,
+  QueryStats as ForecastIcon,
+  Psychology as PsychologyIcon,
+  EmojiEvents as TrophyIcon,
+  Radar as RadarIcon,
+  BarChart as ChartIcon,
+  AutoGraph as PipelineIcon
 } from '@mui/icons-material';
-
 import { useThemeContext } from '../themes/ThemeContext';
-import { supabase } from '../services/supabase/supabase';
-import mockDataService from '../services/mockData/mockDataService';
-import NowCardsStack from '../components/dashboard/NowCardsStack';
-import advancedLinguisticsService, { 
-  ComprehensiveLinguisticsAnalysis,
-  PsychologicalProfile,
-  ConversationDynamics,
-  PowerAnalysis,
-  SalesInsights
-} from '../services/linguistics/advancedLinguisticsService';
-import LinguisticsAnalysisCard from '../components/linguistics/LinguisticsAnalysisCard';
+import UrgentInsightsOverlay from '../components/insights/UrgentInsightsOverlay';
+import { useNavigate } from 'react-router-dom';
 
-// Using the standard Grid from MUI
-
-// These components would be imported from their respective files
-// For now, we'll use the types defined in this file to avoid import errors
-type InsightPriority = 'high' | 'medium' | 'low';
-type InsightCategory = 'visit' | 'follow_up' | 'connect' | 'trend' | 'news' | 'opportunity';
-
-// UrgentAction types and mock service
-type UrgentActionProps = {
-  id: string;
-  title: string;
-  description: string;
-  timeRemaining?: string;
-  expiresAt?: string;
-  source: 'website_activity' | 'call_analysis' | 'market_intelligence' | 'social_media' | 'competitor_activity';
-  sourceDetail?: string;
-  actionText?: string;
-  targetId?: string;
-  targetType?: 'practice' | 'contact' | 'company';
-  onActionClick?: () => void;
-  onDismiss?: () => void;
-};
-
-// Mock UrgentActionService
-const UrgentActionService = {
-  async getUrgentActions(userId: string): Promise<UrgentActionProps[]> {
-    try {
-      const { data, error } = await supabase
-        .from('public_contacts')
-        .select('id, first_name, last_name, created_at')
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (error) {
-        console.error('Error fetching urgent actions:', error);
-      }
-
-      if (data && data.length > 0) {
-        return data.map((c) => ({
-          id: `contact-urgent-${c.id}`,
-          title: `Follow up with ${c.first_name} ${c.last_name}`,
-          description: `${c.first_name} ${c.last_name} recently interacted with our content and may require immediate attention.`,
-          timeRemaining: '15 minutes',
-          expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-          source: 'website_activity',
-          sourceDetail: 'Recent contact activity',
-          actionText: 'Call Now',
-          targetId: c.id,
-          targetType: 'contact'
-        }));
-      }
-
-      // Fallback to mock data if no records were returned
-      const mockContacts = mockDataService.generateMockContacts(5);
-      return mockContacts.map((c, idx) => ({
-        id: `mock-urgent-${idx}-${Date.now()}`,
-        title: `Follow up with ${c.first_name} ${c.last_name}`,
-        description: `${c.first_name} ${c.last_name} recently interacted with our content and may require immediate attention.`,
-        timeRemaining: '15 minutes',
-        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-        source: 'website_activity',
-        sourceDetail: 'Mock contact activity',
-        actionText: 'Call Now',
-        targetId: c.id,
-        targetType: 'contact'
-      }));
-    } catch (err) {
-      console.error('Error fetching urgent actions:', err);
-      const mockContacts = mockDataService.generateMockContacts(5);
-      return mockContacts.map((c, idx) => ({
-        id: `mock-urgent-${idx}-${Date.now()}`,
-        title: `Follow up with ${c.first_name} ${c.last_name}`,
-        description: `${c.first_name} ${c.last_name} recently interacted with our content and may require immediate attention.`,
-        timeRemaining: '15 minutes',
-        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-        source: 'website_activity',
-        sourceDetail: 'Mock contact activity',
-        actionText: 'Call Now',
-        targetId: c.id,
-        targetType: 'contact'
-      }));
-    }
-  },
-  async markActionCompleted(actionId: string, userId: string): Promise<boolean> {
-    console.log(`Marking action ${actionId} as completed by user ${userId}`);
-    return true;
-  },
-  async dismissAction(actionId: string, userId: string): Promise<boolean> {
-    console.log(`Dismissing action ${actionId} by user ${userId}`);
-    return true;
-  }
-};
-
-interface ActionableInsightProps {
-  id: string;
-  title: string;
-  description: string;
-  priority: InsightPriority;
-  category: InsightCategory;
-  actionText?: string;
-  targetId?: string;
-  targetType?: 'practice' | 'contact' | 'company';
-  dueDate?: string;
-  onActionClick?: () => void;
-  onMarkComplete?: () => void;
-  onSave?: () => void;
-  onSchedule?: () => void;
+// Enhanced interface for elite rep analytics
+interface TerritoryMetrics {
+  totalAccounts: number;
+  penetrationRate: number;
+  revenuePerAccount: number;
+  accountGrowthRate: number;
+  competitiveWins: number;
+  competitiveLosses: number;
+  marketShare: number;
+  territoryRank: number;
 }
 
-interface Territory {
-  id: string;
-  name: string;
-  region: string;
-  numPractices: number;
-  numContacts: number;
-  zipCodes: string[];
-  cities: string[];
-  states: string[];
+interface AccountIntelligence {
+  accountId: string;
+  accountName: string;
+  healthScore: number;
+  riskLevel: 'low' | 'medium' | 'high';
+  nextBestAction: string;
+  decisionMakers: Array<{
+    name: string;
+    title: string;
+    influence: number;
+    lastContact: string;
+  }>;
+  competitorPresence: string[];
+  revenueGrowth: number;
+  lastPurchase: string;
+  upcomingOpportunities: number;
 }
 
-interface RepInsight extends ActionableInsightProps {
-  generatedDate: string;
-  expirationDate?: string;
-  score: number;
-  territory: string;
-  zipCodes?: string[];
-  cities?: string[];
-  states?: string[];
-  metadata: {
-    sourceType: 'crm' | 'call_analysis' | 'linguistics' | 'website_visit' | 'market_intelligence' | 'social_media';
-    sourceId?: string;
-  };
-  // Add linguistics data
-  linguistics?: {
-    sentiment_score?: number;
-    key_phrases?: string[];
-    transcript?: string;
-    analysis_result?: any;
-    language_metrics?: {
-      speaking_pace?: number;
-      talk_to_listen_ratio?: number;
-      filler_word_frequency?: number;
-      technical_language_level?: number;
-      interruption_count?: number;
-      average_response_time?: number;
-    };
-    topic_segments?: {
-      topic: string;
-      start_time: number;
-      end_time: number;
-      keywords: string[];
-      summary: string;
-    }[];
-    action_items?: {
-      description: string;
-      timestamp: number;
-      priority: 'low' | 'medium' | 'high';
-      status: 'pending' | 'in_progress' | 'completed';
-    }[];
-  };
+interface CompetitiveIntel {
+  competitor: string;
+  marketShare: number;
+  winRate: number;
+  averageDealSize: number;
+  primaryAdvantages: string[];
+  weaknesses: string[];
+  recentMoves: string[];
+  threatsToWatch: number;
 }
 
-interface InsightFilterOptions {
-  territory?: string;
-  zipCodes?: string[];
-  cities?: string[];
-  states?: string[];
-  minRelevance?: number;
-  categories?: InsightCategory[];
-  priorities?: InsightPriority[];
-  sourceTypes?: ('crm' | 'call_analysis' | 'linguistics' | 'website_visit' | 'market_intelligence' | 'social_media')[];
-  // Pagination parameters
-  page?: number;
-  limit?: number;
+interface PipelineVelocity {
+  stage: string;
+  averageDuration: number;
+  conversionRate: number;
+  bottlenecks: string[];
+  accelerators: string[];
+  currentDeals: number;
+  projectedRevenue: number;
 }
 
-const RepInsightsService = {
-  async getInsights(userId: string, filters?: InsightFilterOptions): Promise<RepInsight[]> {
-    try {
-      console.log('Fetching comprehensive insights from public_contacts...');
-      
-      // Set default pagination values if not provided
-      const page = filters?.page || 1;
-      const limit = filters?.limit || 20; // Increased limit for better data display
-      const offset = (page - 1) * limit;
-      
-      console.log(`Pagination: page ${page}, limit ${limit}, offset ${offset}`);
-      
-      // Fetch comprehensive data starting from public_contacts table
-      const { data: contactsData, error: contactsError } = await supabase
-        .from('public_contacts')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .range(offset, offset + limit - 1);
-      
-      if (contactsError) {
-        console.error('Error fetching contacts:', contactsError);
-        throw contactsError;
-      }
-      
-      const insights: RepInsight[] = [];
-      
-      // For each contact, fetch related analytics data
-      for (const contact of contactsData || []) {
-        // Fetch call analysis data for this contact
-        const { data: callData } = await supabase
-          .from('call_analysis')
-          .select(`
-            *,
-            linguistics_analysis:linguistics_analysis_id(*)
-          `)
-          .eq('contact_id', contact.id)
-          .order('call_date', { ascending: false })
-          .limit(5);
-        
-        // Create insights based on contact and their activities
-        const contactInsights = this.createContactInsights(contact, callData || []);
-        insights.push(...contactInsights);
-      }
-      
-      // Sort insights by score and priority
-      insights.sort((a, b) => {
-        if (a.priority !== b.priority) {
-          const priorityOrder = { high: 0, medium: 1, low: 2 };
-          return priorityOrder[a.priority] - priorityOrder[b.priority];
-        }
-        return b.score - a.score;
-      });
-      
-      return insights.slice(0, limit);
-    } catch (err) {
-      console.error('Error in getInsights:', err);
-      
-      // Generate fallback insights from mock data
-      const mockContacts = mockDataService.generateMockContacts(20);
-      const fallbackInsights: RepInsight[] = [];
-      
-      mockContacts.forEach(contact => {
-        const mockCalls = mockDataService.generateMockCallAnalyses(Math.floor(Math.random() * 3) + 1);
-        const insights = this.createContactInsights(contact, mockCalls);
-        fallbackInsights.push(...insights);
-      });
-      
-      return fallbackInsights.slice(0, limit);
-    }
-  },
-  
-  // Create insights from a contact and their activities
-  createContactInsights(contact: any, callAnalyses: any[]): RepInsight[] {
-    const insights: RepInsight[] = [];
-    const mockLinguisticsData = require('../services/mockData/mockLinguisticsData');
-    
-    // Determine if this is a dental or aesthetic contact
-    const isAesthetic = ['aesthetic_doctor', 'plastic_surgeon', 'dermatologist', 
-                        'cosmetic_dermatologist', 'nurse_practitioner', 
-                        'physician_assistant', 'aesthetician'].includes(contact.type);
-    
-    // Calculate days since last contact
-    const lastContactDate = contact.last_contact_date || contact.updated_at || contact.created_at;
-    const daysSinceContact = Math.floor((new Date().getTime() - new Date(lastContactDate).getTime()) / (1000 * 60 * 60 * 24));
-    
-    // 1. Follow-up insights based on contact timing
-    if (daysSinceContact > 7 && daysSinceContact < 30) {
-      insights.push({
-        id: `follow-up-${contact.id}-${Date.now()}`,
-        title: `Follow up with ${contact.first_name} ${contact.last_name}`,
-        description: `It's been ${daysSinceContact} days since last contact. ${isAesthetic ? 'They may be ready to discuss new aesthetic procedures.' : 'Time to check on their dental equipment needs.'}`,
-        generatedDate: new Date().toISOString(),
-        expirationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        score: 85 - daysSinceContact,
-        priority: daysSinceContact > 14 ? 'high' : 'medium',
-        category: 'follow_up',
-        territory: contact.territory || 'All Territories',
-        targetId: contact.id,
-        targetType: 'contact',
-        actionText: 'Schedule Call',
-        onActionClick: () => {},
-        onMarkComplete: () => {},
-        onSave: () => {},
-        onSchedule: () => {},
-        metadata: {
-          sourceType: 'crm',
-          sourceId: contact.id
-        }
-      });
-    }
-    
-    // 2. New opportunity insights
-    if (daysSinceContact < 3) {
-      insights.push({
-        id: `opportunity-${contact.id}-${Date.now()}`,
-        title: `Hot lead: ${contact.first_name} ${contact.last_name}`,
-        description: `Recently engaged contact at ${contact.practice_name || 'their practice'}. ${isAesthetic ? 'Interest in aesthetic equipment upgrades.' : 'Exploring dental technology solutions.'}`,
-        generatedDate: new Date().toISOString(),
-        expirationDate: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-        score: 95,
-        priority: 'high',
-        category: 'opportunity',
-        territory: contact.territory || 'All Territories',
-        targetId: contact.id,
-        targetType: 'contact',
-        actionText: 'Call Now',
-        onActionClick: () => {},
-        onMarkComplete: () => {},
-        onSave: () => {},
-        onSchedule: () => {},
-        metadata: {
-          sourceType: 'crm',
-          sourceId: contact.id
-        }
-      });
-    }
-    
-    // 3. Visit insights based on location and value
-    if (contact.city && contact.state && Math.random() > 0.5) {
-      insights.push({
-        id: `visit-${contact.id}-${Date.now()}`,
-        title: `Schedule visit: ${contact.practice_name || contact.first_name + ' ' + contact.last_name}`,
-        description: `High-value ${isAesthetic ? 'aesthetic' : 'dental'} practice in ${contact.city}, ${contact.state}. In-person demo could close the deal.`,
-        generatedDate: new Date().toISOString(),
-        expirationDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-        score: 80,
-        priority: 'medium',
-        category: 'visit',
-        territory: contact.territory || 'All Territories',
-        targetId: contact.id,
-        targetType: 'contact',
-        actionText: 'Plan Visit',
-        onActionClick: () => {},
-        onMarkComplete: () => {},
-        onSave: () => {},
-        onSchedule: () => {},
-        metadata: {
-          sourceType: 'crm',
-          sourceId: contact.id
-        }
-      });
-    }
-    
-    // 4. Insights from call analyses
-    callAnalyses.forEach((call, index) => {
-      // Get linguistics data if available
-      let linguisticsData = call.linguistics_analysis;
-      if (!linguisticsData) {
-        // Generate mock linguistics data
-        const mockData = mockLinguisticsData.generateMultipleMockLinguisticsAnalyses(1)[0];
-        linguisticsData = mockData;
-      }
-      
-      // Determine insight category and priority based on sentiment and metrics
-      const sentiment = linguisticsData?.sentiment_score || call.sentiment_score || 0;
-      let category: InsightCategory = 'follow_up';
-      let priority: InsightPriority = 'medium';
-      
-      if (sentiment < -0.3) {
-        category = 'follow_up';
-        priority = 'high';
-      } else if (sentiment > 0.5) {
-        category = 'opportunity';
-        priority = 'high';
-      }
-      
-      // Create insight from call analysis
-      insights.push({
-        id: call.id || `call-${contact.id}-${index}`,
-        title: `${sentiment < 0 ? 'Address concerns' : 'Capitalize on interest'}: ${contact.first_name} ${contact.last_name}`,
-        description: call.summary || `Recent call revealed ${sentiment < 0 ? 'concerns that need addressing' : 'strong interest in your solutions'}. ${linguisticsData?.action_items?.length ? `${linguisticsData.action_items.length} action items identified.` : ''}`,
-        generatedDate: call.created_at || new Date().toISOString(),
-        expirationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        score: Math.max(0, Math.min(100, (sentiment + 1) * 50 + (linguisticsData?.closing_readiness_score || 5) * 5)),
-        priority,
-        category,
-        territory: contact.territory || 'All Territories',
-        targetId: contact.id,
-        targetType: 'contact',
-        actionText: 'View Analysis',
-        onActionClick: () => {},
-        onMarkComplete: () => {},
-        onSave: () => {},
-        onSchedule: () => {},
-        metadata: {
-          sourceType: 'call_analysis',
-          sourceId: call.id
-        },
-        linguistics: linguisticsData ? {
-          sentiment_score: linguisticsData.sentiment_score,
-          key_phrases: linguisticsData.key_phrases || linguisticsData.key_topics,
-          transcript: linguisticsData.transcript,
-          analysis_result: linguisticsData.analysis_result,
-          language_metrics: linguisticsData.analysis_result?.language_metrics || linguisticsData.language_metrics,
-          topic_segments: linguisticsData.analysis_result?.topic_segments || linguisticsData.topic_segments,
-          action_items: linguisticsData.action_items || linguisticsData.analysis_result?.action_items,
-          trust_rapport_score: linguisticsData.trust_rapport_score,
-          influence_effectiveness_score: linguisticsData.influence_effectiveness_score,
-          buyer_personality_type: linguisticsData.buyer_personality_type,
-          closing_readiness_score: linguisticsData.closing_readiness_score,
-          recommended_follow_up_timing: linguisticsData.recommended_follow_up_timing,
-          coaching_recommendations: linguisticsData.coaching_recommendations
-        } : undefined
-      });
-    });
-    
-    // 5. Market intelligence insights
-    if (Math.random() > 0.6) {
-      const trends = isAesthetic 
-        ? ['New FDA-approved laser technology', 'Rising demand for body contouring', 'Competitor pricing changes']
-        : ['Digital dentistry adoption surge', 'Insurance reimbursement updates', 'New implant technology trends'];
-      
-      insights.push({
-        id: `trend-${contact.id}-${Date.now()}`,
-        title: `Market trend affecting ${contact.practice_name || 'practice'}`,
-        description: trends[Math.floor(Math.random() * trends.length)] + ' in your territory. Great conversation starter.',
-        generatedDate: new Date().toISOString(),
-        expirationDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-        score: 70,
-        priority: 'low',
-        category: 'trend',
-        territory: contact.territory || 'All Territories',
-        targetId: contact.id,
-        targetType: 'contact',
-        actionText: 'Share Insight',
-        onActionClick: () => {},
-        onMarkComplete: () => {},
-        onSave: () => {},
-        onSchedule: () => {},
-        metadata: {
-          sourceType: 'market_intelligence',
-          sourceId: contact.id
-        }
-      });
-    }
-    
-    return insights;
-  },
-  
-  // Helper method to transform call analyses to insights
-  transformCallAnalysesToInsights(calls: any[]): RepInsight[] {
-    // Import mock data service for fallback
-    const mockLinguisticsData = require('../services/mockData/mockLinguisticsData');
-    
-    return calls.map(call => {
-      // Extract contact name if available
-      let contactName = '';
-      if (
-        call.public_contacts &&
-        call.public_contacts.first_name &&
-        call.public_contacts.last_name
-      ) {
-        contactName = `${call.public_contacts.first_name} ${call.public_contacts.last_name}`;
-      } else if (
-        call.contacts &&
-        call.contacts.first_name &&
-        call.contacts.last_name
-      ) {
-        // Fallback if the old contacts alias is returned
-        contactName = `${call.contacts.first_name} ${call.contacts.last_name}`;
-      } else {
-        console.log('Contact information not available for call:', call.id);
-      }
-      
-      // Extract linguistics data if available
-      let linguisticsData = null;
-      if (call.linguistics_analysis) {
-        console.log('Linguistics data found for call:', call.id);
-        linguisticsData = {
-          sentiment_score: call.linguistics_analysis.sentiment_score,
-          key_phrases: call.linguistics_analysis.key_phrases || call.linguistics_analysis.key_topics,
-          transcript: call.linguistics_analysis.transcript,
-          analysis_result: call.linguistics_analysis.analysis_result,
-          language_metrics: call.linguistics_analysis.analysis_result?.language_metrics || {},
-          topic_segments: call.linguistics_analysis.analysis_result?.topic_segments || [],
-          action_items: call.linguistics_analysis.action_items || call.linguistics_analysis.analysis_result?.action_items || []
-        };
-      } else {
-        console.log('No linguistics data available for call:', call.id);
-        // Generate mock linguistics data for this call as fallback
-        const mockData = mockLinguisticsData.generateMultipleMockLinguisticsAnalyses(1)[0];
-        linguisticsData = {
-          sentiment_score: mockData.sentiment_score,
-          key_phrases: mockData.key_phrases,
-          transcript: mockData.transcript,
-          analysis_result: mockData.analysis_result,
-          language_metrics: mockData.analysis_result.language_metrics || {},
-          topic_segments: mockData.analysis_result.topic_segments || [],
-          action_items: mockData.analysis_result.action_items || []
-        };
-        console.log('Generated mock linguistics data as fallback for call:', call.id);
-      }
-      
-      // Create a RepInsight from call analysis data
-      const insight: RepInsight = {
-        id: call.id,
-        title: call.title || `Call with ${contactName || 'Unknown Contact'} on ${new Date(call.call_date).toLocaleDateString()}`,
-        description: call.summary || 'No summary available',
-        generatedDate: call.created_at || new Date().toISOString(),
-        expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-        score: call.sentiment_score ? (call.sentiment_score + 1) * 50 : 50, // Convert -1 to 1 scale to 0-100
-        priority: call.sentiment_score < -0.3 ? 'high' : call.sentiment_score > 0.3 ? 'low' : 'medium',
-        category: 'follow_up', // Call analyses are typically followed up on
-        territory: 'All Territories', // Placeholder - should ideally come from contact/practice data
-        targetId: call.contact_id || undefined,
-        targetType: call.contact_id ? 'contact' : undefined,
-        actionText: 'View Details',
-        onActionClick: () => {}, // Placeholder function
-        onMarkComplete: () => {}, // Placeholder function
-        onSave: () => {}, // Placeholder function
-        onSchedule: () => {}, // Placeholder function
-        metadata: {
-          sourceType: 'call_analysis',
-          sourceId: call.id
-        },
-        // Add linguistics data to the insight
-        linguistics: linguisticsData
-      };
-      
-      return insight;
-    });
-  }
-};
-
-// Mock territories data
-const mockTerritories: Territory[] = [
-  {
-    id: 'northeast',
-    name: 'Northeast',
-    region: 'East Coast',
-    numPractices: 124,
-    numContacts: 342,
-    zipCodes: ['02108', '02109', '02110', '02111', '02112'],
-    cities: ['Boston', 'Cambridge', 'Brookline', 'Somerville', 'Newton'],
-    states: ['MA', 'NH', 'ME', 'VT', 'RI', 'CT']
-  },
-  {
-    id: 'southeast',
-    name: 'Southeast',
-    region: 'East Coast',
-    numPractices: 98,
-    numContacts: 276,
-    zipCodes: ['33101', '33102', '33103', '33104', '33105'],
-    cities: ['Miami', 'Tampa', 'Orlando', 'Jacksonville', 'Fort Lauderdale'],
-    states: ['FL', 'GA', 'SC', 'NC', 'AL']
-  },
-  {
-    id: 'midwest',
-    name: 'Midwest',
-    region: 'Central',
-    numPractices: 87,
-    numContacts: 231,
-    zipCodes: ['60601', '60602', '60603', '60604', '60605'],
-    cities: ['Chicago', 'Detroit', 'Indianapolis', 'Columbus', 'Milwaukee'],
-    states: ['IL', 'MI', 'IN', 'OH', 'WI', 'MN', 'IA', 'MO']
-  }
-];
+interface ActivityEfficiency {
+  activityType: string;
+  volume: number;
+  conversionRate: number;
+  revenueGenerated: number;
+  timeInvested: number;
+  roi: number;
+  trend: 'up' | 'down' | 'stable';
+}
 
 const RepAnalytics: React.FC = () => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMoreData, setHasMoreData] = useState(true);
-  const itemsPerPage = 10; // Limit to 10 items per page
-  const [selectedTerritory, setSelectedTerritory] = useState<string | null>(null);
-  const [insights, setInsights] = useState<RepInsight[]>([]);
-  const [filteredInsights, setFilteredInsights] = useState<RepInsight[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<InsightCategory[]>([]);
-  const [selectedPriorities, setSelectedPriorities] = useState<InsightPriority[]>([]);
-  const [activeTab, setActiveTab] = useState(0);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [urgentActions, setUrgentActions] = useState<UrgentActionProps[]>([]);
-  const [loadingUrgentActions, setLoadingUrgentActions] = useState(false);
+  const navigate = useNavigate();
+  const [currentTab, setCurrentTab] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch user ID on component mount
+  // Mock data for elite rep analytics
+  const [territoryMetrics] = useState<TerritoryMetrics>({
+    totalAccounts: 247,
+    penetrationRate: 73.2,
+    revenuePerAccount: 94500,
+    accountGrowthRate: 12.8,
+    competitiveWins: 34,
+    competitiveLosses: 8,
+    marketShare: 42.3,
+    territoryRank: 3
+  });
+
+  const [accountIntelligence] = useState<AccountIntelligence[]>([
+    {
+      accountId: '1',
+      accountName: 'Manhattan Oral Surgery Group',
+      healthScore: 94,
+      riskLevel: 'low',
+      nextBestAction: 'Schedule Q4 expansion meeting',
+      decisionMakers: [
+        { name: 'Dr. Michael Chen', title: 'Managing Partner', influence: 95, lastContact: '3 days ago' },
+        { name: 'Sarah Williams', title: 'Practice Administrator', influence: 78, lastContact: '1 week ago' }
+      ],
+      competitorPresence: ['Nobel Biocare', 'Zimmer'],
+      revenueGrowth: 23.4,
+      lastPurchase: '2 months ago',
+      upcomingOpportunities: 3
+    },
+    {
+      accountId: '2',
+      accountName: 'Elite Aesthetic Center',
+      healthScore: 67,
+      riskLevel: 'medium',
+      nextBestAction: 'Address Botox pricing concerns',
+      decisionMakers: [
+        { name: 'Dr. Jennifer Walsh', title: 'Medical Director', influence: 100, lastContact: '1 week ago' }
+      ],
+      competitorPresence: ['Allergan', 'Merz'],
+      revenueGrowth: -5.2,
+      lastPurchase: '4 months ago',
+      upcomingOpportunities: 1
+    }
+  ]);
+
+  const [competitiveIntel] = useState<CompetitiveIntel[]>([
+    {
+      competitor: 'Nobel Biocare',
+      marketShare: 28.5,
+      winRate: 34,
+      averageDealSize: 87000,
+      primaryAdvantages: ['Brand recognition', 'Clinical studies', 'Training programs'],
+      weaknesses: ['Higher pricing', 'Complex ordering', 'Limited customization'],
+      recentMoves: ['Launched new tapered implant', 'Price increase announced'],
+      threatsToWatch: 7
+    },
+    {
+      competitor: 'Allergan Aesthetics',
+      marketShare: 31.2,
+      winRate: 41,
+      averageDealSize: 52000,
+      primaryAdvantages: ['Product portfolio', 'Patient financing', 'Marketing support'],
+      weaknesses: ['Supply chain issues', 'Rep turnover', 'Limited innovation'],
+      recentMoves: ['New loyalty program', 'Partnership with training institute'],
+      threatsToWatch: 12
+    }
+  ]);
+
+  const [pipelineVelocity] = useState<PipelineVelocity[]>([
+    {
+      stage: 'Prospecting',
+      averageDuration: 8,
+      conversionRate: 67,
+      bottlenecks: ['Contact identification', 'Initial response rate'],
+      accelerators: ['Referral network', 'Social selling'],
+      currentDeals: 23,
+      projectedRevenue: 430000
+    },
+    {
+      stage: 'Qualification',
+      averageDuration: 12,
+      conversionRate: 78,
+      bottlenecks: ['Budget confirmation', 'Decision maker access'],
+      accelerators: ['Clinical evidence', 'ROI calculators'],
+      currentDeals: 18,
+      projectedRevenue: 1250000
+    },
+    {
+      stage: 'Proposal',
+      averageDuration: 15,
+      conversionRate: 83,
+      bottlenecks: ['Legal review', 'Competitive pressure'],
+      accelerators: ['Customization', 'Training inclusion'],
+      currentDeals: 12,
+      projectedRevenue: 890000
+    },
+    {
+      stage: 'Closing',
+      averageDuration: 9,
+      conversionRate: 92,
+      bottlenecks: ['Contract negotiations', 'Implementation timing'],
+      accelerators: ['Incentives', 'Urgency creation'],
+      currentDeals: 8,
+      projectedRevenue: 650000
+    }
+  ]);
+
+  const [activityEfficiency] = useState<ActivityEfficiency[]>([
+    {
+      activityType: 'Clinical Demos',
+      volume: 47,
+      conversionRate: 68,
+      revenueGenerated: 1240000,
+      timeInvested: 94,
+      roi: 324,
+      trend: 'up'
+    },
+    {
+      activityType: 'In-Office Visits',
+      volume: 89,
+      conversionRate: 42,
+      revenueGenerated: 980000,
+      timeInvested: 178,
+      roi: 152,
+      trend: 'stable'
+    },
+    {
+      activityType: 'Virtual Consultations',
+      volume: 156,
+      conversionRate: 28,
+      revenueGenerated: 520000,
+      timeInvested: 234,
+      roi: 87,
+      trend: 'down'
+    },
+    {
+      activityType: 'Conference Meetings',
+      volume: 23,
+      conversionRate: 73,
+      revenueGenerated: 780000,
+      timeInvested: 46,
+      roi: 412,
+      trend: 'up'
+    }
+  ]);
+
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const { data, error } = await supabase.auth.getUser();
-        if (error) {
-          console.warn("Auth error:", error.message);
-          // Use a mock user ID for development
-          const mockUserId = '00000000-0000-0000-0000-000000000000';
-          console.log("Using mock user ID for development:", mockUserId);
-          setUserId(mockUserId);
-        } else if (data?.user) {
-          console.log("Authenticated user:", data.user.id);
-          setUserId(data.user.id);
-        } else {
-          console.warn("No user session found or user data unavailable.");
-          // Use a mock user ID for development
-          const mockUserId = '00000000-0000-0000-0000-000000000000';
-          console.log("Using mock user ID for development:", mockUserId);
-          setUserId(mockUserId);
-        }
-      } catch (err) {
-        console.error("Unexpected error during auth:", err);
-        // Use a mock user ID for development
-        const mockUserId = '00000000-0000-0000-0000-000000000000';
-        console.log("Using mock user ID for development:", mockUserId);
-        setUserId(mockUserId);
-      }
-    };
+    // Simulate loading elite analytics data
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
     
-    fetchUser();
+    return () => clearTimeout(timer);
   }, []);
 
-  // Fetch insights when user ID or territory changes
-  useEffect(() => {
-    if (userId) {
-      fetchInsights(1, false); // Reset to page 1 when territory changes
-      fetchUrgentActions();
+  const formatCurrency = (value: number): string => {
+    if (value >= 1000000) {
+      return `$${(value / 1000000).toFixed(1)}M`;
+    } else if (value >= 1000) {
+      return `$${(value / 1000).toFixed(0)}K`;
     }
-  }, [userId, selectedTerritory]);
-
-  // Filter insights when search or filters change
-  useEffect(() => {
-    filterInsights();
-  }, [insights, searchTerm, selectedCategories, selectedPriorities]);
-
-  const fetchInsights = async (page: number = 1, loadMore: boolean = false) => {
-    if (!userId) return;
-    
-    if (loadMore) {
-      setIsLoadingMore(true);
-    } else {
-      setIsLoading(true);
-    }
-    setError(null);
-    
-    try {
-      const filters: InsightFilterOptions = {};
-      
-      if (selectedTerritory) {
-        filters.territory = selectedTerritory;
-      }
-      
-      // Add pagination parameters
-      filters.page = page;
-      filters.limit = itemsPerPage;
-      
-      const insightData = await RepInsightsService.getInsights(userId, filters);
-      
-      // Check if we've reached the end of the data
-      if (insightData.length < itemsPerPage) {
-        setHasMoreData(false);
-      } else {
-        setHasMoreData(true);
-      }
-      
-      if (loadMore) {
-        // Append new data to existing insights
-        setInsights(prevInsights => [...prevInsights, ...insightData]);
-      } else {
-        // Replace existing data
-        setInsights(insightData);
-        setCurrentPage(1);
-      }
-    } catch (err) {
-      console.error('Error fetching insights:', err);
-      setError(err as Error);
-    } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
-    }
-  };
-  
-  const handleLoadMore = () => {
-    const nextPage = currentPage + 1;
-    setCurrentPage(nextPage);
-    fetchInsights(nextPage, true);
+    return `$${value}`;
   };
 
-  const filterInsights = () => {
-    let filtered = [...insights];
-    
-    // Apply search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(insight => 
-        insight.title.toLowerCase().includes(term) || 
-        insight.description.toLowerCase().includes(term)
-      );
-    }
-    
-    // Apply category filters
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter(insight => 
-        selectedCategories.includes(insight.category)
-      );
-    }
-    
-    // Apply priority filters
-    if (selectedPriorities.length > 0) {
-      filtered = filtered.filter(insight => 
-        selectedPriorities.includes(insight.priority)
-      );
-    }
-    
-    setFilteredInsights(filtered);
+  const getHealthScoreColor = (score: number) => {
+    if (score >= 80) return theme.palette.success.main;
+    if (score >= 60) return theme.palette.warning.main;
+    return theme.palette.error.main;
   };
 
-  const handleTerritoryChange = (territoryId: string | null) => {
-    setSelectedTerritory(territoryId);
-  };
-
-  const handleCategoryToggle = (category: InsightCategory) => {
-    if (selectedCategories.includes(category)) {
-      setSelectedCategories(selectedCategories.filter(c => c !== category));
-    } else {
-      setSelectedCategories([...selectedCategories, category]);
+  const getRiskColor = (risk: 'low' | 'medium' | 'high') => {
+    switch (risk) {
+      case 'low': return theme.palette.success.main;
+      case 'medium': return theme.palette.warning.main;
+      case 'high': return theme.palette.error.main;
     }
   };
 
-  const handlePriorityToggle = (priority: InsightPriority) => {
-    if (selectedPriorities.includes(priority)) {
-      setSelectedPriorities(selectedPriorities.filter(p => p !== priority));
-    } else {
-      setSelectedPriorities([...selectedPriorities, priority]);
+  const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
+    switch (trend) {
+      case 'up': return <TrendingUpIcon sx={{ color: theme.palette.success.main }} />;
+      case 'down': return <TrendingDownIcon sx={{ color: theme.palette.error.main }} />;
+      case 'stable': return <TrendingUpIcon sx={{ color: theme.palette.warning.main, transform: 'rotate(90deg)' }} />;
     }
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
-
-  const handleRefresh = () => {
-    setCurrentPage(1);
-    fetchInsights(1, false);
-    fetchUrgentActions();
-  };
-
-  const fetchUrgentActions = async () => {
-    if (!userId) return;
-    
-    setLoadingUrgentActions(true);
-    
-    try {
-      const actions = await UrgentActionService.getUrgentActions(userId);
-      setUrgentActions(actions);
-    } catch (err) {
-      console.error('Error fetching urgent actions:', err);
-    } finally {
-      setLoadingUrgentActions(false);
-    }
-  };
-  
-  const handleUrgentAction = async (actionId: string) => {
-    try {
-      await UrgentActionService.markActionCompleted(actionId, userId || '');
-      setUrgentActions(urgentActions.filter(action => action.id !== actionId));
-    } catch (err) {
-      console.error('Error handling urgent action:', err);
-    }
-  };
-  
-  const handleDismissUrgentAction = async (actionId: string) => {
-    try {
-      await UrgentActionService.dismissAction(actionId, userId || '');
-      setUrgentActions(urgentActions.filter(action => action.id !== actionId));
-    } catch (err) {
-      console.error('Error dismissing urgent action:', err);
-    }
-  };
-
-  const handleMarkComplete = (insightId: string) => {
-    // In a real implementation, this would update the insight status
-    console.log('Marking insight complete:', insightId);
-    setInsights(insights.filter(insight => insight.id !== insightId));
-  };
-
-  const handleSaveInsight = (insightId: string) => {
-    // In a real implementation, this would save the insight for later
-    console.log('Saving insight for later:', insightId);
-  };
-
-  const handleSchedule = (insightId: string) => {
-    // In a real implementation, this would open a scheduling dialog
-    console.log('Scheduling follow-up for insight:', insightId);
-  };
-
-  const navigate = useNavigate();
-
-  const handleAction = (insightId: string) => {
-    navigate(`/rep-analytics/${insightId}`);
-  };
-
-  const getPriorityColor = (priority: InsightPriority) => {
-    switch (priority) {
-      case 'high':
-        return theme.palette.error.main;
-      case 'medium':
-        return theme.palette.warning.main;
-      case 'low':
-        return theme.palette.info.main;
-      default:
-        return theme.palette.text.secondary;
-    }
-  };
-
-  const getCategoryIcon = (category: InsightCategory) => {
-    switch (category) {
-      case 'visit':
-        return <LocationIcon fontSize="small" />;
-      case 'follow_up':
-        return <PhoneIcon fontSize="small" />;
-      case 'connect':
-        return <BusinessIcon fontSize="small" />;
-      case 'trend':
-        return <TrendingUpIcon fontSize="small" />;
-      case 'news':
-        return <NotificationsIcon fontSize="small" />;
-      case 'opportunity':
-        return <InsightsIcon fontSize="small" />;
-      default:
-        return null;
-    }
-  };
-
-  const getCategoryColor = (category: InsightCategory) => {
-    switch (category) {
-      case 'visit':
-        return theme.palette.primary.main; // Blue for visits
-      case 'follow_up':
-        return theme.palette.secondary.main; // Secondary color for follow-ups
-      case 'connect':
-        return theme.palette.success.main; // Green for connections
-      case 'trend':
-        return theme.palette.info.main; // Light blue for trends
-      case 'news':
-        return theme.palette.warning.main; // Orange for news
-      case 'opportunity':
-        return theme.palette.error.main; // Red for opportunities
-      default:
-        return theme.palette.grey[500];
-    }
-  };
-
-  return (
-    <Box sx={{ 
-      height: '100vh', 
-      overflow: 'auto',
-      p: 3,
-      '&::-webkit-scrollbar': {
-        width: '8px',
-      },
-      '&::-webkit-scrollbar-track': {
-        background: 'rgba(0,0,0,0.1)',
-        borderRadius: '4px',
-      },
-      '&::-webkit-scrollbar-thumb': {
-        background: 'rgba(0,0,0,0.3)',
-        borderRadius: '4px',
-      },
-      '&::-webkit-scrollbar-thumb:hover': {
-        background: 'rgba(0,0,0,0.5)',
-      },
-    }}>
-      <Typography variant="h4" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-        <InsightsIcon sx={{ mr: 1 }} />
-        Rep Analytics
-      </Typography>
-      
-      {/* Enhanced AI Insights Cards - Now Cards Stack */}
-      <Box sx={{ mb: 4 }}>
-        <NowCardsStack />
-      </Box>
-      
-      
-      {/* TerritorySelector would be used here */}
-      <Paper sx={{ p: 2, mb: 3, borderRadius: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="h6" component="h2" sx={{ display: 'flex', alignItems: 'center' }}>
-            <LocationIcon color="primary" sx={{ mr: 1 }} />
-            Territory Analysis
-          </Typography>
-        </Box>
-
-        <FormControl fullWidth>
-          <InputLabel id="territory-select-label">Select Territory</InputLabel>
-          <Select
-            labelId="territory-select-label"
-            id="territory-select"
-            value={selectedTerritory || ''}
-            label="Select Territory"
-            onChange={(e) => handleTerritoryChange(e.target.value)}
-          >
-            <MenuItem value="">All Territories</MenuItem>
-            {mockTerritories.map((territory) => (
-              <MenuItem key={territory.id} value={territory.id}>
-                {territory.name} ({territory.region})
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Paper>
-      
-      <Paper 
-        elevation={0}
-        sx={{ 
-          mb: 3, 
-          borderRadius: 2,
-          backgroundColor: themeMode === 'space'
-            ? 'rgba(22, 27, 44, 0.7)'
-            : theme.palette.background.paper,
-          backdropFilter: 'blur(8px)',
-          border: `1px solid ${
-            themeMode === 'space'
-              ? 'rgba(255, 255, 255, 0.08)'
-              : 'rgba(0, 0, 0, 0.06)'
-          }`
-        }}
-      >
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', display: 'flex', alignItems: 'center', px: 2 }}>
-          <Tabs value={activeTab} onChange={handleTabChange} aria-label="analytics tabs">
-            <Tab label="All Insights" />
-            <Tab label="High Priority" />
-            <Tab label="Visits" />
-            <Tab label="Follow-ups" />
-            <Tab label="Opportunities" />
-          </Tabs>
-          <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
-            <TextField
-              size="small"
-              placeholder="Search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: <SearchIcon fontSize="small" sx={{ mr: 1 }} />
-              }}
-              sx={{ mr: 2 }}
-            />
-            <IconButton onClick={handleRefresh} title="Refresh data">
-              <RefreshIcon />
-            </IconButton>
-          </Box>
-        </Box>
-        
-        <Box sx={{ p: 2 }}>
-          {/* Filter chips */}
-          <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
-              <FilterListIcon fontSize="small" sx={{ mr: 0.5 }} />
-              Filters:
-            </Typography>
-            
-            {/* Filter chips would be used here */}
-            <Button 
-              variant={selectedCategories.includes('visit') ? "contained" : "outlined"} 
-              size="small" 
-              onClick={() => handleCategoryToggle('visit')}
-              sx={{ mb: 1, mr: 1 }}
-            >
-              Visit
-            </Button>
-            <Button 
-              variant={selectedCategories.includes('follow_up') ? "contained" : "outlined"} 
-              size="small" 
-              onClick={() => handleCategoryToggle('follow_up')}
-              sx={{ mb: 1, mr: 1 }}
-            >
-              Follow Up
-            </Button>
-            <Button 
-              variant={selectedCategories.includes('connect') ? "contained" : "outlined"} 
-              size="small" 
-              onClick={() => handleCategoryToggle('connect')}
-              sx={{ mb: 1, mr: 1 }}
-            >
-              Connect
-            </Button>
-            <Button 
-              variant={selectedCategories.includes('trend') ? "contained" : "outlined"} 
-              size="small" 
-              onClick={() => handleCategoryToggle('trend')}
-              sx={{ mb: 1, mr: 1 }}
-            >
-              Trending
-            </Button>
-            <Button 
-              variant={selectedCategories.includes('news') ? "contained" : "outlined"} 
-              size="small" 
-              onClick={() => handleCategoryToggle('news')}
-              sx={{ mb: 1, mr: 1 }}
-            >
-              News
-            </Button>
-            <Button 
-              variant={selectedCategories.includes('opportunity') ? "contained" : "outlined"} 
-              size="small" 
-              onClick={() => handleCategoryToggle('opportunity')}
-              sx={{ mb: 1, mr: 1 }}
-            >
-              Opportunity
-            </Button>
-            
-            <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-            
-            <Button 
-              variant={selectedPriorities.includes('high') ? "contained" : "outlined"} 
-              color="error"
-              size="small" 
-              onClick={() => handlePriorityToggle('high')}
-              sx={{ mb: 1, mr: 1 }}
-            >
-              High Priority
-            </Button>
-            <Button 
-              variant={selectedPriorities.includes('medium') ? "contained" : "outlined"} 
-              color="warning"
-              size="small" 
-              onClick={() => handlePriorityToggle('medium')}
-              sx={{ mb: 1, mr: 1 }}
-            >
-              Medium Priority
-            </Button>
-            <Button 
-              variant={selectedPriorities.includes('low') ? "contained" : "outlined"} 
-              color="info"
-              size="small" 
-              onClick={() => handlePriorityToggle('low')}
-              sx={{ mb: 1, mr: 1 }}
-            >
-              Low Priority
-            </Button>
-          </Stack>
-          
-          {isLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : error ? (
-            <Typography color="error" align="center">
-              Error loading insights: {error.message}
-            </Typography>
-          ) : filteredInsights.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <Typography variant="h6" color="text.secondary">
-                No insights found
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Try adjusting your filters or selecting a different territory
-              </Typography>
-              <Button 
-                variant="outlined" 
-                startIcon={<RefreshIcon />} 
-                onClick={handleRefresh}
-                sx={{ mt: 2 }}
-              >
-                Refresh Data
-              </Button>
-            </Box>
-          ) : (
-            <>
-              <Grid container spacing={2}>
-                {filteredInsights.map((insight) => (
-                  <Grid item xs={12} md={6} key={insight.id}>
-                    <Card sx={{ 
-                      mb: 2, 
-                      borderLeft: `6px solid ${getCategoryColor(insight.category)}`, 
-                      borderRadius: 2,
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                      '&:hover': {
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                        transform: 'translateY(-2px)',
-                        transition: 'all 0.2s ease-in-out'
-                      }
-                    }}>
-                      <CardContent>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                          <Box sx={{ flex: 1, mr: 2 }}>
-                            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <Box sx={{ 
-                                display: 'inline-flex', 
-                                color: getCategoryColor(insight.category),
-                                bgcolor: `${getCategoryColor(insight.category)}20`,
-                                borderRadius: '50%',
-                                p: 0.5
-                              }}>
-                                {getCategoryIcon(insight.category)}
-                              </Box>
-                              {insight.title}
-                            </Typography>
-                          </Box>
-                          <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column', alignItems: 'flex-end' }}>
-                            <Chip
-                              label={insight.category.replace('_', ' ').toUpperCase()}
-                              size="small"
-                              sx={{
-                                bgcolor: getCategoryColor(insight.category),
-                                color: 'white',
-                                fontWeight: 'medium',
-                                fontSize: '0.75rem'
-                              }}
-                            />
-                            <Chip
-                              label={insight.priority.toUpperCase()}
-                              size="small"
-                              variant="outlined"
-                              sx={{
-                                borderColor: getPriorityColor(insight.priority),
-                                color: getPriorityColor(insight.priority),
-                                fontWeight: 'bold',
-                                fontSize: '0.7rem'
-                              }}
-                            />
-                          </Box>
-                        </Box>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{insight.description}</Typography>
-                        
-                        {/* Display linguistics data if available */}
-                        {insight.linguistics && (
-                          <Box sx={{ mt: 2, p: 1, bgcolor: 'rgba(0, 0, 0, 0.03)', borderRadius: 1 }}>
-                            <Typography variant="subtitle2" gutterBottom>
-                              Linguistics Analysis
-                            </Typography>
-                            
-                            <Grid container spacing={1}>
-                              <Grid item xs={12} sm={6}>
-                                {insight.linguistics.sentiment_score !== undefined && (
-                                  <Typography variant="body2">
-                                    <strong>Sentiment Score:</strong> {insight.linguistics.sentiment_score.toFixed(2)}
-                                  </Typography>
-                                )}
-                                
-                                {insight.linguistics.key_phrases && insight.linguistics.key_phrases.length > 0 && (
-                                  <Typography variant="body2">
-                                    <strong>Key Phrases:</strong> {insight.linguistics.key_phrases.slice(0, 3).join(', ')}
-                                    {insight.linguistics.key_phrases.length > 3 && '...'}
-                                  </Typography>
-                                )}
-                                
-                                {insight.linguistics.language_metrics && (
-                                  <>
-                                    {insight.linguistics.language_metrics.speaking_pace && (
-                                      <Typography variant="body2">
-                                        <strong>Speaking Pace:</strong> {insight.linguistics.language_metrics.speaking_pace} WPM
-                                      </Typography>
-                                    )}
-                                    
-                                    {insight.linguistics.language_metrics.talk_to_listen_ratio && (
-                                      <Typography variant="body2">
-                                        <strong>Talk/Listen Ratio:</strong> {insight.linguistics.language_metrics.talk_to_listen_ratio.toFixed(2)}
-                                      </Typography>
-                                    )}
-                                  </>
-                                )}
-                              </Grid>
-                              
-                              <Grid item xs={12} sm={6}>
-                                {/* Advanced metrics from the enhanced schema */}
-                                {insight.linguistics.trust_rapport_score !== undefined && (
-                                  <Typography variant="body2">
-                                    <strong>Trust/Rapport:</strong> {insight.linguistics.trust_rapport_score.toFixed(1)}/10
-                                  </Typography>
-                                )}
-                                
-                                {insight.linguistics.influence_effectiveness_score !== undefined && (
-                                  <Typography variant="body2">
-                                    <strong>Influence Score:</strong> {insight.linguistics.influence_effectiveness_score.toFixed(1)}/10
-                                  </Typography>
-                                )}
-                                
-                                {insight.linguistics.buyer_personality_type && (
-                                  <Typography variant="body2">
-                                    <strong>Buyer Type:</strong> {insight.linguistics.buyer_personality_type}
-                                  </Typography>
-                                )}
-                                
-                                {insight.linguistics.closing_readiness_score !== undefined && (
-                                  <Typography variant="body2">
-                                    <strong>Closing Readiness:</strong> {insight.linguistics.closing_readiness_score.toFixed(1)}/10
-                                  </Typography>
-                                )}
-                              </Grid>
-                              
-                              {insight.linguistics.action_items && insight.linguistics.action_items.length > 0 && (
-                                <Grid item xs={12}>
-                                  <Typography variant="body2">
-                                    <strong>Action Items:</strong> {insight.linguistics.action_items.length} identified
-                                  </Typography>
-                                </Grid>
-                              )}
-                              
-                              {insight.linguistics.recommended_follow_up_timing && (
-                                <Grid item xs={12}>
-                                  <Typography variant="body2">
-                                    <strong>Recommended Follow-up:</strong> {insight.linguistics.recommended_follow_up_timing}
-                                  </Typography>
-                                </Grid>
-                              )}
-                            </Grid>
-                            
-                            {/* Show coaching recommendations if available */}
-                            {insight.linguistics.coaching_recommendations && (
-                              <Box sx={{ mt: 1, pt: 1, borderTop: '1px dashed rgba(0, 0, 0, 0.1)' }}>
-                                <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                                  <strong>Coaching:</strong> {insight.linguistics.coaching_recommendations.length > 100 
-                                    ? `${insight.linguistics.coaching_recommendations.substring(0, 100)}...` 
-                                    : insight.linguistics.coaching_recommendations}
-                                </Typography>
-                              </Box>
-                            )}
-                          </Box>
-                        )}
-                        
-                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                          <Button size="small" onClick={() => handleAction(insight.id)}>
-                            {insight.actionText || 'View Details'}
-                          </Button>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-              
-              {/* Load More Button */}
-              {hasMoreData && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-                  {isLoadingMore ? (
-                    <CircularProgress size={24} sx={{ my: 1 }} />
-                  ) : (
-                    <Button 
-                      variant="outlined" 
-                      onClick={handleLoadMore}
-                      startIcon={<RefreshIcon />}
-                    >
-                      Load More
-                    </Button>
-                  )}
-                </Box>
-              )}
-            </>
-          )}
-        </Box>
-      </Paper>
-      
-      {/* Performance Metrics */}
-      <Paper
-        elevation={0}
-        sx={{ 
-          p: 2,
-          borderRadius: 2,
-          backgroundColor: themeMode === 'space'
-            ? 'rgba(22, 27, 44, 0.7)'
-            : theme.palette.background.paper,
-          backdropFilter: 'blur(8px)',
-          border: `1px solid ${
-            themeMode === 'space'
-              ? 'rgba(255, 255, 255, 0.08)'
-              : 'rgba(0, 0, 0, 0.06)'
-          }`
-        }}
-      >
-        <Typography variant="h6" gutterBottom>
-          Performance Metrics
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '70vh' }}>
+        <CircularProgress size={60} />
+        <Typography sx={{ mt: 2, color: 'text.secondary' }}>
+          Loading elite performance analytics...
         </Typography>
-        
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            <Card variant="outlined" sx={{ height: '100%' }}>
+      </Box>
+    );
+  }
+
+  const tabContent = [
+    // Territory Performance Tab
+    <Box key="territory">
+      <Grid container spacing={3}>
+        {/* Territory Overview */}
+        <Grid item xs={12}>
+          <Card elevation={0} sx={{ borderRadius: 3, mb: 3 }}>
+            <CardHeader
+              title={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <LocationIcon color="primary" />
+                  <Typography variant="h6" fontWeight="bold">
+                    Territory Performance Dashboard
+                  </Typography>
+                  <Chip label={`Rank #${territoryMetrics.territoryRank}`} color="primary" size="small" />
+                </Box>
+              }
+              subheader="Elite territory metrics for top 1% performers"
+            />
+            <CardContent>
+              <Grid container spacing={3}>
+                <Grid item xs={6} md={3}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h3" color="primary" fontWeight="bold">
+                      {territoryMetrics.totalAccounts}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Total Accounts
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h3" color="success.main" fontWeight="bold">
+                      {territoryMetrics.penetrationRate}%
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Market Penetration
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h3" color="secondary" fontWeight="bold">
+                      {formatCurrency(territoryMetrics.revenuePerAccount)}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Revenue/Account
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h3" color="warning.main" fontWeight="bold">
+                      {territoryMetrics.marketShare}%
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Market Share
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Competitive Win/Loss */}
+        <Grid item xs={12} md={6}>
+          <Card elevation={0} sx={{ borderRadius: 3, height: '100%' }}>
+            <CardHeader
+              title={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <TrophyIcon color="warning" />
+                  <Typography variant="h6" fontWeight="bold">
+                    Competitive Performance
+                  </Typography>
+                </Box>
+              }
+            />
+            <CardContent>
+              <Box sx={{ mb: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                  <Typography variant="body2">Wins vs Losses</Typography>
+                  <Typography variant="body2" fontWeight="bold">
+                    {territoryMetrics.competitiveWins}W / {territoryMetrics.competitiveLosses}L
+                  </Typography>
+                </Box>
+                <LinearProgress 
+                  variant="determinate" 
+                  value={(territoryMetrics.competitiveWins / (territoryMetrics.competitiveWins + territoryMetrics.competitiveLosses)) * 100}
+                  sx={{ height: 10, borderRadius: 5 }}
+                />
+              </Box>
+              <Typography variant="h4" color="success.main" fontWeight="bold" sx={{ textAlign: 'center' }}>
+                {Math.round((territoryMetrics.competitiveWins / (territoryMetrics.competitiveWins + territoryMetrics.competitiveLosses)) * 100)}%
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                Win Rate vs Competition
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Account Growth */}
+        <Grid item xs={12} md={6}>
+          <Card elevation={0} sx={{ borderRadius: 3, height: '100%' }}>
+            <CardHeader
+              title={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <ChartIcon color="info" />
+                  <Typography variant="h6" fontWeight="bold">
+                    Account Growth
+                  </Typography>
+                </Box>
+              }
+            />
+            <CardContent>
+              <Typography variant="h4" color="primary" fontWeight="bold" sx={{ textAlign: 'center', mb: 2 }}>
+                +{territoryMetrics.accountGrowthRate}%
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 3 }}>
+                YoY Account Growth Rate
+              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <TrendingUpIcon sx={{ color: theme.palette.success.main, fontSize: 40 }} />
+              </Box>
+              <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center', display: 'block' }}>
+                Top 5% in region
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>,
+
+    // Account Intelligence Tab
+    <Box key="accounts">
+      <Grid container spacing={3}>
+        {accountIntelligence.map((account) => (
+          <Grid item xs={12} md={6} key={account.accountId}>
+            <Card elevation={0} sx={{ borderRadius: 3, height: '100%' }}>
+              <CardHeader
+                title={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <NetworkIcon color="primary" />
+                    <Typography variant="h6" fontWeight="bold">
+                      {account.accountName}
+                    </Typography>
+                  </Box>
+                }
+                action={
+                  <Chip 
+                    label={`${account.healthScore}% Health`}
+                    sx={{ 
+                      backgroundColor: getHealthScoreColor(account.healthScore),
+                      color: 'white',
+                      fontWeight: 'bold'
+                    }}
+                  />
+                }
+              />
               <CardContent>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Visits This Month
-                </Typography>
-                <Typography variant="h4" sx={{ mt: 1 }}>
-                  24
-                </Typography>
-                <Typography variant="body2" color="success.main" sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-                  <TrendingUpIcon fontSize="small" sx={{ mr: 0.5 }} />
-                  +12% from last month
-                </Typography>
+                <Box sx={{ mb: 3 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="body2" color="text.secondary">Account Health</Typography>
+                    <Chip 
+                      label={account.riskLevel.toUpperCase()}
+                      size="small"
+                      sx={{ 
+                        backgroundColor: getRiskColor(account.riskLevel),
+                        color: 'white',
+                        fontSize: '0.7rem'
+                      }}
+                    />
+                  </Box>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={account.healthScore}
+                    sx={{ 
+                      height: 8, 
+                      borderRadius: 4,
+                      '& .MuiLinearProgress-bar': {
+                        backgroundColor: getHealthScoreColor(account.healthScore)
+                      }
+                    }}
+                  />
+                </Box>
+
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                    Next Best Action:
+                  </Typography>
+                  <Typography variant="body2" color="primary" fontWeight="500">
+                    🎯 {account.nextBestAction}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                    Key Decision Makers:
+                  </Typography>
+                  {account.decisionMakers.map((dm, index) => (
+                    <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Box>
+                        <Typography variant="body2" fontWeight="500">{dm.name}</Typography>
+                        <Typography variant="caption" color="text.secondary">{dm.title}</Typography>
+                      </Box>
+                      <Box sx={{ textAlign: 'right' }}>
+                        <Typography variant="caption" color="primary">{dm.influence}% influence</Typography>
+                        <Typography variant="caption" color="text.secondary" display="block">
+                          {dm.lastContact}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+
+                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">Revenue Growth</Typography>
+                    <Typography variant="h6" color={account.revenueGrowth > 0 ? 'success.main' : 'error.main'} fontWeight="bold">
+                      {account.revenueGrowth > 0 ? '+' : ''}{account.revenueGrowth}%
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">Opportunities</Typography>
+                    <Typography variant="h6" color="primary" fontWeight="bold">
+                      {account.upcomingOpportunities}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Box>
+                  <Typography variant="caption" color="text.secondary">Competitors Present:</Typography>
+                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
+                    {account.competitorPresence.map((comp, index) => (
+                      <Chip key={index} label={comp} size="small" variant="outlined" />
+                    ))}
+                  </Box>
+                </Box>
               </CardContent>
             </Card>
           </Grid>
-          
-          <Grid item xs={12} md={4}>
-            <Card variant="outlined" sx={{ height: '100%' }}>
+        ))}
+      </Grid>
+    </Box>,
+
+    // Competitive Intelligence Tab
+    <Box key="competitive">
+      <Grid container spacing={3}>
+        {competitiveIntel.map((competitor, index) => (
+          <Grid item xs={12} md={6} key={index}>
+            <Card elevation={0} sx={{ borderRadius: 3, height: '100%' }}>
+              <CardHeader
+                title={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <RadarIcon color="warning" />
+                    <Typography variant="h6" fontWeight="bold">
+                      {competitor.competitor}
+                    </Typography>
+                  </Box>
+                }
+                action={
+                  <Badge badgeContent={competitor.threatsToWatch} color="error">
+                    <WarningIcon color="action" />
+                  </Badge>
+                }
+              />
               <CardContent>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Insights Actioned
-                </Typography>
-                <Typography variant="h4" sx={{ mt: 1 }}>
-                  18
-                </Typography>
-                <Typography variant="body2" color="success.main" sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-                  <TrendingUpIcon fontSize="small" sx={{ mr: 0.5 }} />
-                  42% action rate
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          
-          <Grid item xs={12} md={4}>
-            <Card variant="outlined" sx={{ height: '100%' }}>
-              <CardContent>
-                <Typography variant="subtitle2" color="text.secondary">
-                  <TimerIcon sx={{ mr: 1, verticalAlign: 'middle', fontSize: '0.9rem' }} /> Time to Resolution
-                </Typography>
-                <Typography variant="h6" mt={1} color="primary.main">
-                  3.2 Days
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Average time from inquiry to resolution
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          
-          {/* Add Linguistics Metrics Card */}
-          <Grid item xs={12} md={12}>
-            <Card variant="outlined">
-              <CardContent>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  <InsightsIcon sx={{ mr: 1, verticalAlign: 'middle', fontSize: '0.9rem' }} /> Linguistics Analysis Metrics
-                </Typography>
-                
-                <Grid container spacing={2} mt={1}>
-                  <Grid item xs={12} sm={4}>
-                    <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', height: '100%' }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Average Sentiment Score
-                      </Typography>
-                      <Typography variant="h6" color="primary.main">
-                        0.42
-                      </Typography>
-                      <Typography variant="caption" color="success.main" sx={{ display: 'flex', alignItems: 'center' }}>
-                        <TrendingUpIcon fontSize="small" sx={{ mr: 0.5 }} />
-                        +0.08 from last month
-                      </Typography>
-                    </Paper>
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                  <Grid item xs={6}>
+                    <Typography variant="caption" color="text.secondary">Market Share</Typography>
+                    <Typography variant="h5" color="primary" fontWeight="bold">
+                      {competitor.marketShare}%
+                    </Typography>
                   </Grid>
-                  
-                  <Grid item xs={12} sm={4}>
-                    <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', height: '100%' }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Average Speaking Pace
-                      </Typography>
-                      <Typography variant="h6" color="primary.main">
-                        145 WPM
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        Ideal range: 120-160 WPM
-                      </Typography>
-                    </Paper>
+                  <Grid item xs={6}>
+                    <Typography variant="caption" color="text.secondary">Win Rate vs Us</Typography>
+                    <Typography variant="h5" color="error.main" fontWeight="bold">
+                      {competitor.winRate}%
+                    </Typography>
                   </Grid>
-                  
-                  <Grid item xs={12} sm={4}>
-                    <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', height: '100%' }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Talk-to-Listen Ratio
-                      </Typography>
-                      <Typography variant="h6" color="primary.main">
-                        0.85
-                      </Typography>
-                      <Typography variant="caption" color="success.main">
-                        Good balance (ideal: 0.8-1.2)
-                      </Typography>
-                    </Paper>
+                  <Grid item xs={12}>
+                    <Typography variant="caption" color="text.secondary">Avg Deal Size</Typography>
+                    <Typography variant="h6" color="secondary" fontWeight="bold">
+                      {formatCurrency(competitor.averageDealSize)}
+                    </Typography>
                   </Grid>
                 </Grid>
+
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle2" fontWeight="bold" gutterBottom color="success.main">
+                    Their Advantages:
+                  </Typography>
+                  <List dense>
+                    {competitor.primaryAdvantages.map((advantage, idx) => (
+                      <ListItem key={idx} sx={{ py: 0 }}>
+                        <ListItemIcon sx={{ minWidth: 20 }}>
+                          <CheckCircleIcon fontSize="small" color="success" />
+                        </ListItemIcon>
+                        <ListItemText primary={advantage} />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle2" fontWeight="bold" gutterBottom color="error.main">
+                    Their Weaknesses:
+                  </Typography>
+                  <List dense>
+                    {competitor.weaknesses.map((weakness, idx) => (
+                      <ListItem key={idx} sx={{ py: 0 }}>
+                        <ListItemIcon sx={{ minWidth: 20 }}>
+                          <WarningIcon fontSize="small" color="error" />
+                        </ListItemIcon>
+                        <ListItemText primary={weakness} />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+
+                <Box>
+                  <Typography variant="subtitle2" fontWeight="bold" gutterBottom color="info.main">
+                    Recent Moves:
+                  </Typography>
+                  {competitor.recentMoves.map((move, idx) => (
+                    <Typography key={idx} variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                      • {move}
+                    </Typography>
+                  ))}
+                </Box>
               </CardContent>
             </Card>
           </Grid>
-        </Grid>
-      </Paper>
+        ))}
+      </Grid>
+    </Box>,
+
+    // Pipeline Velocity Tab
+    <Box key="pipeline">
+      <Grid container spacing={3}>
+        {pipelineVelocity.map((stage, index) => (
+          <Grid item xs={12} md={6} key={index}>
+            <Card elevation={0} sx={{ borderRadius: 3, height: '100%' }}>
+              <CardHeader
+                title={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <PipelineIcon color="secondary" />
+                    <Typography variant="h6" fontWeight="bold">
+                      {stage.stage}
+                    </Typography>
+                  </Box>
+                }
+                action={
+                  <Chip 
+                    label={`${stage.conversionRate}% conversion`}
+                    color="primary"
+                    size="small"
+                  />
+                }
+              />
+              <CardContent>
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                  <Grid item xs={6}>
+                    <Typography variant="caption" color="text.secondary">Avg Duration</Typography>
+                    <Typography variant="h5" color="primary" fontWeight="bold">
+                      {stage.averageDuration}d
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="caption" color="text.secondary">Current Deals</Typography>
+                    <Typography variant="h5" color="secondary" fontWeight="bold">
+                      {stage.currentDeals}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="caption" color="text.secondary">Projected Revenue</Typography>
+                    <Typography variant="h6" color="success.main" fontWeight="bold">
+                      {formatCurrency(stage.projectedRevenue)}
+                    </Typography>
+                  </Grid>
+                </Grid>
+
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle2" fontWeight="bold" gutterBottom color="error.main">
+                    Bottlenecks:
+                  </Typography>
+                  {stage.bottlenecks.map((bottleneck, idx) => (
+                    <Typography key={idx} variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                      🚫 {bottleneck}
+                    </Typography>
+                  ))}
+                </Box>
+
+                <Box>
+                  <Typography variant="subtitle2" fontWeight="bold" gutterBottom color="success.main">
+                    Accelerators:
+                  </Typography>
+                  {stage.accelerators.map((accelerator, idx) => (
+                    <Typography key={idx} variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                      🚀 {accelerator}
+                    </Typography>
+                  ))}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>,
+
+    // Activity Efficiency Tab
+    <Box key="efficiency">
+      <Grid container spacing={3}>
+        {activityEfficiency.map((activity, index) => (
+          <Grid item xs={12} md={6} key={index}>
+            <Card elevation={0} sx={{ borderRadius: 3, height: '100%' }}>
+              <CardHeader
+                title={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <AnalyticsIcon color="info" />
+                    <Typography variant="h6" fontWeight="bold">
+                      {activity.activityType}
+                    </Typography>
+                  </Box>
+                }
+                action={getTrendIcon(activity.trend)}
+              />
+              <CardContent>
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                  <Grid item xs={4}>
+                    <Typography variant="caption" color="text.secondary">Volume</Typography>
+                    <Typography variant="h5" color="primary" fontWeight="bold">
+                      {activity.volume}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Typography variant="caption" color="text.secondary">Conversion</Typography>
+                    <Typography variant="h5" color="success.main" fontWeight="bold">
+                      {activity.conversionRate}%
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Typography variant="caption" color="text.secondary">ROI</Typography>
+                    <Typography variant="h5" color="warning.main" fontWeight="bold">
+                      {activity.roi}%
+                    </Typography>
+                  </Grid>
+                </Grid>
+
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="caption" color="text.secondary">Revenue Generated</Typography>
+                  <Typography variant="h6" color="secondary" fontWeight="bold">
+                    {formatCurrency(activity.revenueGenerated)}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">Time Invested</Typography>
+                    <Typography variant="body2" fontWeight="bold">
+                      {activity.timeInvested} hours
+                    </Typography>
+                  </Box>
+                  <Box sx={{ textAlign: 'right' }}>
+                    <Typography variant="caption" color="text.secondary">$/Hour</Typography>
+                    <Typography variant="body2" fontWeight="bold" color="primary">
+                      {formatCurrency(activity.revenueGenerated / activity.timeInvested)}
+                    </Typography>
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+  ];
+
+  return (
+    <Box sx={{ p: 3 }}>
+      {/* Urgent Insights Overlay */}
+      <UrgentInsightsOverlay />
       
-      {/* Advanced Linguistics Analysis Demo */}
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-          <PsychologyIcon sx={{ mr: 1 }} />
-          Advanced Conversational Intelligence
-        </Typography>
-        <LinguisticsAnalysisCard
-          analysis={{
-            overallSentiment: 'positive',
-            confidenceScore: 92.5,
-            psychologicalProfile: {
-              personalityType: 'analytical',
-              decisionMakingStyle: 'deliberate',
-              communicationStyle: 'formal',
-              riskTolerance: 'medium',
-              pricesensitivity: 'medium',
-              trustFactors: ['Social Proof', 'Local References', 'Risk Reduction', 'Expert Authority'],
-              motivationalTriggers: ['ROI Data', 'Peer Success Stories', 'Risk Mitigation', 'Timeline Clarity'],
-              concernsAndObjections: ['Investment Cost', 'Staff Training', 'Technical Support', 'Implementation Timeline']
-            },
-            conversationDynamics: {
-              talkTimeRatio: { rep: 65, prospect: 35 },
-              interruptionPattern: { repInterruptions: 1, prospectInterruptions: 2 },
-              questioningTechnique: { openQuestions: 8, closedQuestions: 3, leadingQuestions: 2 },
-              silenceMoments: [
-                { duration: 3, context: 'After price mention', effectiveness: 'positive' },
-                { duration: 2, context: 'Before objection response', effectiveness: 'neutral' }
-              ],
-              emotionalFlow: [
-                { timestamp: '00:00:32', emotion: 'concern', intensity: 6, speaker: 'prospect' },
-                { timestamp: '00:01:35', emotion: 'interest', intensity: 7, speaker: 'prospect' },
-                { timestamp: '00:03:25', emotion: 'confidence', intensity: 8, speaker: 'prospect' },
-                { timestamp: '00:04:55', emotion: 'excitement', intensity: 8, speaker: 'prospect' }
-              ]
-            },
-            powerAnalysis: {
-              overallPowerDynamic: 'balanced',
-              controlMoments: [
-                { timestamp: '00:01:05', controlShift: 'to_rep', trigger: 'ROI data offer', impact: 'high' },
-                { timestamp: '00:02:02', controlShift: 'to_prospect', trigger: 'Training concern', impact: 'medium' },
-                { timestamp: '00:03:25', controlShift: 'to_rep', trigger: 'Support assurance', impact: 'high' }
-              ],
-              influenceTechniques: {
-                reciprocity: 7,
-                commitment: 9,
-                socialProof: 9,
-                authority: 8,
-                liking: 7,
-                scarcity: 6
-              },
-              persuasionEffectiveness: 85
-            },
-            salesInsights: {
-              callStage: 'closing',
-              buyingSignals: [
-                { signal: 'Asked about installation timeline', strength: 'strong', timestamp: '00:03:38' },
-                { signal: 'Mentioned practice schedule alignment', strength: 'strong', timestamp: '00:03:55' },
-                { signal: 'Requested demonstration', strength: 'strong', timestamp: '00:04:12' },
-                { signal: 'Confirmed meeting availability', strength: 'strong', timestamp: '00:04:32' }
-              ],
-              objections: [
-                { type: 'price', content: 'concerned about the investment required', handled: true, effectiveness: 90 },
-                { type: 'time', content: 'staff training concerns', handled: true, effectiveness: 85 },
-                { type: 'trust', content: 'maintenance and support concerns', handled: true, effectiveness: 95 }
-              ],
-              nextBestActions: [
-                'Confirm Wednesday 2 PM demonstration appointment',
-                'Prepare Dr. Martinez case study and practice-specific ROI projections',
-                'Coordinate with installation team for 3-4 week timeline',
-                'Send follow-up email with meeting confirmation and agenda'
-              ],
-              winProbability: 88,
-              recommendedFollowUp: {
-                timing: 'Within 24 hours',
-                approach: 'Confirmation email with demonstration agenda',
-                keyPoints: ['Meeting confirmation', 'ROI projections', 'Installation timeline', 'Support details']
-              }
-            },
-            keyMoments: [
-              { timestamp: '00:01:05', moment: 'Offered concrete ROI data', significance: 'critical', recommendation: 'Continue leading with data-driven value propositions' },
-              { timestamp: '00:01:35', moment: 'Provided local market references', significance: 'critical', recommendation: 'Always use geographically relevant case studies' },
-              { timestamp: '00:02:45', moment: 'Proactively addressed support concerns', significance: 'important', recommendation: 'Anticipate and address common objections before they become barriers' },
-              { timestamp: '00:03:25', moment: 'Prospect expressed buying intent', significance: 'critical', recommendation: 'Recognize buying signals and move to next steps immediately' },
-              { timestamp: '00:04:12', moment: 'Successfully moved to concrete next steps', significance: 'critical', recommendation: 'Always end with specific, time-bound commitments' }
-            ],
-            coachingOpportunities: [
-              { area: 'Objection Handling', currentLevel: 90, improvement: 'Excellent proactive objection handling demonstrated', priority: 'low' },
-              { area: 'Social Proof Usage', currentLevel: 95, improvement: 'Outstanding use of local references and case studies', priority: 'low' },
-              { area: 'Closing Technique', currentLevel: 85, improvement: 'Strong natural progression to next steps', priority: 'medium' },
-              { area: 'Question Strategy', currentLevel: 80, improvement: 'Good balance of open and closed questions, continue to let prospect talk', priority: 'medium' },
-              { area: 'Value Communication', currentLevel: 88, improvement: 'Excellent ROI focus, maintain data-driven approach', priority: 'low' }
-            ]
-          }}
-        />
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Box>
+          <Typography variant="h4" fontWeight="bold" gutterBottom>
+            Elite Rep Analytics
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Comprehensive performance intelligence for $200K+ medical device sales professionals
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<AIIcon />}
+          onClick={() => navigate('/call-analysis')}
+        >
+          AI Analysis
+        </Button>
       </Box>
+
+      {/* Performance Summary Cards */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={6} md={3}>
+          <Card elevation={0} sx={{ p: 3, textAlign: 'center', borderRadius: 3 }}>
+            <Typography variant="h4" color="success.main" fontWeight="bold">
+              $2.8M
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              YTD Revenue
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
+              <TrendingUpIcon sx={{ color: 'success.main', mr: 0.5 }} />
+              <Typography variant="caption" color="success.main">+18% vs goal</Typography>
+            </Box>
+          </Card>
+        </Grid>
+        <Grid item xs={6} md={3}>
+          <Card elevation={0} sx={{ p: 3, textAlign: 'center', borderRadius: 3 }}>
+            <Typography variant="h4" color="primary" fontWeight="bold">
+              87%
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Win Rate
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
+              <TrophyIcon sx={{ color: 'warning.main', mr: 0.5 }} />
+              <Typography variant="caption" color="primary">Top 1%</Typography>
+            </Box>
+          </Card>
+        </Grid>
+        <Grid item xs={6} md={3}>
+          <Card elevation={0} sx={{ p: 3, textAlign: 'center', borderRadius: 3 }}>
+            <Typography variant="h4" color="secondary" fontWeight="bold">
+              14d
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Avg Sales Cycle
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
+              <SpeedIcon sx={{ color: 'info.main', mr: 0.5 }} />
+              <Typography variant="caption" color="info.main">42% faster</Typography>
+            </Box>
+          </Card>
+        </Grid>
+        <Grid item xs={6} md={3}>
+          <Card elevation={0} sx={{ p: 3, textAlign: 'center', borderRadius: 3 }}>
+            <Typography variant="h4" color="warning.main" fontWeight="bold">
+              $127K
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Avg Deal Size
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
+              <MoneyIcon sx={{ color: 'success.main', mr: 0.5 }} />
+              <Typography variant="caption" color="success.main">+23% vs avg</Typography>
+            </Box>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Main Analytics Tabs */}
+      <Card elevation={0} sx={{ borderRadius: 3 }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs 
+            value={currentTab} 
+            onChange={(e, newValue) => setCurrentTab(newValue)}
+            variant="scrollable"
+            scrollButtons="auto"
+          >
+            <Tab 
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <LocationIcon />
+                  Territory Performance
+                </Box>
+              } 
+            />
+            <Tab 
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <NetworkIcon />
+                  Account Intelligence
+                </Box>
+              } 
+            />
+            <Tab 
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <RadarIcon />
+                  Competitive Intel
+                </Box>
+              } 
+            />
+            <Tab 
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <PipelineIcon />
+                  Pipeline Velocity
+                </Box>
+              } 
+            />
+            <Tab 
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <AnalyticsIcon />
+                  Activity Efficiency
+                </Box>
+              } 
+            />
+          </Tabs>
+        </Box>
+        <Box sx={{ p: 3 }}>
+          {tabContent[currentTab]}
+        </Box>
+      </Card>
     </Box>
   );
 };
