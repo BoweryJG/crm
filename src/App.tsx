@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './themes/ThemeContext';
 import { AuthProvider } from './hooks/useAuth';
 import { AppModeProvider } from './contexts/AppModeContext';
-import EliteLoadingScreen from './components/common/EliteLoadingScreen';
+import StandaloneEliteLoadingScreen from './components/common/StandaloneEliteLoadingScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
@@ -52,7 +52,7 @@ const App: React.FC = () => {
 
   if (isLoading) {
     return (
-      <EliteLoadingScreen 
+      <StandaloneEliteLoadingScreen 
         loadingText="Initializing RepSpheres CRM"
         message="Loading your elite medical device sales platform..."
         showPreview={true}
