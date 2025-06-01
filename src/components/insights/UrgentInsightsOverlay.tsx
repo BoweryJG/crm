@@ -122,7 +122,7 @@ const UrgentInsightsOverlay: React.FC = () => {
 
   const handleDismiss = () => {
     if (currentInsight) {
-      setDismissed(prev => new Set([...prev, currentInsight.id]));
+      setDismissed(prev => new Set(Array.from(prev).concat(currentInsight.id)));
     }
     setIsVisible(false);
     
