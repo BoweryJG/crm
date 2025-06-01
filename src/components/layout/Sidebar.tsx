@@ -83,9 +83,9 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
     {
       title: 'Knowledge Academy',
       items: [
+        { title: 'Learning Center', path: '/knowledge', icon: <SchoolIcon /> },
         { title: 'Dental Procedures', path: '/knowledge/dental', icon: <HospitalIcon /> },
-        { title: 'Aesthetic Procedures', path: '/knowledge/aesthetic', icon: <BiotechIcon /> },
-        { title: 'Learning Center', path: '/knowledge', icon: <SchoolIcon /> }
+        { title: 'Aesthetic Procedures', path: '/knowledge/aesthetic', icon: <BiotechIcon /> }
       ]
     },
     {
