@@ -380,6 +380,198 @@ const KnowledgeAcademy: React.FC = () => {
           </Grid>
         ))}
       </Grid>
+
+      {/* Additional Learning Resources */}
+      <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3, mt: 6 }}>
+        📖 Additional Learning Resources
+      </Typography>
+      
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={4}>
+          <Paper elevation={2} sx={{ p: 3, borderRadius: 3, textAlign: 'center' }}>
+            <VideoIcon sx={{ fontSize: 48, color: theme.palette.primary.main, mb: 2 }} />
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+              Video Library
+            </Typography>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Access 500+ educational videos covering all aspects of medical and aesthetic procedures
+            </Typography>
+            <Button variant="outlined" sx={{ mt: 2 }}>
+              Browse Videos
+            </Button>
+          </Paper>
+        </Grid>
+        
+        <Grid item xs={12} md={4}>
+          <Paper elevation={2} sx={{ p: 3, borderRadius: 3, textAlign: 'center' }}>
+            <QuizIcon sx={{ fontSize: 48, color: theme.palette.secondary.main, mb: 2 }} />
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+              Interactive Quizzes
+            </Typography>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Test your knowledge with adaptive quizzes and instant feedback
+            </Typography>
+            <Button variant="outlined" sx={{ mt: 2 }}>
+              Take Quiz
+            </Button>
+          </Paper>
+        </Grid>
+        
+        <Grid item xs={12} md={4}>
+          <Paper elevation={2} sx={{ p: 3, borderRadius: 3, textAlign: 'center' }}>
+            <CommunityIcon sx={{ fontSize: 48, color: theme.palette.success.main, mb: 2 }} />
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+              Community Forums
+            </Typography>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Connect with peers, ask questions, and share insights with the learning community
+            </Typography>
+            <Button variant="outlined" sx={{ mt: 2 }}>
+              Join Discussion
+            </Button>
+          </Paper>
+        </Grid>
+      </Grid>
+
+      {/* Learning Statistics */}
+      <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
+        📊 Learning Analytics
+      </Typography>
+      
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={6}>
+          <Paper elevation={2} sx={{ p: 3, borderRadius: 3 }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+              Weekly Study Time
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                  This week: 8.5 hours
+                </Typography>
+                <LinearProgress 
+                  variant="determinate" 
+                  value={85} 
+                  sx={{ height: 8, borderRadius: 4, mt: 1 }} 
+                />
+              </Box>
+              <Typography variant="h6" color="primary.main">
+                85%
+              </Typography>
+            </Box>
+            <Typography variant="caption" color="text.secondary">
+              Goal: 10 hours per week
+            </Typography>
+          </Paper>
+        </Grid>
+        
+        <Grid item xs={12} md={6}>
+          <Paper elevation={2} sx={{ p: 3, borderRadius: 3 }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+              Streak Counter
+            </Typography>
+            <Box sx={{ textAlign: 'center', py: 2 }}>
+              <Typography variant="h2" fontWeight="bold" color="primary.main">
+                🔥 7
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Days in a row
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Keep it up! You're on fire!
+              </Typography>
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
+
+      {/* Recent Activity */}
+      <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
+        🕒 Recent Activity
+      </Typography>
+      
+      <Paper elevation={2} sx={{ p: 3, borderRadius: 3, mb: 4 }}>
+        {[
+          { action: 'Completed', item: 'Dental Implant Procedures Quiz', time: '2 hours ago', score: '92%' },
+          { action: 'Watched', item: 'Advanced Botox Techniques Video', time: '1 day ago', score: null },
+          { action: 'Started', item: 'Aesthetic Facial Procedures Path', time: '2 days ago', score: null },
+          { action: 'Completed', item: 'Basic Dental Anatomy Module', time: '3 days ago', score: '98%' },
+          { action: 'Earned', item: 'Quick Study Achievement', time: '5 days ago', score: null }
+        ].map((activity, index) => (
+          <Box 
+            key={index} 
+            sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              py: 2,
+              borderBottom: index < 4 ? '1px solid' : 'none',
+              borderColor: 'divider'
+            }}
+          >
+            <Box>
+              <Typography variant="body1">
+                <strong>{activity.action}</strong> {activity.item}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {activity.time}
+              </Typography>
+            </Box>
+            {activity.score && (
+              <Chip 
+                label={activity.score} 
+                color="success" 
+                size="small" 
+              />
+            )}
+          </Box>
+        ))}
+      </Paper>
+
+      {/* Call to Action */}
+      <Paper 
+        elevation={4} 
+        sx={{ 
+          p: 4, 
+          borderRadius: 3, 
+          textAlign: 'center',
+          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+          color: 'white',
+          mb: 4
+        }}
+      >
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
+          Ready to Level Up Your Skills?
+        </Typography>
+        <Typography variant="h6" sx={{ mb: 3, opacity: 0.9 }}>
+          Join thousands of medical professionals advancing their careers through our academy
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Button 
+            variant="contained" 
+            size="large" 
+            sx={{ 
+              bgcolor: 'white', 
+              color: theme.palette.primary.main,
+              '&:hover': { bgcolor: 'grey.100' }
+            }}
+            onClick={() => navigate('/knowledge/dental')}
+          >
+            Start Learning Now
+          </Button>
+          <Button 
+            variant="outlined" 
+            size="large" 
+            sx={{ 
+              borderColor: 'white', 
+              color: 'white',
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' }
+            }}
+          >
+            View Curriculum
+          </Button>
+        </Box>
+      </Paper>
     </Box>
   );
 };
