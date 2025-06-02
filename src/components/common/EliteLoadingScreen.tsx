@@ -1,7 +1,18 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Box, Typography, useTheme, keyframes } from '@mui/material';
-import { useThemeContext } from '../../themes/ThemeContext';
 import AnimatedOrbHeroBG from '../dashboard/AnimatedOrbHeroBG';
+
+// Hook that safely gets theme context or falls back to defaults
+const useSafeThemeContext = () => {
+  try {
+    const { useThemeContext } = require('../../themes/ThemeContext');
+    const { themeMode } = useThemeContext();
+    return { themeMode };
+  } catch {
+    // Fallback when ThemeProvider isn't available
+    return { themeMode: 'space' };
+  }
+};
 
 interface EliteLoadingScreenProps {
   message?: string;
@@ -76,7 +87,7 @@ const EliteLoadingScreen: React.FC<EliteLoadingScreenProps> = ({
   showPreview = true 
 }) => {
   const theme = useTheme();
-  const { themeMode } = useThemeContext();
+  const { themeMode } = useSafeThemeContext();
   const [loadingPhase, setLoadingPhase] = useState(0);
   const [showElements, setShowElements] = useState(false);
 
