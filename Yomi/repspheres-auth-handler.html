@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YomiStrike Authentication</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000 0%, #001122 100%);
+            color: white;
+            margin: 0;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-container {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .auth-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .auth-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #00ff88;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo">YomiStrike</div>
+        <div class="subtitle">Precision Surgery Experience</div>
+        
+        <p style="margin-bottom: 30px; font-size: 14px; line-height: 1.6;">
+            Sign in to access the YomiStrike surgical simulation experience.
+        </p>
+        
+        <a href="#" class="auth-btn" onclick="signInWithGoogle()">
+            Continue with Google
+        </a>
+        
+        <a href="#" class="auth-btn" onclick="signInWithFacebook()">
+            Continue with Facebook
+        </a>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+        
+        // Use the same Supabase config as YomiStrike
+        const SUPABASE_URL = 'https://cbopynuvhcymbumjnvay.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNib3B5bnV2aGN5bWJ1bWpudmF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5OTUxNzMsImV4cCI6MjA1OTU3MTE3M30.UZElMkoHugIt984RtYWyfrRuv2rB67opQdCrFVPCfzU'
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        
+        // Get redirect URL from query params
+        const urlParams = new URLSearchParams(window.location.search)
+        const redirectUrl = urlParams.get('redirect') || 'https://yomistrike.com'
+        
+        window.signInWithGoogle = async () => {
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin + window.location.pathname + '?success=true&redirect=' + encodeURIComponent(redirectUrl)
+                    }
+                })
+                if (error) throw error
+            } catch (error) {
+                console.error('Auth error:', error)
+                notifyParent('AUTH_ERROR', error.message)
+            }
+        }
+        
+        window.signInWithFacebook = async () => {
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'facebook',
+                    options: {
+                        redirectTo: window.location.origin + window.location.pathname + '?success=true&redirect=' + encodeURIComponent(redirectUrl)
+                    }
+                })
+                if (error) throw error
+            } catch (error) {
+                console.error('Auth error:', error)
+                notifyParent('AUTH_ERROR', error.message)
+            }
+        }
+        
+        // Check if we're returning from OAuth
+        if (urlParams.get('success') === 'true') {
+            // Get the session
+            supabase.auth.getSession().then(({ data: { session }, error }) => {
+                if (session) {
+                    notifyParent('AUTH_SUCCESS', session)
+                } else {
+                    notifyParent('AUTH_ERROR', 'No session found')
+                }
+            })
+        }
+        
+        // Notify parent window
+        function notifyParent(type, data) {
+            if (window.opener) {
+                window.opener.postMessage({
+                    type: type,
+                    token: data,
+                    error: type === 'AUTH_ERROR' ? data : null
+                }, redirectUrl)
+                window.close()
+            }
+        }
+        
+        // Listen for auth state changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+                notifyParent('AUTH_SUCCESS', session)
+            }
+        })
+    </script>
+</body>
+</html>

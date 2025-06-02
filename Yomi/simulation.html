@@ -1,0 +1,3882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YomiStrike - Precision Surgery Experience</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🦷</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Prevent circular elements from flashing on load */
+        .target-indicator,
+        .target-ring,
+        .precision-cursor {
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+        
+        /* Show elements after page loads */
+        body.loaded .precision-cursor {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #000;
+            color: white;
+            overflow: hidden;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* HUD */
+        .hud {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .hud > * {
+            pointer-events: auto;
+        }
+
+        .hud-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 15px;
+            padding: 12px;
+            min-width: 140px;
+            transform: scale(0.85);
+            transform-origin: top left;
+        }
+        
+        .hud-panel:last-child {
+            transform-origin: top right;
+        }
+
+        .method-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .method-title {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .method-btn {
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .method-btn.active {
+            background: rgba(0, 255, 136, 0.3);
+            border-color: #00ff88;
+            color: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            font-weight: 700;
+        }
+
+        .method-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+            border-color: rgba(0, 255, 136, 0.5);
+        }
+
+        /* Mode toggle */
+        .mode-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 11px;
+        }
+
+        .mode-btn.active {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: #00ff88;
+            color: #00ff88;
+        }
+
+        .mode-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Metrics */
+        .metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .metric-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .metric-value.good {
+            color: #00ff88;
+        }
+
+        .metric-value.warning {
+            color: #ffaa00;
+        }
+
+        .metric-value.bad {
+            color: #ff4444;
+        }
+
+        /* Instructions */
+        .instructions {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            padding: 20px 40px;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .instruction-text {
+            font-size: 16px;
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            font-size: 14px;
+            color: #888;
+        }
+        
+        /* Variance Info Panel */
+        .variance-info {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 320px;
+            z-index: 200;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Target indicator */
+        .target-indicator {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 50;
+            display: none; /* Hide screen target, we'll use 3D target */
+            visibility: hidden; /* Extra hiding to prevent flash */
+            opacity: 0; /* Triple protection against flashing */
+        }
+
+        .target-ring {
+            position: absolute;
+            border: 2px solid #00ff88;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .ring-1 {
+            width: 100px;
+            height: 100px;
+            left: -50px;
+            top: -50px;
+        }
+
+        .ring-2 {
+            width: 60px;
+            height: 60px;
+            left: -30px;
+            top: -30px;
+            animation-delay: 0.5s;
+        }
+
+        .ring-3 {
+            width: 20px;
+            height: 20px;
+            left: -10px;
+            top: -10px;
+            animation-delay: 1s;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        /* Timer */
+        .timer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            font-weight: 700;
+            color: #00ff88;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 200;
+            text-shadow: 0 0 50px rgba(0, 255, 136, 0.5);
+        }
+
+        .timer.show {
+            animation: timerPulse 1s ease-out;
+        }
+
+        @keyframes timerPulse {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+
+        /* Tutorial overlay */
+        .tutorial-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .tutorial-overlay.hidden {
+            display: none;
+        }
+
+        .tutorial-content {
+            background: linear-gradient(135deg, #0a0f1b 0%, #1a1f2e 100%);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 30px;
+            padding: 50px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .tutorial-title {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .tutorial-desc {
+            font-size: 18px;
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .tutorial-steps {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            opacity: 1;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .step.active .step-number {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+        }
+
+        .step-label {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .step.active .step-label {
+            color: #00ff88;
+        }
+
+        /* Results modal */
+        .results-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .results-content {
+            background: linear-gradient(135deg, #0a0f1b 0%, #1a1f2e 100%);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 30px;
+            padding: 50px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .results-title {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+        }
+
+        .score-display {
+            font-size: 72px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .score-breakdown {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .breakdown-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .breakdown-label {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .breakdown-value {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+            color: black;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #00ff88;
+            color: #00ff88;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Precision cursor */
+        .precision-cursor {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid #00ff88;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: all 0.1s ease;
+            /* Hide cursor off-screen initially */
+            left: -100px;
+            top: -100px;
+        }
+
+        .precision-cursor.freehand {
+            animation: shake 0.15s infinite;
+            border-color: #ff4444;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+        }
+
+        .precision-cursor.static {
+            animation: shake 0.3s infinite;
+            border-color: #ffaa00;
+            box-shadow: 0 0 15px rgba(255, 170, 0, 0.6);
+        }
+
+        .precision-cursor.yomi {
+            animation: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 1);
+            border-width: 3px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            10% { transform: translate(-45%, -55%) rotate(2deg); }
+            20% { transform: translate(-55%, -45%) rotate(-2deg); }
+            30% { transform: translate(-52%, -53%) rotate(1deg); }
+            40% { transform: translate(-48%, -47%) rotate(-1deg); }
+            50% { transform: translate(-53%, -50%) rotate(3deg); }
+            60% { transform: translate(-47%, -52%) rotate(-3deg); }
+            70% { transform: translate(-51%, -48%) rotate(2deg); }
+            80% { transform: translate(-49%, -54%) rotate(-1deg); }
+            90% { transform: translate(-54%, -46%) rotate(1deg); }
+        }
+
+        /* Score animation */
+        .score-popup {
+            position: fixed;
+            font-size: 48px;
+            font-weight: 700;
+            pointer-events: none;
+            z-index: 200;
+            animation: scoreFloat 2s ease-out forwards;
+        }
+
+        @keyframes scoreFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1.5);
+            }
+        }
+    </style>
+    <!-- Configuration -->
+    <script src="config.js"></script>
+    <!-- Google Analytics -->
+    <script async id="ga-script"></script>
+    <script>
+        // Load GA script with configured ID
+        document.getElementById('ga-script').src = `https://www.googletagmanager.com/gtag/js?id=${CONFIG.GA_MEASUREMENT_ID}`;
+        
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', CONFIG.GA_MEASUREMENT_ID);
+    </script>
+</head>
+<body>
+    <script>
+        // Add loaded class to body when DOM is ready to prevent circular elements from flashing
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.body.classList.add('loaded');
+            });
+        } else {
+            // DOM is already loaded
+            document.body.classList.add('loaded');
+        }
+        
+        // Quick bypass for testing - add ?demo=true to URL
+        if (window.location.search.includes('demo=true')) {
+            window.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    const authCheck = document.getElementById('authCheck');
+                    if (authCheck) {
+                        authCheck.style.display = 'none';
+                        // Initialize the 3D scene
+                        if (typeof startThreeJSSimulation !== 'undefined') {
+                            startThreeJSSimulation();
+                            setTimeout(() => {
+                                initializeMethodSelection();
+                                if (window.animate) window.animate();
+                            }, 100);
+                        }
+                    }
+                }, 500);
+            });
+        }
+    </script>
+    <!-- Auth check overlay with benefits showcase -->
+    <div id="authCheck" style="position: fixed; inset: 0; background: #000; z-index: 9999; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <!-- Background particles -->
+        <div class="particles-bg"></div>
+        
+        <!-- Minimal auth indicator -->
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.3;">
+            <div style="text-align: center;">
+                <div style="width: 40px; height: 40px; border: 2px solid rgba(0, 255, 136, 0.2); border-radius: 50%; border-top-color: #00ff88; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+            </div>
+        </div>
+        
+        <!-- Benefits carousel (hidden initially) -->
+        <div class="benefits-showcase" id="benefitsShowcase" style="display: none;">
+            <div class="benefit-card" id="benefit1">
+                <div class="benefit-icon">
+                    <svg width="80" height="80" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.3"/>
+                        <circle cx="50" cy="50" r="30" fill="none" stroke="#00ff88" stroke-width="3" opacity="0.5"/>
+                        <circle cx="50" cy="50" r="15" fill="none" stroke="#00ff88" stroke-width="4"/>
+                        <circle cx="50" cy="50" r="5" fill="#00ff88"/>
+                    </svg>
+                </div>
+                <h2 class="benefit-title">Superior Angular Precision</h2>
+                <div class="benefit-stat"><1.5°</div>
+                <p class="benefit-desc">Dr. Neugarten's study: Yomi achieves <1.5° vs 5.8-7° freehand and 2.5-3° static guides</p>
+                <div class="benefit-visual">
+                    <div class="comparison-bar" style="height: 120px;">
+                        <div class="bar freehand" style="width: 100%; top: 5px;">
+                            <span>Freehand: 5.8-7° angular deviation</span>
+                        </div>
+                        <div class="bar static" style="width: 50%; min-width: 140px; background: linear-gradient(90deg, #ffaa00 0%, #ff8800 100%); top: 45px;">
+                            <span>Static: 2.5-3° / ~1mm</span>
+                        </div>
+                        <div class="bar yomi" style="width: 10%; min-width: 120px; bottom: 5px;">
+                            <span>Yomi: <1.5° / <0.2mm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="benefit-card" id="benefit2">
+                <div class="benefit-icon">
+                    <svg width="80" height="80" viewBox="0 0 100 100">
+                        <path d="M50 10 C30 10 10 30 10 50 C10 70 30 90 50 90 C70 90 90 70 90 50 C90 30 70 10 50 10" 
+                              fill="none" stroke="#00ff88" stroke-width="3"/>
+                        <path d="M35 50 L45 60 L65 35" fill="none" stroke="#00ff88" stroke-width="4" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h2 class="benefit-title">Superior to Static Guides</h2>
+                <div class="benefit-stat">45%</div>
+                <p class="benefit-desc">Better precision than static guides (0.2mm vs 0.36mm) per Dr. Neugarten</p>
+                <div class="benefit-visual">
+                    <div class="success-ring">
+                        <svg width="120" height="120">
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="#333" stroke-width="10"/>
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="#00ff88" stroke-width="10"
+                                    stroke-dasharray="314" stroke-dashoffset="3" transform="rotate(-90 60 60)"/>
+                        </svg>
+                        <div class="ring-text">99.2%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="benefit-card" id="benefit3">
+                <div class="benefit-icon">
+                    <svg width="80" height="80" viewBox="0 0 100 100">
+                        <circle cx="30" cy="30" r="20" fill="#00ff88" opacity="0.3"/>
+                        <circle cx="70" cy="30" r="20" fill="#00ff88" opacity="0.3"/>
+                        <path d="M20 60 Q50 80 80 60" fill="none" stroke="#00ff88" stroke-width="3"/>
+                    </svg>
+                </div>
+                <h2 class="benefit-title">Consistent Excellence</h2>
+                <div class="benefit-stat">3-5x</div>
+                <p class="benefit-desc">Less variability than freehand or static methods in clinical trials</p>
+                <div class="benefit-visual">
+                    <div class="patient-benefits">
+                        <div class="patient-item">
+                            <span class="check">✓</span> Minimized tissue trauma
+                        </div>
+                        <div class="patient-item">
+                            <span class="check">✓</span> Reduced chair time
+                        </div>
+                        <div class="patient-item">
+                            <span class="check">✓</span> Enhanced predictability
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="benefit-card" id="benefit4">
+                <div class="benefit-icon">
+                    <svg width="80" height="80" viewBox="0 0 100 100">
+                        <rect x="20" y="30" width="60" height="40" fill="none" stroke="#00ff88" stroke-width="3" rx="5"/>
+                        <circle cx="35" cy="50" r="5" fill="#00ff88"/>
+                        <circle cx="50" cy="50" r="5" fill="#00ff88"/>
+                        <circle cx="65" cy="50" r="5" fill="#00ff88"/>
+                        <path d="M30 20 L50 10 L70 20" fill="none" stroke="#00ff88" stroke-width="3"/>
+                    </svg>
+                </div>
+                <h2 class="benefit-title">Clinical Gold Standard</h2>
+                <div class="benefit-stat">#1</div>
+                <p class="benefit-desc">Ranked best for precision in Dr. Neugarten's comparative analysis</p>
+                <div class="benefit-visual">
+                    <div class="tech-features">
+                        <div class="tech-item">Haptic boundaries</div>
+                        <div class="tech-item">Dynamic navigation</div>
+                        <div class="tech-item">Intraoperative guidance</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <!-- Learn more button (hidden initially) -->
+        <button class="learn-more-btn" id="learnMoreBtn" style="display: none;" onclick="showStudyDetails()">Learn More About This Research</button>
+        
+        <!-- Loading indicator (hidden initially) -->
+        <div class="loading-footer" id="loadingFooter" style="display: none;">
+            <div class="loading-spinner"></div>
+            <span style="font-weight: 300; letter-spacing: 0.5px;">Initializing precision guidance system</span>
+        </div>
+        
+        <!-- Credit (hidden initially) -->
+        <div id="creditText" style="position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); text-align: center; color: rgba(255, 255, 255, 0.5); font-size: 11px; line-height: 1.5; letter-spacing: 0.5px; font-weight: 300; display: none;">
+            Clinical benchmarks based on peer-reviewed research by<br>
+            <span style="color: rgba(0, 255, 136, 0.8); font-weight: 400;">Dr. Jay Neugarten</span>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .particles-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .particles-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, #00ff88 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: drift 20s linear infinite;
+            opacity: 0.03;
+        }
+        
+        @keyframes drift {
+            from { transform: translate(-50%, -50%); }
+            to { transform: translate(0, 0); }
+        }
+        
+        .benefits-showcase {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 600px;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .benefit-card {
+            position: absolute;
+            width: 100%;
+            background: linear-gradient(135deg, rgba(15, 20, 35, 0.95) 0%, rgba(25, 30, 45, 0.95) 100%);
+            border: 1px solid rgba(0, 255, 136, 0.15);
+            border-radius: 24px;
+            padding: 60px;
+            text-align: center;
+            opacity: 0;
+            transform: translateX(100px) scale(0.95);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(30px) saturate(1.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+        }
+        
+        .benefit-card.active {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+        
+        .benefit-card.prev {
+            transform: translateX(-100px) scale(0.9);
+            opacity: 0;
+        }
+        
+        .benefit-icon {
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+            display: inline-block;
+            position: relative;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .benefit-title {
+            font-size: 26px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+            opacity: 0.95;
+        }
+        
+        .benefit-stat {
+            font-size: 64px;
+            font-weight: 300;
+            background: linear-gradient(180deg, #00ff88 0%, #00cc66 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            letter-spacing: -2px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .benefit-desc {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 35px;
+            line-height: 1.6;
+            letter-spacing: 0.2px;
+            font-weight: 300;
+        }
+        
+        .benefit-visual {
+            margin-top: 30px;
+        }
+        
+        .comparison-bar {
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: visible;
+            height: auto;
+            min-height: 120px;
+            margin-top: 10px;
+            padding: 10px;
+        }
+        
+        .bar {
+            position: absolute;
+            height: 28px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            transition: width 1s ease-out;
+            white-space: nowrap;
+            z-index: 1;
+        }
+        
+        .bar.freehand {
+            background: linear-gradient(90deg, #ff4444 0%, #cc0000 100%);
+            top: 5px;
+        }
+        
+        .bar.static {
+            background: linear-gradient(90deg, #ffaa00 0%, #ff8800 100%);
+            top: 35px;
+        }
+        
+        .bar.dynamic {
+            background: linear-gradient(90deg, #4488ff 0%, #3366dd 100%);
+            top: 35px;
+        }
+        
+        .bar.yomi {
+            background: linear-gradient(90deg, #00ff88 0%, #00cc66 100%);
+            bottom: 5px;
+            z-index: 2;
+        }
+        
+        .success-ring {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: 700;
+            color: #00ff88;
+        }
+        
+        .patient-benefits {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .patient-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            color: #fff;
+            opacity: 0;
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        
+        .patient-item:nth-child(1) { animation-delay: 0.2s; }
+        .patient-item:nth-child(2) { animation-delay: 0.4s; }
+        .patient-item:nth-child(3) { animation-delay: 0.6s; }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .check {
+            color: #00ff88;
+            font-size: 24px;
+        }
+        
+        .tech-features {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .tech-item {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #00ff88;
+            animation: glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(0, 255, 136, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.8); }
+        }
+        
+        .showcase-progress {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+        }
+        
+        
+        .loading-footer {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-top-color: #00ff88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Welcome screen styles */
+        .welcome-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+            opacity: 0;
+        }
+        
+        .welcome-content {
+            max-width: 700px;
+            padding: 60px;
+            background: linear-gradient(135deg, rgba(15, 20, 35, 0.95) 0%, rgba(25, 30, 45, 0.95) 100%);
+            border: 1px solid rgba(0, 255, 136, 0.15);
+            border-radius: 24px;
+            backdrop-filter: blur(30px) saturate(1.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4),
+                        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+        }
+        
+        .welcome-title {
+            font-size: 42px;
+            font-weight: 300;
+            margin-bottom: 24px;
+            color: #fff;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+        
+        .welcome-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 50px;
+            line-height: 1.6;
+            letter-spacing: 0.3px;
+            font-weight: 300;
+        }
+        
+        .btn-large {
+            padding: 18px 45px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 30px;
+            letter-spacing: 0.5px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
+        }
+        
+        .btn-large:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.3);
+        }
+        
+        
+        .learn-more-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 30px;
+            background: transparent;
+            border: 1px solid rgba(0, 255, 136, 0.5);
+            color: #00ff88;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+        
+        .learn-more-btn:hover {
+            background: rgba(0, 255, 136, 0.1);
+        }
+        
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            .welcome-content {
+                padding: 30px;
+                max-width: 90%;
+            }
+            
+            .welcome-title {
+                font-size: 28px;
+            }
+            
+            .welcome-subtitle {
+                font-size: 16px;
+            }
+            
+            .benefit-card {
+                padding: 40px 30px;
+            }
+            
+            .benefit-title {
+                font-size: 22px;
+            }
+            
+            .benefit-stat {
+                font-size: 48px;
+            }
+            
+            .benefit-desc {
+                font-size: 14px;
+            }
+            
+            /* Mobile-specific UI adjustments */
+            .hud {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .hud-panel {
+                width: 95%;
+                max-width: 350px;
+                padding: 15px;
+            }
+            
+            .method-selector {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .instructions {
+                bottom: 10px;
+                padding: 15px 20px;
+                width: 90%;
+                max-width: none;
+            }
+            
+            .instruction-text {
+                font-size: 16px;
+            }
+            
+            .variance-info {
+                right: 10px !important;
+                top: auto !important;
+                bottom: 280px !important;
+                max-width: calc(100% - 20px) !important;
+                padding: 20px;
+                font-size: 14px;
+            }
+            
+            .tutorial-content {
+                width: 90%;
+                padding: 30px 20px;
+            }
+            
+            .results-content {
+                width: 90%;
+                padding: 30px 20px;
+            }
+            
+            /* Method selection mobile */
+            .method-cards {
+                flex-direction: column !important;
+                gap: 20px !important;
+                padding: 0 20px;
+            }
+            
+            .method-card {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            
+            .method-selection-content h1 {
+                font-size: 32px !important;
+            }
+            
+            .method-selection-content p {
+                font-size: 16px !important;
+            }
+            
+            #uiToggle {
+                top: 10px !important;
+                right: 10px !important;
+                padding: 8px 15px !important;
+                font-size: 14px;
+            }
+            
+            .instructions {
+                bottom: 20px;
+                padding: 15px 25px;
+                width: 90%;
+                left: 5%;
+                transform: none;
+                font-size: 14px;
+            }
+            
+            .instruction-text {
+                font-size: 14px;
+                margin-bottom: 5px;
+            }
+            
+            .controls {
+                font-size: 12px;
+            }
+            
+            .hud {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .hud-panel {
+                min-width: 90%;
+            }
+            
+            .comparison-bar {
+                min-height: 150px;
+            }
+            
+            .bar span {
+                font-size: 11px;
+            }
+            
+            .carousel-controls {
+                bottom: 120px;
+            }
+            
+            .carousel-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
+    </style>
+    
+    <canvas id="canvas"></canvas>
+    
+    <!-- Custom cursor -->
+    <div class="precision-cursor" id="cursor"></div>
+    
+    <!-- UI Toggle Button -->
+    <button id="uiToggle" onclick="toggleUI()" style="position: fixed; bottom: 20px; right: 20px; z-index: 10001; padding: 12px 20px; background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 25px; color: #00ff88; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px);">
+        <span id="uiToggleIcon">👁️</span> <span id="uiToggleText">Hide UI</span>
+    </button>
+    
+    <!-- HUD -->
+    <div class="hud" id="mainHud">
+        <div class="hud-panel">
+            <div class="mode-toggle" style="margin-bottom: 20px;">
+                <button class="mode-btn active" onclick="setMode('explore')">🔍 Explore</button>
+                <button class="mode-btn" onclick="setMode('challenge')">🎯 Challenge</button>
+            </div>
+            <div class="method-selector">
+                <div class="method-title">SURGICAL METHOD</div>
+                <button class="method-btn active" onclick="setMethod('freehand')">Freehand</button>
+                <button class="method-btn" onclick="setMethod('static')">Static Guided</button>
+                <button class="method-btn" onclick="setMethod('yomi')">Yomi Robotic</button>
+            </div>
+            <div style="margin-top: 20px;">
+                <button class="method-btn" id="pathwayToggle" onclick="togglePathway()" style="width: 100%; background: rgba(0, 255, 136, 0.1);">
+                    👁️ Show Possible Surgical Pathways
+                </button>
+                <button class="method-btn" id="compareToggle" onclick="toggleCompare()" style="width: 100%; margin-top: 10px; background: rgba(0, 136, 255, 0.1);">
+                    ⚔️ Compare All Methods
+                </button>
+            </div>
+        </div>
+        
+        <div class="hud-panel">
+            <div class="metrics">
+                <div class="metric">
+                    <span class="metric-label">Distance from Target</span>
+                    <span class="metric-value" id="platformDeviation">0.00mm</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Precision Goal</span>
+                    <span class="metric-value good">&lt;1mm</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Time Elapsed</span>
+                    <span class="metric-value" id="timeElapsed">0.0s</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Method Variance</span>
+                    <span class="metric-value" id="difficultyLevel" style="font-size: 14px;">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Target indicator -->
+    <div class="target-indicator" id="targetIndicator" style="display: none; visibility: hidden;">
+        <div class="target-ring ring-1"></div>
+        <div class="target-ring ring-2"></div>
+        <div class="target-ring ring-3"></div>
+    </div>
+    
+    <!-- Instructions -->
+    <div class="instructions">
+        <div class="instruction-text" id="instructionText">Welcome! Let's explore how surgical precision improves with technology</div>
+        <div class="controls" id="controlsText">We'll start with freehand surgery to see the challenges</div>
+    </div>
+    
+    <!-- Variance Info Panel -->
+    <div class="variance-info" id="varianceInfo" style="display: none;">
+        <div class="variance-content">
+            <h3 style="margin: 0 0 10px; color: #00ff88;">📊 Dr. Neugarten's Clinical Data</h3>
+            <p style="margin: 0 0 15px; font-size: 14px; line-height: 1.6;">
+                The <strong>wobble</strong> you see represents actual surgical variance measured in the landmark study.
+            </p>
+            <div class="variance-comparison">
+                <div class="variance-item" style="color: #ff4444;">
+                    <strong>Freehand:</strong> 7mm variance (7° angular deviation)
+                    <div style="font-size: 12px; opacity: 0.8;">Extremely difficult to maintain precision</div>
+                </div>
+                <div class="variance-item" style="color: #ffaa00; margin-top: 8px;">
+                    <strong>Static Guide:</strong> 3.5mm variance (3° angular deviation)
+                    <div style="font-size: 12px; opacity: 0.8;">Better, but still challenging</div>
+                </div>
+                <div class="variance-item" style="color: #00ff88; margin-top: 8px;">
+                    <strong>Yomi Robot:</strong> <0.2mm variance (<1.5° angular deviation)
+                    <div style="font-size: 12px; opacity: 0.8;">Near-perfect precision every time</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tutorial Overlay -->
+    <div class="tutorial-overlay hidden" id="tutorialOverlay">
+        <div class="tutorial-content">
+            <h2 class="tutorial-title" id="tutorialTitle">Welcome to Precision Surgery</h2>
+            <p class="tutorial-desc" id="tutorialDesc">
+                You'll experience three different surgical methods, from most challenging to easiest.
+                Watch how technology dramatically improves precision and reduces surgeon fatigue.
+            </p>
+            <div class="tutorial-steps">
+                <div class="step active" id="step1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Freehand</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Static Guide</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Yomi Robot</div>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="startTutorial()">Start</button>
+        </div>
+    </div>
+    
+    <!-- Timer -->
+    <div class="timer" id="timer">3</div>
+    
+    <!-- Results Modal -->
+    <div class="results-modal" id="resultsModal">
+        <div class="results-content">
+            <h2 class="results-title">Procedure Complete!</h2>
+            <div class="score-display" id="scoreDisplay">95%</div>
+            
+            <div class="score-breakdown">
+                <div class="breakdown-item">
+                    <div class="breakdown-label">Method</div>
+                    <div class="breakdown-value" id="methodResult">Freehand</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-label">Precision</div>
+                    <div class="breakdown-value" id="precisionResult">0.5mm</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-label">Time</div>
+                    <div class="breakdown-value" id="timeResult">12.3s</div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="tryAgain()">Try Again</button>
+                <button class="btn btn-secondary" onclick="saveResults()">Save Results</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three'
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+        import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+        
+        // Supabase configuration from config.js
+        const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY)
+        
+        // Check authentication
+        async function checkAuth() {
+            console.log('Checking authentication...')
+            
+            // Add timeout for auth check
+            const timeoutPromise = new Promise((resolve, reject) => {
+                setTimeout(() => reject(new Error('Auth check timeout')), 5000)
+            })
+            
+            const authPromise = (async () => {
+                const { data: { user }, error } = await supabase.auth.getUser()
+                
+                if (error) {
+                    console.error('Auth error:', error)
+                    throw error
+                }
+                
+                if (!user) {
+                    // Not authenticated, redirect to home
+                    console.log('No user found, redirecting...')
+                    alert('Please sign in to use the simulator')
+                    window.location.href = 'index.html'
+                    return false
+                }
+                
+                console.log('User authenticated:', user.email)
+                // Don't hide overlay here - let the timing control handle it
+                return true
+            })()
+            
+            try {
+                return await Promise.race([authPromise, timeoutPromise])
+            } catch (error) {
+                console.error('Auth check failed:', error)
+                alert('Authentication check failed. Redirecting to home page.')
+                window.location.href = 'index.html'
+                return false
+            }
+        }
+        
+        // Benefits carousel - initialize after DOM is ready
+        window.addEventListener('DOMContentLoaded', () => {
+            let currentBenefit = 1
+            const totalBenefits = 4
+            let benefitInterval = null
+            
+            function showBenefit(num) {
+                // Update cards
+                const cards = document.querySelectorAll('.benefit-card')
+                if (!cards.length) return // Exit if cards not found
+                
+                cards.forEach(card => {
+                    card.classList.remove('active', 'prev')
+                })
+                
+                const currentCard = document.getElementById(`benefit${num}`)
+                if (currentCard) {
+                    currentCard.classList.add('active')
+                }
+                
+                // Update previous card
+                const prevNum = num === 1 ? totalBenefits : num - 1
+                const prevCard = document.getElementById(`benefit${prevNum}`)
+                if (prevCard) {
+                    prevCard.classList.add('prev')
+                }
+                
+            }
+            
+            function nextBenefit() {
+                currentBenefit = currentBenefit >= totalBenefits ? 1 : currentBenefit + 1
+                showBenefit(currentBenefit)
+            }
+            
+            // Initialize carousel function
+            window.initCarousel = function() {
+                // Only initialize if not already running
+                if (benefitInterval) return;
+                
+                // Initialize first card
+                showBenefit(1)
+                
+                // Start carousel animation after a delay
+                setTimeout(() => {
+                    benefitInterval = setInterval(nextBenefit, 6000) // 6 seconds per card
+                }, 3000) // 3 second delay to read first card
+                
+                
+                // Store interval reference globally for cleanup
+                window.benefitInterval = benefitInterval
+                
+                // After showing all benefits, start the simulation
+                setTimeout(() => {
+                    if (benefitInterval) clearInterval(benefitInterval)
+                    // Fade out the entire auth overlay
+                    const authCheck = document.getElementById('authCheck')
+                    authCheck.style.transition = 'opacity 1s ease-out'
+                    authCheck.style.opacity = '0'
+                    setTimeout(() => {
+                        authCheck.style.display = 'none'
+                        // Start the 3D simulation
+                        startThreeJSSimulation()
+                    }, 1000)
+                }, carouselShowTime)
+            }
+        })
+        
+        // Ensure carousel shows for minimum time
+        let authCompleted = false
+        let carouselShowTime = 15000 // Show carousel for at least 15 seconds to see all benefits
+        let authResult = null
+        
+        // Carousel state
+        let carouselPaused = false
+        
+        // Function to handle method selection
+        window.selectMethod = function(method) {
+            const welcomeScreen = document.getElementById('welcomeScreen')
+            const authCheck = document.getElementById('authCheck')
+            
+            // Set the selected method
+            window.selectedMethod = method
+            
+            // Track method selection
+            gtag('event', 'initial_method_selected', {
+                'event_category': 'onboarding',
+                'event_label': method
+            });
+            
+            // Create a dramatic transition effect based on method color
+            const methodColors = {
+                freehand: '#ff4444',
+                static: '#ffaa00',
+                yomi: '#00ff88'
+            }
+            
+            welcomeScreen.style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)'
+            welcomeScreen.style.opacity = '0'
+            welcomeScreen.style.transform = 'scale(0.8)'
+            
+            // Color flash effect
+            const flash = document.createElement('div')
+            flash.style.position = 'fixed'
+            flash.style.inset = '0'
+            flash.style.background = `radial-gradient(circle at center, ${methodColors[method]}, transparent)`
+            flash.style.opacity = '0'
+            flash.style.pointerEvents = 'none'
+            flash.style.zIndex = '10000'
+            flash.style.transition = 'opacity 0.3s ease-out'
+            document.body.appendChild(flash)
+            
+            // Flash animation
+            setTimeout(() => {
+                flash.style.opacity = '0.6'
+                setTimeout(() => {
+                    flash.style.opacity = '0'
+                }, 300)
+            }, 200)
+            
+            setTimeout(() => {
+                // Remove welcome and start 3D with cones visible
+                welcomeScreen.style.display = 'none'
+                authCheck.style.transition = 'opacity 0.8s ease-out'
+                authCheck.style.opacity = '0'
+                
+                setTimeout(() => {
+                    authCheck.style.display = 'none'
+                    document.body.removeChild(flash)
+                    
+                    // Start 3D simulation with selected method
+                    startThreeJSSimulation()
+                    
+                    // Set the initial method
+                    setTimeout(() => {
+                        // Set method without tutorial mode
+                        tutorialMode = false
+                        currentMethod = method
+                        setMethodForTutorial(method)
+                        
+                        // Show all cones for comparison
+                        pathwayVisible = true
+                        compareMode = true
+                        Object.keys(pathwayCones).forEach((m, index) => {
+                            const cone = pathwayCones[m]
+                            cone.visible = true
+                            // Position cones side by side
+                            cone.position.x = -1.5 + (index * 1.5)
+                            // Highlight selected method
+                            cone.children.forEach(child => {
+                                if (child.material) {
+                                    child.material.opacity = m === method ? 0.4 : 0.15
+                                }
+                            })
+                        })
+                        
+                        // Show variance info
+                        document.getElementById('varianceInfo').style.display = 'block'
+                        
+                        // Update UI to reflect state
+                        document.getElementById('compareToggle').innerHTML = '⚔️ Hide Comparison'
+                        document.getElementById('compareToggle').style.background = 'rgba(0, 136, 255, 0.3)'
+                        
+                        // Add instruction
+                        document.getElementById('instructionText').textContent = 
+                            `You selected ${method.charAt(0).toUpperCase() + method.slice(1)} - Click to place the drill`
+                        document.getElementById('controlsText').textContent = 
+                            'See the precision difference? Toggle comparison to focus on your method'
+                    }, 500)
+                }, 800)
+            }, 600)
+        }
+        
+        
+        window.showStudyDetails = function() {
+            alert(`Dr. Jay Neugarten's Landmark Study
+            
+Published in The International Journal of Oral & Maxillofacial Implants
+
+Study Details:
+• 273 robot-guided implants over 2 years
+• Average angular deviation: <1.5° (vs 5.8-7° freehand)
+• Average depth deviation: <0.2mm (vs 1.7-4mm freehand)
+• 4-5x more precise than traditional methods
+
+Clinical Impact:
+• Reduced risk of nerve damage
+• Improved aesthetic outcomes
+• Faster healing times
+• Higher patient satisfaction
+
+"The robotic/haptic guidance outperformed freehand, static guides, and dynamic computer navigation."
+- Dr. Jay Neugarten`)
+        }
+        
+        // Wait for config to load then check auth
+        setTimeout(() => {
+            if (typeof CONFIG === 'undefined') {
+                console.error('CONFIG not loaded! Check config.js')
+                authResult = { error: 'Configuration failed to load' }
+                authCompleted = true
+            } else {
+                console.log('Config loaded, checking auth...')
+                // Check auth but don't act on it immediately
+                checkAuth().then(isAuthenticated => {
+                    console.log('Auth check complete:', isAuthenticated)
+                    authResult = { success: isAuthenticated }
+                    authCompleted = true
+                }).catch(err => {
+                    console.error('Auth check promise failed:', err)
+                    authResult = { error: err.message }
+                    authCompleted = true
+                })
+            }
+        }, 500)
+        
+        // Process auth result immediately
+        const checkAuthResult = setInterval(() => {
+            if (authCompleted && authResult) {
+                clearInterval(checkAuthResult)
+                
+                if (authResult.success || authResult === true) {
+                    // Go directly to simulation
+                    initializeSimulation()
+                } else if (authResult && authResult.error) {
+                    document.getElementById('authCheck').innerHTML = '<div style="text-align: center; color: #ff4444;"><h2>Authentication Required</h2><p>Please sign in through repspheres.com to access the YomiStrike experience.</p><button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #00ff88; color: black; border: none; border-radius: 5px; cursor: pointer;">Try Again</button></div>'
+                }
+            }
+        }, 100)
+        
+        function initializeSimulation() {
+            const authCheck = document.getElementById('authCheck')
+            
+            // Setup 3D scene with everything hidden first
+            startThreeJSSimulation()
+            
+            // Initialize selection mode immediately
+            setTimeout(() => {
+                initializeMethodSelection()
+                // Start animation
+                if (window.animate) window.animate()
+                
+                // Now fade out auth overlay smoothly
+                authCheck.style.transition = 'opacity 1s ease-out'
+                authCheck.style.opacity = '0'
+                
+                setTimeout(() => {
+                    authCheck.style.display = 'none'
+                }, 1000)
+            }, 100)
+        }
+        
+        // Initialize method selection with visual drills
+        function initializeMethodSelection() {
+            // Hide all UI initially
+            document.getElementById('mainHud').style.display = 'none'
+            document.querySelector('.instructions').style.display = 'none'
+            document.getElementById('uiToggle').style.display = 'none'
+            
+            // Make sure tutorial overlay stays hidden
+            document.getElementById('tutorialOverlay').classList.add('hidden')
+            
+            // Force hide all 3D elements that should be hidden
+            if (window.jawGroup) window.jawGroup.visible = false
+            if (window.targetGroup) window.targetGroup.visible = false
+            
+            // Show instruction for selection
+            const selectionInstructions = document.createElement('div')
+            selectionInstructions.id = 'selectionInstructions'
+            selectionInstructions.style.cssText = `
+                position: fixed;
+                top: 50px;
+                left: 50%;
+                transform: translateX(-50%);
+                text-align: center;
+                z-index: 1000;
+                color: #aaa;
+                font-size: 24px;
+                font-weight: 300;
+            `
+            selectionInstructions.innerHTML = 'Click to select your precision level<br><span style="font-size: 16px; color: #666; font-weight: normal;">Variance shown based on Dr. Neugarten\'s clinical study</span>'
+            document.body.appendChild(selectionInstructions)
+            
+            // Create selection mode
+            window.selectionMode = true
+            window.selectedDrill = null
+            
+            // Position camera for selection view
+            camera.position.set(0, 3, 10)
+            camera.lookAt(0, 0, 0)
+            
+            // Create three drills side by side
+            createSelectionDrills()
+            
+            // Add orange star particles for selection screen
+            const starsGeometry = new THREE.BufferGeometry()
+            const starsCount = 500
+            const positions = new Float32Array(starsCount * 3)
+            
+            for (let i = 0; i < starsCount * 3; i++) {
+                positions[i] = (Math.random() - 0.5) * 30
+            }
+            
+            starsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+            
+            const starsMaterial = new THREE.PointsMaterial({
+                size: 0.05,
+                color: 0xff6600,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending
+            })
+            
+            const stars = new THREE.Points(starsGeometry, starsMaterial)
+            stars.userData.isSelectionStars = true
+            scene.add(stars)
+            window.selectionStars = stars
+        }
+        
+        // Define global variables at the top level
+        let scene, camera, renderer, controls, raycaster;
+        let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Separate function to initialize the actual 3D simulation
+        function startThreeJSSimulation() {
+        // Scene setup
+        scene = new THREE.Scene()
+        scene.background = new THREE.Color(0x000000)  // Ensure black background
+        scene.fog = new THREE.Fog(0x000000, 10, 50)
+        
+        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000)
+        camera.position.set(0, 5, 8)
+        
+        renderer = new THREE.WebGLRenderer({
+            canvas: document.getElementById('canvas'),
+            antialias: true,
+            alpha: false
+        })
+        renderer.setSize(window.innerWidth, window.innerHeight)
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+        renderer.shadowMap.enabled = true
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap
+        renderer.toneMapping = THREE.ACESFilmicToneMapping
+        renderer.toneMappingExposure = 1.2
+        
+        // Controls
+        controls = new OrbitControls(camera, renderer.domElement)
+        controls.enableDamping = true
+        controls.dampingFactor = 0.05
+        controls.maxPolarAngle = Math.PI / 2.2
+        controls.minDistance = 5
+        controls.maxDistance = 15
+        controls.target.set(0, 0, 0)
+        
+        // Enhanced lighting for photorealistic teeth
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.3)
+        scene.add(ambientLight)
+        
+        // Main key light - mimics dental operatory light
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.5)
+        mainLight.position.set(5, 10, 5)
+        mainLight.castShadow = true
+        mainLight.shadow.camera.near = 0.1
+        mainLight.shadow.camera.far = 50
+        mainLight.shadow.camera.left = -10
+        mainLight.shadow.camera.right = 10
+        mainLight.shadow.camera.top = 10
+        mainLight.shadow.camera.bottom = -10
+        mainLight.shadow.mapSize.width = 4096
+        mainLight.shadow.mapSize.height = 4096
+        mainLight.shadow.bias = -0.001
+        scene.add(mainLight)
+        
+        // Fill light with cooler tone
+        const fillLight = new THREE.DirectionalLight(0x88aaff, 0.5)
+        fillLight.position.set(-5, 5, -5)
+        scene.add(fillLight)
+        
+        // Rim light for tooth edges
+        const rimLight = new THREE.DirectionalLight(0xffffff, 0.8)
+        rimLight.position.set(0, -5, 10)
+        scene.add(rimLight)
+        
+        // Spot light for dramatic highlights
+        const spotLight = new THREE.SpotLight(0xffffff, 0.5)
+        spotLight.position.set(0, 8, 0)
+        spotLight.angle = Math.PI / 6
+        spotLight.penumbra = 0.3
+        spotLight.decay = 2
+        spotLight.distance = 30
+        scene.add(spotLight)
+        
+        // Create realistic jaw - HIDDEN FROM START
+        const jawGroup = new THREE.Group()
+        jawGroup.visible = false  // CRITICAL: Hide before adding to scene
+        
+        // Jaw bone
+        const jawGeometry = new THREE.TorusGeometry(3.5, 1.5, 24, 48, Math.PI)
+        const jawMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0xFFE4E1,
+            roughness: 0.8,
+            metalness: 0,
+            clearcoat: 0.2,
+            clearcoatRoughness: 0.9,
+            bumpScale: 0.002,
+        })
+        
+        const jaw = new THREE.Mesh(jawGeometry, jawMaterial)
+        jaw.rotation.x = -Math.PI / 2
+        jaw.castShadow = true
+        jaw.receiveShadow = true
+        jawGroup.add(jaw)
+        
+        // Gum tissue
+        const gumGeometry = new THREE.TorusGeometry(3.3, 1.4, 24, 48, Math.PI)
+        const gumMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0xFFB5C5,
+            roughness: 0.9,
+            metalness: 0,
+            clearcoat: 0.1,
+            transmission: 0.1,
+            thickness: 0.5,
+        })
+        
+        const gum = new THREE.Mesh(gumGeometry, gumMaterial)
+        gum.rotation.x = -Math.PI / 2
+        gum.position.y = 0.1
+        gum.castShadow = true
+        gum.receiveShadow = true
+        jawGroup.add(gum)
+        
+        // Create realistic teeth
+        const teethGroup = new THREE.Group()
+        
+        function createTooth(type = 'molar') {
+            let geometry
+            
+            // Create smooth, realistic tooth shapes using SphereGeometry as base
+            if (type === 'molar') {
+                // Start with a sphere and deform it
+                geometry = new THREE.SphereGeometry(0.4, 32, 32)
+                
+                // Flatten and shape into molar
+                const positions = geometry.attributes.position
+                for (let i = 0; i < positions.count; i++) {
+                    let x = positions.getX(i)
+                    let y = positions.getY(i)
+                    let z = positions.getZ(i)
+                    
+                    // Flatten the sphere vertically
+                    y *= 0.5
+                    
+                    // Create crown with smooth cusps
+                    if (y > 0) {
+                        const angle = Math.atan2(z, x)
+                        const cuspPattern = 0.8 + 0.2 * Math.sin(angle * 4)
+                        y *= cuspPattern
+                        
+                        // Smooth the top surface
+                        const topFactor = 1 - (y / 0.4)
+                        x *= (0.9 + topFactor * 0.1)
+                        z *= (0.9 + topFactor * 0.1)
+                    }
+                    
+                    // Taper towards the root
+                    if (y < -0.1) {
+                        const rootFactor = (y + 0.1) / -0.3
+                        x *= (1 - rootFactor * 0.3)
+                        z *= (1 - rootFactor * 0.3)
+                    }
+                    
+                    positions.setXYZ(i, x, y + 0.4, z)
+                }
+            } else if (type === 'premolar') {
+                // Smaller sphere base
+                geometry = new THREE.SphereGeometry(0.3, 24, 24)
+                
+                const positions = geometry.attributes.position
+                for (let i = 0; i < positions.count; i++) {
+                    let x = positions.getX(i)
+                    let y = positions.getY(i)
+                    let z = positions.getZ(i)
+                    
+                    // Elongate vertically
+                    y *= 0.7
+                    
+                    // Two smooth cusps
+                    if (y > 0) {
+                        const cuspPattern = 0.9 + 0.1 * Math.abs(x)
+                        y *= cuspPattern
+                    }
+                    
+                    // Taper root
+                    if (y < 0) {
+                        const rootFactor = -y / 0.3
+                        x *= (1 - rootFactor * 0.2)
+                        z *= (1 - rootFactor * 0.2)
+                    }
+                    
+                    positions.setXYZ(i, x, y + 0.45, z)
+                }
+            } else if (type === 'canine') {
+                // Teardrop shape
+                geometry = new THREE.SphereGeometry(0.25, 24, 24)
+                
+                const positions = geometry.attributes.position
+                for (let i = 0; i < positions.count; i++) {
+                    let x = positions.getX(i)
+                    let y = positions.getY(i)
+                    let z = positions.getZ(i)
+                    
+                    // Create slightly pointed crown - more rounded
+                    if (y > 0) {
+                        const pointFactor = y / 0.25
+                        x *= (1 - pointFactor * 0.4)  // Less aggressive point
+                        z *= (1 - pointFactor * 0.4)
+                        y *= 1.5  // Less elongation for more natural look
+                    }
+                    
+                    // Smooth taper to root
+                    if (y < 0) {
+                        y *= 1.5
+                        const rootFactor = -y / 0.375
+                        x *= (1 - rootFactor * 0.3)
+                        z *= (1 - rootFactor * 0.3)
+                    }
+                    
+                    positions.setXYZ(i, x, y + 0.5, z)
+                }
+            } else {
+                // Incisors - flattened sphere
+                geometry = new THREE.SphereGeometry(0.2, 24, 24)
+                
+                const positions = geometry.attributes.position
+                for (let i = 0; i < positions.count; i++) {
+                    let x = positions.getX(i)
+                    let y = positions.getY(i)
+                    let z = positions.getZ(i)
+                    
+                    // Flatten front-to-back
+                    z *= 0.3
+                    
+                    // Elongate vertically
+                    y *= 1.5
+                    
+                    // Chisel edge - much less sharp
+                    if (y > 0.25) {
+                        const edgeFactor = (y - 0.25) / 0.05
+                        z *= (1 - edgeFactor * 0.2)  // Less aggressive taper
+                        // Round the edge slightly
+                        x *= (1 - edgeFactor * 0.05)
+                    }
+                    
+                    // Root taper
+                    if (y < 0) {
+                        const rootFactor = -y / 0.3
+                        x *= (1 - rootFactor * 0.2)
+                        z *= (1 - rootFactor * 0.2)
+                    }
+                    
+                    positions.setXYZ(i, x, y + 0.5, z)
+                }
+            }
+            
+            // Add organic variation to all teeth
+            const positions = geometry.attributes.position
+            for (let i = 0; i < positions.count; i++) {
+                const y = positions.getY(i)
+                const x = positions.getX(i)
+                const z = positions.getZ(i)
+                
+                // Smooth the crown with sine wave modulation
+                if (y > 0.3) {
+                    const crownShape = Math.sin(y * Math.PI) * 0.1
+                    positions.setX(i, x * (1 + crownShape))
+                    positions.setZ(i, z * (1 + crownShape))
+                }
+                
+                // Add subtle surface variation
+                const variation = (Math.sin(x * 10) * Math.cos(z * 10)) * 0.02
+                positions.setY(i, y + variation)
+            }
+            
+            geometry.computeVertexNormals()
+            
+            // Ultra-realistic tooth material with subsurface scattering
+            const material = new THREE.MeshPhysicalMaterial({
+                color: 0xFFFEF8, // Slightly warmer ivory
+                roughness: 0.15,
+                metalness: 0,
+                clearcoat: 1,
+                clearcoatRoughness: 0.02,
+                reflectivity: 0.8,
+                envMapIntensity: 2,
+                sheen: 0.8,
+                sheenRoughness: 0.1,
+                sheenColor: 0xffffff,
+                transmission: 0.05, // Slight translucency like real teeth
+                thickness: 0.5,
+                ior: 1.55, // Index of refraction for enamel
+                specularIntensity: 1,
+                specularColor: 0xffffff,
+                emissive: 0xFFFFF0,
+                emissiveIntensity: 0.01, // Subtle inner glow
+            })
+            
+            const tooth = new THREE.Mesh(geometry, material)
+            tooth.castShadow = true
+            tooth.receiveShadow = true
+            
+            return tooth
+        }
+        
+        // Place teeth in realistic dental arch
+        const teethPositions = []
+        
+        // Lower jaw dental arch - 16 teeth total (8 per side)
+        // Using parabolic curve for realistic arch shape
+        function getArchPosition(index, total) {
+            const t = (index / (total - 1)) * Math.PI // 0 to PI for half circle
+            const archWidth = 3.5
+            const archDepth = 3.0
+            
+            // Parabolic arch formula for more realistic shape
+            const x = Math.cos(t) * archWidth * (1 - 0.3 * Math.sin(t))
+            const z = Math.sin(t) * archDepth
+            
+            return { x, z }
+        }
+        
+        // Define teeth layout (left to right)
+        const teethLayout = [
+            'molar', 'molar', 'premolar', 'premolar', 'canine', 'incisor', 'incisor', 'incisor',
+            'incisor', 'incisor', 'incisor', 'canine', 'premolar', 'premolar', 'molar', 'molar'
+        ]
+        
+        teethLayout.forEach((type, index) => {
+            const pos = getArchPosition(index, teethLayout.length)
+            teethPositions.push({
+                x: pos.x,
+                z: pos.z,
+                type: type,
+                index: index
+            })
+        })
+        
+        teethPositions.forEach((pos, index) => {
+            const tooth = createTooth(pos.type)
+            tooth.position.x = pos.x
+            tooth.position.z = pos.z
+            tooth.position.y = 0.6
+            
+            // Slight random rotation for realism
+            tooth.rotation.y = (Math.random() - 0.5) * 0.1
+            tooth.rotation.z = (Math.random() - 0.5) * 0.05
+            
+            // Skip tooth #10 (lower left lateral incisor) for implant site
+            if (index !== 10) {
+                teethGroup.add(tooth)
+            }
+        })
+        
+        jawGroup.add(teethGroup)
+        jawGroup.visible = false  // Double check - MUST be hidden
+        scene.add(jawGroup)
+        window.jawGroup = jawGroup
+        
+        // Target site marker - MUCH MORE VISIBLE
+        const targetGroup = new THREE.Group()
+        
+        // Main target ring
+        const targetGeometry = new THREE.RingGeometry(0.35, 0.45, 32)
+        const targetMaterial = new THREE.MeshBasicMaterial({
+            color: 0x00ff88,
+            transparent: true,
+            opacity: 0.8,
+            side: THREE.DoubleSide
+        })
+        const targetMarker = new THREE.Mesh(targetGeometry, targetMaterial)
+        targetMarker.rotation.x = -Math.PI / 2
+        targetGroup.add(targetMarker)
+        
+        // Glowing center point
+        const centerGeometry = new THREE.SphereGeometry(0.1, 16, 16)
+        const centerMaterial = new THREE.MeshStandardMaterial({
+            color: 0x00ff88,
+            emissive: 0x00ff88,
+            emissiveIntensity: 2
+        })
+        const centerMarker = new THREE.Mesh(centerGeometry, centerMaterial)
+        centerMarker.position.y = 0.05
+        targetGroup.add(centerMarker)
+        
+        // Outer pulse ring
+        const pulseGeometry = new THREE.RingGeometry(0.5, 0.6, 32)
+        const pulseMaterial = new THREE.MeshBasicMaterial({
+            color: 0x00ff88,
+            transparent: true,
+            opacity: 0.3,
+            side: THREE.DoubleSide
+        })
+        const pulseRing = new THREE.Mesh(pulseGeometry, pulseMaterial)
+        pulseRing.rotation.x = -Math.PI / 2
+        targetGroup.add(pulseRing)
+        
+        
+        // "TARGET HERE" text sprite
+        const canvas = document.createElement('canvas')
+        canvas.width = 256
+        canvas.height = 64
+        const ctx = canvas.getContext('2d')
+        ctx.fillStyle = '#00ff88'
+        ctx.font = 'bold 32px Arial'
+        ctx.textAlign = 'center'
+        ctx.fillText('TARGET HERE', 128, 40)
+        
+        const texture = new THREE.CanvasTexture(canvas)
+        const spriteMaterial = new THREE.SpriteMaterial({ 
+            map: texture,
+            transparent: true,
+            opacity: 0.9
+        })
+        const sprite = new THREE.Sprite(spriteMaterial)
+        sprite.position.y = 2
+        sprite.scale.set(2, 0.5, 1)
+        targetGroup.add(sprite)
+        
+        // Position target at missing tooth location
+        const missingToothPos = teethPositions[10] // Lower left lateral incisor
+        targetGroup.position.set(
+            missingToothPos.x,
+            0.61,
+            missingToothPos.z
+        )
+        targetGroup.visible = false  // CRITICAL: Hide before adding
+        scene.add(targetGroup)
+        window.targetGroup = targetGroup
+        
+        const targetPosition = targetGroup.position.clone()
+        
+        // Drill/Implant model
+        const drillGroup = new THREE.Group()
+        
+        // Drill body
+        const drillBodyGeometry = new THREE.CylinderGeometry(0.15, 0.1, 3, 16)
+        const drillBodyMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0xFFFFFF,  // Bright white base
+            metalness: 1.0,    // Full metallic
+            roughness: 0.05,   // Very smooth/shiny
+            clearcoat: 1,
+            clearcoatRoughness: 0,
+            envMapIntensity: 2.0,  // Strong reflections
+            emissive: 0x222222,    // Slight self-illumination
+            emissiveIntensity: 0.2
+        })
+        const drillBody = new THREE.Mesh(drillBodyGeometry, drillBodyMaterial)
+        drillGroup.add(drillBody)
+        
+        // Drill tip
+        const drillTipGeometry = new THREE.ConeGeometry(0.1, 0.5, 8)
+        const drillTipMesh = new THREE.Mesh(drillTipGeometry, drillBodyMaterial)
+        drillTipMesh.position.y = -1.75
+        drillGroup.add(drillTipMesh)
+        
+        // Add glowing tip indicator
+        const tipIndicatorGeometry = new THREE.SphereGeometry(0.05, 8, 8)
+        const tipIndicatorMaterial = new THREE.MeshBasicMaterial({
+            color: 0xff0000,
+            transparent: true,
+            opacity: 0.8
+        })
+        const tipIndicator = new THREE.Mesh(tipIndicatorGeometry, tipIndicatorMaterial)
+        tipIndicator.position.y = -2 // At the very tip of the drill
+        drillGroup.add(tipIndicator)
+        
+        // Add laser pointer from tip to show where it will land
+        const laserGeometry = new THREE.CylinderGeometry(0.01, 0.01, 5, 8)
+        const laserMaterial = new THREE.MeshBasicMaterial({
+            color: 0xff0000,
+            transparent: true,
+            opacity: 0.3
+        })
+        const laser = new THREE.Mesh(laserGeometry, laserMaterial)
+        laser.position.y = -4.5 // Extends down from drill tip
+        drillGroup.add(laser)
+        
+        drillGroup.position.y = 3
+        drillGroup.visible = false // CRITICAL: Hidden until method selected
+        scene.add(drillGroup)
+        
+        
+        // Store references to important objects
+        const drillTip = tipIndicator
+        const drillLaser = laser
+        
+        // Game state
+        let currentMethod = 'freehand'
+        let currentMode = 'explore'
+        let isPlacing = false
+        let startTime = 0
+        let mouseX = 0, mouseY = 0
+        let tutorialMode = true
+        let tutorialStep = 1
+        let methodScores = {
+            freehand: null,
+            static: null,
+            yomi: null
+        }
+        
+        // DR. NEUGARTEN'S CLINICAL DATA - Realistic surgical variance
+        const methodData = {
+            freehand: {
+                variance: 0.7,       // 7mm variance - VERY DIFFICULT
+                shake: 0.08,         // Major hand tremor - realistic difficulty
+                drift: 0.05,         // Significant natural hand drift
+                angularError: 7,     // 7 degrees angular deviation
+                color: '#ff4444',
+                description: 'Freehand Surgery'
+            },
+            static: {
+                variance: 0.35,      // 3.5mm variance - MODERATE difficulty
+                shake: 0.03,         // Moderate shake even with guide
+                drift: 0.02,         // Some drift still present
+                angularError: 3,     // 3 degrees angular deviation
+                color: '#ffaa00',
+                description: 'Static Guided'
+            },
+            yomi: {
+                variance: 0.002,     // <0.2mm variance - EASY with robot
+                shake: 0.0001,       // Virtually no shake
+                drift: 0,            // Zero drift with robotic guidance
+                angularError: 0.15,  // <1.5 degrees
+                color: '#00ff88',
+                description: 'Yomi Robotic'
+            }
+        }
+        
+        // Create surgical pathway visualization
+        const pathwayGroup = new THREE.Group()
+        
+        // Create cone geometry that shows the margin of error
+        const createPathwayCone = (method) => {
+            const data = methodData[method]
+            // Calculate cone dimensions based on variance
+            // Start narrow at drill tip and expand based on angular error
+            const topRadius = 0.01  // Very narrow at tip
+            const height = 5
+            // Calculate bottom radius based on angular error and distance
+            const angleRad = (data.angularError * Math.PI) / 180
+            const bottomRadius = Math.tan(angleRad) * height + data.variance
+            
+            const geometry = new THREE.CylinderGeometry(topRadius, bottomRadius, height, 32, 1, true)
+            const material = new THREE.MeshBasicMaterial({
+                color: data.color,
+                transparent: true,
+                opacity: 0.2,
+                side: THREE.DoubleSide,
+                depthWrite: false
+            })
+            
+            const cone = new THREE.Mesh(geometry, material)
+            // Position so top is at drill tip (drill tip is at y=-2)
+            cone.position.y = -2 - height/2  // Start from drill tip and extend down
+            
+            // Add wireframe for better visibility
+            const wireframeGeometry = new THREE.CylinderGeometry(topRadius, bottomRadius, height, 16, 1, true)
+            const wireframeMaterial = new THREE.MeshBasicMaterial({
+                color: data.color,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.4
+            })
+            const wireframe = new THREE.Mesh(wireframeGeometry, wireframeMaterial)
+            wireframe.position.y = -2 - height/2
+            
+            const group = new THREE.Group()
+            group.add(cone)
+            group.add(wireframe)
+            group.visible = false  // Hidden by default
+            
+            return group
+        }
+        
+        // Create pathway cones for each method
+        const pathwayCones = {
+            freehand: createPathwayCone('freehand'),
+            static: createPathwayCone('static'),
+            yomi: createPathwayCone('yomi')
+        }
+        
+        Object.values(pathwayCones).forEach(cone => pathwayGroup.add(cone))
+        drillGroup.add(pathwayGroup)
+        
+        // Create selection drills function
+        window.createSelectionDrills = function() {
+            // Create three drills for selection
+            const methods = ['freehand', 'static', 'yomi']
+            const positions = [-4, 0, 4]
+            const selectionDrills = {}
+            
+            methods.forEach((method, index) => {
+                // Create drill group for each method
+                const drillClone = new THREE.Group()
+                
+                // Clone drill body
+                const bodyGeo = new THREE.CylinderGeometry(0.15, 0.1, 3, 16)
+                const bodyMat = new THREE.MeshPhysicalMaterial({
+                    color: methodData[method].color,
+                    metalness: 0.9,
+                    roughness: 0.1,
+                    clearcoat: 1,
+                    clearcoatRoughness: 0,
+                    emissive: methodData[method].color,
+                    emissiveIntensity: 0.2
+                })
+                const body = new THREE.Mesh(bodyGeo, bodyMat)
+                drillClone.add(body)
+                
+                // Clone drill tip
+                const tipGeo = new THREE.ConeGeometry(0.1, 0.5, 8)
+                const tip = new THREE.Mesh(tipGeo, bodyMat)
+                tip.position.y = -1.75
+                drillClone.add(tip)
+                
+                // Position drill
+                drillClone.position.x = positions[index]
+                drillClone.position.y = 2
+                drillClone.userData = { method: method }
+                
+                // Add pathway cone
+                const cone = pathwayCones[method].clone()
+                cone.visible = true
+                cone.position.x = 0
+                cone.position.y = 0
+                drillClone.add(cone)
+                
+                // Add wobble animation
+                drillClone.userData.wobbleOffset = Math.random() * Math.PI * 2
+                
+                selectionDrills[method] = drillClone
+                scene.add(drillClone)
+            })
+            
+            window.selectionDrills = selectionDrills
+            
+            // Add labels under each drill
+            const labelHTML = `
+                <div id="drillLabels" style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; gap: 120px; justify-content: center; pointer-events: none;">
+                    <div style="text-align: center; color: #ff4444;">
+                        <div style="font-size: 20px; font-weight: 600;">Freehand</div>
+                        <div style="font-size: 14px; opacity: 0.8;">7mm variance</div>
+                    </div>
+                    <div style="text-align: center; color: #ffaa00;">
+                        <div style="font-size: 20px; font-weight: 600;">Static Guided</div>
+                        <div style="font-size: 14px; opacity: 0.8;">3.5mm variance</div>
+                    </div>
+                    <div style="text-align: center; color: #00ff88;">
+                        <div style="font-size: 20px; font-weight: 600;">Yomi Robotic</div>
+                        <div style="font-size: 14px; opacity: 0.8;"><0.2mm variance</div>
+                    </div>
+                </div>
+            `
+            document.body.insertAdjacentHTML('beforeend', labelHTML)
+            
+            // Add raycaster for selection
+            raycaster = new THREE.Raycaster()
+            const mouse = new THREE.Vector2()
+            
+            function onMouseClick(event) {
+                if (!window.selectionMode) return
+                
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+                
+                raycaster.setFromCamera(mouse, camera)
+                
+                // Check intersections with drills
+                const drills = Object.values(selectionDrills)
+                const intersects = raycaster.intersectObjects(drills, true)
+                
+                if (intersects.length > 0) {
+                    // Find which drill was clicked
+                    let selectedObject = intersects[0].object
+                    while (selectedObject.parent && !selectedObject.userData.method) {
+                        selectedObject = selectedObject.parent
+                    }
+                    
+                    if (selectedObject.userData.method) {
+                        // Add haptic feedback for selection
+                        if (navigator.vibrate) navigator.vibrate(50)
+                        
+                        // Add audio feedback for selection
+                        if (!window.audioContext) {
+                            window.audioContext = new (window.AudioContext || window.webkitAudioContext)()
+                        }
+                        
+                        // Resume audio context for mobile
+                        if (window.audioContext.state === 'suspended') {
+                            window.audioContext.resume()
+                        }
+                        
+                        playTone(600, 0.1)
+                        
+                        selectMethodVisual(selectedObject.userData.method)
+                    }
+                }
+            }
+            
+            window.addEventListener('click', onMouseClick)
+        }
+        
+        // Visual method selection
+        // Setup drill placement controls
+        function setupDrillPlacement() {
+            // Remove any existing drill placement listeners
+            window.removeEventListener('click', window.drillPlacementHandler)
+            
+            // Create new drill placement handler
+            window.drillPlacementHandler = function(event) {
+                if (window.selectionMode) return // Don't interfere with selection
+                
+                // Toggle placement mode - don't end procedure
+                if (!isPlacing) {
+                    startPlacement()
+                } else {
+                    // Just stop placing, don't end procedure
+                    isPlacing = false
+                    document.getElementById('instructionText').textContent = 
+                        `${currentMethod.charAt(0).toUpperCase() + currentMethod.slice(1)} selected - Click to place the drill`
+                    
+                    // Hide mobile controls
+                    if (isMobile && document.getElementById('mobileControls')) {
+                        document.getElementById('mobileControls').style.display = 'none'
+                    }
+                }
+            }
+            
+            // Add the new handler
+            window.addEventListener('click', window.drillPlacementHandler)
+        }
+        
+        window.selectMethodVisual = function(method) {
+            // Remove selection UI
+            const selectionInstructions = document.getElementById('selectionInstructions')
+            if (selectionInstructions) selectionInstructions.remove()
+            
+            // Remove drill labels
+            const drillLabels = document.getElementById('drillLabels')
+            if (drillLabels) drillLabels.remove()
+            
+            // Hide selection drills
+            Object.values(window.selectionDrills).forEach(drill => {
+                if (drill.userData.method !== method) {
+                    drill.visible = false
+                }
+            })
+            
+            // Animate selected drill to center
+            const selectedDrill = window.selectionDrills[method]
+            const targetPos = { x: 0, y: 3 }
+            const startPos = { x: selectedDrill.position.x, y: selectedDrill.position.y }
+            
+            let animTime = 0
+            const animDuration = 1000
+            
+            function animateDrill() {
+                animTime += 16
+                const progress = Math.min(animTime / animDuration, 1)
+                const easeProgress = 1 - Math.pow(1 - progress, 3) // Ease out cubic
+                
+                selectedDrill.position.x = startPos.x + (targetPos.x - startPos.x) * easeProgress
+                selectedDrill.position.y = startPos.y + (targetPos.y - startPos.y) * easeProgress
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateDrill)
+                } else {
+                    // Transition complete, start game
+                    window.selectionMode = false
+                    selectedDrill.visible = false
+                    
+                    // Show jaw and target now
+                    if (window.jawGroup) window.jawGroup.visible = true
+                    if (window.targetGroup) window.targetGroup.visible = true
+                    
+                    // Hide selection stars
+                    if (window.selectionStars) window.selectionStars.visible = false
+                    
+                    // Set the method and disable tutorial mode
+                    currentMethod = method
+                    tutorialMode = false  // CRITICAL: Allow method switching now
+                    setMethodForTutorial(method)
+                    
+                    // Show main drill
+                    drillGroup.visible = true
+                    
+                    // Show UI
+                    document.getElementById('mainHud').style.display = 'flex'
+                    document.querySelector('.instructions').style.display = 'block'
+                    document.getElementById('uiToggle').style.display = 'block'
+                    
+                    // Ensure controls are enabled
+                    if (controls) {
+                        controls.enabled = true
+                    }
+                    
+                    // Update instruction
+                    document.getElementById('instructionText').textContent = 
+                        `${method.charAt(0).toUpperCase() + method.slice(1)} method selected - Click to place the drill`
+                    
+                    // Track selection
+                    gtag('event', 'visual_method_selected', {
+                        'event_category': 'onboarding',
+                        'event_label': method
+                    });
+                    
+                    // Set up drill placement controls
+                    setupDrillPlacement()
+                }
+            }
+            
+            animateDrill()
+        }
+        
+        // Mode functions
+        window.setMode = (mode, fromButton = true) => {
+            currentMode = mode
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active')
+            })
+            
+            // Add active class to the correct button
+            if (fromButton && event && event.target) {
+                event.target.classList.add('active')
+            } else {
+                // Find and activate the correct button
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    if (btn.textContent.toLowerCase().includes(mode)) {
+                        btn.classList.add('active')
+                    }
+                })
+            }
+            
+            if (mode === 'explore') {
+                // Hide metrics in explore mode
+                document.querySelector('.hud-panel:last-child').style.display = 'none'
+                targetGroup.visible = false
+                document.getElementById('instructionText').textContent = 'Explore Mode - Move the drill freely'
+                document.getElementById('controlsText').textContent = 'Experience the different surgical methods without pressure'
+            } else {
+                // Show metrics in challenge mode
+                document.querySelector('.hud-panel:last-child').style.display = 'block'
+                targetGroup.visible = true
+                document.getElementById('instructionText').textContent = 'Challenge Mode - Hit the target!'
+                document.getElementById('controlsText').textContent = 'Test your precision with each method'
+            }
+        }
+
+        // Tutorial functions
+        window.startTutorial = () => {
+            document.getElementById('tutorialOverlay').classList.add('hidden')
+            // First show the drill selection
+            initializeMethodSelection()
+        }
+
+        function updateTutorialUI() {
+            const tutorials = {
+                1: {
+                    title: "Step 1: Freehand Surgery",
+                    instruction: "Click to start, then move your mouse to the GREEN TARGET and click to place",
+                    controls: "Watch how difficult it is to hit the target - your hand naturally shakes!",
+                    method: 'freehand'
+                },
+                2: {
+                    title: "Step 2: Static Guided Surgery",
+                    instruction: "Click to start, then guide the drill to the GREEN TARGET",
+                    controls: "Better than freehand, but still challenging to hit the exact center",
+                    method: 'static'
+                },
+                3: {
+                    title: "Step 3: Yomi Robotic Surgery",
+                    instruction: "Click to start, then easily guide to the GREEN TARGET",
+                    controls: "Notice how the robot stabilizes your movements - precision is effortless!",
+                    method: 'yomi'
+                }
+            }
+
+            const current = tutorials[tutorialStep]
+            document.getElementById('instructionText').textContent = current.title
+            document.getElementById('controlsText').textContent = current.instruction
+            
+            // Update step indicators
+            document.querySelectorAll('.step').forEach((step, index) => {
+                step.classList.toggle('active', index + 1 === tutorialStep)
+            })
+        }
+
+        function setMethodForTutorial(method) {
+            currentMethod = method
+            
+            // Update button states
+            document.querySelectorAll('.method-btn').forEach((btn, index) => {
+                btn.classList.remove('active')
+                
+                // Match button by text content
+                const btnText = btn.textContent.toLowerCase()
+                if ((method === 'freehand' && btnText.includes('freehand')) ||
+                    (method === 'static' && btnText.includes('static')) ||
+                    (method === 'yomi' && btnText.includes('yomi'))) {
+                    btn.classList.add('active')
+                }
+            })
+            
+            // Update cursor
+            const cursor = document.getElementById('cursor')
+            cursor.className = 'precision-cursor ' + method
+        }
+
+        // Track pathway visibility state
+        let pathwayVisible = false
+        let compareMode = false
+        let uiVisible = true
+        let particleSystem = null
+        let particleAnimating = false
+        
+        // Particle animation for pathway transitions
+        function animatePathwayTransition(fromMethod, toMethod) {
+            console.log('animatePathwayTransition called:', fromMethod, '->', toMethod)
+            if (particleAnimating) return
+            particleAnimating = true
+            
+            const fromCone = pathwayCones[fromMethod]
+            const toCone = pathwayCones[toMethod]
+            
+            if (!fromCone || !toCone) {
+                console.error('Cones not found:', fromCone, toCone)
+                particleAnimating = false
+                return
+            }
+            
+            // Create particle system if not exists
+            if (!particleSystem) {
+                const particleCount = 500
+                const geometry = new THREE.BufferGeometry()
+                const positions = new Float32Array(particleCount * 3)
+                const colors = new Float32Array(particleCount * 3)
+                const sizes = new Float32Array(particleCount)
+                
+                for (let i = 0; i < particleCount; i++) {
+                    positions[i * 3] = 0
+                    positions[i * 3 + 1] = 0
+                    positions[i * 3 + 2] = 0
+                    sizes[i] = Math.random() * 0.05 + 0.02
+                }
+                
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+                geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1))
+                
+                const material = new THREE.PointsMaterial({
+                    size: 0.05,
+                    vertexColors: true,
+                    transparent: true,
+                    opacity: 0,
+                    blending: THREE.AdditiveBlending
+                })
+                
+                particleSystem = new THREE.Points(geometry, material)
+                scene.add(particleSystem)
+            }
+            
+            // Get cone world positions
+            const fromPos = new THREE.Vector3()
+            const toPos = new THREE.Vector3()
+            fromCone.getWorldPosition(fromPos)
+            toCone.getWorldPosition(toPos)
+            
+            // Collapse animation
+            const positions = particleSystem.geometry.attributes.position
+            const colors = particleSystem.geometry.attributes.color
+            const fromColor = new THREE.Color(methodData[fromMethod].color)
+            const toColor = new THREE.Color(methodData[toMethod].color)
+            
+            // Phase 1: Collapse cone into particles
+            fromCone.visible = false
+            particleSystem.material.opacity = 1
+            
+            // Initialize particles at cone positions
+            for (let i = 0; i < positions.count; i++) {
+                const theta = Math.random() * Math.PI * 2
+                const phi = Math.random() * Math.PI
+                const radius = methodData[fromMethod].variance * 0.3
+                
+                positions.setXYZ(
+                    i,
+                    fromPos.x + Math.sin(phi) * Math.cos(theta) * radius,
+                    fromPos.y + Math.cos(phi) * radius,
+                    fromPos.z + Math.sin(phi) * Math.sin(theta) * radius
+                )
+                
+                colors.setXYZ(i, fromColor.r, fromColor.g, fromColor.b)
+            }
+            positions.needsUpdate = true
+            colors.needsUpdate = true
+            
+            // Animate particles from old to new position
+            let animTime = 0
+            const animDuration = 800
+            
+            function animateParticles() {
+                animTime += 16
+                const progress = Math.min(animTime / animDuration, 1)
+                const easeProgress = 1 - Math.pow(1 - progress, 3) // Ease out cubic
+                
+                for (let i = 0; i < positions.count; i++) {
+                    const currentPos = new THREE.Vector3()
+                    currentPos.fromBufferAttribute(positions, i)
+                    
+                    // Interpolate position
+                    const targetTheta = Math.random() * Math.PI * 2
+                    const targetPhi = Math.random() * Math.PI
+                    const targetRadius = methodData[toMethod].variance * 0.3
+                    
+                    const targetX = toPos.x + Math.sin(targetPhi) * Math.cos(targetTheta) * targetRadius
+                    const targetY = toPos.y + Math.cos(targetPhi) * targetRadius
+                    const targetZ = toPos.z + Math.sin(targetPhi) * Math.sin(targetTheta) * targetRadius
+                    
+                    positions.setXYZ(
+                        i,
+                        currentPos.x + (targetX - currentPos.x) * easeProgress * 0.1,
+                        currentPos.y + (targetY - currentPos.y) * easeProgress * 0.1,
+                        currentPos.z + (targetZ - currentPos.z) * easeProgress * 0.1
+                    )
+                    
+                    // Interpolate color
+                    const r = fromColor.r + (toColor.r - fromColor.r) * easeProgress
+                    const g = fromColor.g + (toColor.g - fromColor.g) * easeProgress
+                    const b = fromColor.b + (toColor.b - fromColor.b) * easeProgress
+                    colors.setXYZ(i, r, g, b)
+                }
+                
+                positions.needsUpdate = true
+                colors.needsUpdate = true
+                
+                // Fade out particles and show new cone
+                if (progress > 0.7) {
+                    particleSystem.material.opacity = (1 - progress) * 3.33
+                    if (progress === 1) {
+                        toCone.visible = true
+                        particleSystem.material.opacity = 0
+                        particleAnimating = false
+                        return
+                    }
+                }
+                
+                requestAnimationFrame(animateParticles)
+            }
+            
+            animateParticles()
+        }
+        
+        // Toggle pathway visualization
+        window.togglePathway = () => {
+            pathwayVisible = !pathwayVisible
+            const btn = document.getElementById('pathwayToggle')
+            const varianceInfo = document.getElementById('varianceInfo')
+            
+            if (pathwayVisible) {
+                btn.innerHTML = '👁️ Hide Possible Surgical Pathways'
+                btn.style.background = 'rgba(0, 255, 136, 0.3)'
+                // Show current method's pathway
+                Object.keys(pathwayCones).forEach(method => {
+                    pathwayCones[method].visible = method === currentMethod
+                })
+                // Show variance info panel
+                varianceInfo.style.display = 'block'
+                
+                // Track pathway toggle
+                gtag('event', 'toggle_pathway', {
+                    'event_category': 'visualization',
+                    'event_label': 'show',
+                    'value': 1
+                });
+            } else {
+                btn.innerHTML = '👁️ Show Possible Surgical Pathways'
+                btn.style.background = 'rgba(0, 255, 136, 0.1)'
+                
+                // Track pathway toggle
+                gtag('event', 'toggle_pathway', {
+                    'event_category': 'visualization',
+                    'event_label': 'hide',
+                    'value': 0
+                });
+                // Hide all pathways
+                Object.values(pathwayCones).forEach(cone => {
+                    cone.visible = false
+                })
+                // Hide variance info panel
+                varianceInfo.style.display = 'none'
+            }
+        }
+        
+        // Toggle comparison mode
+        window.toggleCompare = () => {
+            compareMode = !compareMode
+            const btn = document.getElementById('compareToggle')
+            const varianceInfo = document.getElementById('varianceInfo')
+            
+            if (compareMode) {
+                btn.innerHTML = '⚔️ Hide Comparison'
+                btn.style.background = 'rgba(0, 136, 255, 0.3)'
+                
+                // Position cones side by side for comparison
+                let offset = -1.5
+                const spacing = 1.5
+                
+                Object.keys(pathwayCones).forEach((method, index) => {
+                    const cone = pathwayCones[method]
+                    cone.visible = true
+                    // Position cones side by side
+                    cone.position.x = offset + (index * spacing)
+                    // Highlight current method, make others transparent
+                    cone.children.forEach(child => {
+                        if (child.material) {
+                            child.material.opacity = method === currentMethod ? 0.4 : 0.15
+                        }
+                    })
+                })
+                
+                // Show variance info
+                varianceInfo.style.display = 'block'
+                
+                // Hide normal pathway toggle
+                document.getElementById('pathwayToggle').disabled = true
+                document.getElementById('pathwayToggle').style.opacity = '0.5'
+                
+                // Track comparison mode toggle
+                gtag('event', 'toggle_comparison', {
+                    'event_category': 'visualization',
+                    'event_label': 'enabled',
+                    'value': 1
+                });
+            } else {
+                btn.innerHTML = '⚔️ Compare All Methods'
+                btn.style.background = 'rgba(0, 136, 255, 0.1)'
+                
+                // Reset positions and hide all
+                Object.values(pathwayCones).forEach(cone => {
+                    cone.visible = false
+                    cone.position.x = 0
+                    // Reset opacity
+                    cone.children.forEach(child => {
+                        if (child.material) {
+                            child.material.opacity = child.material.wireframe ? 0.4 : 0.2
+                        }
+                    })
+                })
+                
+                // Hide variance info unless pathway is visible
+                if (!pathwayVisible) {
+                    varianceInfo.style.display = 'none'
+                }
+                
+                // Re-enable pathway toggle
+                document.getElementById('pathwayToggle').disabled = false
+                document.getElementById('pathwayToggle').style.opacity = '1'
+                
+                // Track comparison mode toggle
+                gtag('event', 'toggle_comparison', {
+                    'event_category': 'visualization',
+                    'event_label': 'disabled',
+                    'value': 0
+                });
+            }
+        }
+        
+        // Toggle UI visibility
+        window.toggleUI = () => {
+            uiVisible = !uiVisible
+            const btn = document.getElementById('uiToggle')
+            const uiElements = [
+                document.getElementById('mainHud'),
+                document.querySelector('.instructions'),
+                document.getElementById('varianceInfo'),
+                document.getElementById('tutorialCard')
+            ]
+            
+            if (uiVisible) {
+                btn.innerHTML = '<span id="uiToggleIcon">👁️</span> <span id="uiToggleText">Hide UI</span>'
+                uiElements.forEach(el => {
+                    if (el) el.style.display = el.id === 'mainHud' ? 'flex' : 'block'
+                })
+            } else {
+                btn.innerHTML = '<span id="uiToggleIcon">👁️</span> <span id="uiToggleText">Show UI</span>'
+                uiElements.forEach(el => {
+                    if (el) el.style.display = 'none'
+                })
+            }
+            
+            // Track UI toggle
+            gtag('event', 'toggle_ui', {
+                'event_category': 'ui_interaction',
+                'event_label': uiVisible ? 'show' : 'hide'
+            });
+        }
+        
+        // Method selection
+        window.setMethod = (method) => {
+            // Allow method switching after initial selection
+            // if (tutorialMode) return // REMOVED - allow switching
+            
+            currentMethod = method
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                btn.classList.remove('active')
+            })
+            
+            // Find and activate the correct button
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                if ((method === 'freehand' && btn.textContent.includes('Freehand')) ||
+                    (method === 'static' && btn.textContent.includes('Static')) ||
+                    (method === 'yomi' && btn.textContent.includes('Yomi'))) {
+                    btn.classList.add('active')
+                }
+            })
+            
+            // Track method selection
+            gtag('event', 'method_selected', {
+                'method': method
+            });
+            
+            // Audio feedback for method switching
+            if (!window.audioContext) {
+                window.audioContext = new (window.AudioContext || window.webkitAudioContext)()
+            }
+            if (window.audioContext.state === 'suspended') {
+                window.audioContext.resume()
+            }
+            
+            // Different tones for different methods
+            const methodTones = {
+                'freehand': 400,   // Lower tone for harder method
+                'static': 550,     // Medium tone 
+                'yomi': 700        // Higher tone for best method
+            }
+            playTone(methodTones[method], 0.1)
+            
+            // Haptic feedback for method switching
+            if (navigator.vibrate) navigator.vibrate(30)
+            
+            // Update cursor class
+            const cursor = document.getElementById('cursor')
+            cursor.className = 'precision-cursor ' + method
+            
+            // Update pathway visualization if visible with particle animation
+            if (pathwayVisible && !compareMode) {
+                console.log('Pathway visible, single mode')
+                // Store previous method for animation
+                const previousMethod = Object.keys(pathwayCones).find(m => pathwayCones[m].visible)
+                console.log('Previous method:', previousMethod, 'New method:', method)
+                if (previousMethod && previousMethod !== method) {
+                    // Trigger particle animation for pathway transition
+                    console.log('Triggering particle animation')
+                    animatePathwayTransition(previousMethod, method)
+                } else {
+                    // First time showing pathway
+                    console.log('First time showing pathway or same method')
+                    Object.keys(pathwayCones).forEach(m => {
+                        pathwayCones[m].visible = m === method
+                    })
+                }
+            } else if (pathwayVisible && compareMode) {
+                // In compare mode, just update highlighting without hiding
+                Object.keys(pathwayCones).forEach(m => {
+                    const cone = pathwayCones[m]
+                    cone.children.forEach(child => {
+                        if (child.material) {
+                            child.material.opacity = m === method ? 0.4 : 0.15
+                        }
+                    })
+                })
+            }
+            
+            // Update instruction with emphasis on difficulty
+            const methodNames = {
+                freehand: 'Freehand - 7mm variance (Dr. Neugarten)',
+                static: 'Static Guided - 3.5mm variance (Dr. Neugarten)', 
+                yomi: 'Yomi Robotic - <0.2mm variance (Dr. Neugarten)'
+            }
+            // Update instruction based on current state
+            if (isPlacing) {
+                document.getElementById('instructionText').textContent = 
+                    `${methodNames[method]} - Position drill and click to place or switch methods`
+            } else {
+                document.getElementById('instructionText').textContent = 
+                    `${methodNames[method]} - Click to begin placement`
+            }
+            
+            // Update instruction text color based on method
+            const instructionEl = document.getElementById('instructionText')
+            instructionEl.style.color = methodData[method].color
+            
+            // Update variance indicator with Dr. Neugarten's data
+            const difficultyEl = document.getElementById('difficultyLevel')
+            if (difficultyEl) {
+                const variances = {
+                    'freehand': '7mm variance',
+                    'static': '3.5mm variance', 
+                    'yomi': '<0.2mm variance'
+                }
+                difficultyEl.textContent = variances[method] || '-'
+                difficultyEl.style.color = methodData[method].color
+            }
+            
+            // Visual flash effect for method change
+            instructionEl.style.transform = 'scale(1.1)'
+            instructionEl.style.transition = 'all 0.2s ease'
+            setTimeout(() => {
+                instructionEl.style.transform = 'scale(1)'
+            }, 200)
+        }
+        
+        // Mobile detection - use global variable
+        // isMobile is already defined globally
+        
+        // Mouse tracking (desktop)
+        if (!isMobile) {
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX / window.innerWidth) * 2 - 1
+                mouseY = -(event.clientY / window.innerHeight) * 2 + 1
+                
+                // Update cursor position
+                const cursor = document.getElementById('cursor')
+                cursor.style.left = event.clientX + 'px'
+                cursor.style.top = event.clientY + 'px'
+                
+                if (isPlacing) {
+                    updateDrillPosition()
+                }
+            })
+        }
+        
+        // Touch handling (mobile)
+        if (isMobile) {
+            // Hide desktop cursor
+            document.getElementById('cursor').style.display = 'none'
+            
+            // Add mobile UI adjustments - but only if elements exist
+            const hud = document.querySelector('.hud')
+            const varianceInfo = document.querySelector('.variance-info')
+            
+            if (hud) hud.style.flexDirection = 'column'
+            if (varianceInfo) {
+                varianceInfo.style.maxWidth = '280px'
+                varianceInfo.style.right = '10px'
+                varianceInfo.style.top = 'auto'
+                varianceInfo.style.bottom = '100px'
+            }
+            
+            let touchStartX = 0
+            let touchStartY = 0
+            
+            document.addEventListener('touchstart', (event) => {
+                if (event.touches.length === 1) {
+                    touchStartX = event.touches[0].clientX
+                    touchStartY = event.touches[0].clientY
+                }
+            }, { passive: false })
+            
+            document.addEventListener('touchmove', (event) => {
+                if (event.touches.length === 1 && isPlacing) {
+                    event.preventDefault()
+                    
+                    const touch = event.touches[0]
+                    mouseX = (touch.clientX / window.innerWidth) * 2 - 1
+                    mouseY = -(touch.clientY / window.innerHeight) * 2 + 1
+                    
+                    updateDrillPosition()
+                    
+                    // Enhanced mobile haptic feedback for proximity
+                    const drillTipWorld = new THREE.Vector3(
+                        drillGroup.position.x,
+                        drillGroup.position.y - 2,
+                        drillGroup.position.z
+                    )
+                    const targetPos = targetGroup.position
+                    const distance = drillTipWorld.distanceTo(targetPos)
+                    
+                    // More aggressive haptic feedback on mobile
+                    if (distance < 1.0 && navigator.vibrate) {
+                        const intensity = Math.max(10, 60 - (distance * 50))
+                        navigator.vibrate(intensity)
+                    }
+                }
+            }, { passive: false })
+            
+            // Add virtual joystick for precise control
+            const joystickHTML = `
+                <div id="mobileControls" style="position: fixed; bottom: 150px; left: 50%; transform: translateX(-50%); z-index: 1000;">
+                    <div style="background: rgba(0,0,0,0.8); padding: 20px; border-radius: 20px; border: 1px solid rgba(0,255,136,0.3);">
+                        <div style="text-align: center; margin-bottom: 10px; color: #888;">Use joystick for precision</div>
+                        <div id="joystick" style="width: 120px; height: 120px; background: rgba(0,255,136,0.1); border: 2px solid rgba(0,255,136,0.3); border-radius: 50%; position: relative; touch-action: none;">
+                            <div id="joystickKnob" style="width: 40px; height: 40px; background: #00ff88; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); transition: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            `
+            document.body.insertAdjacentHTML('beforeend', joystickHTML)
+            
+            // Hide joystick initially
+            document.getElementById('mobileControls').style.display = 'none'
+            
+            // Joystick control
+            const joystick = document.getElementById('joystick')
+            const knob = document.getElementById('joystickKnob')
+            let joystickActive = false
+            
+            joystick.addEventListener('touchstart', (e) => {
+                joystickActive = true
+                e.preventDefault()
+            }, { passive: false })
+            
+            joystick.addEventListener('touchmove', (e) => {
+                if (joystickActive && isPlacing) {
+                    e.preventDefault()
+                    const rect = joystick.getBoundingClientRect()
+                    const centerX = rect.left + rect.width / 2
+                    const centerY = rect.top + rect.height / 2
+                    
+                    const touch = e.touches[0]
+                    let deltaX = touch.clientX - centerX
+                    let deltaY = touch.clientY - centerY
+                    
+                    // Limit to circle
+                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+                    const maxDistance = rect.width / 2 - 20
+                    if (distance > maxDistance) {
+                        deltaX = (deltaX / distance) * maxDistance
+                        deltaY = (deltaY / distance) * maxDistance
+                    }
+                    
+                    // Update knob position
+                    knob.style.left = `${50 + (deltaX / rect.width) * 100}%`
+                    knob.style.top = `${50 + (deltaY / rect.height) * 100}%`
+                    
+                    // Update mouse position with fine control
+                    mouseX += deltaX * 0.001 * methodData[currentMethod].variance
+                    mouseY -= deltaY * 0.001 * methodData[currentMethod].variance
+                    mouseX = Math.max(-1, Math.min(1, mouseX))
+                    mouseY = Math.max(-1, Math.min(1, mouseY))
+                    
+                    updateDrillPosition()
+                }
+            }, { passive: false })
+            
+            joystick.addEventListener('touchend', () => {
+                joystickActive = false
+                // Reset knob
+                knob.style.left = '50%'
+                knob.style.top = '50%'
+            })
+        }
+        
+        function updateDrillPosition() {
+            if (!raycaster) raycaster = new THREE.Raycaster()
+            raycaster.setFromCamera(new THREE.Vector2(mouseX, mouseY), camera)
+            
+            // Create plane at jaw level
+            const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
+            const intersectPoint = new THREE.Vector3()
+            raycaster.ray.intersectPlane(plane, intersectPoint)
+            
+            if (intersectPoint) {
+                const method = methodData[currentMethod]
+                
+                // Add variance based on method
+                const shakeX = (Math.random() - 0.5) * method.shake
+                const shakeZ = (Math.random() - 0.5) * method.shake
+                const shakeY = (Math.random() - 0.5) * method.shake * 0.5
+                const drift = Math.sin(Date.now() * 0.001) * method.drift
+                const driftY = Math.cos(Date.now() * 0.0015) * method.drift * 0.3
+                
+                drillGroup.position.x = intersectPoint.x + shakeX + drift
+                drillGroup.position.z = intersectPoint.z + shakeZ
+                drillGroup.position.y = 3 + shakeY + driftY
+                
+                // Add rotation shake for freehand
+                if (currentMethod === 'freehand') {
+                    drillGroup.rotation.x = (Math.random() - 0.5) * 0.1
+                    drillGroup.rotation.z = (Math.random() - 0.5) * 0.1
+                } else if (currentMethod === 'static') {
+                    drillGroup.rotation.x = (Math.random() - 0.5) * 0.02
+                    drillGroup.rotation.z = (Math.random() - 0.5) * 0.02
+                } else {
+                    drillGroup.rotation.x = 0
+                    drillGroup.rotation.z = 0
+                }
+                
+                // Update metrics
+                updateMetrics()
+            }
+        }
+        
+        function updateMetrics() {
+            if (currentMode === 'explore') return // No metrics in explore mode
+            
+            // Calculate drill tip position in world space
+            const drillTipWorld = new THREE.Vector3(
+                drillGroup.position.x,
+                drillGroup.position.y - 2, // Tip is 2 units below drill center
+                drillGroup.position.z
+            )
+            
+            // Get 2D distance (ignoring height) from drill tip to target
+            const distance2D = Math.sqrt(
+                Math.pow(drillTipWorld.x - targetPosition.x, 2) +
+                Math.pow(drillTipWorld.z - targetPosition.z, 2)
+            )
+            
+            const platformDeviation = distance2D * 10 // Convert to mm
+            
+            // Update UI - MAIN METRIC IS DISTANCE FROM TARGET
+            document.getElementById('platformDeviation').textContent = platformDeviation.toFixed(2) + 'mm'
+            
+            // Color code based on precision AND method difficulty
+            const platformEl = document.getElementById('platformDeviation')
+            
+            // Method-specific precision expectations based on Dr. Neugarten's data
+            if (currentMethod === 'yomi') {
+                // Yomi: Sub-millimeter should be achievable
+                if (platformDeviation < 0.5) {
+                    platformEl.className = 'metric-value good'
+                } else if (platformDeviation < 2) {
+                    platformEl.className = 'metric-value warning'
+                } else {
+                    platformEl.className = 'metric-value bad'
+                }
+            } else if (currentMethod === 'static') {
+                // Static: 1-2mm is good performance
+                if (platformDeviation < 2) {
+                    platformEl.className = 'metric-value good'
+                } else if (platformDeviation < 4) {
+                    platformEl.className = 'metric-value warning'
+                } else {
+                    platformEl.className = 'metric-value bad'
+                }
+            } else if (currentMethod === 'freehand') {
+                // Freehand: Even 3-4mm is challenging
+                if (platformDeviation < 3) {
+                    platformEl.className = 'metric-value good' // This is HARD to achieve!
+                } else if (platformDeviation < 6) {
+                    platformEl.className = 'metric-value warning'
+                } else {
+                    platformEl.className = 'metric-value bad'
+                }
+            }
+            
+            // Update laser color based on precision
+            if (drillLaser) {
+                if (platformDeviation < 1) {
+                    drillLaser.material.color.setHex(0x00ff00) // Green when close
+                } else if (platformDeviation < 3) {
+                    drillLaser.material.color.setHex(0xffaa00) // Orange when medium
+                } else {
+                    drillLaser.material.color.setHex(0xff0000) // Red when far
+                }
+            }
+            
+            // Enhanced progressive audio and haptic feedback
+            if (!window.audioContext) {
+                window.audioContext = new (window.AudioContext || window.webkitAudioContext)()
+            }
+            
+            // Resume audio context if suspended (mobile requirement)
+            if (window.audioContext.state === 'suspended') {
+                window.audioContext.resume()
+            }
+            
+            // Dr. Neugarten's Study: Method-specific feedback based on SURGICAL REALITY
+            if (isPlacing && platformDeviation < 10.0) {
+                
+                // YOMI ROBOTIC: <0.2mm variance - EASY precision guidance
+                if (currentMethod === 'yomi') {
+                    if (platformDeviation < 0.5) {
+                        // Yomi makes sub-millimeter precision EASY
+                        if (navigator.vibrate) navigator.vibrate([100, 50, 100])
+                        playTone(900, 0.15) // Success tone
+                    } else if (platformDeviation < 2.0) {
+                        if (navigator.vibrate) navigator.vibrate(60)
+                        playTone(700 + (200 / platformDeviation), 0.12) // Guidance tone
+                    } else if (platformDeviation < 5.0) {
+                        playTone(500 + (100 / platformDeviation), 0.08) // Approach tone
+                    }
+                }
+                
+                // STATIC GUIDED: 3.5mm variance - MODERATE difficulty
+                else if (currentMethod === 'static') {
+                    if (platformDeviation < 1.0) {
+                        // Harder to achieve precision than Yomi
+                        if (navigator.vibrate) navigator.vibrate([60, 30, 60])
+                        playTone(600 + (100 / platformDeviation), 0.1) // Success tone
+                    } else if (platformDeviation < 3.5) {
+                        if (navigator.vibrate) navigator.vibrate(40)
+                        playTone(450 + (50 / platformDeviation), 0.08) // Guidance tone  
+                    }
+                }
+                
+                // FREEHAND: 7mm variance - EXTREMELY DIFFICULT
+                else if (currentMethod === 'freehand') {
+                    // Freehand rarely achieves sub-2mm precision due to hand tremor
+                    if (platformDeviation < 2.0) {
+                        // Rare achievement with freehand!
+                        if (navigator.vibrate) navigator.vibrate([150, 100, 150])
+                        playTone(800, 0.2) // Celebration tone - this is HARD!
+                    } else if (platformDeviation < 5.0) {
+                        // Even getting close is difficult with hand tremor
+                        if (navigator.vibrate) navigator.vibrate(30)
+                        playTone(400 + (30 / platformDeviation), 0.06) // Weak guidance
+                    }
+                    // No feedback beyond 5mm - freehand struggles with precision
+                }
+            }
+        }
+        
+        // Drill placement will be handled by setupDrillPlacement() after method selection
+        
+        function startPlacement() {
+            isPlacing = true
+            startTime = Date.now()
+            document.getElementById('instructionText').textContent = 'Position the drill and click to place'
+            
+            // Show mobile controls if on mobile
+            if (isMobile && document.getElementById('mobileControls')) {
+                document.getElementById('mobileControls').style.display = 'block'
+            }
+            
+            // Start session tracking
+            const mode = tutorialMode ? 'tutorial' : currentMode
+            startSession(currentMethod, mode)
+            
+            // Start timer
+            const interval = setInterval(() => {
+                if (isPlacing) {
+                    const elapsed = (Date.now() - startTime) / 1000
+                    document.getElementById('timeElapsed').textContent = elapsed.toFixed(1) + 's'
+                } else {
+                    clearInterval(interval)
+                }
+            }, 100)
+        }
+        
+        function endPlacement() {
+            isPlacing = false
+            
+            // Hide mobile controls
+            if (isMobile && document.getElementById('mobileControls')) {
+                document.getElementById('mobileControls').style.display = 'none'
+            }
+            
+            if (currentMode === 'explore') {
+                // In explore mode, just reset position
+                document.getElementById('instructionText').textContent = 'Nice exploration! Try another method'
+                setTimeout(() => {
+                    drillGroup.position.set(0, 3, 0)
+                }, 1000)
+                return
+            }
+            
+            // Challenge mode scoring
+            const finalTime = ((Date.now() - startTime) / 1000).toFixed(1)
+            
+            // Calculate score based on DRILL TIP distance from target
+            const drillTipWorld = new THREE.Vector3(
+                drillGroup.position.x,
+                drillGroup.position.y - 2, // Tip is 2 units below drill center
+                drillGroup.position.z
+            )
+            
+            // Get 2D distance (ignoring height) from drill tip to target
+            const distance2D = Math.sqrt(
+                Math.pow(drillTipWorld.x - targetPosition.x, 2) +
+                Math.pow(drillTipWorld.z - targetPosition.z, 2)
+            )
+            
+            const platformDeviation = distance2D * 10 // Convert to mm
+            
+            // Scoring: Doctors are proud of precision
+            let score
+            if (platformDeviation < 0.5) {
+                score = 100 // Perfect - sub 0.5mm
+            } else if (platformDeviation < 1) {
+                score = 95 // Excellent - sub 1mm
+            } else if (platformDeviation < 2) {
+                score = 85 // Good - sub 2mm
+            } else if (platformDeviation < 3) {
+                score = 70 // Acceptable - sub 3mm
+            } else if (platformDeviation < 5) {
+                score = 50 // Poor - 3-5mm off
+            } else {
+                score = Math.max(10, 50 - (platformDeviation - 5) * 5) // Very poor
+            }
+            
+            // Show score popup
+            showScorePopup(score)
+            
+            // Show results after delay
+            setTimeout(() => {
+                showResults(score, finalTime, platformDeviation)
+            }, 1500)
+        }
+        
+        function showScorePopup(score) {
+            const popup = document.createElement('div')
+            popup.className = 'score-popup'
+            popup.textContent = score + '%'
+            popup.style.color = score > 90 ? '#00ff88' : score > 70 ? '#ffaa00' : '#ff4444'
+            popup.style.left = '50%'
+            popup.style.top = '50%'
+            document.body.appendChild(popup)
+            
+            setTimeout(() => popup.remove(), 2000)
+        }
+        
+        function showResults(score, time, platformDeviation) {
+            if (tutorialMode) {
+                // Store score AND precision for comparison
+                methodScores[currentMethod] = {
+                    score: score,
+                    precision: platformDeviation
+                }
+                
+                // Show tutorial-specific results
+                if (tutorialStep < 3) {
+                    // Show intermediate tutorial message
+                    showTutorialProgress(score, platformDeviation, currentMethod)
+                    return
+                } else {
+                    // Show final comparison after Yomi
+                    showTutorialComparison()
+                    return
+                }
+            }
+            
+            // Normal results display
+            document.getElementById('scoreDisplay').textContent = score + '%'
+            document.getElementById('scoreDisplay').style.color = 
+                score > 90 ? '#00ff88' : score > 70 ? '#ffaa00' : '#ff4444'
+            
+            document.getElementById('methodResult').textContent = 
+                currentMethod.charAt(0).toUpperCase() + currentMethod.slice(1)
+            document.getElementById('precisionResult').textContent = platformDeviation.toFixed(2) + 'mm'
+            document.getElementById('timeResult').textContent = time + 's'
+            
+            document.getElementById('resultsModal').style.display = 'flex'
+        }
+
+        function showTutorialProgress(score, precision, method) {
+            const messages = {
+                freehand: `Freehand Result: ${precision.toFixed(1)}mm off target\n\nAs you experienced, freehand surgery is extremely challenging. Even skilled surgeons struggle to achieve sub-millimeter precision with natural hand tremors.\n\nLet's see how a static guide improves this...`,
+                static: `Static Guide Result: ${precision.toFixed(1)}mm off target\n\nBetter than freehand! The guide helps, but achieving consistent sub-millimeter precision still requires exceptional skill.\n\nNow let's experience Yomi's robotic precision...`
+            }
+            
+            alert(messages[method])
+            
+            // Progress to next step
+            tutorialStep++
+            if (tutorialStep === 2) {
+                setMethodForTutorial('static')
+            } else if (tutorialStep === 3) {
+                setMethodForTutorial('yomi')
+            }
+            updateTutorialUI()
+            tryAgain()
+        }
+
+        function showTutorialComparison() {
+            const comparison = `Tutorial Complete! Your precision results:
+
+Freehand: ${methodScores.freehand.precision.toFixed(1)}mm off target
+Static Guide: ${methodScores.static.precision.toFixed(1)}mm off target
+Yomi Robot: ${methodScores.yomi.precision.toFixed(1)}mm off target
+
+${methodScores.yomi.precision < 1 ? 
+    "Exceptional! Yomi achieved sub-millimeter precision!" : 
+    "Yomi's robotic guidance dramatically improves precision!"}
+
+Doctors using Yomi consistently achieve <1mm precision - the gold standard in implant surgery.`
+            
+            alert(comparison)
+            tutorialMode = false
+            document.getElementById('instructionText').textContent = "Tutorial complete! Try any method again"
+            document.getElementById('controlsText').textContent = "You can now freely switch between methods"
+            tryAgain()
+        }
+        
+        window.tryAgain = () => {
+            document.getElementById('resultsModal').style.display = 'none'
+            drillGroup.position.set(0, 3, 0)
+            document.getElementById('instructionText').textContent = 'Select a method and click to begin placement'
+        }
+        
+        // Track session start
+        let currentSessionId = null
+        
+        async function startSession(method, mode) {
+            try {
+                const { data: { user } } = await supabase.auth.getUser()
+                if (user) {
+                    const { data, error } = await supabase
+                        .from('yomistrike_sessions')
+                        .insert({
+                            user_id: user.id,
+                            method: method,
+                            mode: mode,
+                            browser_info: {
+                                userAgent: navigator.userAgent,
+                                platform: navigator.platform,
+                                language: navigator.language
+                            }
+                        })
+                        .select()
+                        .single()
+                    
+                    if (!error && data) {
+                        currentSessionId = data.id
+                        console.log('Session started:', currentSessionId)
+                    } else if (error) {
+                        console.warn('Session tracking not available:', error.message)
+                        // Don't break the experience if sessions table doesn't exist
+                    }
+                }
+            } catch (error) {
+                console.error('Error starting session:', error)
+            }
+        }
+        
+        async function completeSession(score, precisionMM, timeSeconds) {
+            if (!currentSessionId) return
+            
+            try {
+                const { error } = await supabase
+                    .from('yomistrike_sessions')
+                    .update({
+                        completed_at: new Date().toISOString(),
+                        score: score,
+                        precision_mm: precisionMM,
+                        time_seconds: timeSeconds
+                    })
+                    .eq('id', currentSessionId)
+                
+                if (!error) {
+                    console.log('Session completed:', currentSessionId)
+                } else {
+                    console.warn('Could not complete session tracking:', error.message)
+                }
+            } catch (error) {
+                console.error('Error completing session:', error)
+            }
+        }
+        
+        // Audio feedback function
+        function playTone(frequency, duration) {
+            if (!window.audioContext) return
+            
+            try {
+                const oscillator = window.audioContext.createOscillator()
+                const gainNode = window.audioContext.createGain()
+                
+                oscillator.connect(gainNode)
+                gainNode.connect(window.audioContext.destination)
+                
+                oscillator.frequency.value = frequency
+                oscillator.type = 'sine' // Smooth sine wave
+                
+                // Much quieter volume
+                const volume = isMobile ? 0.01 : 0.008
+                gainNode.gain.setValueAtTime(volume, window.audioContext.currentTime)
+                gainNode.gain.exponentialRampToValueAtTime(0.001, window.audioContext.currentTime + duration)
+                
+                oscillator.start(window.audioContext.currentTime)
+                oscillator.stop(window.audioContext.currentTime + duration)
+            } catch (error) {
+                console.warn('Audio feedback not available:', error)
+            }
+        }
+        
+        window.saveResults = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser()
+                if (user) {
+                    const score = parseInt(document.getElementById('scoreDisplay').textContent)
+                    const method = document.getElementById('methodResult').textContent.toLowerCase()
+                    const precisionText = document.getElementById('precisionResult').textContent
+                    const precision = parseFloat(precisionText.replace('mm', ''))
+                    const timeText = document.getElementById('timeResult').textContent
+                    const time = parseFloat(timeText.replace('s', ''))
+                    
+                    // Complete the session
+                    await completeSession(score, precision, time)
+                    
+                    // Only show success if session tracking is working
+                    if (currentSessionId) {
+                        alert('Results saved successfully!')
+                    }
+                }
+            } catch (error) {
+                console.error('Save error:', error)
+                alert('Error saving results')
+            }
+            tryAgain()
+        }
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate)
+            
+            controls.update()
+            
+            // Animate selection drills if in selection mode
+            if (window.selectionMode && window.selectionDrills) {
+                Object.entries(window.selectionDrills).forEach(([method, drill]) => {
+                    const data = methodData[method]
+                    const time = Date.now() * 0.001 + drill.userData.wobbleOffset
+                    
+                    // Apply wobble based on method - reduced multipliers for realism
+                    drill.rotation.x = Math.sin(time * 2) * data.shake * 3
+                    drill.rotation.z = Math.cos(time * 1.5) * data.shake * 3
+                    drill.position.y = 2 + Math.sin(time * 3) * data.drift * 5
+                    
+                    // Rotate drill slowly
+                    drill.rotation.y += 0.01
+                    
+                    // Pulse glow for Yomi
+                    if (method === 'yomi' && drill.children[0]) {
+                        const emissiveIntensity = 0.2 + Math.sin(time * 4) * 0.1
+                        drill.children[0].material.emissiveIntensity = emissiveIntensity
+                    }
+                })
+                
+                // Rotate selection stars
+                if (window.selectionStars) {
+                    window.selectionStars.rotation.y += 0.0005
+                    window.selectionStars.rotation.x += 0.0002
+                }
+            }
+            
+            // Animate target elements
+            if (targetGroup && isPlacing) {
+                // Calculate current distance from drill tip
+                const drillTipWorld = new THREE.Vector3(
+                    drillGroup.position.x,
+                    drillGroup.position.y - 2,
+                    drillGroup.position.z
+                )
+                const distance2D = Math.sqrt(
+                    Math.pow(drillTipWorld.x - targetPosition.x, 2) +
+                    Math.pow(drillTipWorld.z - targetPosition.z, 2)
+                )
+                const distanceMM = distance2D * 10
+                
+                // When within 1mm, make everything glow bright green
+                if (distanceMM < 1) {
+                    targetMarker.material.color.setHex(0x00ff00)
+                    targetMarker.material.opacity = 0.9
+                    centerMarker.material.color.setHex(0x00ff00)
+                    centerMarker.material.emissive.setHex(0x00ff00)
+                    centerMarker.material.emissiveIntensity = 5
+                    pulseRing.material.color.setHex(0x00ff00)
+                    pulseRing.material.opacity = 0.6
+                    pulseRing.scale.setScalar(1.5 + Math.sin(Date.now() * 0.01) * 0.2)
+                    
+                    
+                    // Update text to show success
+                    if (sprite.material.map) {
+                        const canvas = document.createElement('canvas')
+                        canvas.width = 256
+                        canvas.height = 64
+                        const ctx = canvas.getContext('2d')
+                        ctx.fillStyle = '#00ff00'
+                        ctx.font = 'bold 32px Arial'
+                        ctx.textAlign = 'center'
+                        ctx.fillText('PERFECT!', 128, 40)
+                        sprite.material.map = new THREE.CanvasTexture(canvas)
+                        sprite.material.map.needsUpdate = true
+                    }
+                } else {
+                    // Normal animation
+                    targetMarker.material.color.setHex(0x00ff88)
+                    targetMarker.material.opacity = 0.6 + Math.sin(Date.now() * 0.003) * 0.2
+                    centerMarker.material.color.setHex(0x00ff88)
+                    centerMarker.material.emissive.setHex(0x00ff88)
+                    centerMarker.material.emissiveIntensity = 2
+                    pulseRing.material.color.setHex(0x00ff88)
+                    pulseRing.material.opacity = 0.2 + Math.sin(Date.now() * 0.002) * 0.1
+                    pulseRing.scale.setScalar(1 + Math.sin(Date.now() * 0.002) * 0.1)
+                }
+                
+                
+                // Rotate the center marker
+                centerMarker.rotation.y += 0.02
+                
+                // Float the text
+                sprite.position.y = 2 + Math.sin(Date.now() * 0.003) * 0.1
+            }
+            
+            // Rotate drill when placing
+            if (isPlacing) {
+                drillGroup.rotation.y += 0.05
+                
+                // Pulse the tip indicator
+                if (drillTip) {
+                    drillTip.material.opacity = 0.6 + Math.sin(Date.now() * 0.01) * 0.3
+                }
+            }
+            
+            renderer.render(scene, camera)
+        }
+        // Don't start animating yet - wait for initialization
+        window.animate = animate
+        
+        // Make sure everything is properly hidden at startup
+        if (jawGroup) jawGroup.visible = false
+        if (targetGroup) targetGroup.visible = false
+        if (drillGroup) drillGroup.visible = false
+        
+        // Handle resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight
+            camera.updateProjectionMatrix()
+            renderer.setSize(window.innerWidth, window.innerHeight)
+        })
+        
+        // Hide cursor
+        document.body.style.cursor = 'none'
+        
+        } // End of startThreeJSSimulation
+        
+        // Track device type and page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track device type
+            gtag('event', 'device_type', {
+                'event_category': 'user_info',
+                'event_label': isMobile ? 'mobile' : 'desktop',
+                'screen_width': window.innerWidth,
+                'screen_height': window.innerHeight,
+                'user_agent': navigator.userAgent.substring(0, 100) // Limit length
+            });
+            
+            // Track page load performance
+            if (window.performance && window.performance.timing) {
+                const loadTime = window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
+                gtag('event', 'page_timing_complete', {
+                    'name': 'load',
+                    'value': Math.round(loadTime),
+                    'event_category': 'performance'
+                });
+            }
+        });
+        
+        // Track tutorial start
+        window.startTutorial = (function() {
+            const originalStartTutorial = window.startTutorial;
+            return function() {
+                gtag('event', 'tutorial_start', {
+                    'event_category': 'tutorial',
+                    'event_label': 'started'
+                });
+                return originalStartTutorial.apply(this, arguments);
+            };
+        })();
+        
+        // Track drill placement
+        const originalStartPlacement = window.startPlacement;
+        window.startPlacement = function() {
+            gtag('event', 'drill_placement_start', {
+                'event_category': 'gameplay',
+                'event_label': currentMethod,
+                'tutorial_mode': tutorialMode,
+                'is_mobile': isMobile
+            });
+            return originalStartPlacement.apply(this, arguments);
+        };
+        
+        // Track placement completion
+        const originalEndPlacement = window.endPlacement;
+        window.endPlacement = function() {
+            const result = originalEndPlacement.apply(this, arguments);
+            
+            // Get the precision data after placement ends
+            setTimeout(() => {
+                const precisionElement = document.getElementById('platformDeviation');
+                if (precisionElement) {
+                    const precisionText = precisionElement.textContent;
+                    const precisionValue = parseFloat(precisionText);
+                    
+                    gtag('event', 'drill_placement_complete', {
+                        'event_category': 'gameplay',
+                        'event_label': currentMethod,
+                        'value': Math.round(precisionValue * 100), // Convert to integer
+                        'precision_mm': precisionValue,
+                        'precision_category': precisionValue < 1 ? 'excellent' : 
+                                            precisionValue < 2 ? 'good' : 
+                                            precisionValue < 3 ? 'acceptable' : 'poor'
+                    });
+                }
+            }, 100);
+            
+            return result;
+        };
+        
+        // Track mode selection
+        const originalSetMode = window.setMode;
+        window.setMode = function(mode, fromButton) {
+            gtag('event', 'mode_selected', {
+                'event_category': 'gameplay',
+                'event_label': mode,
+                'previous_mode': currentMode
+            });
+            return originalSetMode.apply(this, arguments);
+        };
+    </script>
+</body>
+</html>

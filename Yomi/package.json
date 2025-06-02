@@ -1,0 +1,23 @@
+{
+  "name": "tryyomi",
+  "version": "1.0.0",
+  "description": "Enhanced Yomi Precision Dental Surgery Simulator",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "npx live-server --port=8000"
+  },
+  "keywords": [
+    "dental",
+    "surgery",
+    "simulation",
+    "3D",
+    "webgl",
+    "threejs"
+  ],
+  "author": "TryYomi Team",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.8"
+  }
+}
