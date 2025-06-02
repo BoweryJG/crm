@@ -57,6 +57,11 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
   const handleProfileMenuClose = () => {
     setAnchorEl(null);
   };
+
+  const handleMenuItemClick = (path: string) => {
+    navigate(path);
+    handleProfileMenuClose();
+  };
   
   const handleLogout = async () => {
     console.log('Mock logout called');
@@ -262,6 +267,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
               }} 
             />
             <MenuItem 
+              onClick={() => handleMenuItemClick('/profile')}
               sx={{ 
                 py: 1.5,
                 '&:hover': {
@@ -276,6 +282,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
               <PersonIcon sx={{ mr: 2 }} /> Profile
             </MenuItem>
             <MenuItem 
+              onClick={() => handleMenuItemClick('/settings')}
               sx={{ 
                 py: 1.5,
                 '&:hover': {

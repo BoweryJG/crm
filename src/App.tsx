@@ -37,6 +37,8 @@ const SubscribeCancel = lazy(() => import('./pages/SubscribeCancel'));
 const KnowledgeAcademy = lazy(() => import('./pages/KnowledgeAcademy'));
 const KnowledgeDental = lazy(() => import('./pages/KnowledgeDental'));
 const KnowledgeAesthetic = lazy(() => import('./pages/KnowledgeAesthetic'));
+const Settings = lazy(() => import('./pages/Settings'));
+const Profile = lazy(() => import('./pages/Profile'));
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -98,7 +100,8 @@ const App: React.FC = () => {
                 <Route path="subscribe" element={<Suspense fallback={<div>Loading...</div>}><Subscribe /></Suspense>} />
                 <Route path="subscribe/success" element={<Suspense fallback={<div>Loading...</div>}><SubscribeSuccess /></Suspense>} />
                 <Route path="subscribe/cancel" element={<Suspense fallback={<div>Loading...</div>}><SubscribeCancel /></Suspense>} />
-                <Route path="settings" element={<div>Settings (Coming Soon)</div>} />
+                <Route path="settings" element={<Suspense fallback={<StandaloneEliteLoadingScreen loadingText="Loading Settings" message="Preparing your preferences..." />}><Settings /></Suspense>} />
+                <Route path="profile" element={<Suspense fallback={<StandaloneEliteLoadingScreen loadingText="Loading Profile" message="Retrieving your profile..." />}><Profile /></Suspense>} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
             </Routes>
