@@ -1,3 +1,0 @@
-# Netlify redirects file (alternative to netlify.toml)
-/              /index.html     200
-/simulation    /simulation.html 200
