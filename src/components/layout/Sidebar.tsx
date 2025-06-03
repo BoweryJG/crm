@@ -149,7 +149,7 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
               marginRight: 1
             }}
           >
-            RepSpheres
+            Sphere
           </Typography>
           <Typography 
             variant="h6" 
@@ -158,7 +158,7 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
               fontWeight: 500
             }}
           >
-            CRM
+            oS
           </Typography>
         </Box>
       </Box>

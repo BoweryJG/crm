@@ -254,7 +254,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
                 John Smith
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                john.smith@repspheres.com
+                john.smith@sphereos.com
               </Typography>
             </Box>
             <Divider 

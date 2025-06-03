@@ -1,4 +1,4 @@
-# RepSpheres CRM
+# Sphere oS
 
 A visually stunning and comprehensive CRM specifically designed for medical sales representatives in the aesthetic and dental industries.
 
