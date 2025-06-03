@@ -131,8 +131,8 @@ export interface ResearchDataQuery extends BaseModel {
   is_public: boolean;
 }
 
-// Research Workspace State
-export interface ResearchWorkspaceState {
+// Research Canvas State
+export interface ResearchCanvasState {
   activeProject?: ResearchProject;
   activeDocument?: ResearchDocument;
   activeTasks?: ResearchTask[];
