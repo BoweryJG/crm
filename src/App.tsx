@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './themes/ThemeContext';
 import { AuthProvider } from './hooks/useAuth';
 import { AppModeProvider } from './contexts/AppModeContext';
-import StandaloneEliteLoadingScreen from './components/common/StandaloneEliteLoadingScreen';
+import SphereLoadingScreen from './components/common/SphereLoadingScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
@@ -54,9 +54,9 @@ const App: React.FC = () => {
 
   if (isLoading) {
     return (
-      <StandaloneEliteLoadingScreen 
-        loadingText="Initializing RepSpheres CRM"
-        message="Loading your elite medical device sales platform..."
+      <SphereLoadingScreen 
+        loadingText="SPHERE oS"
+        message="QUANTUM SYNC IN PROGRESS"
         showPreview={true}
       />
     );
@@ -78,12 +78,12 @@ const App: React.FC = () => {
                 {/* All Routes - no authentication required */}
                 <Route path="/" element={<Layout />}>
                 <Route index element={<Dashboard />} />
-                <Route path="contacts" element={<React.Suspense fallback={<StandaloneEliteLoadingScreen loadingText="Loading Contacts" message="Accessing your contact database..." />}><Contacts /></React.Suspense>} />
-                <Route path="contacts/:id" element={<React.Suspense fallback={<StandaloneEliteLoadingScreen loadingText="Loading Contact Details" message="Retrieving contact information..." />}><ContactDetail /></React.Suspense>} />
-                <Route path="practices" element={<React.Suspense fallback={<StandaloneEliteLoadingScreen loadingText="Loading Practices" message="Gathering practice data..." />}><Practices /></React.Suspense>} />
-                <Route path="analytics" element={<Suspense fallback={<StandaloneEliteLoadingScreen loadingText="Loading Analytics" message="Preparing regional intelligence..." />}><Analytics /></Suspense>} />
-                <Route path="rep-analytics" element={<Suspense fallback={<StandaloneEliteLoadingScreen loadingText="Loading Rep Analytics" message="Generating elite performance insights..." />}><RepAnalytics /></Suspense>} />
-                <Route path="rep-analytics/:insightId" element={<Suspense fallback={<StandaloneEliteLoadingScreen loadingText="Loading Call Insights" message="Analyzing call data..." />}><CallInsightDetail /></Suspense>} />
+                <Route path="contacts" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="CONTACTS" message="NEURAL DATABASE SYNC" />}><Contacts /></React.Suspense>} />
+                <Route path="contacts/:id" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="PROFILE" message="EXTRACTING DATA MATRIX" />}><ContactDetail /></React.Suspense>} />
+                <Route path="practices" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="PRACTICES" message="MAPPING NEURAL NETWORKS" />}><Practices /></React.Suspense>} />
+                <Route path="analytics" element={<Suspense fallback={<SphereLoadingScreen loadingText="ANALYTICS" message="PROCESSING QUANTUM DATA" />}><Analytics /></Suspense>} />
+                <Route path="rep-analytics" element={<Suspense fallback={<SphereLoadingScreen loadingText="REP MATRIX" message="ANALYZING PERFORMANCE VECTORS" />}><RepAnalytics /></Suspense>} />
+                <Route path="rep-analytics/:insightId" element={<Suspense fallback={<SphereLoadingScreen loadingText="INSIGHTS" message="DECODING CONVERSATION PATTERNS" />}><CallInsightDetail /></Suspense>} />
                 <Route path="research" element={<Suspense fallback={<div>Loading...</div>}><Research /></Suspense>} />
                 <Route path="content" element={<Suspense fallback={<div>Loading...</div>}><PromptManagement /></Suspense>} />
                 <Route path="call-analysis" element={<Suspense fallback={<div>Loading...</div>}><CallAnalysis /></Suspense>} />

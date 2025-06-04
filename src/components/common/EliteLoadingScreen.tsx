@@ -196,7 +196,7 @@ const EliteLoadingScreen: React.FC<EliteLoadingScreenProps> = ({
               }
             }}
           >
-            RepSpheres
+            Sphere oS
           </Typography>
           <Typography
             variant="h6"
@@ -206,7 +206,7 @@ const EliteLoadingScreen: React.FC<EliteLoadingScreenProps> = ({
               mt: 1,
             }}
           >
-            Elite Medical Device CRM
+            Quantum Operating System
           </Typography>
         </Box>
 
