@@ -4,7 +4,7 @@ import ContactDetail from './pages/ContactDetail';
 import Practices from './pages/Practices';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './themes/ThemeContext';
-import { AuthProvider } from './hooks/useAuth';
+import { AuthProvider } from './auth';
 import { AppModeProvider } from './contexts/AppModeContext';
 import LoadingScreen from './components/common/LoadingScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
