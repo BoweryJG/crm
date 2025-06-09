@@ -11,6 +11,10 @@ interface AuthContextType extends AuthState {
   refreshSession: () => Promise<void>;
   subscription?: User['subscription'];
   isAdmin: boolean;
+  // Aliases for compatibility with auth pages
+  signIn: (email: string, password: string) => Promise<{ success: boolean; error: Error | null }>;
+  signUp: (email: string, password: string) => Promise<{ success: boolean; error: Error | null }>;
+  resetPassword: (email: string) => Promise<{ success: boolean; error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -226,6 +230,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
+  // Compatibility methods for auth pages
+  const signIn = async (email: string, password: string) => {
+    try {
+      await signInWithEmail(email, password);
+      return { success: true, error: null };
+    } catch (error: any) {
+      return { success: false, error };
+    }
+  };
+
+  const signUp = async (email: string, password: string) => {
+    try {
+      await signUpWithEmail(email, password);
+      return { success: true, error: null };
+    } catch (error: any) {
+      return { success: false, error };
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: getRedirectUrl('/login'),
+      });
+      
+      if (error) throw error;
+      
+      return { success: true, error: null };
+    } catch (error: any) {
+      return { success: false, error };
+    }
+  };
+
   const value: AuthContextType = {
     ...state,
     signInWithProvider,
@@ -235,6 +272,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     refreshSession,
     subscription: state.user?.subscription,
     isAdmin: state.user?.app_metadata?.roles?.includes('admin') || false,
+    // Compatibility methods
+    signIn,
+    signUp,
+    resetPassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
