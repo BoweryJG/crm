@@ -26,7 +26,7 @@ import {
   VolumeOff as VolumeOffIcon
 } from '@mui/icons-material';
 import { callContact, updateCallStatus } from '../../services/twilio/twilioService';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../auth';
 import { Contact } from '../../types/models';
 
 interface CallButtonProps {

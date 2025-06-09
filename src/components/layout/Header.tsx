@@ -25,7 +25,7 @@ import {
   Person as PersonIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../auth';
 import { useNavigate } from 'react-router-dom';
 import { AppModeToggle } from '../common/AppModeToggle';
 import AuthModal from '../common/AuthModal';

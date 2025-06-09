@@ -23,7 +23,7 @@ import {
   Person as PersonIcon
 } from '@mui/icons-material';
 import { formatPhoneNumber, initiateCall } from '../../services/twilio/twilioService';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../auth';
 import { useThemeContext } from '../../themes/ThemeContext';
 
 const GlobalCallPanel: React.FC = () => {

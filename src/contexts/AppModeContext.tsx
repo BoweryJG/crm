@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../services/supabase/supabase';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../auth';
 
 export type AppMode = 'demo' | 'live';
 export type FeatureTier = 'basic' | 'premium';

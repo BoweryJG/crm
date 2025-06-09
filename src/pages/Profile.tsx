@@ -43,7 +43,7 @@ import {
   History as HistoryIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../themes/ThemeContext';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../auth';
 
 const Profile: React.FC = () => {
   const theme = useTheme();
