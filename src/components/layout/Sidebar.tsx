@@ -24,7 +24,9 @@ import {
   BiotechOutlined as BiotechIcon,
   Science as ScienceIcon,
   Settings as SettingsIcon,
-  CreditCard as CreditCardIcon
+  CreditCard as CreditCardIcon,
+  School as SchoolIcon,
+  LocalHospital as HospitalIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -73,16 +75,17 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
     {
       title: 'Market Research',
       items: [
+        { title: 'Practice Interactions', path: '/market/practice-interaction', icon: <BusinessIcon /> },
         { title: 'Dental Implant Market', path: '/market/dental-implants', icon: <MedicalIcon /> },
-        { title: 'Practice Interactions', path: '/market/practice-interaction', icon: <BusinessIcon /> }
+        { title: 'Aesthetic Market', path: '/market/aesthetic', icon: <BiotechIcon /> }
       ]
     },
     {
-      title: 'Industry Knowledge',
+      title: 'Knowledge Academy',
       items: [
-        { title: 'Dental Procedures', path: '/dental', icon: <MedicalIcon /> },
-        { title: 'Aesthetic Procedures', path: '/aesthetic', icon: <BiotechIcon /> },
-        { title: 'Companies', path: '/companies', icon: <ScienceIcon /> }
+        { title: 'Learning Center', path: '/knowledge', icon: <SchoolIcon /> },
+        { title: 'Dental Procedures', path: '/knowledge/dental', icon: <HospitalIcon /> },
+        { title: 'Aesthetic Procedures', path: '/knowledge/aesthetic', icon: <BiotechIcon /> }
       ]
     },
     {
@@ -122,29 +125,42 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
           borderBottom: `1px solid ${themeMode === 'space' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'}`
         }}
       >
-        <Typography
-          variant="h5"
+        <Box
+          onClick={() => window.open('https://repspheres.com', '_blank')}
           sx={{
-            fontWeight: 600,
-            background: themeMode === 'space'
-              ? 'linear-gradient(45deg, #8860D0 0%, #5CE1E6 100%)'
-              : 'linear-gradient(45deg, #3D52D5 0%, #44CFCB 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            marginRight: 1
+            display: 'flex',
+            alignItems: 'center',
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease-in-out',
+            '&:hover': {
+              transform: 'scale(1.05)'
+            }
           }}
         >
-          RepSpheres
-        </Typography>
-        <Typography 
-          variant="h6" 
-          sx={{ 
-            color: theme.palette.text.secondary,
-            fontWeight: 500
-          }}
-        >
-          CRM
-        </Typography>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 600,
+              background: themeMode === 'space'
+                ? 'linear-gradient(45deg, #8860D0 0%, #5CE1E6 100%)'
+                : 'linear-gradient(45deg, #3D52D5 0%, #44CFCB 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              marginRight: 1
+            }}
+          >
+            Sphere
+          </Typography>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              color: theme.palette.text.secondary,
+              fontWeight: 500
+            }}
+          >
+            oS
+          </Typography>
+        </Box>
       </Box>
 
       {navigationSections.map((section, sectionIndex) => (

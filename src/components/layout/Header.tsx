@@ -29,6 +29,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { AppModeToggle } from '../common/AppModeToggle';
 import AuthModal from '../common/AuthModal';
+import ThemeToggle from '../ui/ThemeToggle';
 
 interface HeaderProps {
   onSidebarToggle: () => void;
@@ -56,6 +57,11 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
   const handleProfileMenuClose = () => {
     setAnchorEl(null);
   };
+
+  const handleMenuItemClick = (path: string) => {
+    navigate(path);
+    handleProfileMenuClose();
+  };
   
   const handleLogout = async () => {
     console.log('Mock logout called');
@@ -73,11 +79,15 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
         ml: { md: `${drawerWidth}px` },
         backdropFilter: 'blur(8px)',
         backgroundColor: themeMode === 'space' 
-          ? 'rgba(22, 27, 44, 0.8)' 
+          ? 'rgba(22, 27, 44, 0.8)'
+          : themeMode === 'luxury'
+          ? 'rgba(26, 26, 26, 0.9)'
           : 'rgba(255, 255, 255, 0.8)',
         borderBottom: `1px solid ${
           themeMode === 'space' 
-            ? 'rgba(255, 255, 255, 0.08)' 
+            ? 'rgba(255, 255, 255, 0.08)'
+            : themeMode === 'luxury'
+            ? 'rgba(201, 176, 55, 0.3)' 
             : 'rgba(0, 0, 0, 0.06)'
         }`
       }}
@@ -99,7 +109,9 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
             display: 'flex',
             alignItems: 'center',
             backgroundColor: themeMode === 'space' 
-              ? 'rgba(10, 14, 23, 0.5)' 
+              ? 'rgba(10, 14, 23, 0.5)'
+              : themeMode === 'luxury'
+              ? 'rgba(26, 26, 26, 0.5)'
               : 'rgba(245, 247, 250, 0.5)',
             borderRadius: 2,
             px: 2,
@@ -128,25 +140,9 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
         <Box sx={{ flexGrow: 1 }} />
 
         {/* Theme toggle button */}
-        <Tooltip title={`Switch to ${themeMode === 'space' ? 'Corporate' : 'Space'} Theme`}>
-          <IconButton 
-            onClick={toggleTheme} 
-            sx={{ 
-              mx: 1,
-              color: theme.palette.text.primary,
-              backgroundColor: themeMode === 'space' 
-                ? 'rgba(138, 96, 208, 0.1)' 
-                : 'rgba(61, 82, 213, 0.05)',
-              '&:hover': {
-                backgroundColor: themeMode === 'space' 
-                  ? 'rgba(138, 96, 208, 0.2)' 
-                  : 'rgba(61, 82, 213, 0.1)'
-              }
-            }}
-          >
-            {themeMode === 'space' ? <LightModeIcon /> : <DarkModeIcon />}
-          </IconButton>
-        </Tooltip>
+        <Box sx={{ mx: 1 }}>
+          <ThemeToggle />
+        </Box>
 
         {/* App Mode Toggle */}
         <Box sx={{ mx: 1 }}>
@@ -163,9 +159,13 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
               backdropFilter: 'blur(6px)',
               backgroundColor: themeMode === 'space'
                 ? 'rgba(255, 255, 255, 0.08)'
+                : themeMode === 'luxury'
+                ? 'rgba(201, 176, 55, 0.1)'
                 : 'rgba(0,0,0,0.04)',
               borderColor: themeMode === 'space'
                 ? 'rgba(255, 255, 255, 0.2)'
+                : themeMode === 'luxury'
+                ? 'rgba(201, 176, 55, 0.3)'
                 : 'rgba(0,0,0,0.2)'
             }}
           >
@@ -205,14 +205,16 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
               p: 0,
               border: `2px solid ${
                 themeMode === 'space' 
-                  ? 'rgba(138, 96, 208, 0.5)' 
+                  ? 'rgba(138, 96, 208, 0.5)'
+                  : themeMode === 'luxury'
+                  ? 'rgba(201, 176, 55, 0.5)'
                   : 'rgba(61, 82, 213, 0.3)'
               }`
             }}
           >
             <Avatar 
               sx={{ 
-                bgcolor: themeMode === 'space' ? '#8860D0' : '#3D52D5',
+                bgcolor: themeMode === 'space' ? '#8860D0' : themeMode === 'luxury' ? '#C9B037' : '#3D52D5',
                 width: 32,
                 height: 32
               }}
@@ -237,7 +239,9 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
                   ? '0 8px 32px rgba(0, 0, 0, 0.4)' 
                   : '0 8px 32px rgba(0, 0, 0, 0.1)',
                 border: themeMode === 'space' 
-                  ? '1px solid rgba(255, 255, 255, 0.08)' 
+                  ? '1px solid rgba(255, 255, 255, 0.08)'
+                  : themeMode === 'luxury'
+                  ? '1px solid rgba(201, 176, 55, 0.3)'
                   : '1px solid rgba(0, 0, 0, 0.04)',
                 backgroundImage: 'none',
                 backgroundColor: theme.palette.background.paper,
@@ -250,22 +254,27 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
                 John Smith
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                john.smith@repspheres.com
+                john.smith@sphereos.com
               </Typography>
             </Box>
             <Divider 
               sx={{ 
                 borderColor: themeMode === 'space' 
-                  ? 'rgba(255, 255, 255, 0.08)' 
+                  ? 'rgba(255, 255, 255, 0.08)'
+                  : themeMode === 'luxury'
+                  ? 'rgba(201, 176, 55, 0.3)'
                   : 'rgba(0, 0, 0, 0.06)' 
               }} 
             />
             <MenuItem 
+              onClick={() => handleMenuItemClick('/profile')}
               sx={{ 
                 py: 1.5,
                 '&:hover': {
                   backgroundColor: themeMode === 'space' 
-                    ? 'rgba(138, 96, 208, 0.1)' 
+                    ? 'rgba(138, 96, 208, 0.1)'
+                    : themeMode === 'luxury'
+                    ? 'rgba(201, 176, 55, 0.1)'
                     : 'rgba(61, 82, 213, 0.05)'
                 }
               }}
@@ -273,11 +282,14 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
               <PersonIcon sx={{ mr: 2 }} /> Profile
             </MenuItem>
             <MenuItem 
+              onClick={() => handleMenuItemClick('/settings')}
               sx={{ 
                 py: 1.5,
                 '&:hover': {
                   backgroundColor: themeMode === 'space' 
-                    ? 'rgba(138, 96, 208, 0.1)' 
+                    ? 'rgba(138, 96, 208, 0.1)'
+                    : themeMode === 'luxury'
+                    ? 'rgba(201, 176, 55, 0.1)'
                     : 'rgba(61, 82, 213, 0.05)'
                 }
               }}
@@ -287,7 +299,9 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
             <Divider 
               sx={{ 
                 borderColor: themeMode === 'space' 
-                  ? 'rgba(255, 255, 255, 0.08)' 
+                  ? 'rgba(255, 255, 255, 0.08)'
+                  : themeMode === 'luxury'
+                  ? 'rgba(201, 176, 55, 0.3)'
                   : 'rgba(0, 0, 0, 0.06)' 
               }} 
             />
@@ -298,7 +312,9 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
                 color: theme.palette.error.main,
                 '&:hover': {
                   backgroundColor: themeMode === 'space' 
-                    ? 'rgba(255, 82, 82, 0.1)' 
+                    ? 'rgba(255, 82, 82, 0.1)'
+                    : themeMode === 'luxury'
+                    ? 'rgba(255, 82, 82, 0.1)'
                     : 'rgba(214, 64, 69, 0.05)'
                 }
               }}

@@ -24,3 +24,6 @@ yarn-debug.log*
 yarn-error.log*
 supabase/.temp/
 .env
+
+# Local Netlify folder
+.netlify

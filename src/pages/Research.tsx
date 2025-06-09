@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Container } from '@mui/material';
-import ResearchWorkspace from '../components/research/ResearchWorkspace';
+import ResearchCanvas from '../components/research/ResearchCanvas';
 import ResearchHero from '../components/research/ResearchHero';
 import ResearchOverview from '../components/research/ResearchOverview';
 import researchService from '../services/research/researchService';
@@ -25,12 +25,12 @@ const Research: React.FC = () => {
     fetchOverviewData();
   }, []);
 
-  const scrollToWorkspace = (tabIndex?: number) => {
+  const scrollToCanvas = (tabIndex?: number) => {
     if (tabIndex !== undefined) {
       const tabs = document.querySelectorAll('[role="tab"]');
       if (tabs[tabIndex]) (tabs[tabIndex] as HTMLElement).click();
     }
-    const el = document.getElementById('research-module-workspace');
+    const el = document.getElementById('research-module-canvas');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
@@ -40,11 +40,11 @@ const Research: React.FC = () => {
       <ResearchOverview
         projects={projects}
         documents={documents}
-        onNewProject={() => scrollToWorkspace(0)}
-        onRunPrompt={() => scrollToWorkspace(2)}
+        onNewProject={() => scrollToCanvas(0)}
+        onRunPrompt={() => scrollToCanvas(2)}
       />
-      <Box id="research-module-workspace">
-        <ResearchWorkspace />
+      <Box id="research-module-canvas">
+        <ResearchCanvas />
       </Box>
     </Container>
   );

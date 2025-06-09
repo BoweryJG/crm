@@ -95,6 +95,7 @@ export interface NYCDentalImplantProvider {
   // Social media presence
   instagramHandle?: string;
   instagramFollowers?: number;
+  instagramEngagementRate?: number;
   instagramPostFrequency?: string; // e.g., "daily", "weekly", "monthly"
   instagramLastPostDate?: Date;
   facebookURL?: string;
@@ -102,6 +103,37 @@ export interface NYCDentalImplantProvider {
   youtubeChannel?: string;
   youtubeSubscribers?: number;
   linkedInUrl?: string;
+  tiktokHandle?: string;
+  tiktokFollowers?: number;
+  
+  // Business Intelligence
+  estimatedMonthlyRevenue?: number;
+  averageImplantPrice?: number;
+  primaryPatientDemographic?: 'Young Professional' | 'Middle-Aged' | 'Senior' | 'Luxury' | 'General';
+  marketingStrategy?: 'Social Media Heavy' | 'Traditional' | 'Referral Based' | 'Mixed';
+  competitiveAdvantage?: string;
+  
+  // Technology Investment Timeline
+  cbctPurchaseYear?: number;
+  scannerPurchaseYear?: number;
+  lastEquipmentUpgrade?: Date;
+  
+  // Staff & Expertise
+  numDentalHygienists?: number;
+  numAssistants?: number;
+  hasOnsiteLabTechnician?: boolean;
+  
+  // Recent Activity & Growth
+  recentExpansion?: boolean;
+  lookingForNewEquipment?: boolean;
+  recentlyHired?: boolean;
+  socialMediaGrowthTrend?: 'Growing' | 'Stable' | 'Declining';
+  patientVolumeGrowth?: 'Growing' | 'Stable' | 'Declining';
+  
+  // Sales Opportunities
+  businessOpportunities?: string[];
+  painPoints?: string[];
+  decisionMakerInfo?: string;
   
   // Rating information
   googleRating?: number; // Out of 5
@@ -357,10 +389,40 @@ export const getNYCDentalImplantProvidersSample = (): NYCDentalImplantProvider[]
       offersZygomaticImplants: false,
       
       instagramHandle: 'nycdentalimplantscenter',
-      instagramFollowers: 37,
-      instagramPostFrequency: 'monthly',
+      instagramFollowers: 3700,
+      instagramEngagementRate: 4.2,
+      instagramPostFrequency: 'daily',
       facebookURL: 'https://www.facebook.com/nycdentalimplantscenter',
-      facebookFollowers: 210,
+      facebookFollowers: 2100,
+      tiktokHandle: 'nycdentalimplants',
+      tiktokFollowers: 1800,
+      
+      // Business Intelligence
+      estimatedMonthlyRevenue: 950000,
+      averageImplantPrice: 4500,
+      primaryPatientDemographic: 'Young Professional',
+      marketingStrategy: 'Social Media Heavy',
+      competitiveAdvantage: 'Same-day implants with advanced 3D technology',
+      
+      // Technology Investment
+      cbctPurchaseYear: 2022,
+      scannerPurchaseYear: 2023,
+      lastEquipmentUpgrade: new Date('2024-01-15'),
+      
+      // Staff
+      numDentalHygienists: 4,
+      numAssistants: 6,
+      hasOnsiteLabTechnician: true,
+      
+      // Growth & Opportunities
+      recentExpansion: true,
+      lookingForNewEquipment: false,
+      recentlyHired: true,
+      socialMediaGrowthTrend: 'Growing',
+      patientVolumeGrowth: 'Growing',
+      businessOpportunities: ['Digital workflow training', 'Social media content creation tools', 'Patient financing solutions'],
+      painPoints: ['Staff scheduling software', 'Patient communication automation'],
+      decisionMakerInfo: 'Dr. Sarah Chen, DDS - Practice Owner, responds well to ROI data',
       
       googleRating: 4.8,
       googleReviewCount: 127,
@@ -405,11 +467,41 @@ export const getNYCDentalImplantProvidersSample = (): NYCDentalImplantProvider[]
       offersZygomaticImplants: true,
       
       instagramHandle: 'nyoralandimplant',
-      instagramFollowers: 150,
-      instagramPostFrequency: 'weekly',
+      instagramFollowers: 5200,
+      instagramEngagementRate: 6.8,
+      instagramPostFrequency: 'daily',
       facebookURL: 'https://www.facebook.com/newyorkoralsurgery',
-      facebookFollowers: 425,
+      facebookFollowers: 4250,
       linkedInUrl: 'https://www.linkedin.com/in/mark-stein-dds-md-8b8b4020',
+      tiktokHandle: 'drmarkstein_oms',
+      tiktokFollowers: 8500,
+      
+      // Business Intelligence
+      estimatedMonthlyRevenue: 1200000,
+      averageImplantPrice: 6800,
+      primaryPatientDemographic: 'Luxury',
+      marketingStrategy: 'Mixed',
+      competitiveAdvantage: 'Complex cases, celebrity clientele, dual MD/DDS credentials',
+      
+      // Technology Investment
+      cbctPurchaseYear: 2020,
+      scannerPurchaseYear: 2021,
+      lastEquipmentUpgrade: new Date('2023-08-20'),
+      
+      // Staff
+      numDentalHygienists: 2,
+      numAssistants: 4,
+      hasOnsiteLabTechnician: false,
+      
+      // Growth & Opportunities
+      recentExpansion: false,
+      lookingForNewEquipment: true,
+      recentlyHired: false,
+      socialMediaGrowthTrend: 'Growing',
+      patientVolumeGrowth: 'Stable',
+      businessOpportunities: ['Next-gen CBCT upgrade', 'IV sedation equipment', 'VIP patient experience enhancements'],
+      painPoints: ['Complex case documentation software', 'Referral management system'],
+      decisionMakerInfo: 'Dr. Mark Stein, DDS, MD - Solo practitioner, prefers premium solutions with proven track record',
       
       googleRating: 4.9,
       googleReviewCount: 98,
@@ -457,13 +549,43 @@ export const getNYCDentalImplantProvidersSample = (): NYCDentalImplantProvider[]
       offersAllOn6: true,
       offersZygomaticImplants: true,
       
-      instagramHandle: 'columbiademtal',
-      instagramFollowers: 2500,
+      instagramHandle: 'columbiadental',
+      instagramFollowers: 12500,
+      instagramEngagementRate: 3.1,
       instagramPostFrequency: 'daily',
       facebookURL: 'https://www.facebook.com/ColumbiaDental',
-      facebookFollowers: 3800,
+      facebookFollowers: 18000,
       youtubeChannel: 'https://www.youtube.com/columbiadental',
-      youtubeSubscribers: 1200,
+      youtubeSubscribers: 45000,
+      tiktokHandle: 'columbia_dental',
+      tiktokFollowers: 2800,
+      
+      // Business Intelligence
+      estimatedMonthlyRevenue: 800000,
+      averageImplantPrice: 3200,
+      primaryPatientDemographic: 'General',
+      marketingStrategy: 'Traditional',
+      competitiveAdvantage: 'Academic reputation, research access, cost-effective treatments',
+      
+      // Technology Investment
+      cbctPurchaseYear: 2019,
+      scannerPurchaseYear: 2020,
+      lastEquipmentUpgrade: new Date('2024-03-10'),
+      
+      // Staff
+      numDentalHygienists: 8,
+      numAssistants: 15,
+      hasOnsiteLabTechnician: true,
+      
+      // Growth & Opportunities
+      recentExpansion: true,
+      lookingForNewEquipment: false,
+      recentlyHired: true,
+      socialMediaGrowthTrend: 'Stable',
+      patientVolumeGrowth: 'Growing',
+      businessOpportunities: ['Research collaboration opportunities', 'Continuing education programs', 'Bulk equipment discounts'],
+      painPoints: ['Academic approval process', 'Budget cycle timing'],
+      decisionMakerInfo: 'Dr. Rodriguez, Department Head - Committee-based decisions, annual budget cycles',
       
       googleRating: 4.6,
       googleReviewCount: 245,

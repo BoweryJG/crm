@@ -211,17 +211,59 @@ const MarketDataExplorer: React.FC<MarketDataExplorerProps> = ({
           
           // Transform procedures into chart-friendly data
           const dentalProceduresByCategory = dentalProcedures.reduce((acc, proc) => {
-            if (!acc[proc.category]) {
-              acc[proc.category] = 0;
+            // Enrich and standardize category names based on dental specialty classifications
+            let category = proc.category || 'general';
+            
+            // Standardize category names to match comprehensive dental classifications
+            if (typeof category === 'string') {
+              const normalizedCategory = category.toLowerCase().trim();
+              
+              // Map variations to standard categories
+              if (normalizedCategory.includes('prevent') || normalizedCategory.includes('clean') || normalizedCategory.includes('hygiene')) {
+                category = 'Preventive';
+              } else if (normalizedCategory.includes('restor') || normalizedCategory.includes('fill') || normalizedCategory.includes('crown')) {
+                category = 'Restorative';
+              } else if (normalizedCategory.includes('diagnos') || normalizedCategory.includes('exam') || normalizedCategory.includes('x-ray')) {
+                category = 'Diagnostic';
+              } else if (normalizedCategory.includes('endodont') || normalizedCategory.includes('root canal')) {
+                category = 'Endodontics';
+              } else if (normalizedCategory.includes('periodont') || normalizedCategory.includes('gum') || normalizedCategory.includes('scaling')) {
+                category = 'Periodontics';
+              } else if (normalizedCategory.includes('prosthodont') || normalizedCategory.includes('denture') || normalizedCategory.includes('bridge')) {
+                category = 'Prosthodontics';
+              } else if (normalizedCategory.includes('implant')) {
+                category = 'Implantology';
+              } else if (normalizedCategory.includes('oral surgery') || normalizedCategory.includes('extract') || normalizedCategory.includes('surgery')) {
+                category = 'Oral Surgery';
+              } else if (normalizedCategory.includes('orthodont') || normalizedCategory.includes('braces') || normalizedCategory.includes('align')) {
+                category = 'Orthodontics';
+              } else if (normalizedCategory.includes('cosmetic') || normalizedCategory.includes('aesthetic') || normalizedCategory.includes('veneer') || normalizedCategory.includes('whitening')) {
+                category = 'Cosmetic Dentistry';
+              } else if (normalizedCategory.includes('pediatric') || normalizedCategory.includes('child')) {
+                category = 'Pediatric Dentistry';
+              } else if (normalizedCategory.includes('digital') || normalizedCategory.includes('cad') || normalizedCategory.includes('scan')) {
+                category = 'Digital Dentistry';
+              } else {
+                // Capitalize first letter for unknown categories
+                category = category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
+              }
+            } else {
+              category = 'General';
             }
-            acc[proc.category]++;
+            
+            if (!acc[category]) {
+              acc[category] = 0;
+            }
+            acc[category]++;
             return acc;
           }, {} as Record<string, number>);
           
-          const dentalProceduresByCost = dentalProcedures.map(proc => ({
-            name: proc.name,
-            cost: proc.averageCost.average
-          }));
+          const dentalProceduresByCost = dentalProcedures
+            .filter(proc => (proc.name || proc.procedure_name) && proc.averageCost?.average)
+            .map(proc => ({
+              name: proc.name || proc.procedure_name!,
+              cost: proc.averageCost!.average
+            }));
           
           data = [
             {
@@ -250,17 +292,53 @@ const MarketDataExplorer: React.FC<MarketDataExplorerProps> = ({
           
           // Transform procedures into chart-friendly data
           const aestheticProceduresByCategory = aestheticProcedures.reduce((acc, proc) => {
-            if (!acc[proc.category]) {
-              acc[proc.category] = 0;
+            // Enrich and standardize category names based on aesthetic procedure classifications
+            let category = proc.category || 'general';
+            
+            // Standardize category names to match comprehensive aesthetic classifications
+            if (typeof category === 'string') {
+              const normalizedCategory = category.toLowerCase().trim();
+              
+              // Map variations to standard categories based on search results
+              if (normalizedCategory.includes('inject') || normalizedCategory.includes('botox') || normalizedCategory.includes('filler') || normalizedCategory.includes('neurotoxin')) {
+                category = 'Injectables';
+              } else if (normalizedCategory.includes('facial') || normalizedCategory.includes('hydrafacial') || normalizedCategory.includes('chemical peel') || normalizedCategory.includes('microneedling')) {
+                category = 'Facial Treatments';
+              } else if (normalizedCategory.includes('laser') || normalizedCategory.includes('ipl') || normalizedCategory.includes('photofacial') || normalizedCategory.includes('resurfacing')) {
+                category = 'Laser Procedures';
+              } else if (normalizedCategory.includes('body') || normalizedCategory.includes('contour') || normalizedCategory.includes('sculpt') || normalizedCategory.includes('liposuction') || normalizedCategory.includes('coolsculpting')) {
+                category = 'Body Contouring';
+              } else if (normalizedCategory.includes('skin') || normalizedCategory.includes('rejuvenat') || normalizedCategory.includes('tighten') || normalizedCategory.includes('lifting')) {
+                category = 'Skin Rejuvenation';
+              } else if (normalizedCategory.includes('hair') || normalizedCategory.includes('removal') || normalizedCategory.includes('restoration') || normalizedCategory.includes('transplant')) {
+                category = 'Hair Treatments';
+              } else if (normalizedCategory.includes('tattoo') || normalizedCategory.includes('removal')) {
+                category = 'Tattoo Removal';
+              } else if (normalizedCategory.includes('vein') || normalizedCategory.includes('sclerotherapy') || normalizedCategory.includes('spider') || normalizedCategory.includes('varicose')) {
+                category = 'Vein Treatments';
+              } else if (normalizedCategory.includes('skincare') || normalizedCategory.includes('product') || normalizedCategory.includes('serum') || normalizedCategory.includes('cream')) {
+                category = 'Skincare';
+              } else {
+                // Capitalize first letter for unknown categories
+                category = category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
+              }
+            } else {
+              category = 'General';
             }
-            acc[proc.category]++;
+            
+            if (!acc[category]) {
+              acc[category] = 0;
+            }
+            acc[category]++;
             return acc;
           }, {} as Record<string, number>);
           
-          const aestheticProceduresByPopularity = aestheticProcedures.map(proc => ({
-            name: proc.name,
-            popularity: proc.popularity
-          }));
+          const aestheticProceduresByPopularity = aestheticProcedures
+            .filter(proc => (proc.name || proc.procedure_name) && proc.popularity != null)
+            .map(proc => ({
+              name: proc.name || proc.procedure_name!,
+              popularity: proc.popularity!
+            }));
           
           data = [
             {
@@ -277,7 +355,7 @@ const MarketDataExplorer: React.FC<MarketDataExplorerProps> = ({
               name: 'Aesthetic Procedures by Popularity',
               description: 'Popularity ratings of aesthetic procedures',
               data_type: 'bar_chart',
-              data: aestheticProceduresByPopularity.sort((a, b) => b.popularity - a.popularity).slice(0, 10),
+              data: aestheticProceduresByPopularity.sort((a, b) => (b.popularity || 0) - (a.popularity || 0)).slice(0, 10),
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
             }
@@ -289,17 +367,20 @@ const MarketDataExplorer: React.FC<MarketDataExplorerProps> = ({
           
           // Transform companies into chart-friendly data
           const companiesByIndustry = companies.reduce((acc, company) => {
-            if (!acc[company.industry]) {
-              acc[company.industry] = 0;
+            const industry = company.industry || 'Other';
+            if (!acc[industry]) {
+              acc[industry] = 0;
             }
-            acc[company.industry]++;
+            acc[industry]++;
             return acc;
           }, {} as Record<string, number>);
           
-          const companiesByRevenue = companies.map(company => ({
-            name: company.name,
-            revenue: company.annual_revenue
-          }));
+          const companiesByRevenue = companies
+            .filter(company => company.name && company.annual_revenue != null)
+            .map(company => ({
+              name: company.name!,
+              revenue: company.annual_revenue!
+            }));
           
           data = [
             {
@@ -317,7 +398,6 @@ const MarketDataExplorer: React.FC<MarketDataExplorerProps> = ({
               description: 'Annual revenue of top companies',
               data_type: 'bar_chart',
               data: companiesByRevenue
-                .filter(company => company.revenue !== undefined)
                 .sort((a, b) => (b.revenue || 0) - (a.revenue || 0))
                 .slice(0, 10),
               created_at: new Date().toISOString(),

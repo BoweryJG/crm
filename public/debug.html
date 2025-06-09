@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Environment Debug</title>
+    <style>
+        body { 
+            font-family: 'Courier New', monospace; 
+            background: #1a1a1a; 
+            color: #00ff00; 
+            padding: 20px; 
+        }
+        .env-var { 
+            margin: 10px 0; 
+            padding: 10px; 
+            background: #2a2a2a; 
+            border-left: 3px solid #00ff00; 
+        }
+        .missing { 
+            border-left-color: #ff0000; 
+            color: #ff0000; 
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Sphere oS - Environment Debug</h1>
+    <div id="env-info"></div>
+    
+    <script>
+        // Check if we're running in production
+        const isProduction = window.location.hostname !== 'localhost';
+        
+        // Get current theme from localStorage
+        const currentTheme = localStorage.getItem('crm-theme-mode') || 'space';
+        
+        // Display environment info
+        const envInfo = document.getElementById('env-info');
+        envInfo.innerHTML = `
+            <div class="env-var">
+                <strong>Environment:</strong> ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}
+            </div>
+            <div class="env-var">
+                <strong>Current URL:</strong> ${window.location.href}
+            </div>
+            <div class="env-var">
+                <strong>Current Theme:</strong> ${currentTheme}
+            </div>
+            <div class="env-var">
+                <strong>Local Storage:</strong> ${JSON.stringify(localStorage, null, 2)}
+            </div>
+            <div class="env-var">
+                <strong>User Agent:</strong> ${navigator.userAgent}
+            </div>
+            <div class="env-var">
+                <strong>Timestamp:</strong> ${new Date().toISOString()}
+            </div>
+        `;
+        
+        // Test theme switching
+        setTimeout(() => {
+            envInfo.innerHTML += `
+                <div class="env-var">
+                    <strong>Testing theme switching...</strong><br>
+                    <button onclick="setTheme('space')">Space Theme</button>
+                    <button onclick="setTheme('corporate')">Corporate Theme</button>
+                    <button onclick="setTheme('luxury')">Luxury Theme</button>
+                </div>
+            `;
+        }, 1000);
+        
+        function setTheme(theme) {
+            localStorage.setItem('crm-theme-mode', theme);
+            alert('Theme set to: ' + theme + '. Refresh the main app to see changes.');
+        }
+    </script>
+</body>
+</html>

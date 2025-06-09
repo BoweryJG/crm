@@ -28,7 +28,7 @@ import ResearchInsights from './ResearchInsights';
 import ResearchLibrary from './ResearchLibrary';
 
 import researchService from '../../services/research/researchService';
-import { ResearchProject, ResearchDocument, ResearchTask, ResearchWorkspaceState } from '../../types/research';
+import { ResearchProject, ResearchDocument, ResearchTask, ResearchCanvasState } from '../../types/research';
 import { useAuth } from '../../hooks/useAuth';
 
 // TabPanel component for tab content
@@ -59,11 +59,11 @@ const TabPanel = (props: TabPanelProps) => {
   );
 };
 
-const ResearchWorkspace: React.FC = () => {
+const ResearchCanvas: React.FC = () => {
   const theme = useTheme();
   const { user } = useAuth();
   const [tabValue, setTabValue] = useState(0);
-  const [workspaceState, setWorkspaceState] = useState<ResearchWorkspaceState>({
+  const [canvasState, setCanvasState] = useState<ResearchCanvasState>({
     isLoading: true,
     activeProject: undefined,
     activeDocument: undefined,
@@ -81,7 +81,7 @@ const ResearchWorkspace: React.FC = () => {
   // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
-      setWorkspaceState(prev => ({ ...prev, isLoading: true }));
+      setCanvasState(prev => ({ ...prev, isLoading: true }));
       
       try {
         // Fetch projects
@@ -92,7 +92,7 @@ const ResearchWorkspace: React.FC = () => {
         // If there's at least one project, set it as active
         if (projectsResult.data && projectsResult.data.length > 0) {
           const activeProject = projectsResult.data[0];
-          setWorkspaceState(prev => ({ ...prev, activeProject }));
+          setCanvasState(prev => ({ ...prev, activeProject }));
           
           // Fetch documents for the active project
           const documentsResult = await researchService.getResearchDocuments(activeProject.id);
@@ -106,9 +106,9 @@ const ResearchWorkspace: React.FC = () => {
         }
       } catch (error) {
         console.error('Error fetching research data:', error);
-        setWorkspaceState(prev => ({ ...prev, error: error as Error }));
+        setCanvasState(prev => ({ ...prev, error: error as Error }));
       } finally {
-        setWorkspaceState(prev => ({ ...prev, isLoading: false }));
+        setCanvasState(prev => ({ ...prev, isLoading: false }));
       }
     };
     
@@ -120,7 +120,7 @@ const ResearchWorkspace: React.FC = () => {
   };
 
   const handleProjectSelect = async (projectId: string) => {
-    setWorkspaceState(prev => ({ ...prev, isLoading: true }));
+    setCanvasState(prev => ({ ...prev, isLoading: true }));
     
     try {
       // Fetch project details
@@ -129,7 +129,7 @@ const ResearchWorkspace: React.FC = () => {
       if (!projectResult.data) throw new Error(`Project with ID ${projectId} not found`);
       
       const activeProject = projectResult.data;
-      setWorkspaceState(prev => ({ ...prev, activeProject: activeProject }));
+      setCanvasState(prev => ({ ...prev, activeProject: activeProject }));
       
       // Fetch documents for the selected project
       const documentsResult = await researchService.getResearchDocuments(projectId);
@@ -142,14 +142,14 @@ const ResearchWorkspace: React.FC = () => {
       setTasks(tasksResult.data || []);
     } catch (error) {
       console.error(`Error selecting project with ID ${projectId}:`, error);
-      setWorkspaceState(prev => ({ ...prev, error: error as Error }));
+      setCanvasState(prev => ({ ...prev, error: error as Error }));
     } finally {
-      setWorkspaceState(prev => ({ ...prev, isLoading: false }));
+      setCanvasState(prev => ({ ...prev, isLoading: false }));
     }
   };
 
   const handleDocumentSelect = async (documentId: string) => {
-    setWorkspaceState(prev => ({ ...prev, isLoading: true }));
+    setCanvasState(prev => ({ ...prev, isLoading: true }));
     
     try {
       // Fetch document details
@@ -158,20 +158,20 @@ const ResearchWorkspace: React.FC = () => {
       if (!documentResult.data) throw new Error(`Document with ID ${documentId} not found`);
       
       const activeDocument = documentResult.data;
-      setWorkspaceState(prev => ({ ...prev, activeDocument: activeDocument }));
+      setCanvasState(prev => ({ ...prev, activeDocument: activeDocument }));
       
       // Switch to the document editor tab
       setTabValue(1);
     } catch (error) {
       console.error(`Error selecting document with ID ${documentId}:`, error);
-      setWorkspaceState(prev => ({ ...prev, error: error as Error }));
+      setCanvasState(prev => ({ ...prev, error: error as Error }));
     } finally {
-      setWorkspaceState(prev => ({ ...prev, isLoading: false }));
+      setCanvasState(prev => ({ ...prev, isLoading: false }));
     }
   };
 
   const handleCreateProject = async (project: Omit<ResearchProject, 'id' | 'created_at' | 'updated_at'>) => {
-    setWorkspaceState(prev => ({ ...prev, isLoading: true }));
+    setCanvasState(prev => ({ ...prev, isLoading: true }));
     
     try {
       // Create the project
@@ -183,21 +183,21 @@ const ResearchWorkspace: React.FC = () => {
       setProjects(prev => [result.data!, ...prev]);
       
       // Set the new project as active
-      setWorkspaceState(prev => ({ ...prev, activeProject: result.data || undefined }));
+      setCanvasState(prev => ({ ...prev, activeProject: result.data || undefined }));
       
       // Clear documents and tasks
       setDocuments([]);
       setTasks([]);
     } catch (error) {
       console.error('Error creating project:', error);
-      setWorkspaceState(prev => ({ ...prev, error: error as Error }));
+      setCanvasState(prev => ({ ...prev, error: error as Error }));
     } finally {
-      setWorkspaceState(prev => ({ ...prev, isLoading: false }));
+      setCanvasState(prev => ({ ...prev, isLoading: false }));
     }
   };
 
   const handleCreateDocument = async (document: Omit<ResearchDocument, 'id' | 'created_at' | 'updated_at'>) => {
-    setWorkspaceState(prev => ({ ...prev, isLoading: true }));
+    setCanvasState(prev => ({ ...prev, isLoading: true }));
     
     try {
       // Create the document
@@ -209,15 +209,15 @@ const ResearchWorkspace: React.FC = () => {
       setDocuments(prev => [result.data!, ...prev]);
       
       // Set the new document as active
-      setWorkspaceState(prev => ({ ...prev, activeDocument: result.data || undefined }));
+      setCanvasState(prev => ({ ...prev, activeDocument: result.data || undefined }));
       
       // Switch to the document editor tab
       setTabValue(1);
     } catch (error) {
       console.error('Error creating document:', error);
-      setWorkspaceState(prev => ({ ...prev, error: error as Error }));
+      setCanvasState(prev => ({ ...prev, error: error as Error }));
     } finally {
-      setWorkspaceState(prev => ({ ...prev, isLoading: false }));
+      setCanvasState(prev => ({ ...prev, isLoading: false }));
     }
   };
 
@@ -227,7 +227,7 @@ const ResearchWorkspace: React.FC = () => {
         <Tabs 
           value={tabValue} 
           onChange={handleTabChange} 
-          aria-label="research workspace tabs"
+          aria-label="research canvas tabs"
           variant="scrollable"
           scrollButtons="auto"
         >
@@ -241,13 +241,13 @@ const ResearchWorkspace: React.FC = () => {
       </Box>
       
       <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
-        {workspaceState.isLoading ? (
+        {canvasState.isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
             <CircularProgress />
           </Box>
-        ) : workspaceState.error ? (
+        ) : canvasState.error ? (
           <Box sx={{ p: 3, textAlign: 'center' }}>
-            <Typography color="error">Error: {workspaceState.error.message}</Typography>
+            <Typography color="error">Error: {canvasState.error.message}</Typography>
             <Button 
               variant="contained" 
               sx={{ mt: 2 }}
@@ -261,7 +261,7 @@ const ResearchWorkspace: React.FC = () => {
             <TabPanel value={tabValue} index={0}>
               <ResearchProjectManager 
                 projects={projects}
-                activeProject={workspaceState.activeProject}
+                activeProject={canvasState.activeProject}
                 onProjectSelect={handleProjectSelect}
                 onCreateProject={handleCreateProject}
                 userId={user?.id || ''}
@@ -270,8 +270,8 @@ const ResearchWorkspace: React.FC = () => {
             
             <TabPanel value={tabValue} index={1}>
               <ResearchDocumentEditor 
-                document={workspaceState.activeDocument}
-                project={workspaceState.activeProject}
+                document={canvasState.activeDocument}
+                project={canvasState.activeProject}
                 onSave={(doc: ResearchDocument) => {
                   // Handle document save
                   console.log('Saving document:', doc);
@@ -282,8 +282,8 @@ const ResearchWorkspace: React.FC = () => {
             
             <TabPanel value={tabValue} index={2}>
               <AIResearchAssistant 
-                project={workspaceState.activeProject}
-                document={workspaceState.activeDocument}
+                project={canvasState.activeProject}
+                document={canvasState.activeDocument}
                 onDocumentCreate={handleCreateDocument}
                 userId={user?.id || ''}
               />
@@ -291,7 +291,7 @@ const ResearchWorkspace: React.FC = () => {
             
             <TabPanel value={tabValue} index={3}>
               <MarketDataExplorer 
-                project={workspaceState.activeProject}
+                project={canvasState.activeProject}
                 onDocumentCreate={handleCreateDocument}
                 userId={user?.id || ''}
               />
@@ -299,7 +299,7 @@ const ResearchWorkspace: React.FC = () => {
             
             <TabPanel value={tabValue} index={4}>
               <ResearchInsights 
-                project={workspaceState.activeProject}
+                project={canvasState.activeProject}
                 documents={documents}
                 userId={user?.id || ''}
                 onInsightGenerated={(doc) => {
@@ -323,4 +323,4 @@ const ResearchWorkspace: React.FC = () => {
   );
 };
 
-export default ResearchWorkspace;
+export default ResearchCanvas;
