@@ -73,6 +73,9 @@ interface SalesActivity {
   updated_at: string;
 }
 
+// Store for consistent mock data
+let mockDataStore: any = null;
+
 // Generate a random number between min and max (inclusive)
 const getRandomInt = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -474,7 +477,13 @@ export const generateDashboardStats = () => {
   // Generate random stats with realistic values
   const totalContacts = getRandomInt(1200, 1400);
   const activePractices = getRandomInt(330, 370);
-  const revenueGenerated = getRandomInt(800, 950) * 1000; // $800K to $950K
+  const salesGoal = 1300000; // $1.3M
+  
+  // Generate revenue based on a specific progress percentage
+  const salesGoalProgress = getRandomInt(60, 75); // This will be used for both quota and sales goal
+  const currentRevenue = Math.round((salesGoal * salesGoalProgress) / 100); // Calculate revenue from progress
+  const revenueGenerated = currentRevenue; // Keep them in sync
+  
   const activeCampaigns = getRandomInt(20, 30);
   
   // Generate percentage changes
@@ -482,11 +491,6 @@ export const generateDashboardStats = () => {
   const practicesChange = getRandomPercentageChange(3, 15); // Positive trend for practices
   const revenueChange = getRandomPercentageChange(-10, 10); // Mixed trend for revenue
   const campaignsChange = getRandomPercentageChange(10, 25); // Strong positive trend for campaigns
-  
-  // Current progress toward sales goal
-  const salesGoalProgress = getRandomInt(60, 75);
-  const currentRevenue = revenueGenerated;
-  const salesGoal = 1300000; // $1.3M
   
   return {
     totalContacts,
@@ -588,11 +592,24 @@ export const generateUpcomingTasks = (count: number = 5) => {
 
 // Main function to get all mock data for the dashboard
 export const getMockDashboardData = () => {
-  return {
+  // Return cached data if available to ensure consistency
+  if (mockDataStore) {
+    return mockDataStore;
+  }
+  
+  // Generate new data and cache it
+  mockDataStore = {
     stats: generateDashboardStats(),
     recentActivities: generateRecentActivities(),
     upcomingTasks: generateUpcomingTasks()
   };
+  
+  // Clear cache after 5 minutes to allow for some variation
+  setTimeout(() => {
+    mockDataStore = null;
+  }, 5 * 60 * 1000);
+  
+  return mockDataStore;
 };
 
 // Generate mock call analyses

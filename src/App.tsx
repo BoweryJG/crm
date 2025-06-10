@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './themes/ThemeContext';
 import { AuthProvider } from './auth';
 import { AppModeProvider } from './contexts/AppModeContext';
+import { DashboardDataProvider } from './contexts/DashboardDataContext';
 import SphereLoadingScreen from './components/common/SphereLoadingScreen';
 import StandaloneEliteLoadingScreen from './components/common/StandaloneEliteLoadingScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
@@ -68,8 +69,9 @@ const App: React.FC = () => {
       <ErrorBoundary>
         <AuthProvider>
           <AppModeProvider>
-            <CssBaseline />
-            <BrowserRouter>
+            <DashboardDataProvider>
+              <CssBaseline />
+              <BrowserRouter>
               <Routes>
                 {/* Auth Routes - still available but not required */}
                 <Route path="/login" element={<Login />} />
@@ -115,6 +117,7 @@ const App: React.FC = () => {
             <FeatureUpgradeModal />
             <DemoModeIndicator />
           </BrowserRouter>
+            </DashboardDataProvider>
           </AppModeProvider>
         </AuthProvider>
       </ErrorBoundary>

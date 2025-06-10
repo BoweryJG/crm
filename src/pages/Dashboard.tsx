@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { 
   Box, 
   Typography, 
@@ -14,11 +14,9 @@ import NowCardsStack from '../components/dashboard/NowCardsStack'; // Added impo
 import ClassicRevenueGauge from '../components/gauges/ClassicRevenueGauge';
 import LiveActionTicker from '../components/dashboard/LiveActionTicker';
 import { useThemeContext } from '../themes/ThemeContext';
-import { getMockDashboardData } from '../services/mockData/mockDataService';
-import { dashboardService, DashboardMetrics } from '../services/supabase/dashboardService';
-import { useAuth } from '../auth';
-import { useAppMode } from '../contexts/AppModeContext';
 import { useNavigate } from 'react-router-dom';
+import { useDashboardData } from '../contexts/DashboardDataContext';
+import { useAuth } from '../auth';
 
 // Helper function to generate random integers
 const getRandomInt = (min: number, max: number): number => {
@@ -30,84 +28,8 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { themeMode } = useThemeContext();
   const { user } = useAuth();
-  const { isDemo } = useAppMode();
-  const [dashboardData, setDashboardData] = useState<DashboardMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { dashboardData, loading, mockActivities, mockTasks } = useDashboardData();
   
-  // Load dashboard data on component mount
-  useEffect(() => {
-    const loadDashboardData = async () => {
-      setLoading(true);
-      
-      if (isDemo || !user?.id) {
-        // Use mock data in demo mode or when not authenticated
-        const mockData = getMockDashboardData();
-        setDashboardData({
-          user_id: user?.id || 'demo',
-          total_contacts: mockData.stats.totalContacts,
-          contacts_change: mockData.stats.contactsChange,
-          active_practices: mockData.stats.activePractices,
-          practices_change: mockData.stats.practicesChange,
-          revenue_generated: mockData.stats.revenueGenerated * 100, // Convert to cents
-          revenue_change: mockData.stats.revenueChange,
-          active_campaigns: mockData.stats.activeCampaigns,
-          campaigns_change: mockData.stats.campaignsChange,
-          sales_goal: mockData.stats.salesGoal * 100, // Convert to cents
-          current_revenue: mockData.stats.currentRevenue * 100, // Convert to cents
-          sales_goal_progress: mockData.stats.salesGoalProgress,
-          quota_percentage: mockData.stats.salesGoalProgress, // Sync with sales goal progress
-          pipeline_value: mockData.stats.revenueGenerated * 1.5 * 100, // Mock pipeline value in cents
-          conversion_rate: 45 // Mock conversion rate
-        });
-      } else {
-        // Load real data from Supabase
-        let metrics = await dashboardService.getMetrics(user.id);
-        
-        // If no metrics exist, initialize them
-        if (!metrics) {
-          await dashboardService.initializeMetrics(user.id);
-          metrics = await dashboardService.getMetrics(user.id);
-        }
-        
-        if (metrics) {
-          // Sync percentages to ensure quota matches sales goal progress
-          await dashboardService.syncPercentages(user.id);
-          // Reload to get synced data
-          metrics = await dashboardService.getMetrics(user.id);
-          setDashboardData(metrics);
-        } else {
-          // Fallback to mock data if something goes wrong
-          const mockData = getMockDashboardData();
-          setDashboardData({
-            user_id: user.id,
-            total_contacts: mockData.stats.totalContacts,
-            contacts_change: mockData.stats.contactsChange,
-            active_practices: mockData.stats.activePractices,
-            practices_change: mockData.stats.practicesChange,
-            revenue_generated: mockData.stats.revenueGenerated * 100, // Convert to cents
-            revenue_change: mockData.stats.revenueChange,
-            active_campaigns: mockData.stats.activeCampaigns,
-            campaigns_change: mockData.stats.campaignsChange,
-            sales_goal: mockData.stats.salesGoal * 100, // Convert to cents
-            current_revenue: mockData.stats.currentRevenue * 100, // Convert to cents
-            sales_goal_progress: mockData.stats.salesGoalProgress,
-            quota_percentage: mockData.stats.salesGoalProgress,
-            pipeline_value: mockData.stats.revenueGenerated * 1.5 * 100, // Convert to cents
-            conversion_rate: 45
-          });
-        }
-      }
-      
-      setLoading(false);
-    };
-    
-    loadDashboardData();
-    
-    // Refresh data every 5 minutes
-    const intervalId = setInterval(loadDashboardData, 5 * 60 * 1000);
-    
-    return () => clearInterval(intervalId);
-  }, [user, isDemo]);
 
   return (
     <Box>
@@ -232,8 +154,8 @@ const Dashboard: React.FC = () => {
               }}
             >
               {!loading && dashboardData ? (
-                // For now, use mock data for activities until we have real activity tracking
-                getMockDashboardData().recentActivities.map((activity: any) => (
+                // Use activities from context
+                mockActivities.map((activity: any) => (
                   <Box
                     key={activity.id}
                     sx={{
@@ -295,8 +217,8 @@ const Dashboard: React.FC = () => {
               }}
             >
               {!loading && dashboardData ? (
-                // For now, use mock data for tasks until we have real task tracking
-                getMockDashboardData().upcomingTasks.map((task: any) => (
+                // Use tasks from context
+                mockTasks.map((task: any) => (
                   <Box
                     key={task.id}
                     sx={{
