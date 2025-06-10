@@ -11,7 +11,7 @@ import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
 import NowCardsStack from '../components/dashboard/NowCardsStack'; // Added import
 import ClassicRevenueGauge from '../components/gauges/ClassicRevenueGauge';
-import EnhancedBreakingNewsTicker from '../components/dashboard/EnhancedBreakingNewsTicker';
+import LiveActionTicker from '../components/dashboard/LiveActionTicker';
 import { useThemeContext } from '../themes/ThemeContext';
 import { getMockDashboardData } from '../services/mockData/mockDataService';
 import { useAuth } from '../auth';
@@ -44,9 +44,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box>
-      {/* Enhanced Breaking News Ticker - AT THE VERY TOP */}
+      {/* Live Action Ticker - Award-Winning Real-Time Insights */}
       <Box sx={{ mb: 3, mx: -3, mt: -3 }}>
-        <EnhancedBreakingNewsTicker />
+        <LiveActionTicker />
       </Box>
 
       <Box sx={{ mb: 4 }}>
