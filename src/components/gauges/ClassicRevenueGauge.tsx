@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, keyframes } from '@mui/material/styles';
 
 interface ClassicRevenueGaugeProps {
   value: number; // 0-180
@@ -8,10 +8,48 @@ interface ClassicRevenueGaugeProps {
   label?: string;
   size?: 'small' | 'medium' | 'large';
   onClick?: () => void;
+  animationDelay?: number; // Delay in milliseconds for staggered animation
 }
 
+// Animation keyframes
+const initialSpin = keyframes`
+  0% {
+    transform: scale(0.8) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(360deg);
+    opacity: 1;
+  }
+  60% {
+    transform: scale(0.95) rotate(380deg);
+  }
+  70% {
+    transform: scale(1.02) rotate(355deg);
+  }
+  80% {
+    transform: scale(0.98) rotate(362deg);
+  }
+  90% {
+    transform: scale(1.01) rotate(358deg);
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 1;
+  }
+`;
+
+const gentlePulse = keyframes`
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+`;
+
 // Main container with leather texture
-const GaugeContainer = styled(Box)<{ size: string }>(({ size }) => {
+const GaugeContainer = styled(Box)<{ size: string; delay?: number }>(({ size, delay = 0 }) => {
   const dimensions = {
     small: 200,
     medium: 260,
@@ -36,6 +74,7 @@ const GaugeContainer = styled(Box)<{ size: string }>(({ size }) => {
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
+    animation: `${initialSpin} 2s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay}ms, ${gentlePulse} 3s ease-in-out infinite ${2500 + delay}ms`,
     transition: 'transform 0.3s ease',
     '&:hover': {
       transform: 'scale(1.02)'
@@ -180,11 +219,11 @@ const GaugeSVG = styled('svg')<{ size: string }>(({ size }) => {
   };
 });
 
-// Needle with realistic shadow
+// Needle with chrome tip and realistic shadow
 const Needle = styled(Box)<{ rotation: number }>(({ rotation }) => ({
   position: 'absolute',
   width: '48%',
-  height: 3,
+  height: 4,
   background: `linear-gradient(90deg, 
     #8B0000 0%, 
     #DC143C 20%, 
@@ -196,21 +235,52 @@ const Needle = styled(Box)<{ rotation: number }>(({ rotation }) => ({
   top: '50%',
   transformOrigin: '15% center',
   transform: `translate(-15%, -50%) rotate(${rotation}deg)`,
-  filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6))',
+  filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8))',
   transition: 'transform 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
   zIndex: 10,
-  // Needle tip
+  // Chrome needle tip
   '&::after': {
     content: '""',
     position: 'absolute',
-    right: -1,
+    right: -16,
     top: '50%',
     transform: 'translateY(-50%)',
-    width: 0,
-    height: 0,
-    borderLeft: '20px solid #FF0000',
-    borderTop: '6px solid transparent',
-    borderBottom: '6px solid transparent'
+    width: 20,
+    height: 16,
+    background: `conic-gradient(
+      from 180deg at 50% 50%,
+      #ffffff 0deg,
+      #e0e0e0 45deg,
+      #909090 90deg,
+      #606060 135deg,
+      #909090 180deg,
+      #e0e0e0 225deg,
+      #ffffff 270deg,
+      #e0e0e0 315deg,
+      #ffffff 360deg
+    )`,
+    clipPath: 'polygon(0 0, 100% 50%, 0 100%)',
+    boxShadow: `
+      2px 0 4px rgba(0, 0, 0, 0.3),
+      inset -1px 0 2px rgba(255, 255, 255, 0.8)
+    `,
+    filter: 'contrast(1.1) brightness(1.05)'
+  },
+  // Chrome base connector
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    right: -4,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: 8,
+    height: 8,
+    borderRadius: '50%',
+    background: `radial-gradient(circle at 30% 30%, #e0e0e0 0%, #909090 50%, #606060 100%)`,
+    boxShadow: `
+      inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+      0 1px 2px rgba(255, 255, 255, 0.5)
+    `
   }
 }));
 
@@ -254,25 +324,25 @@ const GaugeLabel = styled('text')({
 // LED Display Container with glow effect
 const LEDDisplay = styled(Box)(({ theme }) => ({
   position: 'absolute',
-  bottom: '28%',
+  bottom: '22%',
   left: '50%',
   transform: 'translateX(-50%)',
   display: 'flex',
-  gap: 3,
-  padding: '6px 10px',
+  gap: 2,
+  padding: '4px 8px',
   background: '#000000',
-  borderRadius: 4,
-  border: '1px solid #222',
+  borderRadius: 3,
+  border: '1px solid #1a1a1a',
   boxShadow: `
-    inset 0 2px 8px rgba(0, 0, 0, 0.9),
-    0 0 20px rgba(0, 255, 0, 0.15),
-    0 0 30px rgba(0, 255, 0, 0.1)
+    inset 0 2px 6px rgba(0, 0, 0, 0.9),
+    0 0 15px rgba(0, 255, 0, 0.1),
+    0 0 25px rgba(0, 255, 0, 0.05)
   `
 }));
 
 const LEDDigit = styled('div')({
-  width: 24,
-  height: 32,
+  width: 20,
+  height: 26,
   background: '#0a0a0a',
   borderRadius: 2,
   display: 'flex',
@@ -280,13 +350,13 @@ const LEDDigit = styled('div')({
   justifyContent: 'center',
   position: 'relative',
   fontFamily: 'Monaco, Consolas, monospace',
-  fontSize: '24px',
+  fontSize: '20px',
   fontWeight: 'bold',
   color: '#00FF00',
   textShadow: `
-    0 0 5px #00FF00,
-    0 0 10px #00FF00,
-    0 0 15px #00FF00
+    0 0 4px #00FF00,
+    0 0 8px #00FF00,
+    0 0 12px #00FF00
   `,
   '&::before': {
     content: '"8"',
@@ -301,7 +371,8 @@ const ClassicRevenueGauge: React.FC<ClassicRevenueGaugeProps> = ({
   displayValue,
   label = "REVENUE",
   size = "medium",
-  onClick
+  onClick,
+  animationDelay = 0
 }) => {
   const [needleValue, setNeedleValue] = useState(0);
   const clampedValue = Math.max(0, Math.min(180, value));
@@ -380,7 +451,7 @@ const ClassicRevenueGauge: React.FC<ClassicRevenueGaugeProps> = ({
   }
   
   return (
-    <GaugeContainer size={size} onClick={onClick}>
+    <GaugeContainer size={size} delay={animationDelay} onClick={onClick}>
       <StitchingBorder size={size} />
       <ChromeBezel size={size}>
         <GaugeFace size={size}>

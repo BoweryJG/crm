@@ -72,6 +72,7 @@ const Dashboard: React.FC = () => {
             label="REVENUE"
             size="medium"
             onClick={() => navigate('/analytics')}
+            animationDelay={0}
           />
           <ClassicRevenueGauge 
             value={132}
@@ -79,6 +80,7 @@ const Dashboard: React.FC = () => {
             label="PIPELINE"
             size="medium"
             onClick={() => navigate('/analytics')}
+            animationDelay={200}
           />
           <ClassicRevenueGauge 
             value={165}
@@ -86,6 +88,7 @@ const Dashboard: React.FC = () => {
             label="QUOTA"
             size="medium"
             onClick={() => navigate('/analytics')}
+            animationDelay={400}
           />
           <ClassicRevenueGauge 
             value={45}
@@ -93,6 +96,7 @@ const Dashboard: React.FC = () => {
             label="CONVERSION"
             size="medium"
             onClick={() => navigate('/analytics')}
+            animationDelay={600}
           />
         </Box>
       </Box>
