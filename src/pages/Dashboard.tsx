@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
 
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" component="h1" fontWeight={600} gutterBottom>
-          Welcome back, {user?.email?.split('@')[0] || user?.user_metadata?.name || 'User'}
+          Welcome back, {user?.email?.split('@')[0] || user?.user_metadata?.full_name || 'User'}
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Here's an overview of your sales performance and activity
