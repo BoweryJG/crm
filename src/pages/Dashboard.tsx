@@ -11,7 +11,7 @@ import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
 import NowCardsStack from '../components/dashboard/NowCardsStack'; // Added import
 import ClassicRevenueGauge from '../components/gauges/ClassicRevenueGauge';
-import IconicUrgentTicker from '../components/dashboard/IconicUrgentTicker';
+import ThreeLevelPriorityTicker from '../components/dashboard/ThreeLevelPriorityTicker';
 import { useThemeContext } from '../themes/ThemeContext';
 import { getMockDashboardData } from '../services/mockData/mockDataService';
 import { useAuth } from '../auth';
@@ -44,9 +44,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box>
-      {/* Iconic Urgent Ticker - AT THE VERY TOP */}
+      {/* Three Level Priority Ticker - AT THE VERY TOP */}
       <Box sx={{ mb: 3, mx: -3, mt: -3 }}>
-        <IconicUrgentTicker />
+        <ThreeLevelPriorityTicker />
       </Box>
 
       <Box sx={{ mb: 4 }}>
