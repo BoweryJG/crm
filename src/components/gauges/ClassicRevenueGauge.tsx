@@ -4,8 +4,8 @@ import { styled } from '@mui/material/styles';
 
 interface ClassicRevenueGaugeProps {
   value: number; // 0-180
+  displayValue?: number; // The actual value to show in LED display (e.g., 87 for 87K)
   label?: string;
-  odometer?: string;
   size?: 'small' | 'medium' | 'large';
   onClick?: () => void;
 }
@@ -251,50 +251,76 @@ const GaugeLabel = styled('text')({
   textAnchor: 'middle'
 });
 
-// Odometer display
-const OdometerContainer = styled(Box)(({ theme }) => ({
+// LED Display Container with glow effect
+const LEDDisplay = styled(Box)(({ theme }) => ({
   position: 'absolute',
-  bottom: '25%',
+  bottom: '28%',
   left: '50%',
   transform: 'translateX(-50%)',
+  display: 'flex',
+  gap: 3,
+  padding: '6px 10px',
   background: '#000000',
-  border: '2px solid #333333',
   borderRadius: 4,
-  padding: '4px 10px',
+  border: '1px solid #222',
   boxShadow: `
-    inset 0 2px 6px rgba(0, 0, 0, 0.8),
-    0 1px 2px rgba(255, 255, 255, 0.1)
+    inset 0 2px 8px rgba(0, 0, 0, 0.9),
+    0 0 20px rgba(0, 255, 0, 0.15),
+    0 0 30px rgba(0, 255, 0, 0.1)
   `
 }));
 
-const OdometerText = styled('text')({
-  fill: '#ffffff',
-  fontSize: '14px',
-  fontFamily: 'monospace',
+const LEDDigit = styled('div')({
+  width: 24,
+  height: 32,
+  background: '#0a0a0a',
+  borderRadius: 2,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  position: 'relative',
+  fontFamily: 'Monaco, Consolas, monospace',
+  fontSize: '24px',
   fontWeight: 'bold',
-  letterSpacing: '0.1em'
+  color: '#00FF00',
+  textShadow: `
+    0 0 5px #00FF00,
+    0 0 10px #00FF00,
+    0 0 15px #00FF00
+  `,
+  '&::before': {
+    content: '"8"',
+    position: 'absolute',
+    color: 'rgba(0, 255, 0, 0.05)',
+    textShadow: 'none'
+  }
 });
 
 const ClassicRevenueGauge: React.FC<ClassicRevenueGaugeProps> = ({
   value = 0,
+  displayValue,
   label = "REVENUE",
-  odometer = "142908",
   size = "medium",
   onClick
 }) => {
-  const [displayValue, setDisplayValue] = useState(0);
+  const [needleValue, setNeedleValue] = useState(0);
   const clampedValue = Math.max(0, Math.min(180, value));
   
   // Animate needle on mount and value change
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDisplayValue(clampedValue);
+      setNeedleValue(clampedValue);
     }, 100);
     return () => clearTimeout(timer);
   }, [clampedValue]);
   
   // Convert value to rotation (-135° to +45°)
-  const rotation = -135 + (displayValue / 180) * 180;
+  const rotation = -135 + (needleValue / 180) * 180;
+  
+  // Format LED display value (ensure 2 digits)
+  const ledValue = displayValue || value;
+  const digit1 = Math.floor(ledValue / 10) % 10;
+  const digit2 = ledValue % 10;
   
   // Calculate dimensions based on size
   const svgSize = size === 'small' ? 148 : size === 'large' ? 268 : 208;
@@ -373,21 +399,6 @@ const ClassicRevenueGauge: React.FC<ClassicRevenueGaugeProps> = ({
               {label}
             </GaugeLabel>
             
-            {/* Odometer */}
-            <foreignObject
-              x={centerX - 40}
-              y={centerY + radius * 0.5}
-              width="80"
-              height="30"
-            >
-              <OdometerContainer>
-                <svg width="80" height="20">
-                  <OdometerText x="40" y="15" textAnchor="middle">
-                    {odometer}
-                  </OdometerText>
-                </svg>
-              </OdometerContainer>
-            </foreignObject>
           </GaugeSVG>
           
           {/* Needle */}
@@ -395,6 +406,12 @@ const ClassicRevenueGauge: React.FC<ClassicRevenueGaugeProps> = ({
           
           {/* Center cap */}
           <CenterCap />
+          
+          {/* LED Display */}
+          <LEDDisplay>
+            <LEDDigit>{digit1}</LEDDigit>
+            <LEDDigit>{digit2}</LEDDigit>
+          </LEDDisplay>
         </GaugeFace>
       </ChromeBezel>
     </GaugeContainer>

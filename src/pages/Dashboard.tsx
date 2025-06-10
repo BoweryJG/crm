@@ -68,29 +68,29 @@ const Dashboard: React.FC = () => {
         }}>
           <ClassicRevenueGauge 
             value={87}
+            displayValue={87}
             label="REVENUE"
-            odometer="142908"
             size="medium"
             onClick={() => navigate('/analytics')}
           />
           <ClassicRevenueGauge 
             value={132}
+            displayValue={92}
             label="PIPELINE"
-            odometer="287654"
             size="medium"
             onClick={() => navigate('/analytics')}
           />
           <ClassicRevenueGauge 
             value={165}
+            displayValue={165}
             label="QUOTA"
-            odometer="195432"
             size="medium"
             onClick={() => navigate('/analytics')}
           />
           <ClassicRevenueGauge 
             value={45}
+            displayValue={45}
             label="CONVERSION"
-            odometer="000045"
             size="medium"
             onClick={() => navigate('/analytics')}
           />

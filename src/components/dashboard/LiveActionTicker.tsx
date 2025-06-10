@@ -33,8 +33,79 @@ import {
   Notifications as AlertIcon,
   Analytics as AnalyticsIcon,
   Timer as TimerIcon,
-  NavigateNext as ActionIcon
+  NavigateNext as ActionIcon,
+  Warning as WarningIcon,
+  Refresh as RefreshIcon
 } from '@mui/icons-material';
+
+// Import NowCards data
+const nowCardsData = [
+  { 
+    id: '1', 
+    title: '🔥 HOT LEAD: Dr. Sarah Chen - Implant System', 
+    description: 'Dr. Chen from Advanced Dental Care has shown 7 strong purchase signals for the new implant system.', 
+    priority: 'high', 
+    type: 're_engagement', 
+    contactName: 'Dr. Sarah Chen', 
+    companyName: 'Advanced Dental Care',
+    aiInsight: 'AI detected 94% purchase probability. Practice mentioned patient backlog for implant procedures and insurance reimbursement improvements.',
+    confidenceScore: 94,
+    timeframe: 'Next 24-48 hours',
+    actionRequired: 'Schedule in-office demo with clinical specialist'
+  },
+  { 
+    id: '2', 
+    title: '⚡ COMPETITOR THREAT: Dr. Rodriguez - Botox', 
+    description: 'Dr. Rodriguez comparing Botox suppliers - Allergan mentioned multiple times.', 
+    priority: 'high', 
+    type: 'competitor_threat', 
+    contactName: 'Dr. Mike Rodriguez', 
+    companyName: 'Aesthetic Medicine Associates',
+    aiInsight: 'Practice evaluating alternative suppliers. 72% close rate when providing clinical efficacy comparisons within 6 hours.',
+    confidenceScore: 87,
+    timeframe: 'Next 6 hours critical',
+    actionRequired: 'Send competitive analysis immediately'
+  },
+  { 
+    id: '3', 
+    title: '💰 CONTRACT RENEWAL: Valley Ortho - Sutures', 
+    description: 'Annual suture contract renewal worth $240K approaching deadline.', 
+    priority: 'high', 
+    type: 'renewal_risk', 
+    contactName: 'Procurement Dept', 
+    companyName: 'Valley Orthopedics Group',
+    aiInsight: 'Contract expires in 10 days. Competitor (Ethicon) has been visiting frequently. 85% retention rate with proactive renewal.',
+    confidenceScore: 78,
+    timeframe: 'Next 10 days',
+    actionRequired: 'Submit renewal with 5% loyalty discount'
+  },
+  { 
+    id: '4', 
+    title: '🎯 PURCHASE INTENT: Dr. Thompson - Digital Scanner', 
+    description: 'Comparing digital impression scanners - high engagement with iTero content.', 
+    priority: 'medium', 
+    type: 'purchase_intent', 
+    contactName: 'Dr. James Thompson', 
+    companyName: 'Thompson Family Dentistry',
+    aiInsight: 'Downloaded ROI calculator, attended webinar, requested peer references. 68% close rate at this engagement level.',
+    confidenceScore: 68,
+    timeframe: 'Next 2 weeks',
+    actionRequired: 'Arrange peer reference calls'
+  },
+  { 
+    id: '5', 
+    title: '⏰ URGENT REQUEST: Dr. Kim - Surgical Tools', 
+    description: 'Needs specific bone graft instruments for scheduled surgery.', 
+    priority: 'medium', 
+    type: 'urgent_need', 
+    contactName: 'Dr. Jennifer Kim', 
+    companyName: 'Kim Oral Surgery',
+    aiInsight: 'Practice has scheduled complex cases requiring specific instrumentation. 73% close rate with expedited delivery.',
+    confidenceScore: 73,
+    timeframe: 'Next 5 days',
+    actionRequired: 'Offer express delivery + loaner kit'
+  }
+];
 
 // Animation keyframes
 const pulse = keyframes`
@@ -72,6 +143,15 @@ const shimmer = keyframes`
   }
   100% {
     background-position: 1000px 0;
+  }
+`;
+
+const snakeBorder = keyframes`
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
   }
 `;
 
@@ -199,55 +279,77 @@ const TickerContent = styled(Box)<{ paused: boolean }>(({ paused }) => ({
   gap: 24
 }));
 
-const ActionCard = styled(Box)<{ priority: string }>(({ priority }) => {
+const ActionCard = styled(Box)<{ priority: string; active?: boolean }>(({ priority, active = false }) => {
   const colors = {
     critical: { 
       bg: 'rgba(220, 38, 38, 0.08)', 
       border: 'rgba(220, 38, 38, 0.3)',
       text: '#EF4444',
-      glow: 'rgba(220, 38, 38, 0.3)'
+      glow: 'rgba(220, 38, 38, 0.3)',
+      gradient: '#DC2626'
     },
     urgent: { 
       bg: 'rgba(245, 158, 11, 0.08)', 
       border: 'rgba(245, 158, 11, 0.3)',
       text: '#F59E0B',
-      glow: 'rgba(245, 158, 11, 0.3)'
+      glow: 'rgba(245, 158, 11, 0.3)',
+      gradient: '#F59E0B'
     },
     opportunity: { 
       bg: 'rgba(16, 185, 129, 0.08)', 
       border: 'rgba(16, 185, 129, 0.3)',
       text: '#10B981',
-      glow: 'rgba(16, 185, 129, 0.3)'
+      glow: 'rgba(16, 185, 129, 0.3)',
+      gradient: '#10B981'
     },
     success: { 
       bg: 'rgba(59, 130, 246, 0.08)', 
       border: 'rgba(59, 130, 246, 0.3)',
       text: '#3B82F6',
-      glow: 'rgba(59, 130, 246, 0.3)'
+      glow: 'rgba(59, 130, 246, 0.3)',
+      gradient: '#3B82F6'
     }
   };
   
-  const color = colors[priority as keyof typeof colors];
+  const color = colors[priority as keyof typeof colors] || colors.success;
   
   return {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 12,
-    padding: '8px 16px',
-    background: color.bg,
-    border: `1px solid ${color.border}`,
-    borderRadius: 8,
+    padding: '10px 16px',
+    background: `linear-gradient(135deg, ${color.bg} 0%, rgba(0,0,0,0.05) 100%)`,
+    borderRadius: 10,
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     position: 'relative',
-    minWidth: 320,
-    height: 36,
+    minWidth: 350,
+    height: 42,
     flexShrink: 0,
+    overflow: 'hidden',
     '&:hover': {
-      transform: 'translateY(-1px)',
-      borderColor: color.text,
-      background: priority === 'critical' ? 'rgba(220, 38, 38, 0.12)' : color.bg
-    }
+      transform: 'translateY(-1px) scale(1.02)',
+      background: `linear-gradient(135deg, ${color.bg} 0%, rgba(0,0,0,0.08) 100%)`,
+    },
+    // Snake border animation
+    '&::before': priority === 'critical' || active ? {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderRadius: 'inherit',
+      padding: '2px',
+      background: `linear-gradient(90deg, ${color.gradient}, ${color.text}, ${color.gradient})`,
+      backgroundSize: '200% 100%',
+      animation: `${snakeBorder} 3s linear infinite`,
+      mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+      maskComposite: 'exclude',
+      WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+      WebkitMaskComposite: 'xor',
+      opacity: 0.8,
+    } : {}
   };
 });
 
@@ -292,123 +394,57 @@ const CategorySection = styled(Box)(({ theme }) => ({
   }
 }));
 
-// Sample data
-const generateActionItems = (): ActionItem[] => [
-  {
-    id: '1',
-    priority: 'critical',
-    icon: <CriticalIcon />,
-    title: 'CLOSING ALERT',
-    message: 'Dr. Martinez ready to sign $285K implant system - needs call in next 30 min',
-    value: '$285K',
-    time: '2 min',
-    action: {
-      type: 'call',
-      label: 'Call Now',
-      handler: () => console.log('Calling Dr. Martinez...')
-    },
-    metrics: {
-      probability: 95,
-      impact: '$285K',
-      deadline: '30 min'
-    }
-  },
-  {
-    id: '2',
-    priority: 'critical',
-    icon: <AlertIcon />,
-    title: 'COMPETITOR ALERT',
-    message: 'Straumann rep at Premier Dental - our $180K renewal at risk',
-    value: 'URGENT',
-    time: '5 min',
-    action: {
-      type: 'call',
-      label: 'Intervene',
-      handler: () => console.log('Calling Premier Dental...')
-    },
-    metrics: {
-      probability: 85,
-      impact: '$180K',
-      deadline: 'NOW'
-    }
-  },
-  {
-    id: '3',
-    priority: 'urgent',
-    icon: <UrgentIcon />,
-    title: 'HOT LEAD',
-    message: '3 practices showing 90%+ purchase intent - schedule visits today',
-    value: '$450K',
-    time: '15 min',
-    action: {
-      type: 'schedule',
-      label: 'Schedule',
-      handler: () => console.log('Opening calendar...')
-    },
-    metrics: {
-      probability: 90,
-      impact: '$450K',
-      deadline: 'Today'
-    }
-  },
-  {
-    id: '4',
-    priority: 'urgent',
-    icon: <TimerIcon />,
-    title: 'QUOTE DUE',
-    message: 'Dr. Chen expecting laser system proposal by 3 PM',
-    value: '$125K',
-    time: '1 hr',
-    action: {
-      type: 'email',
-      label: 'Send Quote',
-      handler: () => console.log('Opening email...')
-    },
-    metrics: {
-      probability: 75,
-      impact: '$125K',
-      deadline: '3 PM'
-    }
-  },
-  {
-    id: '5',
-    priority: 'opportunity',
-    icon: <OpportunityIcon />,
-    title: 'EXPANSION OPP',
-    message: 'Valley Ortho interested in adding 2nd location - huge growth potential',
-    value: '$520K',
-    time: '2 hrs',
-    action: {
-      type: 'view',
-      label: 'View Details',
-      handler: () => console.log('Opening opportunity...')
-    },
-    metrics: {
-      probability: 70,
-      impact: '$520K',
-      deadline: 'This week'
-    }
-  },
-  {
-    id: '6',
-    priority: 'success',
-    icon: <SuccessIcon />,
-    title: 'WIN CLOSED',
-    message: 'Riverside Dental purchase approved - process order immediately',
-    value: '$195K',
-    time: '30 min',
-    action: {
-      type: 'view',
-      label: 'Process',
-      handler: () => console.log('Processing order...')
-    },
-    metrics: {
-      probability: 100,
-      impact: '$195K',
-      deadline: 'Complete'
-    }
-  }
-];
+// Convert NowCards data to ticker format
+const generateActionItems = (): ActionItem[] => {
+  return nowCardsData.map((card, index) => {
+    // Map priority
+    const getPriority = (priority: string) => {
+      if (priority === 'high') return 'critical';
+      if (priority === 'medium') return 'urgent';
+      return 'opportunity';
+    };
+
+    // Determine action type based on card type
+    const getAction = (type: string) => {
+      switch (type) {
+        case 'competitor_threat':
+        case 'renewal_risk':
+          return { type: 'call' as const, label: 'Call Now', handler: () => console.log('Calling...') };
+        case 're_engagement':
+        case 'purchase_intent':
+          return { type: 'email' as const, label: 'Send Info', handler: () => console.log('Sending...') };
+        case 'urgent_need':
+          return { type: 'schedule' as const, label: 'Schedule', handler: () => console.log('Scheduling...') };
+        default:
+          return { type: 'view' as const, label: 'View', handler: () => console.log('Viewing...') };
+      }
+    };
+
+    // Extract value from title if present
+    const extractValue = (title: string) => {
+      const match = title.match(/\$(\d+)K/);
+      return match ? match[0] : '';
+    };
+
+    return {
+      id: card.id,
+      priority: getPriority(card.priority),
+      icon: card.priority === 'high' ? <CriticalIcon /> : 
+            card.priority === 'medium' ? <UrgentIcon /> : 
+            <OpportunityIcon />,
+      title: card.title.split(':')[0].replace(/[🔥⚡💰🎯⏰🔄📊]/g, '').trim(),
+      message: card.description,
+      value: extractValue(card.title) || `${card.confidenceScore}% AI`,
+      time: '2 min',
+      action: getAction(card.type),
+      metrics: {
+        probability: card.confidenceScore,
+        impact: extractValue(card.title),
+        deadline: card.timeframe
+      }
+    };
+  });
+};
 
 const LiveActionTicker: React.FC = () => {
   const [items, setItems] = useState<ActionItem[]>(generateActionItems());
@@ -600,19 +636,29 @@ const LiveActionTicker: React.FC = () => {
                 </Typography>
               </Box>
               
-              {item.value && (
-                <Chip 
-                  label={item.value} 
-                  size="small"
-                  sx={{ 
-                    height: 18,
+              {item.metrics?.probability && (
+                <Box
+                  sx={{
+                    background: `linear-gradient(45deg, ${
+                      item.priority === 'critical' ? '#DC2626' :
+                      item.priority === 'urgent' ? '#F59E0B' :
+                      '#10B981'
+                    }, ${
+                      item.priority === 'critical' ? '#DC262688' :
+                      item.priority === 'urgent' ? '#F59E0B88' :
+                      '#10B98188'
+                    })`,
+                    color: 'white',
+                    px: 1,
+                    py: 0.25,
+                    borderRadius: 1.5,
                     fontSize: '0.65rem',
-                    fontWeight: 600,
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    color: 'rgba(255, 255, 255, 0.8)'
+                    fontWeight: 'bold',
+                    boxShadow: 1,
                   }}
-                />
+                >
+                  {item.metrics.probability}% AI
+                </Box>
               )}
             </ActionCard>
           ))}
