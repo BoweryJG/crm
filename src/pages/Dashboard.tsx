@@ -10,11 +10,12 @@ import {
 import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
 import NowCardsStack from '../components/dashboard/NowCardsStack'; // Added import
-import { AviationDashboard } from '../components/gauges/AviationGauges';
-import EnhancedBreakingNewsTicker from '../components/dashboard/EnhancedBreakingNewsTicker';
+import RevenueGauge from '../components/gauges/RevenueGauge';
+import MultiColorProgressTicker from '../components/dashboard/MultiColorProgressTicker';
 import { useThemeContext } from '../themes/ThemeContext';
 import { getMockDashboardData } from '../services/mockData/mockDataService';
 import { useAuth } from '../auth';
+import { useNavigate } from 'react-router-dom';
 
 // Helper function to generate random integers
 const getRandomInt = (min: number, max: number): number => {
@@ -23,6 +24,7 @@ const getRandomInt = (min: number, max: number): number => {
 
 const Dashboard: React.FC = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const { themeMode } = useThemeContext();
   const { user } = useAuth();
   const [dashboardData, setDashboardData] = useState<any>(null);
@@ -42,9 +44,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box>
-      {/* Enhanced Breaking News Ticker - AT THE VERY TOP */}
+      {/* Multi-Color Progress Ticker - AT THE VERY TOP */}
       <Box sx={{ mb: 3 }}>
-        <EnhancedBreakingNewsTicker />
+        <MultiColorProgressTicker />
       </Box>
 
       <Box sx={{ mb: 4 }}>
@@ -56,18 +58,43 @@ const Dashboard: React.FC = () => {
         </Typography>
       </Box>
 
-      {/* Aviation Gauges Dashboard */}
+      {/* Revenue Gauges Dashboard */}
       <Box sx={{ mb: 4 }}>
-        <AviationDashboard 
-          metrics={{
-            winProbability: 87,
-            persuasionScore: 92,
-            talkTimeRatio: 78,
-            confidence: 94,
-            marketSentiment: 65
-          }}
-          size="medium"
-        />
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(4, 1fr)' },
+          gap: 3,
+          justifyContent: 'center'
+        }}>
+          <RevenueGauge 
+            value={87}
+            label="REVENUE"
+            odometer="142908"
+            size="medium"
+            onClick={() => navigate('/analytics')}
+          />
+          <RevenueGauge 
+            value={132}
+            label="PIPELINE"
+            odometer="287654"
+            size="medium"
+            onClick={() => navigate('/analytics')}
+          />
+          <RevenueGauge 
+            value={165}
+            label="QUOTA"
+            odometer="195432"
+            size="medium"
+            onClick={() => navigate('/analytics')}
+          />
+          <RevenueGauge 
+            value={45}
+            label="CONVERSION"
+            odometer="000045"
+            size="medium"
+            onClick={() => navigate('/analytics')}
+          />
+        </Box>
       </Box>
 
       {/* Stats Cards */}

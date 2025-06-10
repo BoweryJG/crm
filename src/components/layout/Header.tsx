@@ -149,39 +149,41 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
           <AppModeToggle />
         </Box>
         
-        {/* Auth Buttons */}
-        <Box sx={{ mx: 1, display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => setLoginOpen(true)}
-            sx={{
-              backdropFilter: 'blur(6px)',
-              backgroundColor: themeMode === 'space'
-                ? 'rgba(255, 255, 255, 0.08)'
-                : themeMode === 'luxury'
-                ? 'rgba(201, 176, 55, 0.1)'
-                : 'rgba(0,0,0,0.04)',
-              borderColor: themeMode === 'space'
-                ? 'rgba(255, 255, 255, 0.2)'
-                : themeMode === 'luxury'
-                ? 'rgba(201, 176, 55, 0.3)'
-                : 'rgba(0,0,0,0.2)'
-            }}
-          >
-            Login
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setSignupOpen(true)}
-            sx={{
-              backdropFilter: 'blur(6px)',
-            }}
-          >
-            Sign Up
-          </Button>
-        </Box>
+        {/* Auth Buttons - Only show when not logged in */}
+        {!user && (
+          <Box sx={{ mx: 1, display: { xs: 'none', md: 'flex' }, gap: 1 }}>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => setLoginOpen(true)}
+              sx={{
+                backdropFilter: 'blur(6px)',
+                backgroundColor: themeMode === 'space'
+                  ? 'rgba(255, 255, 255, 0.08)'
+                  : themeMode === 'luxury'
+                  ? 'rgba(201, 176, 55, 0.1)'
+                  : 'rgba(0,0,0,0.04)',
+                borderColor: themeMode === 'space'
+                  ? 'rgba(255, 255, 255, 0.2)'
+                  : themeMode === 'luxury'
+                  ? 'rgba(201, 176, 55, 0.3)'
+                  : 'rgba(0,0,0,0.2)'
+              }}
+            >
+              Login
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setSignupOpen(true)}
+              sx={{
+                backdropFilter: 'blur(6px)',
+              }}
+            >
+              Sign Up
+            </Button>
+          </Box>
+        )}
 
         {/* Notifications */}
         <Tooltip title="Notifications">
@@ -197,31 +199,32 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
           </IconButton>
         </Tooltip>
 
-        {/* User Menu */}
-        <Box sx={{ ml: 2 }}>
-          <IconButton
-            onClick={handleProfileMenuOpen}
-            sx={{
-              p: 0,
-              border: `2px solid ${
-                themeMode === 'space' 
-                  ? 'rgba(138, 96, 208, 0.5)'
-                  : themeMode === 'luxury'
-                  ? 'rgba(201, 176, 55, 0.5)'
-                  : 'rgba(61, 82, 213, 0.3)'
-              }`
-            }}
-          >
-            <Avatar 
-              sx={{ 
-                bgcolor: themeMode === 'space' ? '#8860D0' : themeMode === 'luxury' ? '#C9B037' : '#3D52D5',
-                width: 32,
-                height: 32
+        {/* User Menu - Only show when logged in */}
+        {user && (
+          <Box sx={{ ml: 2 }}>
+            <IconButton
+              onClick={handleProfileMenuOpen}
+              sx={{
+                p: 0,
+                border: `2px solid ${
+                  themeMode === 'space' 
+                    ? 'rgba(138, 96, 208, 0.5)'
+                    : themeMode === 'luxury'
+                    ? 'rgba(201, 176, 55, 0.5)'
+                    : 'rgba(61, 82, 213, 0.3)'
+                }`
               }}
             >
-              JS
-            </Avatar>
-          </IconButton>
+              <Avatar 
+                sx={{ 
+                  bgcolor: themeMode === 'space' ? '#8860D0' : themeMode === 'luxury' ? '#C9B037' : '#3D52D5',
+                  width: 32,
+                  height: 32
+                }}
+              >
+                {user.email ? user.email.substring(0, 2).toUpperCase() : 'U'}
+              </Avatar>
+            </IconButton>
           <Menu
             anchorEl={anchorEl}
             id="profile-menu"
@@ -323,6 +326,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
             </MenuItem>
           </Menu>
         </Box>
+        )}
       </Toolbar>
     </AppBar>
     <AuthModal open={loginOpen} onClose={() => setLoginOpen(false)} mode="login" />
