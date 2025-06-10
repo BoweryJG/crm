@@ -65,8 +65,8 @@ const Dashboard: React.FC = () => {
           ) : (
             <>
               <ClassicRevenueGauge 
-                value={Math.min(180, (dashboardData.revenue_generated / 100 / 1000 / 1000) * 180)} // Convert cents to K, then scale to 1000K (1M) max
-                displayValue={Math.round(dashboardData.revenue_generated / 100 / 1000)} // Convert cents to K for LED display
+                value={Math.min(180, (dashboardData.revenue_generated / 100000) * 180)} // Convert cents to K directly (100,000 cents = 1K)
+                displayValue={Math.round(dashboardData.revenue_generated / 100000)} // Convert cents to K for LED display
                 label="REVENUE"
                 size="medium"
                 onClick={() => navigate('/analytics')}
@@ -74,8 +74,8 @@ const Dashboard: React.FC = () => {
                 scaleLabels={['0', '', '', '', '', '500K', '', '', '', '1M']}
               />
               <ClassicRevenueGauge 
-                value={Math.min(180, (dashboardData.pipeline_value / 100 / 1000 / 2000) * 180)} // Convert cents to K, then scale to 2000K (2M) max
-                displayValue={Math.round(dashboardData.pipeline_value / 100 / 1000)} // Convert cents to K for LED display
+                value={Math.min(180, (dashboardData.pipeline_value / 200000) * 180)} // Convert cents to K and scale to 2M max (200,000,000 cents = 2M)
+                displayValue={Math.round(dashboardData.pipeline_value / 100000)} // Convert cents to K for LED display
                 label="PIPELINE"
                 size="medium"
                 onClick={() => navigate('/analytics')}
