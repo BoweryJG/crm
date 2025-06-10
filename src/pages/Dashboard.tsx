@@ -71,7 +71,7 @@ const Dashboard: React.FC = () => {
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={0}
-                scaleLabels={['0', '', '', '', '', '500K', '', '', '', '1M']}
+                scaleLabels={['0', '100K', '200K', '300K', '400K', '500K', '600K', '700K', '800K', '1M']}
               />
               <ClassicRevenueGauge 
                 value={(dashboardData.pipeline_value / 100000) / 2000 * 180} // 1190K/2000K = 0.595, * 180 = 107.1°
@@ -80,7 +80,7 @@ const Dashboard: React.FC = () => {
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={200}
-                scaleLabels={['0', '', '', '', '', '1M', '', '', '', '2M']}
+                scaleLabels={['0', '200K', '400K', '600K', '800K', '1M', '1.2M', '1.4M', '1.6M', '2M']}
               />
               <ClassicRevenueGauge 
                 value={(dashboardData.quota_percentage / 100) * 180} // 61%/100% = 0.61, * 180 = 109.8°
@@ -89,7 +89,7 @@ const Dashboard: React.FC = () => {
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={400}
-                scaleLabels={['0%', '', '', '', '', '50%', '', '', '', '100%']}
+                scaleLabels={['0%', '10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '100%']}
               />
               <ClassicRevenueGauge 
                 value={(dashboardData.conversion_rate / 100) * 180} // 45%/100% = 0.45, * 180 = 81°
@@ -98,7 +98,7 @@ const Dashboard: React.FC = () => {
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={600}
-                scaleLabels={['0%', '', '', '', '', '50%', '', '', '', '100%']}
+                scaleLabels={['0%', '10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '100%']}
               />
             </>
           )}
