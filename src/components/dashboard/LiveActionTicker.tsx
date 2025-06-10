@@ -57,14 +57,12 @@ const glow = keyframes`
   }
 `;
 
-const slideIn = keyframes`
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
+const scroll = keyframes`
+  0% {
     transform: translateX(0);
-    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%);
   }
 `;
 
@@ -112,6 +110,7 @@ const TickerRoot = styled(Box)(({ theme }) => ({
   backdropFilter: 'blur(20px)',
   borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
   overflow: 'hidden',
+  height: 'auto',
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -127,26 +126,27 @@ const TickerRoot = styled(Box)(({ theme }) => ({
 const ControlBar = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: '8px 16px',
+  padding: '6px 16px',
   background: 'rgba(0, 0, 0, 0.5)',
   borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-  gap: 12
+  gap: 8,
+  minHeight: 36
 }));
 
 const LiveIndicator = styled(Box)<{ active: boolean }>(({ active }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: 8,
-  padding: '4px 12px',
-  borderRadius: 20,
-  background: active ? 'rgba(255, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-  border: `1px solid ${active ? 'rgba(255, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`,
+  gap: 6,
+  padding: '2px 8px',
+  borderRadius: 12,
+  background: active ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+  border: `1px solid ${active ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`,
   '& .dot': {
-    width: 8,
-    height: 8,
+    width: 6,
+    height: 6,
     borderRadius: '50%',
-    background: active ? '#FF0000' : '#666',
-    animation: active ? `${pulse} 1s ease-in-out infinite` : 'none'
+    background: active ? '#EF4444' : '#666',
+    animation: active ? `${pulse} 1.5s ease-in-out infinite` : 'none'
   }
 }));
 
@@ -158,10 +158,10 @@ const LayerControls = styled(Box)(({ theme }) => ({
 
 const LayerToggle = styled(Chip)<{ active: boolean; priority: string }>(({ active, priority }) => {
   const colors = {
-    critical: { bg: '#FF3B30', light: 'rgba(255, 59, 48, 0.1)' },
-    urgent: { bg: '#FF9500', light: 'rgba(255, 149, 0, 0.1)' },
-    opportunity: { bg: '#34C759', light: 'rgba(52, 199, 89, 0.1)' },
-    success: { bg: '#007AFF', light: 'rgba(0, 122, 255, 0.1)' }
+    critical: { bg: '#DC2626', light: 'rgba(220, 38, 38, 0.1)' },
+    urgent: { bg: '#F59E0B', light: 'rgba(245, 158, 11, 0.1)' },
+    opportunity: { bg: '#10B981', light: 'rgba(16, 185, 129, 0.1)' },
+    success: { bg: '#3B82F6', light: 'rgba(59, 130, 246, 0.1)' }
   };
   
   const color = colors[priority as keyof typeof colors];
@@ -172,6 +172,8 @@ const LayerToggle = styled(Chip)<{ active: boolean; priority: string }>(({ activ
     background: active ? color.light : 'transparent',
     borderColor: active ? color.bg : 'rgba(255, 255, 255, 0.2)',
     color: active ? color.bg : 'rgba(255, 255, 255, 0.5)',
+    fontSize: '0.7rem',
+    height: 24,
     '&:hover': {
       background: color.light,
       borderColor: color.bg,
@@ -182,70 +184,69 @@ const LayerToggle = styled(Chip)<{ active: boolean; priority: string }>(({ activ
 
 const MainTicker = styled(Box)(({ theme }) => ({
   position: 'relative',
-  minHeight: 60,
+  height: 48,
   display: 'flex',
   alignItems: 'center',
-  padding: '0 16px',
-  overflow: 'hidden'
+  overflow: 'hidden',
+  background: 'rgba(0, 0, 0, 0.3)'
 }));
 
 const TickerContent = styled(Box)<{ paused: boolean }>(({ paused }) => ({
   display: 'flex',
   alignItems: 'center',
-  animation: paused ? 'none' : `${slideIn} 30s linear infinite`,
-  paddingRight: '100%',
-  gap: 40
+  animation: paused ? 'none' : `${scroll} 60s linear infinite`,
+  whiteSpace: 'nowrap',
+  gap: 24
 }));
 
 const ActionCard = styled(Box)<{ priority: string }>(({ priority }) => {
   const colors = {
     critical: { 
-      bg: 'rgba(255, 59, 48, 0.1)', 
-      border: '#FF3B30',
-      text: '#FF6B6B',
-      glow: 'rgba(255, 59, 48, 0.5)'
+      bg: 'rgba(220, 38, 38, 0.08)', 
+      border: 'rgba(220, 38, 38, 0.3)',
+      text: '#EF4444',
+      glow: 'rgba(220, 38, 38, 0.3)'
     },
     urgent: { 
-      bg: 'rgba(255, 149, 0, 0.1)', 
-      border: '#FF9500',
-      text: '#FFB84D',
-      glow: 'rgba(255, 149, 0, 0.5)'
+      bg: 'rgba(245, 158, 11, 0.08)', 
+      border: 'rgba(245, 158, 11, 0.3)',
+      text: '#F59E0B',
+      glow: 'rgba(245, 158, 11, 0.3)'
     },
     opportunity: { 
-      bg: 'rgba(52, 199, 89, 0.1)', 
-      border: '#34C759',
-      text: '#5CD87A',
-      glow: 'rgba(52, 199, 89, 0.5)'
+      bg: 'rgba(16, 185, 129, 0.08)', 
+      border: 'rgba(16, 185, 129, 0.3)',
+      text: '#10B981',
+      glow: 'rgba(16, 185, 129, 0.3)'
     },
     success: { 
-      bg: 'rgba(0, 122, 255, 0.1)', 
-      border: '#007AFF',
-      text: '#4DA3FF',
-      glow: 'rgba(0, 122, 255, 0.5)'
+      bg: 'rgba(59, 130, 246, 0.08)', 
+      border: 'rgba(59, 130, 246, 0.3)',
+      text: '#3B82F6',
+      glow: 'rgba(59, 130, 246, 0.3)'
     }
   };
   
   const color = colors[priority as keyof typeof colors];
   
   return {
-    display: 'flex',
+    display: 'inline-flex',
     alignItems: 'center',
-    gap: 16,
-    padding: '12px 20px',
+    gap: 12,
+    padding: '8px 16px',
     background: color.bg,
     border: `1px solid ${color.border}`,
-    borderRadius: 12,
+    borderRadius: 8,
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     position: 'relative',
-    minWidth: 400,
-    animation: priority === 'critical' ? `${glow} 2s ease-in-out infinite` : 'none',
+    minWidth: 320,
+    height: 36,
+    flexShrink: 0,
     '&:hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: `0 8px 24px ${color.glow}`,
-      '& .action-button': {
-        transform: 'translateX(4px)'
-      }
+      transform: 'translateY(-1px)',
+      borderColor: color.text,
+      background: priority === 'critical' ? 'rgba(220, 38, 38, 0.12)' : color.bg
     }
   };
 });
@@ -254,14 +255,17 @@ const PriorityIcon = styled(Box)<{ priority: string }>(({ priority }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: 40,
-  height: 40,
+  width: 24,
+  height: 24,
   borderRadius: '50%',
-  background: priority === 'critical' ? 'rgba(255, 59, 48, 0.2)' : 
-              priority === 'urgent' ? 'rgba(255, 149, 0, 0.2)' :
-              priority === 'opportunity' ? 'rgba(52, 199, 89, 0.2)' :
-              'rgba(0, 122, 255, 0.2)',
-  animation: priority === 'critical' ? `${pulse} 1s ease-in-out infinite` : 'none'
+  background: priority === 'critical' ? 'rgba(220, 38, 38, 0.15)' : 
+              priority === 'urgent' ? 'rgba(245, 158, 11, 0.15)' :
+              priority === 'opportunity' ? 'rgba(16, 185, 129, 0.15)' :
+              'rgba(59, 130, 246, 0.15)',
+  animation: priority === 'critical' ? `${pulse} 2s ease-in-out infinite` : 'none',
+  '& svg': {
+    fontSize: 16
+  }
 }));
 
 const MetricBadge = styled(Box)(({ theme }) => ({
@@ -473,40 +477,6 @@ const LiveActionTicker: React.FC = () => {
     console.log('Action clicked:', item);
   };
 
-  const ActionButton = ({ type, label }: { type: string; label: string }) => {
-    const icons = {
-      call: <CallIcon fontSize="small" />,
-      email: <EmailIcon fontSize="small" />,
-      schedule: <CalendarIcon fontSize="small" />,
-      view: <ActionIcon fontSize="small" />
-    };
-    
-    return (
-      <Button
-        size="small"
-        startIcon={icons[type as keyof typeof icons]}
-        sx={{
-          textTransform: 'none',
-          fontWeight: 600,
-          fontSize: '0.75rem',
-          px: 2,
-          py: 0.5,
-          borderRadius: 2,
-          background: 'rgba(255, 255, 255, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          color: '#fff',
-          transition: 'all 0.2s ease',
-          '&:hover': {
-            background: 'rgba(255, 255, 255, 0.2)',
-            transform: 'translateX(2px)'
-          }
-        }}
-        className="action-button"
-      >
-        {label}
-      </Button>
-    );
-  };
 
   return (
     <TickerRoot>
@@ -514,7 +484,7 @@ const LiveActionTicker: React.FC = () => {
       <ControlBar>
         <LiveIndicator active={playing}>
           <Box className="dot" />
-          <Typography variant="caption" fontWeight={700}>
+          <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 600 }}>
             {playing ? 'LIVE' : 'PAUSED'}
           </Typography>
         </LiveIndicator>
@@ -527,18 +497,18 @@ const LiveActionTicker: React.FC = () => {
           {playing ? <PauseIcon /> : <PlayIcon />}
         </IconButton>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <SpeedIcon sx={{ fontSize: 18, color: 'rgba(255, 255, 255, 0.5)' }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <SpeedIcon sx={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.5)' }} />
           <Slider
             value={speed}
             onChange={(e, val) => setSpeed(val as number)}
             min={0.5}
             max={2}
             step={0.5}
-            sx={{ width: 80 }}
+            sx={{ width: 60, '& .MuiSlider-thumb': { width: 12, height: 12 } }}
             size="small"
           />
-          <Typography variant="caption" sx={{ minWidth: 30 }}>
+          <Typography variant="caption" sx={{ minWidth: 25, fontSize: '0.65rem' }}>
             {speed}x
           </Typography>
         </Box>
@@ -605,69 +575,45 @@ const LiveActionTicker: React.FC = () => {
               onClick={() => handleActionClick(item)}
             >
               <PriorityIcon priority={item.priority}>
-                {item.icon}
+                {React.cloneElement(item.icon as React.ReactElement, { 
+                  sx: { color: item.priority === 'critical' ? '#DC2626' : 
+                        item.priority === 'urgent' ? '#F59E0B' :
+                        item.priority === 'opportunity' ? '#10B981' : '#3B82F6' }
+                })}
               </PriorityIcon>
               
-              <Box sx={{ flex: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                  <Typography 
-                    variant="caption" 
-                    sx={{ 
-                      fontWeight: 700,
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      opacity: 0.8
-                    }}
-                  >
-                    {item.title}
-                  </Typography>
-                  {item.value && (
-                    <Chip 
-                      label={item.value} 
-                      size="small"
-                      sx={{ 
-                        height: 20,
-                        fontSize: '0.7rem',
-                        fontWeight: 700,
-                        background: 'rgba(255, 255, 255, 0.1)'
-                      }}
-                    />
-                  )}
-                  <Typography variant="caption" sx={{ opacity: 0.6, ml: 'auto' }}>
-                    {item.time} ago
-                  </Typography>
-                </Box>
-                
+              <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography 
-                  variant="body2" 
+                  variant="caption" 
                   sx={{ 
-                    fontWeight: 500,
-                    mb: 1,
-                    color: 'rgba(255, 255, 255, 0.9)'
+                    fontWeight: 600,
+                    fontSize: '0.75rem',
+                    color: item.priority === 'critical' ? '#EF4444' : 
+                           item.priority === 'urgent' ? '#F59E0B' :
+                           item.priority === 'opportunity' ? '#10B981' : '#3B82F6',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
                   }}
                 >
                   {item.message}
                 </Typography>
-                
-                {item.metrics && (
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    {item.metrics.probability && (
-                      <MetricBadge>
-                        <AnalyticsIcon sx={{ fontSize: 14 }} />
-                        {item.metrics.probability}%
-                      </MetricBadge>
-                    )}
-                    {item.metrics.deadline && (
-                      <MetricBadge>
-                        <TimerIcon sx={{ fontSize: 14 }} />
-                        {item.metrics.deadline}
-                      </MetricBadge>
-                    )}
-                  </Box>
-                )}
               </Box>
               
-              <ActionButton type={item.action.type} label={item.action.label} />
+              {item.value && (
+                <Chip 
+                  label={item.value} 
+                  size="small"
+                  sx={{ 
+                    height: 18,
+                    fontSize: '0.65rem',
+                    fontWeight: 600,
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    color: 'rgba(255, 255, 255, 0.8)'
+                  }}
+                />
+              )}
             </ActionCard>
           ))}
         </TickerContent>
@@ -725,14 +671,23 @@ const LiveActionTicker: React.FC = () => {
                     </Box>
                   </Box>
                   
-                  <ActionButton type={item.action.type} label={item.action.label} />
+                  <Button
+                    size="small"
+                    sx={{
+                      textTransform: 'none',
+                      fontSize: '0.7rem',
+                      py: 0.5,
+                      px: 1.5,
+                      minWidth: 'auto'
+                    }}
+                  >
+                    {item.action.label}
+                  </Button>
                 </ActionCard>
               ))}
             </Box>
           </CategorySection>
         )}
-        
-        {/* Similar sections for other categories... */}
       </ExpandedView>
 
       {/* Settings Menu */}
