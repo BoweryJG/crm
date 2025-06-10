@@ -25,7 +25,7 @@ import { useThemeContext } from '../../themes/ThemeContext';
 const Login: React.FC = () => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
-  const { signIn } = useAuth();
+  const { signIn, user } = useAuth();
   const navigate = useNavigate();
   
   const [email, setEmail] = useState('demo@example.com');
@@ -35,17 +35,12 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [autoLoginMessage, setAutoLoginMessage] = useState<string | null>(null);
   
-  // Remove auto-login for now
+  // Check if already logged in
   useEffect(() => {
-    // Check if already logged in
-    const checkAuth = async () => {
-      const { user } = useAuth();
-      if (user) {
-        navigate('/');
-      }
-    };
-    checkAuth();
-  }, [navigate]);
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
