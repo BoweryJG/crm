@@ -143,32 +143,32 @@ const Dashboard: React.FC = () => {
           ) : (
             <>
               <ClassicRevenueGauge 
-                value={Math.min(180, (dashboardData.revenue_generated / 100 / 1000000) * 180)} // Convert from cents to millions for gauge scale
-                displayValue={Math.round(dashboardData.revenue_generated / 100 / 1000)} // Convert from cents to K
+                value={Math.min(180, (dashboardData.revenue_generated / 100 / 1000000) * 180)} // Convert cents to millions, then scale to 180
+                displayValue={Math.round(dashboardData.revenue_generated / 100 / 1000)} // Convert cents to K for LED display
                 label="REVENUE"
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={0}
               />
               <ClassicRevenueGauge 
-                value={Math.min(180, (dashboardData.pipeline_value / 100 / 1000000) * 180)} // Convert from cents to millions for gauge scale
-                displayValue={Math.round(dashboardData.pipeline_value / 100 / 1000)} // Convert from cents to K
+                value={Math.min(180, (dashboardData.pipeline_value / 100 / 2000000) * 180)} // Convert cents to 2M scale
+                displayValue={Math.round(dashboardData.pipeline_value / 100 / 1000)} // Convert cents to K for LED display
                 label="PIPELINE"
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={200}
               />
               <ClassicRevenueGauge 
-                value={Math.min(180, (dashboardData.quota_percentage / 100) * 180)} // Convert percentage to gauge scale
-                displayValue={dashboardData.quota_percentage} // Show percentage
+                value={Math.min(180, (dashboardData.quota_percentage / 100) * 180)} // Use quota_percentage to match sales goal progress
+                displayValue={dashboardData.quota_percentage} // Show percentage in LED
                 label="QUOTA"
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={400}
               />
               <ClassicRevenueGauge 
-                value={Math.min(180, (dashboardData.conversion_rate / 100) * 180)} // Convert percentage to gauge scale
-                displayValue={dashboardData.conversion_rate} // Show percentage
+                value={Math.min(180, (dashboardData.conversion_rate / 100) * 180)} // Convert percentage to 0-180 scale
+                displayValue={dashboardData.conversion_rate} // Show percentage in LED
                 label="CONVERSION"
                 size="medium"
                 onClick={() => navigate('/analytics')}

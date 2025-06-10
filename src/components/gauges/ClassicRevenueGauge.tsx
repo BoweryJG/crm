@@ -380,10 +380,10 @@ const ClassicRevenueGauge: React.FC<ClassicRevenueGaugeProps> = ({
   // Convert value to rotation (-135° to +45°)
   const rotation = -135 + (needleValue / 180) * 180;
   
-  // Format LED display value (ensure 2 digits)
-  const ledValue = displayValue || value;
-  const digit1 = Math.floor(ledValue / 10) % 10;
-  const digit2 = ledValue % 10;
+  // Format LED display value - convert to string and get individual digits
+  const ledValue = displayValue !== undefined ? displayValue : Math.round(value);
+  const ledString = ledValue.toString();
+  const digits = ledString.split('').map(d => parseInt(d));
   
   // Calculate dimensions based on size
   const svgSize = size === 'small' ? 148 : size === 'large' ? 268 : 208;
@@ -472,8 +472,9 @@ const ClassicRevenueGauge: React.FC<ClassicRevenueGaugeProps> = ({
           
           {/* LED Display */}
           <LEDDisplay>
-            <LEDDigit>{digit1}</LEDDigit>
-            <LEDDigit>{digit2}</LEDDigit>
+            {digits.map((digit, index) => (
+              <LEDDigit key={index}>{digit}</LEDDigit>
+            ))}
           </LEDDisplay>
         </GaugeFace>
       </ChromeBezel>
