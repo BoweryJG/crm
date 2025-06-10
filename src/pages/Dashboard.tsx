@@ -11,7 +11,7 @@ import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
 import NowCardsStack from '../components/dashboard/NowCardsStack'; // Added import
 import RevenueGauge from '../components/gauges/RevenueGauge';
-import MultiColorProgressTicker from '../components/dashboard/MultiColorProgressTicker';
+import UrgentDataTicker from '../components/dashboard/UrgentDataTicker';
 import { useThemeContext } from '../themes/ThemeContext';
 import { getMockDashboardData } from '../services/mockData/mockDataService';
 import { useAuth } from '../auth';
@@ -44,9 +44,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box>
-      {/* Multi-Color Progress Ticker - AT THE VERY TOP */}
+      {/* Urgent Data Ticker - AT THE VERY TOP */}
       <Box sx={{ mb: 3 }}>
-        <MultiColorProgressTicker />
+        <UrgentDataTicker />
       </Box>
 
       <Box sx={{ mb: 4 }}>
