@@ -12,39 +12,23 @@ interface ClassicRevenueGaugeProps {
 }
 
 // Animation keyframes
-const initialSpin = keyframes`
+const fadeIn = keyframes`
   0% {
-    transform: scale(0.8) rotate(0deg);
     opacity: 0;
-  }
-  50% {
-    transform: scale(1.1) rotate(360deg);
-    opacity: 1;
-  }
-  60% {
-    transform: scale(0.95) rotate(380deg);
-  }
-  70% {
-    transform: scale(1.02) rotate(355deg);
-  }
-  80% {
-    transform: scale(0.98) rotate(362deg);
-  }
-  90% {
-    transform: scale(1.01) rotate(358deg);
+    transform: scale(0.9);
   }
   100% {
-    transform: scale(1) rotate(360deg);
     opacity: 1;
+    transform: scale(1);
   }
 `;
 
-const gentlePulse = keyframes`
-  0%, 100% {
-    transform: scale(1);
+const needleSweep = keyframes`
+  0% {
+    transform: translate(-15%, -50%) rotate(-135deg);
   }
-  50% {
-    transform: scale(1.02);
+  100% {
+    transform: translate(-15%, -50%) rotate(var(--final-rotation));
   }
 `;
 
@@ -74,7 +58,8 @@ const GaugeContainer = styled(Box)<{ size: string; delay?: number }>(({ size, de
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    animation: `${initialSpin} 2s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay}ms, ${gentlePulse} 3s ease-in-out infinite ${2500 + delay}ms`,
+    animation: `${fadeIn} 0.8s ease-out ${delay}ms forwards`,
+    opacity: 0,
     transition: 'transform 0.3s ease',
     '&:hover': {
       transform: 'scale(1.02)'
@@ -220,7 +205,7 @@ const GaugeSVG = styled('svg')<{ size: string }>(({ size }) => {
 });
 
 // Needle with chrome tip and realistic shadow
-const Needle = styled(Box)<{ rotation: number }>(({ rotation }) => ({
+const Needle = styled(Box)<{ rotation: number; animated?: boolean }>(({ rotation, animated = false }) => ({
   position: 'absolute',
   width: '48%',
   height: 4,
@@ -236,7 +221,9 @@ const Needle = styled(Box)<{ rotation: number }>(({ rotation }) => ({
   transformOrigin: '15% center',
   transform: `translate(-15%, -50%) rotate(${rotation}deg)`,
   filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8))',
-  transition: 'transform 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
+  transition: animated ? 'none' : 'transform 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
+  animation: animated ? `${needleSweep} 3s cubic-bezier(0.4, 0, 0.2, 1) forwards` : 'none',
+  '--final-rotation': `${rotation}deg`,
   zIndex: 10,
   // Chrome needle tip
   '&::after': {
@@ -324,7 +311,7 @@ const GaugeLabel = styled('text')({
 // LED Display Container with glow effect
 const LEDDisplay = styled(Box)(({ theme }) => ({
   position: 'absolute',
-  bottom: '22%',
+  bottom: '18%',
   left: '50%',
   transform: 'translateX(-50%)',
   display: 'flex',
@@ -375,15 +362,20 @@ const ClassicRevenueGauge: React.FC<ClassicRevenueGaugeProps> = ({
   animationDelay = 0
 }) => {
   const [needleValue, setNeedleValue] = useState(0);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const clampedValue = Math.max(0, Math.min(180, value));
   
   // Animate needle on mount and value change
   useEffect(() => {
     const timer = setTimeout(() => {
       setNeedleValue(clampedValue);
-    }, 100);
+      // After initial animation, switch to normal transitions
+      if (isInitialLoad) {
+        setTimeout(() => setIsInitialLoad(false), 3000);
+      }
+    }, animationDelay + 800); // Wait for gauge fade-in
     return () => clearTimeout(timer);
-  }, [clampedValue]);
+  }, [clampedValue, animationDelay, isInitialLoad]);
   
   // Convert value to rotation (-135° to +45°)
   const rotation = -135 + (needleValue / 180) * 180;
@@ -473,7 +465,7 @@ const ClassicRevenueGauge: React.FC<ClassicRevenueGaugeProps> = ({
           </GaugeSVG>
           
           {/* Needle */}
-          <Needle rotation={rotation} />
+          <Needle rotation={rotation} animated={isInitialLoad} />
           
           {/* Center cap */}
           <CenterCap />

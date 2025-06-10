@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   Button,
   Box,
-  Typography
+  Typography,
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import EmailIcon from '@mui/icons-material/Email';
 import { useNavigate } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
+import { useAuth } from '../../auth';
 
 interface AuthModalProps {
   open: boolean;
@@ -22,20 +25,39 @@ interface AuthModalProps {
 const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode }) => {
   const navigate = useNavigate();
   const { themeMode } = useThemeContext();
+  const { signInWithProvider } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleEmail = () => {
     onClose();
     navigate(mode === 'login' ? '/login' : '/signup');
   };
 
-  const handleGoogle = () => {
-    console.log('Google auth placeholder');
-    onClose();
+  const handleGoogle = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      await signInWithProvider('google');
+      // The OAuth flow will redirect, so we don't need to close the modal
+    } catch (err: any) {
+      console.error('Google sign-in error:', err);
+      setError(err.message || 'Failed to sign in with Google');
+      setLoading(false);
+    }
   };
 
-  const handleFacebook = () => {
-    console.log('Facebook auth placeholder');
-    onClose();
+  const handleFacebook = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      await signInWithProvider('facebook');
+      // The OAuth flow will redirect, so we don't need to close the modal
+    } catch (err: any) {
+      console.error('Facebook sign-in error:', err);
+      setError(err.message || 'Failed to sign in with Facebook');
+      setLoading(false);
+    }
   };
 
   return (
@@ -65,18 +87,25 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode }) => {
       </DialogTitle>
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {error && (
+            <Alert severity="error" onClose={() => setError(null)}>
+              {error}
+            </Alert>
+          )}
           <Button
             variant="contained"
-            startIcon={<GoogleIcon />}
+            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <GoogleIcon />}
             onClick={handleGoogle}
+            disabled={loading}
           >
             {mode === 'login' ? 'Sign in with Google' : 'Sign up with Google'}
           </Button>
           <Button
             variant="contained"
-            startIcon={<FacebookIcon />}
+            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <FacebookIcon />}
             sx={{ backgroundColor: '#4267B2' }}
             onClick={handleFacebook}
+            disabled={loading}
           >
             {mode === 'login' ? 'Sign in with Facebook' : 'Sign up with Facebook'}
           </Button>
@@ -84,6 +113,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, mode }) => {
             variant="outlined"
             startIcon={<EmailIcon />}
             onClick={handleEmail}
+            disabled={loading}
           >
             {mode === 'login' ? 'Sign in with Email' : 'Sign up with Email'}
           </Button>
