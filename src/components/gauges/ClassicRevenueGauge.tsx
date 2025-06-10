@@ -9,6 +9,7 @@ interface ClassicRevenueGaugeProps {
   size?: 'small' | 'medium' | 'large';
   onClick?: () => void;
   animationDelay?: number; // Delay in milliseconds for staggered animation
+  scaleLabels?: string[]; // Custom labels for the scale (e.g., ['0', '200K', '400K', '600K', '800K', '1M'])
 }
 
 // Animation keyframes
@@ -359,7 +360,8 @@ const ClassicRevenueGauge: React.FC<ClassicRevenueGaugeProps> = ({
   label = "REVENUE",
   size = "medium",
   onClick,
-  animationDelay = 0
+  animationDelay = 0,
+  scaleLabels
 }) => {
   const [needleValue, setNeedleValue] = useState(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -424,6 +426,10 @@ const ClassicRevenueGauge: React.FC<ClassicRevenueGaugeProps> = ({
       const nx = centerX + Math.cos(angle) * numberRadius;
       const ny = centerY + Math.sin(angle) * numberRadius;
       
+      // Calculate which label to show based on position
+      const labelIndex = i / 20; // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+      const labelText = scaleLabels && scaleLabels[labelIndex] ? scaleLabels[labelIndex] : i.toString();
+      
       numbers.push(
         <text
           key={`num-${i}`}
@@ -436,7 +442,7 @@ const ClassicRevenueGauge: React.FC<ClassicRevenueGaugeProps> = ({
           textAnchor="middle"
           dominantBaseline="middle"
         >
-          {i}
+          {labelText}
         </text>
       );
     }

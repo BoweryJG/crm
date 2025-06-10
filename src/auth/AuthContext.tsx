@@ -108,7 +108,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: provider as any,
         options: {
-          redirectTo: options?.redirectTo || getRedirectUrl('/'),
+          redirectTo: options?.redirectTo || getRedirectUrl('/dashboard'),
           scopes: options?.scopes,
           queryParams: options?.queryParams,
         },
