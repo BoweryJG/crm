@@ -10,8 +10,8 @@ import {
 import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
 import NowCardsStack from '../components/dashboard/NowCardsStack'; // Added import
-import RevenueGauge from '../components/gauges/RevenueGauge';
-import UrgentDataTicker from '../components/dashboard/UrgentDataTicker';
+import ClassicRevenueGauge from '../components/gauges/ClassicRevenueGauge';
+import IconicUrgentTicker from '../components/dashboard/IconicUrgentTicker';
 import { useThemeContext } from '../themes/ThemeContext';
 import { getMockDashboardData } from '../services/mockData/mockDataService';
 import { useAuth } from '../auth';
@@ -44,9 +44,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box>
-      {/* Urgent Data Ticker - AT THE VERY TOP */}
-      <Box sx={{ mb: 3 }}>
-        <UrgentDataTicker />
+      {/* Iconic Urgent Ticker - AT THE VERY TOP */}
+      <Box sx={{ mb: 3, mx: -3, mt: -3 }}>
+        <IconicUrgentTicker />
       </Box>
 
       <Box sx={{ mb: 4 }}>
@@ -66,28 +66,28 @@ const Dashboard: React.FC = () => {
           gap: 3,
           justifyContent: 'center'
         }}>
-          <RevenueGauge 
+          <ClassicRevenueGauge 
             value={87}
             label="REVENUE"
             odometer="142908"
             size="medium"
             onClick={() => navigate('/analytics')}
           />
-          <RevenueGauge 
+          <ClassicRevenueGauge 
             value={132}
             label="PIPELINE"
             odometer="287654"
             size="medium"
             onClick={() => navigate('/analytics')}
           />
-          <RevenueGauge 
+          <ClassicRevenueGauge 
             value={165}
             label="QUOTA"
             odometer="195432"
             size="medium"
             onClick={() => navigate('/analytics')}
           />
-          <RevenueGauge 
+          <ClassicRevenueGauge 
             value={45}
             label="CONVERSION"
             odometer="000045"
