@@ -4,7 +4,8 @@ import {
   Paper, 
   Typography, 
   LinearProgress,
-  useTheme
+  useTheme,
+  Skeleton
 } from '@mui/material';
 import { 
   TrendingUp as TrendingUpIcon,
@@ -16,6 +17,9 @@ import {
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { getMockDashboardData } from '../../services/mockData/mockDataService';
+import { dashboardService, DashboardMetrics } from '../../services/supabase/dashboardService';
+import { useAuth } from '../../auth';
+import { useAppMode } from '../../contexts/AppModeContext';
 import AnimatedOrbHeroBG from './AnimatedOrbHeroBG'; // Ensure this path is correct
 
 interface StatCardProps {
@@ -127,7 +131,10 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, change, color, 
 const DashboardStats: React.FC = () => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
-  const [dashboardData, setDashboardData] = useState<any>(null);
+  const { user } = useAuth();
+  const { isDemo } = useAppMode();
+  const [dashboardData, setDashboardData] = useState<DashboardMetrics | null>(null);
+  const [loading, setLoading] = useState(true);
   
   // Format currency for display
   const formatCurrency = (value: number): string => {
@@ -139,38 +146,103 @@ const DashboardStats: React.FC = () => {
     return `$${value}`;
   };
   
-  // Load mock data on component mount
+  // Load data on component mount
   useEffect(() => {
-    const data = getMockDashboardData();
-    setDashboardData(data);
+    const loadDashboardData = async () => {
+      setLoading(true);
+      
+      if (isDemo || !user?.id) {
+        // Use mock data in demo mode or when not authenticated
+        const mockData = getMockDashboardData();
+        setDashboardData({
+          user_id: user?.id || 'demo',
+          total_contacts: mockData.stats.totalContacts,
+          contacts_change: mockData.stats.contactsChange,
+          active_practices: mockData.stats.activePractices,
+          practices_change: mockData.stats.practicesChange,
+          revenue_generated: mockData.stats.revenueGenerated,
+          revenue_change: mockData.stats.revenueChange,
+          active_campaigns: mockData.stats.activeCampaigns,
+          campaigns_change: mockData.stats.campaignsChange,
+          sales_goal: mockData.stats.salesGoal,
+          current_revenue: mockData.stats.currentRevenue,
+          sales_goal_progress: mockData.stats.salesGoalProgress,
+          quota_percentage: mockData.stats.salesGoalProgress, // Sync with sales goal progress
+          pipeline_value: mockData.stats.revenueGenerated * 1.5, // Mock pipeline value
+          conversion_rate: 45 // Mock conversion rate
+        });
+      } else {
+        // Load real data from Supabase
+        let metrics = await dashboardService.getMetrics(user.id);
+        
+        // If no metrics exist, initialize them
+        if (!metrics) {
+          await dashboardService.initializeMetrics(user.id);
+          metrics = await dashboardService.getMetrics(user.id);
+        }
+        
+        if (metrics) {
+          // Sync percentages to ensure quota matches sales goal progress
+          await dashboardService.syncPercentages(user.id);
+          // Reload to get synced data
+          metrics = await dashboardService.getMetrics(user.id);
+          setDashboardData(metrics);
+        } else {
+          // Fallback to mock data if something goes wrong
+          const mockData = getMockDashboardData();
+          setDashboardData({
+            user_id: user.id,
+            total_contacts: mockData.stats.totalContacts,
+            contacts_change: mockData.stats.contactsChange,
+            active_practices: mockData.stats.activePractices,
+            practices_change: mockData.stats.practicesChange,
+            revenue_generated: mockData.stats.revenueGenerated,
+            revenue_change: mockData.stats.revenueChange,
+            active_campaigns: mockData.stats.activeCampaigns,
+            campaigns_change: mockData.stats.campaignsChange,
+            sales_goal: mockData.stats.salesGoal,
+            current_revenue: mockData.stats.currentRevenue,
+            sales_goal_progress: mockData.stats.salesGoalProgress,
+            quota_percentage: mockData.stats.salesGoalProgress,
+            pipeline_value: mockData.stats.revenueGenerated * 1.5,
+            conversion_rate: 45
+          });
+        }
+      }
+      
+      setLoading(false);
+    };
     
-    // Refresh data every 5 minutes to simulate real-time updates
-    const intervalId = setInterval(() => {
-      setDashboardData(getMockDashboardData());
-    }, 5 * 60 * 1000);
+    loadDashboardData();
+    
+    // Refresh data every 5 minutes
+    const intervalId = setInterval(loadDashboardData, 5 * 60 * 1000);
     
     return () => clearInterval(intervalId);
-  }, []);
+  }, [user, isDemo]);
   
   // If data is still loading, show a loading state
-  if (!dashboardData) {
+  if (loading || !dashboardData) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-        <Typography>Loading dashboard data...</Typography>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 3 }}>
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} variant="rectangular" height={180} sx={{ borderRadius: 3 }} />
+        ))}
+        <Box sx={{ gridColumn: '1 / -1' }}>
+          <Skeleton variant="rectangular" height={120} sx={{ borderRadius: 3 }} />
+        </Box>
       </Box>
     );
   }
-  
-  const { stats } = dashboardData;
   
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 3 }}>
       <Box>
         <StatCard
           title="Total Contacts"
-          value={stats.totalContacts.toLocaleString()}
+          value={dashboardData.total_contacts.toLocaleString()}
           icon={<PersonIcon />}
-          change={{ value: stats.contactsChange, trend: stats.contactsChange >= 0 ? 'up' : 'down' }}
+          change={{ value: dashboardData.contacts_change, trend: dashboardData.contacts_change >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#8860D0' : '#3D52D5'} // Primary color
           orbIndex={0}
         />
@@ -179,9 +251,9 @@ const DashboardStats: React.FC = () => {
       <Box>
         <StatCard
           title="Active Practices"
-          value={stats.activePractices.toLocaleString()}
+          value={dashboardData.active_practices.toLocaleString()}
           icon={<BusinessIcon />}
-          change={{ value: stats.practicesChange, trend: stats.practicesChange >= 0 ? 'up' : 'down' }}
+          change={{ value: dashboardData.practices_change, trend: dashboardData.practices_change >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#5CE1E6' : '#44CFCB'} // Secondary color
           orbIndex={1}
         />
@@ -190,9 +262,9 @@ const DashboardStats: React.FC = () => {
       <Box>
         <StatCard
           title="Revenue Generated"
-          value={formatCurrency(stats.revenueGenerated)}
+          value={formatCurrency(dashboardData.revenue_generated)}
           icon={<RevenueIcon />}
-          change={{ value: stats.revenueChange, trend: stats.revenueChange >= 0 ? 'up' : 'down' }}
+          change={{ value: dashboardData.revenue_change, trend: dashboardData.revenue_change >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#FFD700' : '#FFAB4C'} // Warning color
           orbIndex={2}
         />
@@ -201,9 +273,9 @@ const DashboardStats: React.FC = () => {
       <Box>
         <StatCard
           title="Active Campaigns"
-          value={stats.activeCampaigns.toString()}
+          value={dashboardData.active_campaigns.toString()}
           icon={<CampaignIcon />}
-          change={{ value: stats.campaignsChange, trend: stats.campaignsChange >= 0 ? 'up' : 'down' }}
+          change={{ value: dashboardData.campaigns_change, trend: dashboardData.campaigns_change >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#00E676' : '#4CAF50'} // Success color
           orbIndex={3}
         />
@@ -231,13 +303,13 @@ const DashboardStats: React.FC = () => {
               Sales Goal Progress
             </Typography>
             <Typography variant="h6" fontWeight={600} color="primary">
-              {stats.salesGoalProgress}%
+              {dashboardData.sales_goal_progress}%
             </Typography>
           </Box>
           
           <LinearProgress
             variant="determinate"
-            value={stats.salesGoalProgress}
+            value={dashboardData.sales_goal_progress}
             sx={{
               height: 8,
               borderRadius: 4,
@@ -261,10 +333,10 @@ const DashboardStats: React.FC = () => {
             }}
           >
             <Typography variant="body2" color="text.secondary">
-              Current: {formatCurrency(stats.currentRevenue)}
+              Current: {formatCurrency(dashboardData.current_revenue)}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Goal: {formatCurrency(stats.salesGoal)}
+              Goal: {formatCurrency(dashboardData.sales_goal)}
             </Typography>
           </Box>
         </Paper>

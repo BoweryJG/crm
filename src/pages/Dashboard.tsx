@@ -5,7 +5,8 @@ import {
   Paper, 
   CardHeader,
   CardContent,
-  useTheme
+  useTheme,
+  Skeleton
 } from '@mui/material';
 import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
@@ -14,7 +15,9 @@ import ClassicRevenueGauge from '../components/gauges/ClassicRevenueGauge';
 import LiveActionTicker from '../components/dashboard/LiveActionTicker';
 import { useThemeContext } from '../themes/ThemeContext';
 import { getMockDashboardData } from '../services/mockData/mockDataService';
+import { dashboardService, DashboardMetrics } from '../services/supabase/dashboardService';
 import { useAuth } from '../auth';
+import { useAppMode } from '../contexts/AppModeContext';
 import { useNavigate } from 'react-router-dom';
 
 // Helper function to generate random integers
@@ -27,20 +30,84 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { themeMode } = useThemeContext();
   const { user } = useAuth();
-  const [dashboardData, setDashboardData] = useState<any>(null);
+  const { isDemo } = useAppMode();
+  const [dashboardData, setDashboardData] = useState<DashboardMetrics | null>(null);
+  const [loading, setLoading] = useState(true);
   
-  // Load mock data on component mount
+  // Load dashboard data on component mount
   useEffect(() => {
-    const data = getMockDashboardData();
-    setDashboardData(data);
+    const loadDashboardData = async () => {
+      setLoading(true);
+      
+      if (isDemo || !user?.id) {
+        // Use mock data in demo mode or when not authenticated
+        const mockData = getMockDashboardData();
+        setDashboardData({
+          user_id: user?.id || 'demo',
+          total_contacts: mockData.stats.totalContacts,
+          contacts_change: mockData.stats.contactsChange,
+          active_practices: mockData.stats.activePractices,
+          practices_change: mockData.stats.practicesChange,
+          revenue_generated: mockData.stats.revenueGenerated,
+          revenue_change: mockData.stats.revenueChange,
+          active_campaigns: mockData.stats.activeCampaigns,
+          campaigns_change: mockData.stats.campaignsChange,
+          sales_goal: mockData.stats.salesGoal,
+          current_revenue: mockData.stats.currentRevenue,
+          sales_goal_progress: mockData.stats.salesGoalProgress,
+          quota_percentage: mockData.stats.salesGoalProgress, // Sync with sales goal progress
+          pipeline_value: mockData.stats.revenueGenerated * 1.5, // Mock pipeline value
+          conversion_rate: 45 // Mock conversion rate
+        });
+      } else {
+        // Load real data from Supabase
+        let metrics = await dashboardService.getMetrics(user.id);
+        
+        // If no metrics exist, initialize them
+        if (!metrics) {
+          await dashboardService.initializeMetrics(user.id);
+          metrics = await dashboardService.getMetrics(user.id);
+        }
+        
+        if (metrics) {
+          // Sync percentages to ensure quota matches sales goal progress
+          await dashboardService.syncPercentages(user.id);
+          // Reload to get synced data
+          metrics = await dashboardService.getMetrics(user.id);
+          setDashboardData(metrics);
+        } else {
+          // Fallback to mock data if something goes wrong
+          const mockData = getMockDashboardData();
+          setDashboardData({
+            user_id: user.id,
+            total_contacts: mockData.stats.totalContacts,
+            contacts_change: mockData.stats.contactsChange,
+            active_practices: mockData.stats.activePractices,
+            practices_change: mockData.stats.practicesChange,
+            revenue_generated: mockData.stats.revenueGenerated,
+            revenue_change: mockData.stats.revenueChange,
+            active_campaigns: mockData.stats.activeCampaigns,
+            campaigns_change: mockData.stats.campaignsChange,
+            sales_goal: mockData.stats.salesGoal,
+            current_revenue: mockData.stats.currentRevenue,
+            sales_goal_progress: mockData.stats.salesGoalProgress,
+            quota_percentage: mockData.stats.salesGoalProgress,
+            pipeline_value: mockData.stats.revenueGenerated * 1.5,
+            conversion_rate: 45
+          });
+        }
+      }
+      
+      setLoading(false);
+    };
     
-    // Refresh data every 5 minutes to simulate real-time updates
-    const intervalId = setInterval(() => {
-      setDashboardData(getMockDashboardData());
-    }, 5 * 60 * 1000);
+    loadDashboardData();
+    
+    // Refresh data every 5 minutes
+    const intervalId = setInterval(loadDashboardData, 5 * 60 * 1000);
     
     return () => clearInterval(intervalId);
-  }, []);
+  }, [user, isDemo]);
 
   return (
     <Box>
@@ -66,38 +133,47 @@ const Dashboard: React.FC = () => {
           gap: 3,
           justifyContent: 'center'
         }}>
-          <ClassicRevenueGauge 
-            value={87}
-            displayValue={87}
-            label="REVENUE"
-            size="medium"
-            onClick={() => navigate('/analytics')}
-            animationDelay={0}
-          />
-          <ClassicRevenueGauge 
-            value={132}
-            displayValue={92}
-            label="PIPELINE"
-            size="medium"
-            onClick={() => navigate('/analytics')}
-            animationDelay={200}
-          />
-          <ClassicRevenueGauge 
-            value={165}
-            displayValue={165}
-            label="QUOTA"
-            size="medium"
-            onClick={() => navigate('/analytics')}
-            animationDelay={400}
-          />
-          <ClassicRevenueGauge 
-            value={45}
-            displayValue={45}
-            label="CONVERSION"
-            size="medium"
-            onClick={() => navigate('/analytics')}
-            animationDelay={600}
-          />
+          {loading || !dashboardData ? (
+            // Show loading skeletons
+            [1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} variant="circular" width={260} height={260} />
+            ))
+          ) : (
+            <>
+              <ClassicRevenueGauge 
+                value={Math.min(180, (dashboardData.revenue_generated / 1000000) * 180)} // Convert to gauge scale
+                displayValue={Math.round(dashboardData.revenue_generated / 1000)} // Show in K
+                label="REVENUE"
+                size="medium"
+                onClick={() => navigate('/analytics')}
+                animationDelay={0}
+              />
+              <ClassicRevenueGauge 
+                value={Math.min(180, (dashboardData.pipeline_value / 1000000) * 180)} // Convert to gauge scale
+                displayValue={Math.round(dashboardData.pipeline_value / 1000)} // Show in K
+                label="PIPELINE"
+                size="medium"
+                onClick={() => navigate('/analytics')}
+                animationDelay={200}
+              />
+              <ClassicRevenueGauge 
+                value={Math.min(180, (dashboardData.quota_percentage / 100) * 180)} // Convert percentage to gauge scale
+                displayValue={dashboardData.quota_percentage} // Show percentage
+                label="QUOTA"
+                size="medium"
+                onClick={() => navigate('/analytics')}
+                animationDelay={400}
+              />
+              <ClassicRevenueGauge 
+                value={Math.min(180, (dashboardData.conversion_rate / 100) * 180)} // Convert percentage to gauge scale
+                displayValue={dashboardData.conversion_rate} // Show percentage
+                label="CONVERSION"
+                size="medium"
+                onClick={() => navigate('/analytics')}
+                animationDelay={600}
+              />
+            </>
+          )}
         </Box>
       </Box>
 
@@ -153,8 +229,9 @@ const Dashboard: React.FC = () => {
                 gap: 2
               }}
             >
-              {dashboardData ? (
-                dashboardData.recentActivities.map((activity: any) => (
+              {!loading && dashboardData ? (
+                // For now, use mock data for activities until we have real activity tracking
+                getMockDashboardData().recentActivities.map((activity: any) => (
                   <Box
                     key={activity.id}
                     sx={{
@@ -215,8 +292,9 @@ const Dashboard: React.FC = () => {
                 gap: 2
               }}
             >
-              {dashboardData ? (
-                dashboardData.upcomingTasks.map((task: any) => (
+              {!loading && dashboardData ? (
+                // For now, use mock data for tasks until we have real task tracking
+                getMockDashboardData().upcomingTasks.map((task: any) => (
                   <Box
                     key={task.id}
                     sx={{
