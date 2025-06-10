@@ -160,15 +160,15 @@ const DashboardStats: React.FC = () => {
           contacts_change: mockData.stats.contactsChange,
           active_practices: mockData.stats.activePractices,
           practices_change: mockData.stats.practicesChange,
-          revenue_generated: mockData.stats.revenueGenerated,
+          revenue_generated: mockData.stats.revenueGenerated * 100, // Convert to cents
           revenue_change: mockData.stats.revenueChange,
           active_campaigns: mockData.stats.activeCampaigns,
           campaigns_change: mockData.stats.campaignsChange,
-          sales_goal: mockData.stats.salesGoal,
-          current_revenue: mockData.stats.currentRevenue,
+          sales_goal: mockData.stats.salesGoal * 100, // Convert to cents
+          current_revenue: mockData.stats.currentRevenue * 100, // Convert to cents
           sales_goal_progress: mockData.stats.salesGoalProgress,
           quota_percentage: mockData.stats.salesGoalProgress, // Sync with sales goal progress
-          pipeline_value: mockData.stats.revenueGenerated * 1.5, // Mock pipeline value
+          pipeline_value: mockData.stats.revenueGenerated * 1.5 * 100, // Mock pipeline value in cents
           conversion_rate: 45 // Mock conversion rate
         });
       } else {
@@ -196,15 +196,15 @@ const DashboardStats: React.FC = () => {
             contacts_change: mockData.stats.contactsChange,
             active_practices: mockData.stats.activePractices,
             practices_change: mockData.stats.practicesChange,
-            revenue_generated: mockData.stats.revenueGenerated,
+            revenue_generated: mockData.stats.revenueGenerated * 100, // Convert to cents
             revenue_change: mockData.stats.revenueChange,
             active_campaigns: mockData.stats.activeCampaigns,
             campaigns_change: mockData.stats.campaignsChange,
-            sales_goal: mockData.stats.salesGoal,
-            current_revenue: mockData.stats.currentRevenue,
+            sales_goal: mockData.stats.salesGoal * 100, // Convert to cents
+            current_revenue: mockData.stats.currentRevenue * 100, // Convert to cents
             sales_goal_progress: mockData.stats.salesGoalProgress,
             quota_percentage: mockData.stats.salesGoalProgress,
-            pipeline_value: mockData.stats.revenueGenerated * 1.5,
+            pipeline_value: mockData.stats.revenueGenerated * 1.5 * 100, // Convert to cents
             conversion_rate: 45
           });
         }
@@ -262,7 +262,7 @@ const DashboardStats: React.FC = () => {
       <Box>
         <StatCard
           title="Revenue Generated"
-          value={formatCurrency(dashboardData.revenue_generated)}
+          value={formatCurrency(dashboardData.revenue_generated / 100)} // Convert from cents
           icon={<RevenueIcon />}
           change={{ value: dashboardData.revenue_change, trend: dashboardData.revenue_change >= 0 ? 'up' : 'down' }}
           color={themeMode === 'space' ? '#FFD700' : '#FFAB4C'} // Warning color
@@ -333,10 +333,10 @@ const DashboardStats: React.FC = () => {
             }}
           >
             <Typography variant="body2" color="text.secondary">
-              Current: {formatCurrency(dashboardData.current_revenue)}
+              Current: {formatCurrency(dashboardData.current_revenue / 100)}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Goal: {formatCurrency(dashboardData.sales_goal)}
+              Goal: {formatCurrency(dashboardData.sales_goal / 100)}
             </Typography>
           </Box>
         </Paper>

@@ -7,15 +7,15 @@ export interface DashboardMetrics {
   contacts_change: number;
   active_practices: number;
   practices_change: number;
-  revenue_generated: number;
+  revenue_generated: number; // in cents
   revenue_change: number;
   active_campaigns: number;
   campaigns_change: number;
-  sales_goal: number;
-  current_revenue: number;
+  sales_goal: number; // in cents
+  current_revenue: number; // in cents
   sales_goal_progress: number;
   quota_percentage: number; // This will sync with the QUOTA gauge
-  pipeline_value: number;
+  pipeline_value: number; // in cents
   conversion_rate: number;
   created_at?: string;
   updated_at?: string;

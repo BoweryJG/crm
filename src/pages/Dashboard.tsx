@@ -48,15 +48,15 @@ const Dashboard: React.FC = () => {
           contacts_change: mockData.stats.contactsChange,
           active_practices: mockData.stats.activePractices,
           practices_change: mockData.stats.practicesChange,
-          revenue_generated: mockData.stats.revenueGenerated,
+          revenue_generated: mockData.stats.revenueGenerated * 100, // Convert to cents
           revenue_change: mockData.stats.revenueChange,
           active_campaigns: mockData.stats.activeCampaigns,
           campaigns_change: mockData.stats.campaignsChange,
-          sales_goal: mockData.stats.salesGoal,
-          current_revenue: mockData.stats.currentRevenue,
+          sales_goal: mockData.stats.salesGoal * 100, // Convert to cents
+          current_revenue: mockData.stats.currentRevenue * 100, // Convert to cents
           sales_goal_progress: mockData.stats.salesGoalProgress,
           quota_percentage: mockData.stats.salesGoalProgress, // Sync with sales goal progress
-          pipeline_value: mockData.stats.revenueGenerated * 1.5, // Mock pipeline value
+          pipeline_value: mockData.stats.revenueGenerated * 1.5 * 100, // Mock pipeline value in cents
           conversion_rate: 45 // Mock conversion rate
         });
       } else {
@@ -84,15 +84,15 @@ const Dashboard: React.FC = () => {
             contacts_change: mockData.stats.contactsChange,
             active_practices: mockData.stats.activePractices,
             practices_change: mockData.stats.practicesChange,
-            revenue_generated: mockData.stats.revenueGenerated,
+            revenue_generated: mockData.stats.revenueGenerated * 100, // Convert to cents
             revenue_change: mockData.stats.revenueChange,
             active_campaigns: mockData.stats.activeCampaigns,
             campaigns_change: mockData.stats.campaignsChange,
-            sales_goal: mockData.stats.salesGoal,
-            current_revenue: mockData.stats.currentRevenue,
+            sales_goal: mockData.stats.salesGoal * 100, // Convert to cents
+            current_revenue: mockData.stats.currentRevenue * 100, // Convert to cents
             sales_goal_progress: mockData.stats.salesGoalProgress,
             quota_percentage: mockData.stats.salesGoalProgress,
-            pipeline_value: mockData.stats.revenueGenerated * 1.5,
+            pipeline_value: mockData.stats.revenueGenerated * 1.5 * 100, // Convert to cents
             conversion_rate: 45
           });
         }
@@ -131,7 +131,9 @@ const Dashboard: React.FC = () => {
           display: 'grid', 
           gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(4, 1fr)' },
           gap: 3,
-          justifyContent: 'center'
+          justifyContent: 'center',
+          justifyItems: 'center',
+          alignItems: 'center'
         }}>
           {loading || !dashboardData ? (
             // Show loading skeletons
@@ -141,16 +143,16 @@ const Dashboard: React.FC = () => {
           ) : (
             <>
               <ClassicRevenueGauge 
-                value={Math.min(180, (dashboardData.revenue_generated / 1000000) * 180)} // Convert to gauge scale
-                displayValue={Math.round(dashboardData.revenue_generated / 1000)} // Show in K
+                value={Math.min(180, (dashboardData.revenue_generated / 100 / 1000000) * 180)} // Convert from cents to millions for gauge scale
+                displayValue={Math.round(dashboardData.revenue_generated / 100 / 1000)} // Convert from cents to K
                 label="REVENUE"
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={0}
               />
               <ClassicRevenueGauge 
-                value={Math.min(180, (dashboardData.pipeline_value / 1000000) * 180)} // Convert to gauge scale
-                displayValue={Math.round(dashboardData.pipeline_value / 1000)} // Show in K
+                value={Math.min(180, (dashboardData.pipeline_value / 100 / 1000000) * 180)} // Convert from cents to millions for gauge scale
+                displayValue={Math.round(dashboardData.pipeline_value / 100 / 1000)} // Convert from cents to K
                 label="PIPELINE"
                 size="medium"
                 onClick={() => navigate('/analytics')}
