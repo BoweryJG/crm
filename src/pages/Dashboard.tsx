@@ -10,8 +10,11 @@ import {
 import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
 import NowCardsStack from '../components/dashboard/NowCardsStack'; // Added import
+import GaugeCluster from '../components/gauges/GaugeCluster';
+import EnhancedBreakingNewsTicker from '../components/dashboard/EnhancedBreakingNewsTicker';
 import { useThemeContext } from '../themes/ThemeContext';
 import { getMockDashboardData } from '../services/mockData/mockDataService';
+import { useNavigate } from 'react-router-dom';
 
 // Helper function to generate random integers
 const getRandomInt = (min: number, max: number): number => {
@@ -20,8 +23,10 @@ const getRandomInt = (min: number, max: number): number => {
 
 const Dashboard: React.FC = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const { themeMode } = useThemeContext();
   const [dashboardData, setDashboardData] = useState<any>(null);
+  const [gaugePeriod, setGaugePeriod] = useState<'daily' | 'weekly' | 'monthly' | 'quarterly'>('monthly');
   
   // Load mock data on component mount
   useEffect(() => {
@@ -36,8 +41,24 @@ const Dashboard: React.FC = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  const handleGaugeClick = (metric: string) => {
+    // Navigate to detailed analytics based on the metric clicked
+    switch (metric) {
+      case 'quota':
+      case 'pipeline':
+      case 'winrate':
+        navigate('/analytics');
+        break;
+      case 'activities':
+        navigate('/rep-analytics');
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
-    <Box>
+    <Box sx={{ backgroundColor: '#000000', minHeight: '100vh', color: '#ffffff' }}>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" component="h1" fontWeight={600} gutterBottom>
           Welcome back, John
@@ -45,6 +66,20 @@ const Dashboard: React.FC = () => {
         <Typography variant="body1" color="text.secondary">
           Here's an overview of your sales performance and activity
         </Typography>
+      </Box>
+
+      {/* Enhanced Breaking News Ticker - AI-Powered Urgent Insights */}
+      <Box sx={{ mb: 3 }}>
+        <EnhancedBreakingNewsTicker />
+      </Box>
+
+      {/* New Gauge Cluster - Replacing individual gauges */}
+      <Box sx={{ mb: 4 }}>
+        <GaugeCluster 
+          period={gaugePeriod}
+          onPeriodChange={(period) => setGaugePeriod(period as any)}
+          onGaugeClick={handleGaugeClick}
+        />
       </Box>
 
       {/* Stats Cards */}
