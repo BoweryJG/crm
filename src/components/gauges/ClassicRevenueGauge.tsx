@@ -436,9 +436,9 @@ const ClassicRevenueGauge: React.FC<ClassicRevenueGaugeProps> = ({
           x={nx}
           y={ny}
           fill="#ffffff"
-          fontSize="14px"
+          fontSize="12px"
           fontFamily="Arial, sans-serif"
-          fontWeight="bold"
+          fontWeight="500"
           textAnchor="middle"
           dominantBaseline="middle"
         >

@@ -71,7 +71,7 @@ const Dashboard: React.FC = () => {
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={0}
-                scaleLabels={['0', '100K', '200K', '300K', '400K', '500K', '600K', '700K', '800K', '900K']}
+                scaleLabels={['0', '', '250K', '', '500K', '', '750K', '', '1M', '']}
               />
               <ClassicRevenueGauge 
                 value={Math.min(180, (dashboardData.pipeline_value / 100 / 2000000) * 180)} // Convert cents to 2M scale
@@ -80,7 +80,7 @@ const Dashboard: React.FC = () => {
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={200}
-                scaleLabels={['0', '200K', '400K', '600K', '800K', '1M', '1.2M', '1.4M', '1.6M', '1.8M']}
+                scaleLabels={['0', '', '500K', '', '1M', '', '1.5M', '', '2M', '']}
               />
               <ClassicRevenueGauge 
                 value={Math.min(180, (dashboardData.quota_percentage / 100) * 180)} // Use quota_percentage to match sales goal progress
@@ -89,7 +89,7 @@ const Dashboard: React.FC = () => {
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={400}
-                scaleLabels={['0%', '10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%']}
+                scaleLabels={['0', '', '25%', '', '50%', '', '75%', '', '100%', '']}
               />
               <ClassicRevenueGauge 
                 value={Math.min(180, (dashboardData.conversion_rate / 100) * 180)} // Convert percentage to 0-180 scale
@@ -98,7 +98,7 @@ const Dashboard: React.FC = () => {
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={600}
-                scaleLabels={['0%', '10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%']}
+                scaleLabels={['0', '', '25%', '', '50%', '', '75%', '', '100%', '']}
               />
             </>
           )}
