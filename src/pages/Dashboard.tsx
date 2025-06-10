@@ -65,7 +65,7 @@ const Dashboard: React.FC = () => {
           ) : (
             <>
               <ClassicRevenueGauge 
-                value={Math.min(180, (dashboardData.revenue_generated / 100000) * 180)} // Convert cents to K directly (100,000 cents = 1K)
+                value={(dashboardData.revenue_generated / 100000) / 1000 * 180} // 793K/1000K = 0.793, * 180 = 142.74°
                 displayValue={Math.round(dashboardData.revenue_generated / 100000)} // Convert cents to K for LED display
                 label="REVENUE"
                 size="medium"
@@ -74,7 +74,7 @@ const Dashboard: React.FC = () => {
                 scaleLabels={['0', '', '', '', '', '500K', '', '', '', '1M']}
               />
               <ClassicRevenueGauge 
-                value={Math.min(180, (dashboardData.pipeline_value / 200000) * 180)} // Convert cents to K and scale to 2M max (200,000,000 cents = 2M)
+                value={(dashboardData.pipeline_value / 100000) / 2000 * 180} // 1190K/2000K = 0.595, * 180 = 107.1°
                 displayValue={Math.round(dashboardData.pipeline_value / 100000)} // Convert cents to K for LED display
                 label="PIPELINE"
                 size="medium"
@@ -83,7 +83,7 @@ const Dashboard: React.FC = () => {
                 scaleLabels={['0', '', '', '', '', '1M', '', '', '', '2M']}
               />
               <ClassicRevenueGauge 
-                value={Math.min(180, (dashboardData.quota_percentage / 100) * 180)} // Use quota_percentage to match sales goal progress
+                value={(dashboardData.quota_percentage / 100) * 180} // 61%/100% = 0.61, * 180 = 109.8°
                 displayValue={dashboardData.quota_percentage} // Show percentage in LED
                 label="QUOTA"
                 size="medium"
@@ -92,7 +92,7 @@ const Dashboard: React.FC = () => {
                 scaleLabels={['0%', '', '', '', '', '50%', '', '', '', '100%']}
               />
               <ClassicRevenueGauge 
-                value={Math.min(180, (dashboardData.conversion_rate / 100) * 180)} // Convert percentage to 0-180 scale
+                value={(dashboardData.conversion_rate / 100) * 180} // 45%/100% = 0.45, * 180 = 81°
                 displayValue={dashboardData.conversion_rate} // Show percentage in LED
                 label="CONVERSION"
                 size="medium"
