@@ -35,25 +35,35 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [autoLoginMessage, setAutoLoginMessage] = useState<string | null>(null);
   
-  // Auto-login effect
+  // Remove auto-login for now
   useEffect(() => {
-    setAutoLoginMessage("Auto-login enabled. Redirecting to dashboard...");
-    setLoading(true);
-    
-    // Simulate login delay
-    const timer = setTimeout(() => {
-      navigate('/');
-    }, 1500);
-    
-    return () => clearTimeout(timer);
+    // Check if already logged in
+    const checkAuth = async () => {
+      const { user } = useAuth();
+      if (user) {
+        navigate('/');
+      }
+    };
+    checkAuth();
   }, [navigate]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     
-    // Just redirect to dashboard immediately
-    navigate('/');
+    try {
+      const result = await signIn(email, password);
+      if (result.success) {
+        navigate('/');
+      } else {
+        setError(result.error?.message || 'Failed to sign in');
+        setLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred');
+      setLoading(false);
+    }
   };
   
   return (

@@ -31,6 +31,7 @@ import {
 } from '@mui/icons-material';
 import { useThemeContext } from '../themes/ThemeContext';
 import ThemeToggle from '../components/ui/ThemeToggle';
+import { useAuth } from '../auth';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -56,6 +57,7 @@ function TabPanel(props: TabPanelProps) {
 const Settings: React.FC = () => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
+  const { user } = useAuth();
   const [tabValue, setTabValue] = useState(0);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
@@ -132,6 +134,14 @@ const Settings: React.FC = () => {
         <Typography variant="body1" color="text.secondary">
           Manage your account preferences and system settings
         </Typography>
+        
+        {/* Account Info */}
+        <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <EmailIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+          <Typography variant="body2" color="text.secondary">
+            Logged in as: <strong>{user?.email || 'Not logged in'}</strong>
+          </Typography>
+        </Box>
       </Box>
 
       {saveStatus === 'saved' && (
