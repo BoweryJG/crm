@@ -76,11 +76,43 @@ import {
 } from '@mui/icons-material';
 import { procedureTrainingService } from '../../services/procedureTrainingService';
 import type { 
-  CaseStudyTemplate as CaseStudy, 
-  DecisionPoint as DecisionNode, 
+  CaseStudyTemplate,
   OutcomeVariation as CaseStudyResult,
   AnatomyRegion 
 } from '../../services/procedureTrainingService';
+
+// Local DecisionNode type for the component
+interface DecisionNode {
+  node_id: string;
+  is_root: boolean;
+  scenario: string;
+  hints?: string[];
+  options: {
+    option_id: string;
+    option_text: string;
+    is_optimal: boolean;
+    risk_level: string;
+    consequence: string;
+    leads_to_node: string | null;
+    expert_notes?: string;
+  }[];
+}
+
+// Local CaseStudy type for the component
+interface CaseStudy {
+  id: string;
+  case_id: string;
+  title: string;
+  patient_profile: any;
+  clinical_presentation: string;
+  decision_tree: DecisionNode[];
+  outcomes: any[];
+  learning_objectives: string[];
+  difficulty_level: string;
+  estimated_time: number;
+  complexity_score: number;
+  scoring_criteria: any;
+}
 
 interface CaseStudyViewerProps {
   anatomyRegion: AnatomyRegion;
@@ -199,18 +231,118 @@ const CaseStudyViewer: React.FC<CaseStudyViewerProps> = ({
     try {
       setLoading(true);
       
-      // Generate case study based on anatomy region and difficulty
-      const caseStudy = await procedureTrainingService.generateCaseStudies(
-        anatomyRegion.name,
-        difficulty,
-        1
+      // Create a mock case study template for now
+      const mockTemplate: CaseStudyTemplate = {
+        scenario_type: 'routine',
+        patient_demographics: {
+          age_range: '30-40',
+          gender_distribution: 'female',
+          skin_types: ['II', 'III'],
+          common_concerns: ['Fine lines', 'Skin laxity'],
+          typical_expectations: ['Natural results', 'Minimal downtime']
+        },
+        complexity_factors: ['First-time patient', 'Moderate aging signs'],
+        learning_focus: ['Patient consultation', 'Treatment planning'],
+        decision_points: [],
+        outcome_variations: []
+      };
+      
+      const caseStudySection = await procedureTrainingService.generateCaseStudy(
+        mockTemplate,
+        'botox' // Default to botox procedure
       );
       
-      if (caseStudy.length === 0) {
-        throw new Error('No case studies available');
-      }
-
-      const selectedCase = caseStudy[0];
+      // Transform the learning section into case study format
+      const caseStudy = {
+        id: caseStudySection.id,
+        case_id: caseStudySection.id,
+        title: caseStudySection.title,
+        patient_profile: {
+          age: 35,
+          gender: 'female',
+          skin_type: 'II',
+          medical_history: [],
+          chief_complaint: 'Facial rejuvenation',
+          expectations: 'Natural results',
+          contraindications: []
+        },
+        clinical_presentation: 'Patient seeking facial rejuvenation',
+        decision_tree: [
+          {
+            node_id: 'root',
+            is_root: true,
+            scenario: 'Patient presents for facial rejuvenation consultation. How do you proceed?',
+            hints: ['Consider patient age and skin type', 'Evaluate medical history'],
+            options: [
+              {
+                option_id: 'opt1',
+                option_text: 'Recommend Botox for dynamic wrinkles',
+                is_optimal: true,
+                risk_level: 'low',
+                consequence: 'Good choice for initial treatment',
+                leads_to_node: 'node2',
+                expert_notes: 'Botox is a safe starting point for most patients'
+              },
+              {
+                option_id: 'opt2',
+                option_text: 'Suggest dermal fillers immediately',
+                is_optimal: false,
+                risk_level: 'medium',
+                consequence: 'May be too aggressive for first-time patients',
+                leads_to_node: 'node3',
+                expert_notes: 'Consider starting with less invasive options'
+              }
+            ]
+          },
+          {
+            node_id: 'node2',
+            is_root: false,
+            scenario: 'Patient is interested in Botox. What areas do you recommend treating first?',
+            hints: ['Start conservatively', 'Focus on most bothersome areas'],
+            options: [
+              {
+                option_id: 'opt3',
+                option_text: 'Start with crow\'s feet and forehead lines',
+                is_optimal: true,
+                risk_level: 'low',
+                consequence: 'Natural-looking results',
+                leads_to_node: null,
+                expert_notes: 'Conservative approach builds trust'
+              }
+            ]
+          },
+          {
+            node_id: 'node3',
+            is_root: false,
+            scenario: 'Patient hesitates about fillers. How do you address their concerns?',
+            hints: ['Education is key', 'Address specific concerns'],
+            options: [
+              {
+                option_id: 'opt4',
+                option_text: 'Explain the safety profile and reversibility of HA fillers',
+                is_optimal: true,
+                risk_level: 'low',
+                consequence: 'Patient feels more informed and comfortable',
+                leads_to_node: null,
+                expert_notes: 'Education builds confidence'
+              }
+            ]
+          }
+        ],
+        outcomes: [],
+        learning_objectives: ['Proper patient assessment', 'Safe injection technique', 'Managing expectations'],
+        difficulty_level: difficulty,
+        estimated_time: 30,
+        complexity_score: difficulty === 'beginner' ? 30 : difficulty === 'intermediate' ? 50 : difficulty === 'advanced' ? 70 : 90,
+        scoring_criteria: {
+          decision_quality: 0.4,
+          timing: 0.2,
+          patient_communication: 0.2,
+          safety_awareness: 0.2
+        }
+      };
+      
+      const selectedCase = caseStudy;
       setCurrentCase(selectedCase);
       
       // Find the root decision node
@@ -512,7 +644,7 @@ const CaseStudyViewer: React.FC<CaseStudyViewerProps> = ({
   };
 
   const getDifficultyColor = (difficulty: string) => {
-    const colors = {
+    const colors: Record<string, string> = {
       beginner: theme.palette.success.main,
       intermediate: theme.palette.info.main,
       advanced: theme.palette.warning.main,
@@ -638,7 +770,7 @@ const CaseStudyViewer: React.FC<CaseStudyViewerProps> = ({
                     </Typography>
                   </Box>
 
-                  <Accordion size="small">
+                  <Accordion>
                     <AccordionSummary expandIcon={<ExpandIcon />}>
                       <Typography variant="subtitle2">Chief Complaint</Typography>
                     </AccordionSummary>
@@ -647,7 +779,7 @@ const CaseStudyViewer: React.FC<CaseStudyViewerProps> = ({
                     </AccordionDetails>
                   </Accordion>
 
-                  <Accordion size="small">
+                  <Accordion>
                     <AccordionSummary expandIcon={<ExpandIcon />}>
                       <Typography variant="subtitle2">Medical History</Typography>
                     </AccordionSummary>
@@ -662,7 +794,7 @@ const CaseStudyViewer: React.FC<CaseStudyViewerProps> = ({
                     </AccordionDetails>
                   </Accordion>
 
-                  <Accordion size="small">
+                  <Accordion>
                     <AccordionSummary expandIcon={<ExpandIcon />}>
                       <Typography variant="subtitle2">Treatment Goals</Typography>
                     </AccordionSummary>

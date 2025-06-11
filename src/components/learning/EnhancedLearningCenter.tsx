@@ -98,7 +98,7 @@ import {
   CameraAlt as PhotoIcon,
   VideoCall as VideoIcon,
   ArticleOutlined as DocumentIcon,
-  Touch as InteractiveIcon,
+  TouchApp as InteractiveIcon,
   AutoAwesome as MagicIcon,
   Insights as InsightsIcon
 } from '@mui/icons-material';

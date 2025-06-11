@@ -75,9 +75,9 @@ import { procedureTrainingService } from '../../services/procedureTrainingServic
 import type { 
   InjectionSite, 
   DangerZone, 
-  AnatomyRegion,
-  SimulationConfig 
+  AnatomyRegion
 } from '../../services/procedureTrainingService';
+import type { SimulationConfig } from '../../services/learningCenterService';
 import ThreeDAnatomyViewer from './ThreeDAnatomyViewer';
 
 interface InjectionSimulatorProps {
@@ -310,8 +310,8 @@ const InjectionSimulator: React.FC<InjectionSimulatorProps> = ({
     difficulty: string
   ): Promise<InjectionAttempt['simulation_result']> => {
     // Simulate complex injection analysis
-    const optimalAngle = site.injection_angle;
-    const optimalDepth = site.injection_depth;
+    const optimalAngle = site.angle;
+    const optimalDepth = parseFloat(site.depth) || 5; // Convert depth string to number
     const optimalVelocity = 5; // mm/s for most procedures
 
     // Calculate accuracy based on deviation from optimal parameters
@@ -392,7 +392,7 @@ const InjectionSimulator: React.FC<InjectionSimulatorProps> = ({
     score -= prepTimeDiff * 0.5;
 
     // Volume assessment
-    const optimalVolume = site.recommended_volume || 0.1;
+    const optimalVolume = site.typical_dosage / 10 || 0.1; // Convert dosage to volume
     const volumeAccuracy = Math.max(0, 100 - Math.abs(input.volume - optimalVolume) * 100);
     score = (score + volumeAccuracy) / 2;
 
@@ -409,11 +409,11 @@ const InjectionSimulator: React.FC<InjectionSimulatorProps> = ({
     painScore += input.velocity * 0.1;
 
     // Incorrect angle increases pain
-    const angleDiff = Math.abs(input.angle - site.injection_angle);
+    const angleDiff = Math.abs(input.angle - site.angle);
     painScore += angleDiff * 0.05;
 
     // Incorrect depth increases pain
-    const depthDiff = Math.abs(input.depth - site.injection_depth);
+    const depthDiff = Math.abs(input.depth - (parseFloat(site.depth) || 5));
     painScore += depthDiff * 0.1;
 
     // Poor stability increases pain
@@ -433,7 +433,7 @@ const InjectionSimulator: React.FC<InjectionSimulatorProps> = ({
       complications.push('Risk of vascular injury');
     }
 
-    if (input.depth > site.injection_depth * 1.5) {
+    if (input.depth > (parseFloat(site.depth) || 5) * 1.5) {
       complications.push('Over-injection depth');
     }
 
@@ -441,7 +441,7 @@ const InjectionSimulator: React.FC<InjectionSimulatorProps> = ({
       complications.push('Injection too rapid');
     }
 
-    if (input.volume > (site.recommended_volume || 0.1) * 2) {
+    if (input.volume > (site.typical_dosage / 10 || 0.1) * 2) {
       complications.push('Excessive volume');
     }
 
