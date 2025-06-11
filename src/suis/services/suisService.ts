@@ -15,7 +15,6 @@ import {
   SUISNotification
 } from '../types';
 import { getSUISAPIManager } from './suisConfigService';
-import { twilioService } from '../../services/twilio/twilioService';
 
 class SUISService {
   private apiManager: any = null;

@@ -37,7 +37,7 @@ import {
   Warning as WarningIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
-import { useSUIS } from '../../hooks/useSUIS';
+import { useSUISOptional } from '../../hooks/useSUIS';
 
 // Import NowCards data
 const nowCardsData = [
@@ -448,16 +448,9 @@ const generateActionItems = (): ActionItem[] => {
 };
 
 const LiveActionTicker: React.FC = () => {
-  // Use SUIS data for real intelligence
-  let suisContext;
-  try {
-    suisContext = useSUIS();
-  } catch (error) {
-    // SUIS not available, will use fallback data
-    suisContext = null;
-  }
-  
-  const { state } = suisContext || { state: null };
+  // Use SUIS data for real intelligence - use optional hook
+  const suisContext = useSUISOptional();
+  const state = suisContext?.state || null;
   const { marketIntelligence, notifications } = state || { marketIntelligence: [], notifications: [] };
   
   // Transform SUIS data into ticker format

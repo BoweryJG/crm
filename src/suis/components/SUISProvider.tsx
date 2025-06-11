@@ -417,6 +417,9 @@ interface SUISProviderProps {
   supabaseAnonKey: string;
 }
 
+// Export SUISContext for use in hooks
+export { SUISContext };
+
 export const SUISProvider: React.FC<SUISProviderProps> = ({
   children,
   supabaseUrl,

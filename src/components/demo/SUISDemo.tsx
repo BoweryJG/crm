@@ -25,11 +25,34 @@ import { useSUIS } from '../../hooks/useSUIS';
 
 const SUISDemo: React.FC = () => {
   const theme = useTheme();
-  const { insights, procedures, isLoading, error } = useSUIS({
-    autoRefresh: true,
-    refreshInterval: 30000,
-    enableRealtime: true
-  });
+  const suisContext = useSUIS();
+  const { state } = suisContext || { state: null };
+  const isLoading = state?.loading || false;
+  const error = state?.error || null;
+  
+  // Extract and transform data from SUIS state
+  const insights = state?.marketIntelligence?.map((intel: any) => ({
+    id: intel.id,
+    insight_type: intel.intelligenceType || 'market_trend',
+    urgency_level: intel.data?.impact === 'high' ? 'immediate' : 'standard',
+    insight_data: {
+      message: intel.data?.trend || intel.data?.action || 'Market intelligence update'
+    },
+    procedure_tags: intel.tags || ['general'],
+    correlation_score: Math.round((intel.confidenceScore || 0.7) * 100),
+    created_at: intel.createdAt || new Date().toISOString()
+  })) || [];
+  
+  const procedures: any[] = state?.intelligenceProfile?.specializations?.map((spec: string, index: number) => ({
+    id: index,
+    procedure_name: spec,
+    procedure_category: ['Restorative', 'Cosmetic', 'Surgical', 'Diagnostic'][Math.floor(Math.random() * 4)],
+    proficiency_score: 75 + Math.random() * 20,
+    market_value: 100000 + Math.random() * 900000,
+    market_size_millions: 100 + Math.random() * 900,
+    growth_percentage: 5 + Math.random() * 20,
+    certification_status: 'active'
+  })) || [];
 
   const formatCurrency = (value: number): string => {
     if (value >= 1000000) {
@@ -120,7 +143,7 @@ const SUISDemo: React.FC = () => {
                       </Typography>
                       
                       <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mb: 1 }}>
-                        {insight.procedure_tags.map((tag, index) => (
+                        {insight.procedure_tags.map((tag: string, index: number) => (
                           <Chip key={index} label={tag} size="small" variant="outlined" />
                         ))}
                       </Box>

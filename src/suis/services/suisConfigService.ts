@@ -2,8 +2,39 @@
 // Centralizes all SUIS-related configurations and integrations
 
 import { supabase } from '../../auth/supabase';
-import { SUISAPIConfig } from '../types';
 import { apiKeyService } from '../../services/apiKeyService';
+import { getAPIManager } from '../api';
+
+// Define API configuration type
+interface SUISAPIConfig {
+  supabase: {
+    url: string;
+    anonKey: string;
+    serviceKey: string;
+  };
+  sphere1a: {
+    baseUrl: string;
+    apiKey: string;
+    version: string;
+  };
+  openRouter: {
+    baseUrl: string;
+    apiKey: string;
+    defaultModel: string;
+  };
+  twilio: {
+    accountSid: string;
+    authToken: string;
+    apiVersion: string;
+    functionUrl: string;
+    apiKey: string;
+    phoneNumber: string;
+  };
+  encryption: {
+    key: string;
+    algorithm: string;
+  };
+}
 
 // Get existing configurations from environment
 const getTwilioConfig = () => {
@@ -41,7 +72,7 @@ export const getSUISConfig = async (): Promise<SUISAPIConfig> => {
     },
     sphere1a: {
       baseUrl: process.env.REACT_APP_SPHERE1A_URL || 'https://api.sphere1a.com/v1',
-      apiKey: cachedSphere1aKey,
+      apiKey: cachedSphere1aKey || '',
       version: 'v1'
     },
     openRouter: {
@@ -103,8 +134,6 @@ export const getSUISConfigSync = (): SUISAPIConfig => {
 export { supabase as suisSupabase };
 
 // Initialize SUIS API Manager
-import { getAPIManager } from '../api';
-
 let suisAPIManager: any = null;
 
 export const getSUISAPIManager = async () => {

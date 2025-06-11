@@ -12,4 +12,10 @@ export const useSUIS = () => {
   return context;
 };
 
+// Optional SUIS hook that returns null if not in provider
+export const useSUISOptional = () => {
+  const context = useContext(SUISContext);
+  return context;
+};
+
 export default useSUIS;

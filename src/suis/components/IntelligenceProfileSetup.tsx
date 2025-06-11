@@ -97,8 +97,24 @@ const IntelligenceProfileSetup: React.FC = () => {
       insightDepth: 'detailed',
       automationLevel: 'assisted',
       communicationStyle: 'formal',
-      dataVisualization: 'interactive',
-      aiPersonality: 'professional'
+      dashboardLayout: {
+        layout: 'grid',
+        widgets: [],
+        customizations: {
+          autoArrange: true,
+          compactMode: false,
+          gridSize: 12,
+          padding: 16,
+          allowOverlap: false
+        },
+        responsiveBreakpoints: {
+          xs: 480,
+          sm: 768,
+          md: 1024,
+          lg: 1280,
+          xl: 1920
+        }
+      }
     }
   });
 
