@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { suisService } from '../services/suisService';
+import { suisRealtimeService } from '../services/suisRealtimeService';
 import { 
   PredictiveInsight,
   PerformanceMetrics,
@@ -129,18 +130,18 @@ export const useSUISFeatures = () => {
     const notificationSub = suisService.subscribeToNotifications(user.id, (notification) => {
       setNotifications(prev => [notification, ...prev]);
       // Update summary count
-      setNotificationSummary(prev => ({
+      setNotificationSummary((prev: any) => ({
         ...prev,
         total: (prev?.total || 0) + 1,
         byType: {
           ...prev?.byType,
-          [notification.notification_type]: (prev?.byType?.[notification.notification_type] || 0) + 1
+          [notification.notificationType]: (prev?.byType?.[notification.notificationType] || 0) + 1
         }
       }));
     });
 
     // Subscribe to analytics updates
-    const analyticsSub = suisService.subscribeToAnalyticsUpdates(user.id, () => {
+    const analyticsSub = suisRealtimeService.subscribeToAnalyticsUpdates(user.id, () => {
       loadMetrics(); // Reload metrics when updated
     });
 

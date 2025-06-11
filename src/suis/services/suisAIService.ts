@@ -9,6 +9,7 @@ import {
   CallIntelligence,
   IntelligenceProfile 
 } from '../types';
+import axios from 'axios';
 
 interface ContentGenerationRequest {
   type: 'email' | 'presentation' | 'social' | 'proposal' | 'follow_up';
@@ -31,6 +32,28 @@ interface AIAnalysisRequest {
 }
 
 class SUISAIService {
+  // Helper method to call OpenRouter API
+  private async callOpenRouterAPI(prompt: string, options: { maxTokens: number; temperature: number; model: string }): Promise<string> {
+    try {
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com';
+      const response = await axios.post(`${BACKEND_URL}/webhook`, {
+        prompt,
+        model: options.model,
+        parameters: {
+          temperature: options.temperature,
+          max_tokens: options.maxTokens
+        }
+      });
+      
+      if (response.data.result?.choices && response.data.result.choices.length > 0) {
+        return response.data.result.choices[0].message.content;
+      }
+      return 'No content was generated';
+    } catch (error) {
+      console.error('Error calling OpenRouter API:', error);
+      throw error;
+    }
+  }
   // Generate intelligent content based on user profile and context
   async generateContent(
     userId: string, 
@@ -47,8 +70,8 @@ class SUISAIService {
       // Build AI prompt based on request type
       const prompt = this.buildContentPrompt(request, profile);
 
-      // Generate content using OpenRouter
-      const aiResponse = await openRouterService.generateResponse(prompt, {
+      // Generate content using direct API call
+      const aiResponse = await this.callOpenRouterAPI(prompt, {
         maxTokens: request.length === 'long' ? 2000 : request.length === 'short' ? 500 : 1000,
         temperature: request.type === 'social' ? 0.8 : 0.7,
         model: 'anthropic/claude-3-opus'
@@ -139,8 +162,8 @@ class SUISAIService {
       // Build comprehensive research prompt
       const researchPrompt = this.buildResearchPrompt(query, profile, context);
 
-      // Execute research using OpenRouter
-      const researchResponse = await openRouterService.generateResponse(researchPrompt, {
+      // Execute research using direct API call
+      const researchResponse = await this.callOpenRouterAPI(researchPrompt, {
         maxTokens: 3000,
         temperature: 0.7,
         model: 'anthropic/claude-3-opus'
@@ -237,7 +260,7 @@ Structure your response with clear headings and bullet points for easy scanning.
 
 Text: ${text}`;
 
-    const response = await openRouterService.generateResponse(prompt, {
+    const response = await this.callOpenRouterAPI(prompt, {
       maxTokens: 500,
       temperature: 0.3,
       model: 'anthropic/claude-3-haiku'
@@ -251,7 +274,7 @@ Text: ${text}`;
 
 Text: ${text}`;
 
-    const response = await openRouterService.generateResponse(prompt, {
+    const response = await this.callOpenRouterAPI(prompt, {
       maxTokens: 300,
       temperature: 0.3,
       model: 'anthropic/claude-3-haiku'
@@ -271,7 +294,7 @@ Format as JSON array.
 
 Text: ${text}`;
 
-    const response = await openRouterService.generateResponse(prompt, {
+    const response = await this.callOpenRouterAPI(prompt, {
       maxTokens: 500,
       temperature: 0.3,
       model: 'anthropic/claude-3-haiku'
@@ -291,7 +314,7 @@ Format as JSON array.
 
 Text: ${text}`;
 
-    const response = await openRouterService.generateResponse(prompt, {
+    const response = await this.callOpenRouterAPI(prompt, {
       maxTokens: 500,
       temperature: 0.3,
       model: 'anthropic/claude-3-haiku'
@@ -313,7 +336,7 @@ Consider the conversation outcome and any unresolved issues.
 Text: ${text}
 ${metadata ? `Metadata: ${JSON.stringify(metadata)}` : ''}`;
 
-    const response = await openRouterService.generateResponse(prompt, {
+    const response = await this.callOpenRouterAPI(prompt, {
       maxTokens: 600,
       temperature: 0.5,
       model: 'anthropic/claude-3-haiku'

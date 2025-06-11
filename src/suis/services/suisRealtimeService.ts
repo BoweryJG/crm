@@ -248,22 +248,26 @@ class SUISRealtimeService {
 
   // Handle contact updates with enrichment
   private handleContactUpdate(payload: RealtimePostgresChangesPayload<ContactUniverse>) {
-    const userId = payload.new?.user_id || payload.old?.user_id;
+    const newContact = payload.new as ContactUniverse | undefined;
+    const oldContact = payload.old as ContactUniverse | undefined;
+    const userId = newContact?.userId || oldContact?.userId;
     if (userId) {
       const channelName = `contacts-${userId}`;
-      if (payload.new) {
-        this.notifyCallbacks(channelName, payload.new);
+      if (newContact) {
+        this.notifyCallbacks(channelName, newContact);
       }
     }
   }
 
   // Handle analytics updates
   private handleAnalyticsUpdate(payload: RealtimePostgresChangesPayload<any>) {
-    const userId = payload.new?.user_id || payload.old?.user_id;
+    const newData = payload.new as any;
+    const oldData = payload.old as any;
+    const userId = newData?.userId || oldData?.userId;
     if (userId) {
       const channelName = `analytics-${userId}`;
-      if (payload.new) {
-        this.notifyCallbacks(channelName, payload.new);
+      if (newData) {
+        this.notifyCallbacks(channelName, newData);
       }
     }
   }

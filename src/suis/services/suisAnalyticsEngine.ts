@@ -114,7 +114,7 @@ class SUISAnalyticsEngine {
         salesCycleLength: await this.calculateAverageSalesCycle(userId, periodStart, periodEnd),
         winRate: await this.calculateWinRate(userId, periodStart, periodEnd),
         activityLevel: activities?.length || 0,
-        engagementScore: await this.calculateEngagementScore(userId, activities)
+        engagementScore: await this.calculateEngagementScore(userId, activities || [])
       };
 
       // Save metrics
@@ -570,7 +570,7 @@ class SUISAnalyticsEngine {
     // Save insights as notifications
     const notifications = insights.map(insight => ({
       user_id: userId,
-      notification_type: 'insight',
+      notificationType: 'insight',
       priority: insight.impact === 'high' ? 'high' : insight.impact === 'medium' ? 'medium' : 'low',
       title: insight.title,
       content: {
@@ -579,8 +579,8 @@ class SUISAnalyticsEngine {
         timeframe: insight.timeframe,
         suggestedActions: insight.suggestedActions
       },
-      context_data: insight.relatedData,
-      action_required: insight.actionRequired,
+      contextData: insight.relatedData,
+      actionRequired: insight.actionRequired,
       created_at: new Date().toISOString()
     }));
 

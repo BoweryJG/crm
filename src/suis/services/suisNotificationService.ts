@@ -84,15 +84,15 @@ class SUISNotificationService {
 
     unread.forEach(notification => {
       // Count by type
-      summary.byType[notification.notification_type] = 
-        (summary.byType[notification.notification_type] || 0) + 1;
+      summary.byType[notification.notificationType] = 
+        (summary.byType[notification.notificationType] || 0) + 1;
       
       // Count by priority
       summary.byPriority[notification.priority] = 
         (summary.byPriority[notification.priority] || 0) + 1;
       
       // Count action required
-      if (notification.action_required) {
+      if (notification.actionRequired) {
         summary.actionRequired++;
       }
     });
@@ -107,12 +107,12 @@ class SUISNotificationService {
   ): Promise<void> {
     const notifications = insights.map(insight => ({
       user_id: userId,
-      notification_type: 'insight' as const,
+      notificationType: 'insight' as const,
       priority: insight.priority || 'medium' as const,
       title: insight.title,
       content: insight,
-      context_data: insight.data,
-      action_required: insight.actionRequired || false,
+      contextData: insight.data,
+      actionRequired: insight.actionRequired || false,
       created_at: new Date().toISOString()
     }));
 
