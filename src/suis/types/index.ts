@@ -1448,6 +1448,22 @@ export interface RealtimePayload {
 }
 
 // ==================================================================
+// ADDITIONAL TYPES FOR ANALYTICS ENGINE
+// ==================================================================
+
+export interface PredictiveInsight {
+  type: 'opportunity' | 'risk' | 'trend' | 'recommendation';
+  title: string;
+  description: string;
+  confidence: number;
+  impact: 'low' | 'medium' | 'high';
+  timeframe: string;
+  actionRequired: boolean;
+  suggestedActions?: string[];
+  relatedData?: any;
+}
+
+// ==================================================================
 // EXPORT DEFAULTS
 // ==================================================================
 
