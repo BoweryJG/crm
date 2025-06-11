@@ -1,6 +1,6 @@
 // SUIS (Sphereos Unified Intelligence System) Service
 // Integrates Sphere1a data with existing components
-import { supabase } from './supabase';
+import { supabase } from './supabase/supabase';
 
 // Types for SUIS intelligence
 export interface IntelligenceInsight {

@@ -1,6 +1,6 @@
 // Content Generator Service - AI-Powered Sales Content Creation
 // Generates customized sales materials for aesthetic and dental medical device sales
-import { supabase } from './supabase';
+import { supabase } from './supabase/supabase';
 import { openRouterService } from './openRouterService';
 import { suisService } from './suisService';
 

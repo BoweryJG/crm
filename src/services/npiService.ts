@@ -1,6 +1,6 @@
 // NPI (National Provider Identifier) Integration Service
 // Connects to CMS NPI Registry for practice discovery
-import { supabase } from './supabase';
+import { supabase } from './supabase/supabase';
 
 // NPI API Types
 export interface NPIProvider {

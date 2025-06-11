@@ -1,6 +1,6 @@
 // Content Engagement Notification Service
 // Real-time notifications when prospects engage with magic link content
-import { supabase } from './supabase';
+import { supabase } from './supabase/supabase';
 import { suisService } from './suisService';
 
 // Notification Types

@@ -1,5 +1,5 @@
 // Contact Universe Service - Manages practice discovery and batch acquisition
-import { supabase } from './supabase';
+import { supabase } from './supabase/supabase';
 import { npiService, EnrichedPractice } from './npiService';
 import { suisService } from './suisService';
 

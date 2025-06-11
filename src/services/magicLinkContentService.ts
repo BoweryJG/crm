@@ -1,6 +1,6 @@
 // Spark Content Service - Intelligent Content Delivery System with Advanced Tracking
 // Create "Sparks" - trackable, personalized content experiences that notify you when prospects engage
-import { supabase } from './supabase';
+import { supabase } from './supabase/supabase';
 import { contentGeneratorService } from './contentGeneratorService';
 
 // Magic Link Content Types

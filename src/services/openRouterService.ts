@@ -1,6 +1,6 @@
 // OpenRouter Service - Access to 400+ AI Models
 // Provides raw access to multiple AI models for research and comparison
-import { supabase } from './supabase';
+import { supabase } from './supabase/supabase';
 
 // OpenRouter API Types
 export interface OpenRouterModel {
