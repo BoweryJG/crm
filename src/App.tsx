@@ -47,6 +47,7 @@ const RipplePage = lazy(() => import('./pages/RipplePage'));
 // SUIS Components
 const SUISDemo = lazy(() => import('./components/demo/SUISDemo'));
 const IntelligenceDashboard = lazy(() => import('./suis/components/IntelligenceDashboard'));
+const IntelligenceProfileSetup = lazy(() => import('./suis/components/IntelligenceProfileSetup'));
 const ContactUniverse = lazy(() => import('./suis/components/ContactUniverse'));
 const ContentGenerator = lazy(() => import('./suis/components/ContentGenerator'));
 const ResearchAssistant = lazy(() => import('./suis/components/ResearchAssistant'));
@@ -127,6 +128,7 @@ const App: React.FC = () => {
                 
                 {/* SUIS Intelligence Routes */}
                 <Route path="intelligence" element={<Suspense fallback={<SphereLoadingScreen loadingText="INTELLIGENCE" message="INITIALIZING UNIFIED SYSTEM" />}><IntelligenceDashboard /></Suspense>} />
+                <Route path="intelligence/setup" element={<Suspense fallback={<SphereLoadingScreen loadingText="PROFILE SETUP" message="PREPARING INTELLIGENCE PROFILE" />}><IntelligenceProfileSetup /></Suspense>} />
                 <Route path="intelligence/demo" element={<Suspense fallback={<SphereLoadingScreen loadingText="SUIS DEMO" message="LOADING DEMONSTRATION" />}><SUISDemo /></Suspense>} />
                 <Route path="intelligence/contacts" element={<Suspense fallback={<SphereLoadingScreen loadingText="CONTACT UNIVERSE" message="MAPPING NEURAL CONNECTIONS" />}><ContactUniverse /></Suspense>} />
                 <Route path="intelligence/content" element={<Suspense fallback={<SphereLoadingScreen loadingText="CONTENT GENERATOR" message="ACTIVATING AI ENGINE" />}><ContentGenerator /></Suspense>} />

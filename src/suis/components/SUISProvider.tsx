@@ -19,6 +19,7 @@ import {
   APIResponse,
   SUISSubscription
 } from '../types';
+import { getSUISAPIManager, checkAPIConfiguration } from '../services/suisConfigService';
 
 // ==================================================================
 // SUIS PROVIDER CONTEXT
