@@ -466,7 +466,7 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
               notificationFrequency: 'real_time',
               insightDepth: 'detailed',
               automationLevel: 'assisted',
-              communicationStyle: 'professional',
+              communicationStyle: 'formal',
               dashboardLayout: {
                 layout: 'grid',
                 widgets: [],
@@ -705,8 +705,8 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
   const subscribeToRealtime = useCallback((subscription: SUISSubscription) => {
     const channel = supabase
       .channel(subscription.channel)
-      .on('postgres_changes', {
-        event: subscription.event as any,
+      .on('postgres_changes' as any, {
+        event: subscription.event,
         schema: 'public',
         table: subscription.channel,
         filter: subscription.filter

@@ -3,11 +3,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSUIS } from './SUISProvider';
-import { SystemPreferences } from '../types';
+import { UserPreferences } from '../types';
 import { 
   Palette, Sun, Moon, Monitor, Check, Sliders,
   Eye, Copy, Download, RefreshCw, Sparkles,
-  Droplet, Layout, Type, Square
+  Droplet, Layout, Type, Square, Brain
 } from 'lucide-react';
 
 interface ColorPreset {
@@ -29,8 +29,8 @@ interface ThemePreview {
 
 const ThemeCustomizer: React.FC = () => {
   const { state, actions } = useSUIS();
-  const [preferences, setPreferences] = useState<SystemPreferences>(
-    state.systemPreferences || {
+  const [preferences, setPreferences] = useState<any>(
+    state.intelligenceProfile?.preferences || {
       userId: state.user?.id || '',
       theme: 'light',
       notifications: {
@@ -187,8 +187,12 @@ const ThemeCustomizer: React.FC = () => {
       root.style.setProperty(`--color-${key}`, value);
     });
 
-    // Save preferences
-    actions.updateSystemPreferences(preferences);
+    // Save preferences (TODO: implement theme preference saving)
+    // For now, just update the theme with custom colors
+    actions.updateTheme({ 
+      currentTheme: preferences.theme as any,
+      themes: state.theme.themes 
+    });
   };
 
   const exportTheme = () => {

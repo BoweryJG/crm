@@ -60,7 +60,9 @@ const ResearchAssistant: React.FC = () => {
         currentOpportunities: [],
         activeProjects: [],
         recentInteractions: [],
-        userGoals: Object.values(contextOptions.goals.salesTargets || {}),
+        userGoals: contextOptions.goals && 'salesTargets' in contextOptions.goals 
+          ? Object.values(contextOptions.goals.salesTargets || {}) 
+          : [],
         marketConditions: {}
       });
 

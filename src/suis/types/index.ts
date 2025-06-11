@@ -1471,7 +1471,7 @@ export default {
       notificationFrequency: 'real_time',
       insightDepth: 'detailed',
       automationLevel: 'assisted',
-      communicationStyle: 'professional',
+      communicationStyle: 'formal',
       dashboardLayout: {
         layout: 'grid',
         widgets: [],

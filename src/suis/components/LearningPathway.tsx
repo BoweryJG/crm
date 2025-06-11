@@ -3,13 +3,25 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSUIS } from './SUISProvider';
-import { LearningPath } from '../types';
 import { LearningModule, UserProgress } from '../../services/learningCenterService';
 import { 
   BookOpen, Award, Clock, CheckCircle, PlayCircle, 
   Lock, TrendingUp, Users, Brain, Trophy, ChevronRight,
   Star, BarChart, Target, Zap
 } from 'lucide-react';
+
+// Local interface for mock learning paths
+interface LearningPath {
+  id: string;
+  name: string;
+  description: string;
+  modules: LearningModule[];
+  targetAudience: string[];
+  totalCredits: number;
+  estimatedDuration: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface ModuleCardProps {
   module: LearningModule;
@@ -103,16 +115,16 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, progress, onStart, isLo
           className={`w-full py-2 rounded-lg text-sm font-medium transition-colors ${
             isLocked 
               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : progress?.completionStatus === 'completed'
+              : progress?.status === 'completed'
               ? 'bg-green-100 text-green-700 hover:bg-green-200'
-              : progress?.completionStatus === 'in_progress'
+              : progress?.status === 'in_progress'
               ? 'bg-blue-600 text-white hover:bg-blue-700'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           {isLocked ? 'Locked' : 
-           progress?.completionStatus === 'completed' ? 'Review' :
-           progress?.completionStatus === 'in_progress' ? 'Continue' :
+           progress?.status === 'completed' ? 'Review' :
+           progress?.status === 'in_progress' ? 'Continue' :
            'Start'}
         </button>
       </div>
@@ -196,57 +208,90 @@ const LearningPathway: React.FC = () => {
       modules: [
         {
           id: 'mod1',
-          pathId: '1',
           title: 'Understanding Medical Device Sales',
           description: 'Foundation course on medical device industry and sales process',
+          category: 'sales' as const,
+          difficulty_level: 'beginner',
+          estimated_duration: 45,
+          content_type: 'mixed',
           content: {
-            lessons: [],
-            assessments: [],
+            sections: [],
             resources: []
           },
-          difficultyLevel: 'beginner',
-          estimatedDuration: 45,
           prerequisites: [],
-          creditsEarned: 10,
-          skills: ['Industry Knowledge', 'Sales Fundamentals'],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          learning_objectives: ['Understand basics of medical device sales', 'Learn industry terminology'],
+          certification_eligible: true,
+          ce_credits: 10,
+          tags: ['Industry Knowledge', 'Sales Fundamentals'],
+          instructor: {
+            name: 'Dr. Smith',
+            credentials: 'MBA, PhD',
+            bio: 'Expert in medical device sales'
+          },
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          published: true,
+          enrollment_count: 0,
+          average_rating: 0,
+          completion_rate: 0
         },
         {
           id: 'mod2',
-          pathId: '1',
           title: 'Advanced Consultative Selling',
           description: 'Deep dive into consultative selling techniques for medical professionals',
+          category: 'sales' as const,
+          difficulty_level: 'intermediate',
+          estimated_duration: 60,
+          content_type: 'mixed',
           content: {
-            lessons: [],
-            assessments: [],
+            sections: [],
             resources: []
           },
-          difficultyLevel: 'intermediate',
-          estimatedDuration: 60,
-          prerequisites: ['Understanding Medical Device Sales'],
-          creditsEarned: 15,
-          skills: ['Consultative Selling', 'Needs Analysis'],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          prerequisites: ['mod1'],
+          learning_objectives: ['Master consultative selling techniques', 'Learn needs analysis'],
+          certification_eligible: true,
+          ce_credits: 15,
+          tags: ['Consultative Selling', 'Needs Analysis'],
+          instructor: {
+            name: 'Dr. Smith',
+            credentials: 'MBA, PhD',
+            bio: 'Expert in medical device sales'
+          },
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          published: true,
+          enrollment_count: 0,
+          average_rating: 0,
+          completion_rate: 0
         },
         {
           id: 'mod3',
-          pathId: '1',
           title: 'Negotiation Mastery',
           description: 'Advanced negotiation strategies for high-value medical device deals',
+          category: 'sales' as const,
+          difficulty_level: 'advanced',
+          estimated_duration: 90,
+          content_type: 'mixed',
           content: {
-            lessons: [],
-            assessments: [],
+            sections: [],
             resources: []
           },
-          difficultyLevel: 'advanced',
-          estimatedDuration: 90,
-          prerequisites: ['Advanced Consultative Selling'],
-          creditsEarned: 20,
-          skills: ['Negotiation', 'Deal Closing'],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          prerequisites: ['mod2'],
+          learning_objectives: ['Master negotiation techniques', 'Learn deal closing strategies'],
+          certification_eligible: true,
+          ce_credits: 20,
+          tags: ['Negotiation', 'Deal Closing'],
+          instructor: {
+            name: 'Dr. Smith',
+            credentials: 'MBA, PhD',
+            bio: 'Expert in medical device sales'
+          },
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          published: true,
+          enrollment_count: 0,
+          average_rating: 0,
+          completion_rate: 0
         }
       ],
       targetAudience: ['sales_rep', 'account_manager'],
@@ -262,21 +307,32 @@ const LearningPathway: React.FC = () => {
       modules: [
         {
           id: 'mod4',
-          pathId: '2',
           title: 'Product Knowledge Essentials',
           description: 'Comprehensive overview of product portfolio',
+          category: 'sales' as const,
+          difficulty_level: 'beginner',
+          estimated_duration: 30,
+          content_type: 'mixed',
           content: {
-            lessons: [],
-            assessments: [],
+            sections: [],
             resources: []
           },
-          difficultyLevel: 'beginner',
-          estimatedDuration: 30,
           prerequisites: [],
-          creditsEarned: 8,
-          skills: ['Product Knowledge'],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          learning_objectives: ['Understand product portfolio', 'Learn product features'],
+          certification_eligible: true,
+          ce_credits: 8,
+          tags: ['Product Knowledge'],
+          instructor: {
+            name: 'Dr. Johnson',
+            credentials: 'MD',
+            bio: 'Product specialist'
+          },
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          published: true,
+          enrollment_count: 0,
+          average_rating: 0,
+          completion_rate: 0
         }
       ],
       targetAudience: ['product_specialist'],
@@ -308,8 +364,7 @@ const LearningPathway: React.FC = () => {
       started_at: new Date().toISOString(),
       completed_at: new Date().toISOString(),
       certificate_issued: new Date().toISOString(),
-      last_accessed: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      last_accessed: new Date().toISOString()
     });
     mockProgress.set('mod2', {
       user_id: state.user?.id || '',
@@ -339,7 +394,7 @@ const LearningPathway: React.FC = () => {
       const prereqModule = selectedPath?.modules.find(m => m.title === prereq);
       if (!prereqModule) return false;
       const progress = userProgress.get(prereqModule.id);
-      return progress?.completionStatus === 'completed';
+      return progress?.status === 'completed' || progress?.status === 'certified';
     });
   };
 
