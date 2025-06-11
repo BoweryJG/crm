@@ -81,10 +81,12 @@ const Contacts: React.FC = () => {
     const fetchContacts = async () => {
       try {
         setLoading(true);
-        // Fetch contacts from the public_contacts table
+        // Fetch contacts from the contacts table
         const { data, error } = await supabase
-          .from('public_contacts')
-          .select('*');
+          .from('contacts')
+          .select('*')
+          .order('value_score', { ascending: false })
+          .limit(100); // Start with top 100 for performance
         
         if (error) {
           console.error('Error fetching contacts from public_contacts:', error);
