@@ -74,14 +74,14 @@ const ContentGenerator: React.FC = () => {
     try {
       const result = await generateContent(contentRequest);
       setGeneratedContent(result);
-      setEditedContent(result?.content_data?.content || '');
+      setEditedContent(result?.contentData?.content || '');
     } catch (err: any) {
       setError(err.message || 'Failed to generate content');
     }
   };
 
   const handleCopy = () => {
-    const content = isEditing ? editedContent : generatedContent?.content_data?.content;
+    const content = isEditing ? editedContent : generatedContent?.contentData?.content;
     if (content) {
       navigator.clipboard.writeText(content);
       // Could show a toast notification here
@@ -93,8 +93,8 @@ const ContentGenerator: React.FC = () => {
     if (generatedContent) {
       setGeneratedContent({
         ...generatedContent,
-        content_data: {
-          ...generatedContent.content_data,
+        contentData: {
+          ...generatedContent.contentData,
           content: editedContent
         }
       });
@@ -279,7 +279,7 @@ const ContentGenerator: React.FC = () => {
                         <IconButton 
                           onClick={() => {
                             setIsEditing(false);
-                            setEditedContent(generatedContent?.content_data?.content || '');
+                            setEditedContent(generatedContent?.contentData?.content || '');
                           }} 
                           size="small" 
                           color="error"
@@ -311,7 +311,7 @@ const ContentGenerator: React.FC = () => {
                 <Paper variant="outlined" sx={{ p: 3, minHeight: 400 }}>
                   {!isEditing ? (
                     <Typography style={{ whiteSpace: 'pre-wrap' }}>
-                      {generatedContent.content_data?.content || 'No content generated'}
+                      {generatedContent.contentData?.content || 'No content generated'}
                     </Typography>
                   ) : (
                     <TextField
@@ -325,12 +325,12 @@ const ContentGenerator: React.FC = () => {
                     />
                   )}
                   
-                  {generatedContent.content_data?.metadata && (
+                  {generatedContent.contentData?.metadata && (
                     <>
                       <Divider sx={{ my: 2 }} />
                       <Box display="flex" gap={1} flexWrap="wrap">
                         <Chip 
-                          label={`Model: ${generatedContent.content_data.metadata.model || 'AI'}`} 
+                          label={`Model: ${generatedContent.contentData.metadata.model || 'AI'}`} 
                           size="small" 
                         />
                         <Chip 
