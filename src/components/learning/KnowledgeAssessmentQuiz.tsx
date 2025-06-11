@@ -82,7 +82,6 @@ import {
 import {
   learningCenterService,
   QuizQuestion,
-  QuizResult,
   LearningModule
 } from '../../services/learningCenterService';
 

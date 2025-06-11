@@ -34,6 +34,7 @@ import {
   Divider,
   Grid,
   LinearProgress,
+  CircularProgress,
   Table,
   TableBody,
   TableCell,
@@ -69,7 +70,8 @@ import {
   TrendingUp as ImprovementIcon,
   Analytics as AnalyticsIcon,
   Star as StarIcon,
-  Assignment as TaskIcon
+  Assignment as TaskIcon,
+  Share as ShareIcon
 } from '@mui/icons-material';
 import { procedureTrainingService } from '../../services/procedureTrainingService';
 import type { 
@@ -477,7 +479,7 @@ const InjectionSimulator: React.FC<InjectionSimulatorProps> = ({
       feedback.push('Excellent hand stability and needle control.');
     }
 
-    if (Math.abs(input.angle - site.injection_angle) < 5) {
+    if (Math.abs(input.angle - site.angle) < 5) {
       feedback.push('Perfect injection angle achieved.');
     }
 
@@ -492,11 +494,11 @@ const InjectionSimulator: React.FC<InjectionSimulatorProps> = ({
     const suggestions: string[] = [];
 
     if (accuracyBreakdown.angleAccuracy < 80) {
-      suggestions.push(`Adjust injection angle: aim for ${site.injection_angle}° perpendicular`);
+      suggestions.push(`Adjust injection angle: aim for ${site.angle}° perpendicular`);
     }
 
     if (accuracyBreakdown.depthAccuracy < 80) {
-      suggestions.push(`Optimize injection depth: target ${site.injection_depth}mm`);
+      suggestions.push(`Optimize injection depth: target ${site.depth}`);
     }
 
     if (accuracyBreakdown.velocityAccuracy < 80) {
@@ -801,7 +803,7 @@ const InjectionSimulator: React.FC<InjectionSimulatorProps> = ({
                     <Box>
                       <Typography variant="caption">Angle (degrees)</Typography>
                       <Slider
-                        defaultValue={simulationState.selectedSite.injection_angle}
+                        defaultValue={simulationState.selectedSite.angle}
                         min={0}
                         max={90}
                         valueLabelDisplay="auto"
@@ -811,7 +813,7 @@ const InjectionSimulator: React.FC<InjectionSimulatorProps> = ({
                     <Box>
                       <Typography variant="caption">Depth (mm)</Typography>
                       <Slider
-                        defaultValue={simulationState.selectedSite.injection_depth}
+                        defaultValue={parseFloat(simulationState.selectedSite.depth) || 5}
                         min={1}
                         max={20}
                         valueLabelDisplay="auto"
@@ -832,10 +834,10 @@ const InjectionSimulator: React.FC<InjectionSimulatorProps> = ({
                       variant="contained"
                       fullWidth
                       onClick={() => performInjection({
-                        angle: simulationState.selectedSite!.injection_angle,
-                        depth: simulationState.selectedSite!.injection_depth,
+                        angle: simulationState.selectedSite!.angle,
+                        depth: parseFloat(simulationState.selectedSite!.depth) || 5,
                         velocity: 5,
-                        volume: simulationState.selectedSite!.recommended_volume || 0.1,
+                        volume: simulationState.selectedSite!.typical_dosage / 10 || 0.1,
                         approach_vector: { x: 0, y: 0, z: 1 },
                         hand_stability: 85 + Math.random() * 15,
                         preparation_time: 20 + Math.random() * 20
@@ -896,12 +898,7 @@ const InjectionSimulator: React.FC<InjectionSimulatorProps> = ({
                       </ListItemAvatar>
                       <ListItemText
                         primary={site.name}
-                        secondary={`${site.injection_angle}° • ${site.injection_depth}mm`}
-                      />
-                      <Chip 
-                        label={site.difficulty}
-                        size="small"
-                        variant="outlined"
+                        secondary={`${site.angle}° • ${site.depth}`}
                       />
                     </ListItem>
                   ))}
