@@ -254,11 +254,12 @@ export interface EngagementMetrics {
 }
 
 export interface PerformanceMetrics {
-  overallScore: number;
-  goalAttainment: number;
-  trendDirection: TrendDirection;
-  percentileRank: number;
-  improvementRate: number;
+  conversionRate: number;
+  averageDealSize: number;
+  salesCycleLength: number;
+  winRate: number;
+  activityLevel: number;
+  engagementScore: number;
 }
 
 export interface Insight {
@@ -269,6 +270,18 @@ export interface Insight {
   confidence: number;
   actionable: boolean;
   priority: Priority;
+}
+
+export interface PredictiveInsight {
+  type: 'opportunity' | 'risk' | 'trend' | 'recommendation';
+  title: string;
+  description: string;
+  confidence: number;
+  impact: 'low' | 'medium' | 'high';
+  timeframe: string;
+  actionRequired: boolean;
+  suggestedActions?: string[];
+  relatedData?: any;
 }
 
 export type InsightType = 
