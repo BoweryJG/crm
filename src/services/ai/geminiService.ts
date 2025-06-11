@@ -5,7 +5,7 @@ import { supabase } from '../supabase/supabase';
 const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY || '');
 
 // Backend API configuration
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com';
 
 export interface GeminiAnalysisResult {
   transcription: string;
