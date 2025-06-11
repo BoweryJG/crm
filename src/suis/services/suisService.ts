@@ -15,6 +15,10 @@ import {
   SUISNotification
 } from '../types';
 import { getSUISAPIManager } from './suisConfigService';
+import { suisRealtimeService } from './suisRealtimeService';
+import { suisAIService } from './suisAIService';
+import { suisAnalyticsEngine } from './suisAnalyticsEngine';
+import { suisNotificationService } from './suisNotificationService';
 
 class SUISService {
   private apiManager: any = null;
@@ -572,36 +576,60 @@ class SUISService {
     }
   }
 
-  // Real-time subscriptions
-  subscribeToMarketIntelligence(callback: (data: MarketIntelligence) => void) {
-    return supabase
-      .channel('market-intelligence')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'suis_market_intelligence'
-        },
-        (payload) => callback(payload.new as MarketIntelligence)
-      )
-      .subscribe();
+  // Real-time subscriptions (use enhanced service)
+  subscribeToMarketIntelligence(callback: (data: MarketIntelligence) => void, filters?: any) {
+    return suisRealtimeService.subscribeToMarketIntelligence(callback, filters);
   }
 
   subscribeToNotifications(userId: string, callback: (data: SUISNotification) => void) {
-    return supabase
-      .channel(`notifications-${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'suis_notifications',
-          filter: `user_id=eq.${userId}`
-        },
-        (payload) => callback(payload.new as SUISNotification)
-      )
-      .subscribe();
+    return suisRealtimeService.subscribeToNotifications(userId, callback);
+  }
+
+  subscribeToContactUpdates(userId: string, callback: (data: ContactUniverse) => void) {
+    return suisRealtimeService.subscribeToContactUpdates(userId, callback);
+  }
+
+  subscribeToCallIntelligence(userId: string, callback: (data: CallIntelligence) => void) {
+    return suisRealtimeService.subscribeToCallIntelligence(userId, callback);
+  }
+
+  // AI-Powered Features
+  async generateAIContent(userId: string, request: any) {
+    return suisAIService.generateContent(userId, request);
+  }
+
+  async analyzeCallWithAI(callId: string, transcript: string, metadata?: any) {
+    return suisAIService.analyzeCallTranscript(callId, transcript, metadata);
+  }
+
+  async conductAIResearch(userId: string, query: string, context?: any) {
+    return suisAIService.conductResearch(userId, query, context);
+  }
+
+  // Predictive Analytics
+  async generatePredictiveInsights(userId: string) {
+    return suisAnalyticsEngine.generatePredictiveInsights(userId);
+  }
+
+  async calculatePerformanceMetrics(userId: string, periodStart: Date, periodEnd: Date) {
+    return suisAnalyticsEngine.calculatePerformanceMetrics(userId, periodStart, periodEnd);
+  }
+
+  async scoreOpportunity(userId: string, contactId: string, procedureType?: string) {
+    return suisAnalyticsEngine.scoreOpportunity(userId, contactId, procedureType);
+  }
+
+  // Enhanced Notifications
+  async createIntelligentNotification(userId: string, notification: any) {
+    return suisNotificationService.createNotification(userId, notification);
+  }
+
+  async getNotificationSummary(userId: string) {
+    return suisNotificationService.getNotificationSummary(userId);
+  }
+
+  async createInsightNotifications(userId: string, insights: any[]) {
+    return suisNotificationService.createInsightNotifications(userId, insights);
   }
 }
 
