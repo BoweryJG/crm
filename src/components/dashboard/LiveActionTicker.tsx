@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   Box, 
   Typography, 
@@ -37,7 +37,7 @@ import {
   Warning as WarningIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
-import { useSUISForTicker } from '../../hooks/useSUIS';
+import { useSUIS } from '../../hooks/useSUIS';
 
 // Import NowCards data
 const nowCardsData = [
@@ -449,7 +449,72 @@ const generateActionItems = (): ActionItem[] => {
 
 const LiveActionTicker: React.FC = () => {
   // Use SUIS data for real intelligence
-  const { tickerData, loading, error } = useSUISForTicker();
+  let suisContext;
+  try {
+    suisContext = useSUIS();
+  } catch (error) {
+    // SUIS not available, will use fallback data
+    suisContext = null;
+  }
+  
+  const { state } = suisContext || { state: null };
+  const { marketIntelligence, notifications } = state || { marketIntelligence: [], notifications: [] };
+  
+  // Transform SUIS data into ticker format
+  const tickerData = useMemo(() => {
+    const items: ActionItem[] = [];
+    
+    // Convert market intelligence to ticker items
+    if (marketIntelligence && marketIntelligence.length > 0) {
+      marketIntelligence.forEach((intel: any) => {
+        items.push({
+          id: intel.id,
+          priority: intel.data?.impact === 'high' ? 'critical' : 'urgent',
+          icon: intel.intelligenceType === 'competitor_move' ? <UrgentIcon /> : <OpportunityIcon />,
+          title: intel.intelligenceType.toUpperCase(),
+          message: intel.data?.trend || intel.data?.action || 'Market Intelligence Update',
+          value: intel.confidenceScore ? `${Math.round(intel.confidenceScore * 100)}% AI` : '',
+          time: '2 min',
+          action: {
+            type: 'view' as const,
+            label: 'View Details',
+            handler: () => console.log('View intelligence:', intel.id)
+          },
+          metrics: {
+            probability: Math.round((intel.confidenceScore || 0.5) * 100),
+            impact: intel.data?.impact || 'medium',
+            deadline: intel.expiresAt ? new Date(intel.expiresAt).toLocaleDateString() : 'N/A'
+          }
+        });
+      });
+    }
+    
+    // Convert notifications to ticker items
+    if (notifications && notifications.length > 0) {
+      notifications.slice(0, 5).forEach((notif: any) => {
+        if (!notif.readAt) {
+          items.push({
+            id: notif.id,
+            priority: notif.priority === 'high' ? 'critical' : 'urgent',
+            icon: notif.type === 'alert' ? <AlertIcon /> : <AnalyticsIcon />,
+            title: notif.type.toUpperCase(),
+            message: notif.message || 'New notification',
+            time: 'Just now',
+            action: {
+              type: 'view' as const,
+              label: 'Mark Read',
+              handler: () => console.log('Mark read:', notif.id)
+            }
+          });
+        }
+      });
+    }
+    
+    return items;
+  }, [marketIntelligence, notifications]);
+  
+  const loading = false;
+  const error = null;
   
   const [items, setItems] = useState<ActionItem[]>([]);
   const [playing, setPlaying] = useState(true);
