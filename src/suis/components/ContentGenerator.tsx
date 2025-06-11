@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { 
   Mail, FileText, Share2, Send, Copy, Download, 
-  Wand2, Edit3, Save, Cancel
+  Wand2, Edit3, Save, X
 } from 'lucide-react';
 import { useSUISFeatures } from '../hooks/useSUISFeatures';
 import { useAuth } from '../../hooks/useAuth';
@@ -284,7 +284,7 @@ const ContentGenerator: React.FC = () => {
                           size="small" 
                           color="error"
                         >
-                          <Cancel size={20} />
+                          <X size={20} />
                         </IconButton>
                       </>
                     )}

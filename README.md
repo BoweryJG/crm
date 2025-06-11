@@ -2,6 +2,8 @@
 
 A visually stunning and comprehensive CRM specifically designed for medical sales representatives in the aesthetic and dental industries.
 
+Last updated: January 6, 2025
+
 🚀 **Live at**: [crm.repspheres.com](https://crm.repspheres.com)
 
 ## Overview
