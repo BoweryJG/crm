@@ -45,7 +45,7 @@ import {
   Psychology as SocraticIcon,
   TrendingUp as ChallengerIcon,
   Email as EmailIcon,
-  Presentation as DemoIcon,
+  Slideshow as DemoIcon,
   QuestionAnswer as ObjectionIcon,
   Timeline as SequenceIcon,
   Description as ProposalIcon,
