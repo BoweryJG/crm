@@ -19,10 +19,12 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import StarIcon from '@mui/icons-material/Star';
+import DiamondIcon from '@mui/icons-material/Diamond';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { useAppMode } from '../contexts/AppModeContext';
 
 type BillingCycle = 'monthly' | 'annual';
-type SubscriptionTier = 'explorer' | 'professional' | 'insights';
+type SubscriptionTier = 'explorer' | 'professional' | 'growth' | 'enterprise' | 'elite';
 
 const Subscribe: React.FC = () => {
   const theme = useTheme();
@@ -51,7 +53,8 @@ const Subscribe: React.FC = () => {
       },
       body: JSON.stringify({
         tier,
-        billingCycle
+        billingCycle,
+        priceId: pricing[tier].priceIds[billingCycle]
       })
     });
     
@@ -61,52 +64,121 @@ const Subscribe: React.FC = () => {
     }
   };
 
-  // Pricing configuration
+  // Pricing configuration from Stripe CSV
   const pricing = {
     explorer: {
-      monthly: 0,
-      annual: 0,
+      monthly: 49,
+      annual: 490,
+      priceIds: {
+        monthly: 'price_1RRuqbGRiAPUZqWu3f91wnNx',
+        annual: 'price_1RWMXEGRiAPUZqWuPwcgrovN'
+      },
+      productId: 'prod_SMe8fPX6r65llM',
       features: {
         basic: [
-          'Demo mode only',
-          'Limited call recording (5 calls/month)',
-          'Basic call transcription',
-          'Sample linguistics insights'
+          'Test the waters with essential market insights',
+          'Access to 25% of dental/aesthetic procedure database',
+          'View market sizes and growth rates (top-level only)',
+          '5 AI Workspace prompts/month',
+          'Basic category descriptions',
+          'Weekly market digest email',
+          'Badge: Explorer Badge in community'
         ],
         premium: []
       }
     },
     professional: {
-      monthly: 29,
-      annual: 290, // Save ~17%
+      monthly: 149,
+      annual: 1490,
+      priceIds: {
+        monthly: 'price_1RRurNGRiAPUZqWuklICsE4P',
+        annual: 'price_1RWMWjGRiAPUZqWu6YBZY7o4'
+      },
+      productId: 'prod_SMe9s5P6OirVgP',
       features: {
         basic: [
-          'Live mode access',
-          'Unlimited call recording and storage',
-          'Full call transcription',
-          'Basic sentiment analysis',
-          'Call tagging and organization',
-          '10 linguistics analyses per month'
+          'Everything you need to excel in your territory',
+          'Full access to complete procedure database',
+          'Detailed market insights with growth projections',
+          '50 AI Workspace prompts/month',
+          'Linguistics module: 10 call analyses/month',
+          'Recent news article links',
+          'Export capabilities (PDF/CSV)',
+          'Badge: Professional Badge + priority support'
         ],
         premium: []
       }
     },
-    insights: {
-      monthly: 79,
-      annual: 790, // Save ~17%
+    growth: {
+      monthly: 349,
+      annual: 3490,
+      priceIds: {
+        monthly: 'price_1RWMW3GRiAPUZqWuoTA0eLUC',
+        annual: 'price_1RRus5GRiAPUZqWup3jk1S8U'
+      },
+      productId: 'prod_SMeAJE1MaklEQi',
       features: {
         basic: [
-          'Everything in Professional plan',
-          'Unlimited linguistics analyses',
-          'Detailed sentiment progression tracking',
-          'Key phrase extraction',
-          'Topic segmentation'
+          'Scale your success with advanced analytics',
+          'Everything in Professional, plus:',
+          'Unlimited AI Workspace prompts',
+          '50 call analyses/month with coaching insights',
+          'CRM module access (manual entry)',
+          'Custom market reports (3/month)',
+          'Team collaboration features (up to 3 users)',
+          'API access for basic integrations',
+          'Badge: Growth Badge + quarterly strategy call'
+        ],
+        premium: []
+      }
+    },
+    enterprise: {
+      monthly: 749,
+      annual: 7490,
+      priceIds: {
+        monthly: 'price_1RRushGRiAPUZqWuIvqueK7h',
+        annual: 'price_1RWMT4GRiAPUZqWuqiNhkZfw'
+      },
+      productId: 'prod_SMeBAukl5Fqeeh',
+      features: {
+        basic: [
+          'Command center for market domination',
+          'Everything in Growth, plus:',
+          'Unlimited call analyses with AI coaching',
+          'Full CRM automation features',
+          'AI-powered workflow automation (5 workflows)',
+          'Custom AI prompt library creation',
+          'White-label reports for clients',
+          'Team access (up to 10 users)',
+          'Priority API access',
+          'Badge: Enterprise Badge + monthly strategy calls'
+        ],
+        premium: []
+      }
+    },
+    elite: {
+      monthly: 1499,
+      annual: 14990,
+      priceIds: {
+        monthly: 'price_1RRutVGRiAPUZqWuDMSAqHsD',
+        annual: 'price_1RWMSCGRiAPUZqWu30j19b9G'
+      },
+      productId: 'prod_SMeBmeB7knfARi',
+      features: {
+        basic: [
+          'Your personal AI-powered sales acceleration team',
+          'Everything in Enterprise, plus:'
         ],
         premium: [
-          'Action item identification',
-          'Speaking pace and talk-to-listen ratio',
-          'Competitive intelligence extraction',
-          'Custom dashboards and reports'
+          'Unlimited workflow automations',
+          'Custom AI agent configuration',
+          'Done-for-you report generation',
+          'Dedicated success manager',
+          'Custom integrations',
+          'Unlimited team members',
+          'Quarterly business reviews',
+          'Early access to new features',
+          'Badge: Elite Badge + weekly check-ins'
         ]
       }
     }
@@ -123,7 +195,7 @@ const Subscribe: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
+    <Box sx={{ maxWidth: 1400, mx: 'auto', p: 3 }}>
       <Box sx={{ textAlign: 'center', mb: 6 }}>
         <Typography variant="h3" gutterBottom fontWeight="bold">
           Choose Your Plan
@@ -150,15 +222,15 @@ const Subscribe: React.FC = () => {
               Monthly
             </ToggleButton>
             <ToggleButton value="annual" aria-label="annual billing">
-              Annual <Chip size="small" label="Save 17%" color="success" sx={{ ml: 1 }} />
+              Annual <Chip size="small" label="Save up to 17%" color="success" sx={{ ml: 1 }} />
             </ToggleButton>
           </ToggleButtonGroup>
         </Box>
       </Box>
 
       <Grid container spacing={3} justifyContent="center">
-        {/* Explorer Plan (Free) */}
-        <Grid item xs={12} md={4}>
+        {/* Explorer Plan */}
+        <Grid item xs={12} md={4} lg={2.4}>
           <Paper 
             elevation={3} 
             sx={{ 
@@ -177,10 +249,18 @@ const Subscribe: React.FC = () => {
               Explorer
             </Typography>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
-              Free
+              ${pricing.explorer[billingCycle]}
+              <Typography component="span" variant="body1" color="text.secondary">
+                /{billingCycle === 'monthly' ? 'mo' : 'yr'}
+              </Typography>
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Try out SphereOS CRM with limited features
+            {billingCycle === 'annual' && (
+              <Typography variant="body2" color="success.main" sx={{ mb: 2 }}>
+                Save ${getSavings('explorer').savings}/year
+              </Typography>
+            )}
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
+              Test the waters with essential market insights
             </Typography>
             
             <Divider sx={{ my: 2 }} />
@@ -191,7 +271,10 @@ const Subscribe: React.FC = () => {
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="success" fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText primary={feature} />
+                  <ListItemText 
+                    primary={feature} 
+                    primaryTypographyProps={{ variant: 'body2' }}
+                  />
                 </ListItem>
               ))}
             </List>
@@ -201,15 +284,15 @@ const Subscribe: React.FC = () => {
               color="primary" 
               fullWidth 
               sx={{ mt: 2 }}
-              disabled={mode === 'demo'}
+              onClick={() => handleSubscribe('explorer')}
             >
-              Current Plan
+              Get Started
             </Button>
           </Paper>
         </Grid>
         
         {/* Professional Plan */}
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={4} lg={2.4}>
           <Paper 
             elevation={6} 
             sx={{ 
@@ -250,11 +333,11 @@ const Subscribe: React.FC = () => {
             </Typography>
             {billingCycle === 'annual' && (
               <Typography variant="body2" color="success.main" sx={{ mb: 2 }}>
-                Save ${getSavings('professional').savings}/year ({getSavings('professional').savingsPercentage}% off)
+                Save ${getSavings('professional').savings}/year
               </Typography>
             )}
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Perfect for sales reps who need live data and call recording
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
+              Everything you need to excel in your territory
             </Typography>
             
             <Divider sx={{ my: 2 }} />
@@ -265,7 +348,10 @@ const Subscribe: React.FC = () => {
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="success" fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText primary={feature} />
+                  <ListItemText 
+                    primary={feature} 
+                    primaryTypographyProps={{ variant: 'body2' }}
+                  />
                 </ListItem>
               ))}
             </List>
@@ -277,13 +363,13 @@ const Subscribe: React.FC = () => {
               sx={{ mt: 2 }}
               onClick={() => handleSubscribe('professional')}
             >
-              {mode === 'live' ? 'Upgrade Now' : 'Get Started'}
+              Get Professional
             </Button>
           </Paper>
         </Grid>
         
-        {/* Insights Plan */}
-        <Grid item xs={12} md={4}>
+        {/* Growth Plan */}
+        <Grid item xs={12} md={4} lg={2.4}>
           <Paper 
             elevation={3} 
             sx={{ 
@@ -301,58 +387,39 @@ const Subscribe: React.FC = () => {
           >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
               <Typography variant="h5" fontWeight="bold" gutterBottom>
-                Insights
+                Growth
               </Typography>
               <StarIcon color="primary" sx={{ ml: 1 }} />
             </Box>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
-              ${pricing.insights[billingCycle]}
+              ${pricing.growth[billingCycle]}
               <Typography component="span" variant="body1" color="text.secondary">
                 /{billingCycle === 'monthly' ? 'mo' : 'yr'}
               </Typography>
             </Typography>
             {billingCycle === 'annual' && (
               <Typography variant="body2" color="success.main" sx={{ mb: 2 }}>
-                Save ${getSavings('insights').savings}/year ({getSavings('insights').savingsPercentage}% off)
+                Save ${getSavings('growth').savings}/year
               </Typography>
             )}
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Advanced linguistics analysis for sales professionals who want to maximize every call
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
+              Scale your success with advanced analytics
             </Typography>
             
             <Divider sx={{ my: 2 }} />
             
             <List dense sx={{ flexGrow: 1 }}>
-              {pricing.insights.features.basic.map((feature, index) => (
+              {pricing.growth.features.basic.map((feature, index) => (
                 <ListItem key={index} disableGutters>
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="success" fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText primary={feature} />
+                  <ListItemText 
+                    primary={feature} 
+                    primaryTypographyProps={{ variant: 'body2' }}
+                  />
                 </ListItem>
               ))}
-              
-              {pricing.insights.features.premium.length > 0 && (
-                <>
-                  <ListItem sx={{ pt: 2 }}>
-                    <Typography variant="subtitle2" color="primary" fontWeight="bold">
-                      Premium Features:
-                    </Typography>
-                  </ListItem>
-                  
-                  {pricing.insights.features.premium.map((feature, index) => (
-                    <ListItem key={`premium-${index}`} disableGutters>
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        <StarIcon color="primary" fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={feature} 
-                        primaryTypographyProps={{ fontWeight: 'medium' }}
-                      />
-                    </ListItem>
-                  ))}
-                </>
-              )}
             </List>
             
             <Button 
@@ -366,9 +433,181 @@ const Subscribe: React.FC = () => {
                   backgroundColor: theme.palette.primary.main,
                 }
               }}
-              onClick={() => handleSubscribe('insights')}
+              onClick={() => handleSubscribe('growth')}
             >
-              Get Premium
+              Scale Up
+            </Button>
+          </Paper>
+        </Grid>
+
+        {/* Enterprise Plan */}
+        <Grid item xs={12} md={4} lg={2.4}>
+          <Paper 
+            elevation={3} 
+            sx={{ 
+              p: 3, 
+              height: '100%', 
+              display: 'flex', 
+              flexDirection: 'column',
+              borderRadius: 2,
+              backgroundColor: alpha(theme.palette.secondary.main, 0.03),
+              transition: 'transform 0.2s',
+              '&:hover': {
+                transform: 'translateY(-5px)'
+              }
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Typography variant="h5" fontWeight="bold" gutterBottom>
+                Enterprise
+              </Typography>
+              <DiamondIcon color="secondary" sx={{ ml: 1 }} />
+            </Box>
+            <Typography variant="h3" fontWeight="bold" gutterBottom>
+              ${pricing.enterprise[billingCycle]}
+              <Typography component="span" variant="body1" color="text.secondary">
+                /{billingCycle === 'monthly' ? 'mo' : 'yr'}
+              </Typography>
+            </Typography>
+            {billingCycle === 'annual' && (
+              <Typography variant="body2" color="success.main" sx={{ mb: 2 }}>
+                Save ${getSavings('enterprise').savings}/year
+              </Typography>
+            )}
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
+              Command center for market domination
+            </Typography>
+            
+            <Divider sx={{ my: 2 }} />
+            
+            <List dense sx={{ flexGrow: 1 }}>
+              {pricing.enterprise.features.basic.map((feature, index) => (
+                <ListItem key={index} disableGutters>
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <CheckCircleIcon color="success" fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary={feature} 
+                    primaryTypographyProps={{ variant: 'body2' }}
+                  />
+                </ListItem>
+              ))}
+            </List>
+            
+            <Button 
+              variant="contained" 
+              color="secondary" 
+              fullWidth 
+              sx={{ mt: 2 }}
+              onClick={() => handleSubscribe('enterprise')}
+            >
+              Go Enterprise
+            </Button>
+          </Paper>
+        </Grid>
+
+        {/* Elite Plan */}
+        <Grid item xs={12} md={4} lg={2.4}>
+          <Paper 
+            elevation={6} 
+            sx={{ 
+              p: 3, 
+              height: '100%', 
+              display: 'flex', 
+              flexDirection: 'column',
+              borderRadius: 2,
+              background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)} 0%, ${alpha(theme.palette.secondary.main, 0.1)} 100%)`,
+              border: `2px solid ${theme.palette.warning.main}`,
+              position: 'relative',
+              transition: 'transform 0.2s',
+              '&:hover': {
+                transform: 'translateY(-5px)'
+              }
+            }}
+          >
+            <Chip 
+              label="PREMIUM" 
+              color="warning" 
+              size="small" 
+              sx={{ 
+                position: 'absolute', 
+                top: -12, 
+                left: '50%', 
+                transform: 'translateX(-50%)',
+                fontWeight: 'bold'
+              }} 
+            />
+            
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Typography variant="h5" fontWeight="bold" gutterBottom>
+                Elite
+              </Typography>
+              <EmojiEventsIcon color="warning" sx={{ ml: 1 }} />
+            </Box>
+            <Typography variant="h3" fontWeight="bold" gutterBottom>
+              ${pricing.elite[billingCycle]}
+              <Typography component="span" variant="body1" color="text.secondary">
+                /{billingCycle === 'monthly' ? 'mo' : 'yr'}
+              </Typography>
+            </Typography>
+            {billingCycle === 'annual' && (
+              <Typography variant="body2" color="success.main" sx={{ mb: 2 }}>
+                Save ${getSavings('elite').savings}/year
+              </Typography>
+            )}
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
+              Your personal AI-powered sales acceleration team
+            </Typography>
+            
+            <Divider sx={{ my: 2 }} />
+            
+            <List dense sx={{ flexGrow: 1 }}>
+              {pricing.elite.features.basic.map((feature, index) => (
+                <ListItem key={index} disableGutters>
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <CheckCircleIcon color="success" fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary={feature} 
+                    primaryTypographyProps={{ variant: 'body2' }}
+                  />
+                </ListItem>
+              ))}
+              
+              {pricing.elite.features.premium.length > 0 && (
+                <>
+                  {pricing.elite.features.premium.map((feature, index) => (
+                    <ListItem key={`premium-${index}`} disableGutters>
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <EmojiEventsIcon color="warning" fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary={feature} 
+                        primaryTypographyProps={{ 
+                          fontWeight: 'medium',
+                          variant: 'body2'
+                        }}
+                      />
+                    </ListItem>
+                  ))}
+                </>
+              )}
+            </List>
+            
+            <Button 
+              variant="contained" 
+              fullWidth 
+              sx={{ 
+                mt: 2,
+                backgroundColor: theme.palette.warning.main,
+                color: theme.palette.warning.contrastText,
+                '&:hover': {
+                  backgroundColor: theme.palette.warning.dark,
+                }
+              }}
+              onClick={() => handleSubscribe('elite')}
+            >
+              Go Elite
             </Button>
           </Paper>
         </Grid>
