@@ -3,8 +3,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSUIS } from './SUISProvider';
-import { LearningPath, LearningProgress } from '../types';
-import { LearningModule } from '../../services/learningCenterService';
+import { LearningPath } from '../types';
+import { LearningModule, UserProgress } from '../../services/learningCenterService';
 import { 
   BookOpen, Award, Clock, CheckCircle, PlayCircle, 
   Lock, TrendingUp, Users, Brain, Trophy, ChevronRight,
@@ -13,7 +13,7 @@ import {
 
 interface ModuleCardProps {
   module: LearningModule;
-  progress?: LearningProgress;
+  progress?: UserProgress;
   onStart: (moduleId: string) => void;
   isLocked: boolean;
 }
@@ -21,8 +21,8 @@ interface ModuleCardProps {
 const ModuleCard: React.FC<ModuleCardProps> = ({ module, progress, onStart, isLocked }) => {
   const getStatusIcon = () => {
     if (isLocked) return <Lock className="w-5 h-5 text-gray-400" />;
-    if (progress?.completionStatus === 'completed') return <CheckCircle className="w-5 h-5 text-green-500" />;
-    if (progress?.completionStatus === 'in_progress') return <PlayCircle className="w-5 h-5 text-blue-500" />;
+    if (progress?.status === 'completed' || progress?.status === 'certified') return <CheckCircle className="w-5 h-5 text-green-500" />;
+    if (progress?.status === 'in_progress') return <PlayCircle className="w-5 h-5 text-blue-500" />;
     return <BookOpen className="w-5 h-5 text-gray-500" />;
   };
 
@@ -35,7 +35,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, progress, onStart, isLo
     }
   };
 
-  const completionPercentage = progress ? (progress.completedLessons / progress.totalLessons) * 100 : 0;
+  const completionPercentage = progress?.progress_percentage || 0;
 
   return (
     <div 
@@ -56,17 +56,17 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, progress, onStart, isLo
             {module.description}
           </p>
         </div>
-        <span className={`px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(module.difficultyLevel)}`}>
-          {module.difficultyLevel}
+        <span className={`px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(module.difficulty_level)}`}>
+          {module.difficulty_level}
         </span>
       </div>
 
       <div className="space-y-3">
         {/* Progress Bar */}
-        {progress && progress.completionStatus === 'in_progress' && (
+        {progress && progress.status === 'in_progress' && (
           <div>
             <div className="flex justify-between text-xs text-gray-500 mb-1">
-              <span>{progress.completedLessons} of {progress.totalLessons} lessons</span>
+              <span>{progress.sections_completed.length} sections completed</span>
               <span>{Math.round(completionPercentage)}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -82,11 +82,11 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, progress, onStart, isLo
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="flex items-center text-gray-600 dark:text-gray-400">
             <Clock className="w-4 h-4 mr-1" />
-            {module.estimatedDuration} min
+            {module.estimated_duration} min
           </div>
           <div className="flex items-center text-gray-600 dark:text-gray-400">
             <Award className="w-4 h-4 mr-1" />
-            {module.creditsEarned} credits
+            {module.ce_credits || 0} credits
           </div>
         </div>
 
@@ -184,7 +184,7 @@ const PathwayProgress: React.FC<PathwayProgressProps> = ({ path, totalCredits, c
 const LearningPathway: React.FC = () => {
   const { state, actions } = useSUIS();
   const [selectedPath, setSelectedPath] = useState<LearningPath | null>(null);
-  const [userProgress, setUserProgress] = useState<Map<string, LearningProgress>>(new Map());
+  const [userProgress, setUserProgress] = useState<Map<string, UserProgress>>(new Map());
   const [activeModule, setActiveModule] = useState<LearningModule | null>(null);
 
   // Mock learning paths
@@ -289,37 +289,43 @@ const LearningPathway: React.FC = () => {
 
   // Mock progress data
   useEffect(() => {
-    const mockProgress = new Map<string, LearningProgress>();
+    const mockProgress = new Map<string, UserProgress>();
     mockProgress.set('mod1', {
-      id: 'prog1',
-      userId: state.user?.id || '',
-      moduleId: 'mod1',
-      pathId: '1',
-      startedAt: new Date().toISOString(),
-      completionStatus: 'completed',
-      completedLessons: 5,
-      totalLessons: 5,
-      quizScores: [85, 90, 88],
-      timeSpent: 42,
-      lastAccessedAt: new Date().toISOString(),
-      certificateEarned: true,
-      createdAt: new Date().toISOString(),
+      user_id: state.user?.id || '',
+      module_id: 'mod1',
+      status: 'completed',
+      progress_percentage: 100,
+      time_spent: 42,
+      sections_completed: ['section1', 'section2', 'section3', 'section4', 'section5'],
+      quiz_scores: [
+        { section_id: 'quiz1', score: 85, attempts: 1, best_score: 85 },
+        { section_id: 'quiz2', score: 90, attempts: 1, best_score: 90 },
+        { section_id: 'quiz3', score: 88, attempts: 1, best_score: 88 }
+      ],
+      assessment_scores: [],
+      notes: '',
+      bookmarks: [],
+      started_at: new Date().toISOString(),
+      completed_at: new Date().toISOString(),
+      certificate_issued: new Date().toISOString(),
+      last_accessed: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     });
     mockProgress.set('mod2', {
-      id: 'prog2',
-      userId: state.user?.id || '',
-      moduleId: 'mod2',
-      pathId: '1',
-      startedAt: new Date().toISOString(),
-      completionStatus: 'in_progress',
-      completedLessons: 3,
-      totalLessons: 7,
-      quizScores: [82],
-      timeSpent: 25,
-      lastAccessedAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      user_id: state.user?.id || '',
+      module_id: 'mod2',
+      status: 'in_progress',
+      progress_percentage: Math.round((3 / 7) * 100),
+      time_spent: 25,
+      sections_completed: ['section1', 'section2', 'section3'],
+      quiz_scores: [
+        { section_id: 'quiz1', score: 82, attempts: 1, best_score: 82 }
+      ],
+      assessment_scores: [],
+      notes: '',
+      bookmarks: [],
+      started_at: new Date().toISOString(),
+      last_accessed: new Date().toISOString()
     });
     setUserProgress(mockProgress);
     setSelectedPath(learningPaths[0]);
@@ -347,9 +353,9 @@ const LearningPathway: React.FC = () => {
   const calculateTotalCredits = (): number => {
     let total = 0;
     userProgress.forEach((progress) => {
-      if (progress.completionStatus === 'completed') {
-        const module = selectedPath?.modules.find(m => m.id === progress.moduleId);
-        if (module) total += module.creditsEarned;
+      if (progress.status === 'completed' || progress.status === 'certified') {
+        const module = selectedPath?.modules.find(m => m.id === progress.module_id);
+        if (module) total += module.ce_credits || 0;
       }
     });
     return total;
@@ -358,7 +364,7 @@ const LearningPathway: React.FC = () => {
   const calculateCompletedModules = (): number => {
     let count = 0;
     userProgress.forEach((progress) => {
-      if (progress.completionStatus === 'completed') count++;
+      if (progress.status === 'completed' || progress.status === 'certified') count++;
     });
     return count;
   };
