@@ -13,16 +13,24 @@ import {
   IconButton,
   Tooltip,
   CircularProgress,
-  useTheme
+  useTheme,
+  Button,
+  Dialog
 } from '@mui/material';
 import {
   Phone as PhoneIcon,
   PhoneMissed as PhoneMissedIcon,
   Info as InfoIcon,
-  AccessTime as AccessTimeIcon
+  AccessTime as AccessTimeIcon,
+  Mic as MicIcon,
+  Upload as UploadIcon,
+  PlayArrow as PlayIcon
 } from '@mui/icons-material';
 import { fetchCallHistory } from '../../services/twilio/twilioService';
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
+import { geminiService } from '../../services/ai/geminiService';
+import { ExternalRecordingUpload } from './ExternalRecordingUpload';
+import { supabase } from '../../services/supabase/supabase';
 
 interface CallHistoryProps {
   contactId: string;
@@ -35,8 +43,8 @@ interface CallActivity {
   user_id: string;
   type: string;
   date: string;
-  call_sid: string;
-  call_status: string;
+  call_sid?: string;
+  call_status?: string;
   call_duration?: number;
   notes?: string;
   details?: {
@@ -45,6 +53,12 @@ interface CallActivity {
   };
   created_at: string;
   updated_at: string;
+  // External recording fields
+  source?: 'twilio' | 'plaud' | 'manual' | 'other';
+  file_name?: string;
+  transcription?: string;
+  analysis_results?: any;
+  storage_path?: string;
 }
 
 const CallHistory: React.FC<CallHistoryProps> = ({ contactId }) => {
@@ -52,20 +66,56 @@ const CallHistory: React.FC<CallHistoryProps> = ({ contactId }) => {
   const [callActivities, setCallActivities] = useState<CallActivity[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [selectedRecording, setSelectedRecording] = useState<CallActivity | null>(null);
 
   useEffect(() => {
     const loadCallHistory = async () => {
       try {
         setLoading(true);
-        const { data, error } = await fetchCallHistory(contactId);
         
-        if (error) {
-          throw error;
+        // Load both Twilio call history and external recordings
+        const [twilioResult, externalResult] = await Promise.all([
+          fetchCallHistory(contactId),
+          geminiService.getExternalRecordingsForContact(contactId)
+        ]);
+        
+        const allActivities: CallActivity[] = [];
+        
+        // Add Twilio calls
+        if (twilioResult.data) {
+          allActivities.push(...twilioResult.data.map((call: any) => ({
+            ...call,
+            source: 'twilio' as const
+          })));
         }
         
-        if (data) {
-          setCallActivities(data);
+        // Add external recordings
+        if (externalResult.success && externalResult.data) {
+          allActivities.push(...externalResult.data.map((recording: any) => ({
+            id: recording.id,
+            contact_id: recording.contact_id,
+            practice_id: recording.practice_id,
+            user_id: recording.user_id,
+            type: 'external_recording',
+            date: recording.created_at,
+            call_status: 'completed',
+            call_duration: recording.duration,
+            notes: recording.external_id || recording.file_name,
+            created_at: recording.created_at,
+            updated_at: recording.updated_at,
+            source: recording.source,
+            file_name: recording.file_name,
+            transcription: recording.transcription,
+            analysis_results: recording.analysis_results,
+            storage_path: recording.storage_path
+          })));
         }
+        
+        // Sort by date (newest first)
+        allActivities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        
+        setCallActivities(allActivities);
       } catch (err) {
         console.error('Error loading call history:', err);
         setError('Failed to load call history');
@@ -85,8 +135,21 @@ const CallHistory: React.FC<CallHistoryProps> = ({ contactId }) => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Get source icon
+  const getSourceIcon = (source?: string) => {
+    switch (source) {
+      case 'plaud':
+        return <MicIcon fontSize="small" />;
+      case 'manual':
+      case 'other':
+        return <UploadIcon fontSize="small" />;
+      default:
+        return <PhoneIcon fontSize="small" />;
+    }
+  };
+
   // Get status color based on call status
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status?: string) => {
     switch (status) {
       case 'completed':
         return theme.palette.success.main;
@@ -106,7 +169,7 @@ const CallHistory: React.FC<CallHistoryProps> = ({ contactId }) => {
   };
 
   // Get status icon based on call status
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status?: string) => {
     switch (status) {
       case 'completed':
         return <PhoneIcon fontSize="small" />;
