@@ -1,6 +1,8 @@
-# Sphere oS
+# Sphere oS CRM
 
 A visually stunning and comprehensive CRM specifically designed for medical sales representatives in the aesthetic and dental industries.
+
+🚀 **Live at**: [crm.repspheres.com](https://crm.repspheres.com)
 
 ## Overview
 
@@ -15,7 +17,8 @@ RepSpheres CRM combines an intuitive, space-themed interface with powerful indus
 - **Procedure Knowledge Base**: Detailed information on dental and aesthetic procedures
 - **Companies Database**: Comprehensive directory of industry vendors and manufacturers
 - **Sales Performance Tracking**: Monitor goals, achievements, and activities
-- **Stripe Billing**: Simple monthly membership payments
+- **Stripe Billing**: Flexible subscription tiers with monthly and annual options
+- **Live Payment Processing**: Production-ready Stripe integration
 
 ## Tech Stack
 
@@ -23,9 +26,10 @@ RepSpheres CRM combines an intuitive, space-themed interface with powerful indus
 - **Backend**: Supabase (PostgreSQL)
 - **State Management**: React Context API
 - **Styling**: CSS-in-JS with Material UI
-- **Data Visualization**: Recharts (coming soon)
-- **Authentication**: Supabase Auth (coming soon)
-- **Hosting**: GitHub Pages (planned)
+- **Data Visualization**: Recharts
+- **Authentication**: Supabase Auth
+- **Payment Processing**: Stripe with Netlify Functions
+- **Hosting**: Netlify with custom domain (crm.repspheres.com)
 
 ## Project Structure
 
@@ -82,11 +86,19 @@ RepSpheres CRM combines an intuitive, space-themed interface with powerful indus
    SUPABASE_DB_NAME=postgres
    SUPABASE_DB_USER=postgres
    SUPABASE_DB_PASSWORD=your_db_password_here
+   
+   # Stripe Configuration
    STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key_here
    STRIPE_SECRET_KEY=your_stripe_secret_key_here
-   STRIPE_PRICE_ID=your_stripe_price_id_here
+   STRIPE_PRICE_ID_PROFESSIONAL_MONTHLY=your_price_id_here
+   STRIPE_PRICE_ID_PROFESSIONAL_ANNUAL=your_price_id_here
+   STRIPE_PRICE_ID_INSIGHTS_MONTHLY=your_price_id_here
+   STRIPE_PRICE_ID_INSIGHTS_ANNUAL=your_price_id_here
    STRIPE_SUCCESS_URL=http://localhost:3000/subscribe/success
    STRIPE_CANCEL_URL=http://localhost:3000/subscribe/cancel
+   
+   # OpenRouter API (for AI features)
+   REACT_APP_OPENROUTER_API_KEY=your_openrouter_api_key_here
    ```
    The database values can be found in your Supabase dashboard under **Settings → Database → Connection Info**.
 
@@ -119,21 +131,43 @@ RepSpheres CRM uses Supabase as a backend. The database schema includes:
 
 Import the schema from `supabase/schema.sql` to set up your database structure.
 
+## Subscription Tiers
+
+### Professional Tier
+- Full CRM access
+- Contact and practice management
+- Basic analytics
+- Email support
+- Monthly: $49/month | Annual: $470/year (save $118)
+
+### Insights Tier
+- Everything in Professional
+- AI-powered call analysis
+- Advanced analytics
+- Market intelligence
+- Priority support
+- Monthly: $99/month | Annual: $950/year (save $238)
+
+### Enterprise
+- Custom pricing
+- Dedicated support
+- Custom integrations
+- Team management
+- Contact sales
+
 ## Development Roadmap
 
 - [x] Initial UI framework
 - [x] Dashboard design and implementation
 - [x] Supabase database schema
 - [x] Data models and service layer
-- [ ] Authentication and user management
-- [ ] Contacts and practices CRUD operations
-- [ ] Procedures knowledge base
-- [ ] Companies database
-- [ ] Task management
-- [ ] Sales activity tracking
-- [ ] Reporting and analytics
-- [ ] AI-powered features
+- [x] Stripe payment integration
+- [x] Subscription management
+- [x] AI-powered features with OpenRouter
+- [ ] Enhanced authentication
+- [ ] Team collaboration features
 - [ ] Mobile optimization
+- [ ] Advanced reporting
 
 ## License
 
