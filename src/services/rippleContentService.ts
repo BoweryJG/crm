@@ -1,22 +1,22 @@
-// Spark Content Service - Intelligent Content Delivery System with Advanced Tracking
-// Create "Sparks" - trackable, personalized content experiences that notify you when prospects engage
+// Ripple Content Service - Intelligent Content Delivery System with Advanced Tracking
+// Create "Ripples" - trackable, personalized content experiences that notify you when prospects engage
 import { supabase } from './supabase/supabase';
 import { contentGeneratorService } from './contentGeneratorService';
 
-// Spark Content Types
-export interface SparkContent {
+// Ripple Content Types
+export interface RippleContent {
   id: string;
   user_id: string;
   content_id: string; // References generated_sales_content
-  spark_id: string;
-  spark_token: string;
+  ripple_id: string;
+  ripple_token: string;
   recipient_email?: string;
   recipient_name?: string;
   practice_name?: string;
   content_type: string;
   subject_line?: string;
   personalized_content: any;
-  spark_analytics: {
+  ripple_analytics: {
     opens: number;
     unique_opens: number;
     time_spent: number;
@@ -50,13 +50,13 @@ export interface SparkContent {
     interest_signals: string[];
     buying_stage?: 'awareness' | 'consideration' | 'decision' | 'purchase';
   };
-  spark_status: 'draft' | 'active' | 'viewed' | 'engaged' | 'blazing' | 'converted' | 'expired';
+  ripple_status: 'draft' | 'active' | 'viewed' | 'engaged' | 'blazing' | 'converted' | 'expired';
   created_at: string;
   updated_at: string;
 }
 
-export interface SparkDeliveryOptions {
-  delivery_method: 'spark' | 'email_spark' | 'multi_channel';
+export interface RippleDeliveryOptions {
+  delivery_method: 'ripple' | 'email_ripple' | 'multi_channel';
   personalization_level: 'ultra' | 'high' | 'standard';
   tracking_depth: 'comprehensive' | 'standard' | 'basic';
   ai_enhancement: boolean;
@@ -67,10 +67,10 @@ export interface SparkDeliveryOptions {
   device_optimization?: boolean;
 }
 
-export interface SparkViewer {
+export interface RippleViewer {
   content: any;
   practice_context: any;
-  spark_experience: {
+  ripple_experience: {
     personalized_greeting?: string;
     dynamic_content_blocks: any[];
     interactive_elements: any[];
@@ -87,8 +87,8 @@ export interface SparkViewer {
   };
 }
 
-export interface SparkEngagement {
-  spark_id: string;
+export interface RippleEngagement {
+  ripple_id: string;
   engagement_type: 'view' | 'deep_read' | 'interaction' | 'share' | 'conversion' | 'blazing_interest';
   engagement_depth: number; // 0-100 score
   session_data: {
@@ -108,12 +108,12 @@ export interface SparkEngagement {
   };
 }
 
-class SparkContentService {
-  // Create a Spark from generated content
-  async createSpark(
+class RippleContentService {
+  // Create a Ripple from generated content
+  async createRipple(
     userId: string,
     contentId: string,
-    deliveryOptions: SparkDeliveryOptions,
+    deliveryOptions: RippleDeliveryOptions,
     recipientInfo?: {
       email?: string;
       name?: string;
@@ -121,7 +121,7 @@ class SparkContentService {
       specialty?: string;
       known_interests?: string[];
     }
-  ): Promise<SparkContent> {
+  ): Promise<RippleContent> {
     try {
       // Get the generated content
       const { data: content, error: contentError } = await supabase
@@ -134,24 +134,24 @@ class SparkContentService {
         throw new Error('Content not found');
       }
 
-      // Generate unique spark token
-      const sparkToken = this.generateSparkToken();
+      // Generate unique ripple token
+      const rippleToken = this.generateRippleToken();
       
-      // Create spark entry in magic_links table (reusing existing infrastructure)
-      const sparkData = {
+      // Create ripple entry in magic_links table (reusing existing infrastructure)
+      const rippleData = {
         user_id: userId,
-        link_type: 'spark_content',
-        link_token: sparkToken,
+        link_type: 'ripple_content',
+        link_token: rippleToken,
         target_data: {
           content_id: contentId,
           content_type: content.content_type,
           practice_context: content.target_practice,
-          spark_version: '2.0'
+          ripple_version: '2.0'
         },
         access_config: {
           expires_at: deliveryOptions.expires_in_days ? 
             new Date(Date.now() + deliveryOptions.expires_in_days * 24 * 60 * 60 * 1000).toISOString() : null,
-          max_views: null, // Unlimited views for Sparks
+          max_views: null, // Unlimited views for Ripples
           require_authentication: false,
           collect_analytics: deliveryOptions.tracking_depth === 'comprehensive'
         },
@@ -159,13 +159,13 @@ class SparkContentService {
         status: 'active'
       };
 
-      const { data: spark, error: sparkError } = await supabase
+      const { data: ripple, error: rippleError } = await supabase
         .from('magic_links')
-        .insert([sparkData])
+        .insert([rippleData])
         .select()
         .single();
 
-      if (sparkError) throw sparkError;
+      if (rippleError) throw rippleError;
 
       // Create AI-enhanced personalized content
       const personalizedContent = await this.createAIEnhancedContent(
@@ -174,19 +174,19 @@ class SparkContentService {
         deliveryOptions
       );
 
-      // Create spark content record
-      const sparkContentData = {
+      // Create ripple content record
+      const rippleContentData = {
         user_id: userId,
         content_id: contentId,
-        spark_id: spark.id,
-        spark_token: sparkToken,
+        ripple_id: ripple.id,
+        ripple_token: rippleToken,
         recipient_email: recipientInfo?.email,
         recipient_name: recipientInfo?.name,
         practice_name: recipientInfo?.practice_name,
         content_type: content.content_type,
         subject_line: content.generated_content.subject_line,
         personalized_content: personalizedContent,
-        spark_analytics: {
+        ripple_analytics: {
           opens: 0,
           unique_opens: 0,
           time_spent: 0,
@@ -198,7 +198,7 @@ class SparkContentService {
           scroll_depth: 0
         },
         ripple_config: {
-          expires_at: sparkData.access_config.expires_at,
+          expires_at: rippleData.access_config.expires_at,
           require_contact_info: false,
           enable_deep_analytics: deliveryOptions.tracking_depth === 'comprehensive',
           custom_branding: true,
@@ -213,61 +213,61 @@ class SparkContentService {
           interest_signals: [],
           buying_stage: 'awareness' as const
         },
-        spark_status: 'active' as const
+        ripple_status: 'active' as const
       };
 
-      const { data: sparkContent, error } = await supabase
-        .from('spark_content')
-        .insert([sparkContentData])
+      const { data: rippleContent, error } = await supabase
+        .from('ripple_content')
+        .insert([rippleContentData])
         .select()
         .single();
 
       if (error) throw error;
 
-      return sparkContent;
+      return rippleContent;
     } catch (error) {
-      console.error('Error creating spark:', error);
+      console.error('Error creating ripple:', error);
       throw error;
     }
   }
 
-  // Send Spark via preferred channel
-  async sendSpark(
-    sparkId: string,
+  // Send Ripple via preferred channel
+  async sendRipple(
+    rippleId: string,
     channel: 'email' | 'sms' | 'direct' = 'email',
     customMessage?: string
-  ): Promise<{ success: boolean; spark_url?: string; tracking_id?: string }> {
+  ): Promise<{ success: boolean; ripple_url?: string; tracking_id?: string }> {
     try {
-      const { data: sparkContent, error } = await supabase
-        .from('spark_content')
+      const { data: rippleContent, error } = await supabase
+        .from('ripple_content')
         .select('*')
-        .eq('id', sparkId)
+        .eq('id', rippleId)
         .single();
 
-      if (error || !sparkContent) {
-        throw new Error('Spark not found');
+      if (error || !rippleContent) {
+        throw new Error('Ripple not found');
       }
 
-      const sparkUrl = `${window.location.origin}/spark/${sparkContent.spark_token}`;
+      const rippleUrl = `${window.location.origin}/ripple/${rippleContent.ripple_token}`;
 
-      if (channel === 'email' && sparkContent.recipient_email) {
-        await this.sendSparkEmail(sparkContent, sparkUrl, customMessage);
+      if (channel === 'email' && rippleContent.recipient_email) {
+        await this.sendRippleEmail(rippleContent, rippleUrl, customMessage);
       }
 
       // Create tracking ID for this send
       const trackingId = this.generateTrackingId();
 
-      // Update spark status
+      // Update ripple status
       await supabase
-        .from('spark_content')
+        .from('ripple_content')
         .update({ 
-          spark_status: 'active',
+          ripple_status: 'active',
           updated_at: new Date().toISOString()
         })
-        .eq('id', sparkId);
+        .eq('id', rippleId);
 
-      // Track the spark send event
-      await this.trackSparkEvent(sparkId, 'sent', {
+      // Track the ripple send event
+      await this.trackRippleEvent(rippleId, 'sent', {
         channel,
         tracking_id: trackingId,
         sent_at: new Date().toISOString()
@@ -275,20 +275,20 @@ class SparkContentService {
 
       return {
         success: true,
-        spark_url: sparkUrl,
+        ripple_url: rippleUrl,
         tracking_id: trackingId
       };
     } catch (error) {
-      console.error('Error sending spark:', error);
+      console.error('Error sending ripple:', error);
       return { success: false };
     }
   }
 
-  // Get Spark viewer experience
-  async getSparkViewer(sparkToken: string): Promise<SparkViewer | null> {
+  // Get Ripple viewer experience
+  async getRippleViewer(rippleToken: string): Promise<RippleViewer | null> {
     try {
-      const { data: sparkContent, error } = await supabase
-        .from('spark_content')
+      const { data: rippleContent, error } = await supabase
+        .from('ripple_content')
         .select(`
           *,
           generated_sales_content (
@@ -297,61 +297,61 @@ class SparkContentService {
             customization_data
           )
         `)
-        .eq('spark_token', sparkToken)
+        .eq('ripple_token', rippleToken)
         .single();
 
-      if (error || !sparkContent) {
+      if (error || !rippleContent) {
         return null;
       }
 
-      // Check if spark is expired
-      if (sparkContent.spark_config.expires_at && 
-          new Date() > new Date(sparkContent.spark_config.expires_at)) {
-        await this.updateSparkStatus(sparkContent.id, 'expired');
+      // Check if ripple is expired
+      if (rippleContent.ripple_config.expires_at && 
+          new Date() > new Date(rippleContent.ripple_config.expires_at)) {
+        await this.updateRippleStatus(rippleContent.id, 'expired');
         return null;
       }
 
       // Track the view with advanced analytics
-      await this.trackSparkView(sparkContent.id, sparkToken);
+      await this.trackRippleView(rippleContent.id, rippleToken);
 
       // Build personalized viewer experience
-      const viewer: SparkViewer = {
-        content: sparkContent.personalized_content,
-        practice_context: sparkContent.generated_sales_content.target_practice,
-        spark_experience: await this.buildSparkExperience(sparkContent),
+      const viewer: RippleViewer = {
+        content: rippleContent.personalized_content,
+        practice_context: rippleContent.generated_sales_content.target_practice,
+        ripple_experience: await this.buildRippleExperience(rippleContent),
         tracking_config: {
-          track_everything: sparkContent.spark_config.enable_deep_analytics || false,
-          session_recording: sparkContent.spark_config.enable_deep_analytics || false,
+          track_everything: rippleContent.ripple_config.enable_deep_analytics || false,
+          session_recording: rippleContent.ripple_config.enable_deep_analytics || false,
           interaction_analytics: true,
-          sentiment_analysis: sparkContent.spark_config.ai_personalization || false,
-          attention_tracking: sparkContent.spark_config.enable_deep_analytics || false
+          sentiment_analysis: rippleContent.ripple_config.ai_personalization || false,
+          attention_tracking: rippleContent.ripple_config.enable_deep_analytics || false
         }
       };
 
       return viewer;
     } catch (error) {
-      console.error('Error getting spark viewer:', error);
+      console.error('Error getting ripple viewer:', error);
       return null;
     }
   }
 
-  // Track Spark engagement with deep analytics
-  async trackSparkEngagement(
-    sparkToken: string,
-    engagement: Partial<SparkEngagement>
+  // Track Ripple engagement with deep analytics
+  async trackRippleEngagement(
+    rippleToken: string,
+    engagement: Partial<RippleEngagement>
   ): Promise<void> {
     try {
-      const { data: sparkContent } = await supabase
-        .from('spark_content')
-        .select('id, spark_analytics, performance_data')
-        .eq('spark_token', sparkToken)
+      const { data: rippleContent } = await supabase
+        .from('ripple_content')
+        .select('id, ripple_analytics, performance_data')
+        .eq('ripple_token', rippleToken)
         .single();
 
-      if (!sparkContent) return;
+      if (!rippleContent) return;
 
-      // Update spark analytics with sophisticated tracking
-      const updatedAnalytics = this.updateSparkAnalytics(
-        sparkContent.spark_analytics,
+      // Update ripple analytics with sophisticated tracking
+      const updatedAnalytics = this.updateRippleAnalytics(
+        rippleContent.ripple_analytics,
         engagement
       );
 
@@ -361,48 +361,48 @@ class SparkContentService {
       const interestSignals = this.detectInterestSignals(engagement);
       const buyingStage = this.determineBuyingStage(updatedAnalytics, engagement);
 
-      // Update spark with new analytics
+      // Update ripple with new analytics
       await supabase
-        .from('spark_content')
+        .from('ripple_content')
         .update({
-          spark_analytics: updatedAnalytics,
+          ripple_analytics: updatedAnalytics,
           performance_data: {
-            ...sparkContent.performance_data,
+            ...rippleContent.performance_data,
             engagement_quality: engagementQuality,
             lead_temperature: leadTemperature,
             interest_signals: interestSignals,
             buying_stage: buyingStage,
             conversion_score: this.calculateConversionScore(updatedAnalytics, engagement)
           },
-          spark_status: this.determineSparkStatus(engagement, leadTemperature),
+          ripple_status: this.determineRippleStatus(engagement, leadTemperature),
           updated_at: new Date().toISOString()
         })
-        .eq('id', sparkContent.id);
+        .eq('id', rippleContent.id);
 
       // Track detailed engagement event
-      await this.trackSparkEvent(sparkContent.id, engagement.engagement_type || 'interaction', {
+      await this.trackRippleEvent(rippleContent.id, engagement.engagement_type || 'interaction', {
         ...engagement,
         analytics_snapshot: updatedAnalytics
       });
 
       // Trigger notifications for significant engagement
       if (this.isSignificantEngagement(engagement, leadTemperature)) {
-        await this.triggerEngagementNotification(sparkContent.id, engagement, leadTemperature);
+        await this.triggerEngagementNotification(rippleContent.id, engagement, leadTemperature);
       }
 
     } catch (error) {
-      console.error('Error tracking spark engagement:', error);
+      console.error('Error tracking ripple engagement:', error);
     }
   }
 
-  // Get Spark analytics dashboard
-  async getSparkAnalytics(userId: string, timeframe: 'day' | 'week' | 'month' = 'week'): Promise<any> {
+  // Get Ripple analytics dashboard
+  async getRippleAnalytics(userId: string, timeframe: 'day' | 'week' | 'month' = 'week'): Promise<any> {
     try {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - (timeframe === 'day' ? 1 : timeframe === 'week' ? 7 : 30));
 
       const { data, error } = await supabase
-        .from('spark_content')
+        .from('ripple_content')
         .select('*')
         .eq('user_id', userId)
         .gte('created_at', startDate.toISOString());
@@ -415,37 +415,37 @@ class SparkContentService {
 
       const analytics = {
         total_sparks: data.length,
-        total_views: data.reduce((sum, item) => sum + item.spark_analytics.opens, 0),
-        unique_viewers: data.reduce((sum, item) => sum + item.spark_analytics.unique_opens, 0),
+        total_views: data.reduce((sum, item) => sum + item.ripple_analytics.opens, 0),
+        unique_viewers: data.reduce((sum, item) => sum + item.ripple_analytics.unique_opens, 0),
         blazing_leads: data.filter(item => item.performance_data.lead_temperature === 'blazing').length,
         hot_leads: data.filter(item => item.performance_data.lead_temperature === 'hot').length,
-        conversions: data.filter(item => item.spark_status === 'converted').length,
+        conversions: data.filter(item => item.ripple_status === 'converted').length,
         avg_engagement_score: this.calculateAverageEngagement(data),
-        top_performing_sparks: this.getTopPerformingSparks(data),
+        top_performing_sparks: this.getTopPerformingRipples(data),
         engagement_heatmap: this.generateEngagementHeatmap(data),
         conversion_funnel: this.calculateConversionFunnel(data),
         interest_insights: this.aggregateInterestSignals(data),
         spark_performance: {
-          open_rate: data.filter(d => d.spark_analytics.opens > 0).length / data.length * 100,
-          engagement_rate: data.filter(d => d.spark_status === 'engaged' || d.spark_status === 'blazing').length / data.length * 100,
-          conversion_rate: data.filter(d => d.spark_status === 'converted').length / data.length * 100,
-          avg_time_spent: data.reduce((sum, item) => sum + item.spark_analytics.time_spent, 0) / data.length,
+          open_rate: data.filter(d => d.ripple_analytics.opens > 0).length / data.length * 100,
+          engagement_rate: data.filter(d => d.ripple_status === 'engaged' || d.ripple_status === 'blazing').length / data.length * 100,
+          conversion_rate: data.filter(d => d.ripple_status === 'converted').length / data.length * 100,
+          avg_time_spent: data.reduce((sum, item) => sum + item.ripple_analytics.time_spent, 0) / data.length,
           viral_coefficient: this.calculateViralCoefficient(data)
         }
       };
 
       return analytics;
     } catch (error) {
-      console.error('Error getting spark analytics:', error);
+      console.error('Error getting ripple analytics:', error);
       return this.getEmptyAnalytics();
     }
   }
 
-  // Get user's Spark content
-  async getUserSparks(userId: string): Promise<SparkContent[]> {
+  // Get user's Ripple content
+  async getUserRipples(userId: string): Promise<RippleContent[]> {
     try {
       const { data, error } = await supabase
-        .from('spark_content')
+        .from('ripple_content')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
@@ -459,7 +459,7 @@ class SparkContentService {
   }
 
   // Private helper methods
-  private generateSparkToken(): string {
+  private generateRippleToken(): string {
     return 'spk_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
   }
 
@@ -470,7 +470,7 @@ class SparkContentService {
   private async createAIEnhancedContent(
     content: any,
     recipientInfo?: any,
-    deliveryOptions?: SparkDeliveryOptions
+    deliveryOptions?: RippleDeliveryOptions
   ): Promise<any> {
     const enhanced = { ...content.generated_content };
 
@@ -484,8 +484,8 @@ class SparkContentService {
         urgency_triggers: this.createUrgencyTriggers(content.content_type)
       };
 
-      // Add interactive Spark elements
-      enhanced.spark_interactions = {
+      // Add interactive Ripple elements
+      enhanced.ripple_interactions = {
         polls: this.generateInteractivePolls(content.content_type),
         calculators: this.createROICalculators(content.target_practice.procedures),
         comparison_tools: this.buildComparisonWidgets(recipientInfo.specialty),
@@ -505,30 +505,30 @@ class SparkContentService {
     return enhanced;
   }
 
-  private async sendSparkEmail(
-    sparkContent: any,
+  private async sendRippleEmail(
+    rippleContent: any,
     sparkUrl: string,
     customMessage?: string
   ): Promise<void> {
     // Email sending implementation
-    console.log('Sending Spark email:', {
-      to: sparkContent.recipient_email,
-      subject: `💥 ${sparkContent.subject_line}`,
-      spark_url: sparkUrl,
+    console.log('Sending Ripple email:', {
+      to: rippleContent.recipient_email,
+      subject: `💥 ${rippleContent.subject_line}`,
+      ripple_url: rippleUrl,
       custom_message: customMessage
     });
   }
 
-  private async trackSparkView(sparkId: string, sparkToken: string): Promise<void> {
+  private async trackRippleView(rippleId: string, rippleToken: string): Promise<void> {
     // Increment view count and track unique views
-    const { data: spark } = await supabase
-      .from('spark_content')
-      .select('spark_analytics')
-      .eq('id', sparkId)
+    const { data: ripple } = await supabase
+      .from('ripple_content')
+      .select('ripple_analytics')
+      .eq('id', rippleId)
       .single();
 
-    if (spark) {
-      const analytics = spark.spark_analytics;
+    if (ripple) {
+      const analytics = ripple.ripple_analytics;
       analytics.opens += 1;
       
       // Track unique opens (simplified - in production would use visitor fingerprinting)
@@ -540,63 +540,63 @@ class SparkContentService {
       analytics.last_viewed = new Date().toISOString();
 
       await supabase
-        .from('spark_content')
+        .from('ripple_content')
         .update({ 
-          spark_analytics: analytics,
-          spark_status: analytics.opens === 1 ? 'viewed' : spark.spark_status
+          ripple_analytics: analytics,
+          ripple_status: analytics.opens === 1 ? 'viewed' : ripple.ripple_status
         })
-        .eq('id', sparkId);
+        .eq('id', rippleId);
     }
   }
 
-  private async trackSparkEvent(
-    sparkId: string,
+  private async trackRippleEvent(
+    rippleId: string,
     eventType: string,
     eventData: any
   ): Promise<void> {
     try {
       await supabase
-        .from('spark_engagement_events')
+        .from('ripple_engagement_events')
         .insert([{
-          spark_id: sparkId,
+          ripple_id: rippleId,
           event_type: eventType,
           event_data: eventData,
           timestamp: new Date().toISOString()
         }]);
     } catch (error) {
-      console.error('Error tracking spark event:', error);
+      console.error('Error tracking ripple event:', error);
     }
   }
 
-  private async buildSparkExperience(sparkContent: any): Promise<any> {
+  private async buildRippleExperience(rippleContent: any): Promise<any> {
     return {
-      personalized_greeting: this.generatePersonalizedGreeting(sparkContent),
+      personalized_greeting: this.generatePersonalizedGreeting(rippleContent),
       dynamic_content_blocks: [
         {
           type: 'hero',
-          content: sparkContent.personalized_content.content_body,
+          content: rippleContent.personalized_content.content_body,
           animation: 'fade-in'
         },
         {
           type: 'value_props',
-          content: this.createValuePropBlocks(sparkContent),
+          content: this.createValuePropBlocks(rippleContent),
           layout: 'grid'
         },
         {
           type: 'social_proof',
-          content: this.generateSocialProofSection(sparkContent.generated_sales_content?.target_practice?.specialty)
+          content: this.generateSocialProofSection(rippleContent.generated_sales_content?.target_practice?.specialty)
         }
       ],
-      interactive_elements: this.createInteractiveElements(sparkContent),
-      smart_ctas: this.generateSmartCTAs(sparkContent),
+      interactive_elements: this.createInteractiveElements(rippleContent),
+      smart_ctas: this.generateSmartCTAs(rippleContent),
       social_proof_widgets: this.createSocialProofWidgets(),
       urgency_indicators: this.createUrgencyIndicators()
     };
   }
 
-  private updateSparkAnalytics(
+  private updateRippleAnalytics(
     currentAnalytics: any,
-    engagement: Partial<SparkEngagement>
+    engagement: Partial<RippleEngagement>
   ): any {
     const updated = { ...currentAnalytics };
 
@@ -632,7 +632,7 @@ class SparkContentService {
 
   private calculateEngagementQuality(
     analytics: any,
-    engagement: Partial<SparkEngagement>
+    engagement: Partial<RippleEngagement>
   ): 'exceptional' | 'high' | 'medium' | 'low' {
     const score = analytics.engagement_score;
     const depth = engagement.engagement_depth || 0;
@@ -645,7 +645,7 @@ class SparkContentService {
 
   private calculateLeadTemperature(
     analytics: any,
-    engagement: Partial<SparkEngagement>
+    engagement: Partial<RippleEngagement>
   ): 'blazing' | 'hot' | 'warm' | 'cold' {
     const insights = engagement.prospect_insights;
     
@@ -655,7 +655,7 @@ class SparkContentService {
     return 'cold';
   }
 
-  private detectInterestSignals(engagement: Partial<SparkEngagement>): string[] {
+  private detectInterestSignals(engagement: Partial<RippleEngagement>): string[] {
     const signals = [];
     
     if (engagement.session_data?.return_visit) signals.push('repeat_visitor');
@@ -671,7 +671,7 @@ class SparkContentService {
 
   private determineBuyingStage(
     analytics: any,
-    engagement: Partial<SparkEngagement>
+    engagement: Partial<RippleEngagement>
   ): 'awareness' | 'consideration' | 'decision' | 'purchase' {
     if (analytics.conversions > 0) return 'purchase';
     if (analytics.engagement_score > 70 || engagement.engagement_depth > 70) return 'decision';
@@ -681,7 +681,7 @@ class SparkContentService {
 
   private calculateConversionScore(
     analytics: any,
-    engagement: Partial<SparkEngagement>
+    engagement: Partial<RippleEngagement>
   ): number {
     let score = analytics.engagement_score;
     
@@ -699,10 +699,10 @@ class SparkContentService {
     return Math.min(100, score);
   }
 
-  private determineSparkStatus(
-    engagement: Partial<SparkEngagement>,
+  private determineRippleStatus(
+    engagement: Partial<RippleEngagement>,
     temperature: string
-  ): SparkContent['spark_status'] {
+  ): RippleContent['ripple_status'] {
     if (engagement.engagement_type === 'conversion') return 'converted';
     if (temperature === 'blazing') return 'blazing';
     if (engagement.engagement_depth > 50) return 'engaged';
@@ -710,7 +710,7 @@ class SparkContentService {
   }
 
   private isSignificantEngagement(
-    engagement: Partial<SparkEngagement>,
+    engagement: Partial<RippleEngagement>,
     temperature: string
   ): boolean {
     return temperature === 'blazing' || 
@@ -721,26 +721,26 @@ class SparkContentService {
   }
 
   private async triggerEngagementNotification(
-    sparkId: string,
-    engagement: Partial<SparkEngagement>,
+    rippleId: string,
+    engagement: Partial<RippleEngagement>,
     temperature: string
   ): Promise<void> {
     // This would integrate with the notification service
-    console.log('Triggering Spark notification:', { sparkId, engagement, temperature });
+    console.log('Triggering Ripple notification:', { rippleId, engagement, temperature });
   }
 
-  private updateSparkStatus(sparkId: string, status: SparkContent['spark_status']): Promise<void> {
+  private updateRippleStatus(rippleId: string, status: RippleContent['ripple_status']): Promise<void> {
     return supabase
-      .from('spark_content')
-      .update({ spark_status: status, updated_at: new Date().toISOString() })
-      .eq('id', sparkId)
+      .from('ripple_content')
+      .update({ ripple_status: status, updated_at: new Date().toISOString() })
+      .eq('id', rippleId)
       .then(() => {});
   }
 
   // Analytics helper methods
   private getEmptyAnalytics(): any {
     return {
-      total_sparks: 0,
+      total_ripples: 0,
       total_views: 0,
       unique_viewers: 0,
       blazing_leads: 0,
@@ -761,25 +761,25 @@ class SparkContentService {
     };
   }
 
-  private calculateAverageEngagement(sparks: SparkContent[]): number {
+  private calculateAverageEngagement(sparks: RippleContent[]): number {
     if (sparks.length === 0) return 0;
-    return sparks.reduce((sum, s) => sum + s.spark_analytics.engagement_score, 0) / sparks.length;
+    return sparks.reduce((sum, s) => sum + s.ripple_analytics.engagement_score, 0) / sparks.length;
   }
 
-  private getTopPerformingSparks(sparks: SparkContent[]): any[] {
+  private getTopPerformingRipples(sparks: RippleContent[]): any[] {
     return sparks
-      .sort((a, b) => b.spark_analytics.engagement_score - a.spark_analytics.engagement_score)
+      .sort((a, b) => b.ripple_analytics.engagement_score - a.ripple_analytics.engagement_score)
       .slice(0, 5)
       .map(s => ({
         id: s.id,
         subject: s.subject_line,
-        engagement_score: s.spark_analytics.engagement_score,
+        engagement_score: s.ripple_analytics.engagement_score,
         lead_temperature: s.performance_data.lead_temperature,
-        conversions: s.spark_analytics.conversions
+        conversions: s.ripple_analytics.conversions
       }));
   }
 
-  private generateEngagementHeatmap(sparks: SparkContent[]): any {
+  private generateEngagementHeatmap(sparks: RippleContent[]): any {
     // Generate heatmap data for visualization
     return {
       hourly_engagement: this.calculateHourlyEngagement(sparks),
@@ -788,11 +788,11 @@ class SparkContentService {
     };
   }
 
-  private calculateConversionFunnel(sparks: SparkContent[]): any {
+  private calculateConversionFunnel(sparks: RippleContent[]): any {
     const total = sparks.length;
-    const viewed = sparks.filter(s => s.spark_analytics.opens > 0).length;
-    const engaged = sparks.filter(s => s.spark_status === 'engaged' || s.spark_status === 'blazing').length;
-    const converted = sparks.filter(s => s.spark_status === 'converted').length;
+    const viewed = sparks.filter(s => s.ripple_analytics.opens > 0).length;
+    const engaged = sparks.filter(s => s.ripple_status === 'engaged' || s.ripple_status === 'blazing').length;
+    const converted = sparks.filter(s => s.ripple_status === 'converted').length;
 
     return {
       sent: total,
@@ -803,7 +803,7 @@ class SparkContentService {
     };
   }
 
-  private aggregateInterestSignals(sparks: SparkContent[]): any {
+  private aggregateInterestSignals(sparks: RippleContent[]): any {
     const allSignals = sparks.flatMap(s => s.performance_data.interest_signals);
     const signalCounts = allSignals.reduce((acc, signal) => {
       acc[signal] = (acc[signal] || 0) + 1;
@@ -816,9 +816,9 @@ class SparkContentService {
       .map(([signal, count]) => ({ signal, count }));
   }
 
-  private calculateViralCoefficient(sparks: SparkContent[]): number {
+  private calculateViralCoefficient(sparks: RippleContent[]): number {
     if (sparks.length === 0) return 0;
-    const totalShares = sparks.reduce((sum, s) => sum + s.spark_analytics.shares, 0);
+    const totalShares = sparks.reduce((sum, s) => sum + s.ripple_analytics.shares, 0);
     return totalShares / sparks.length;
   }
 
@@ -931,7 +931,7 @@ class SparkContentService {
     ];
   }
 
-  private createValuePropBlocks(sparkContent: any): any[] {
+  private createValuePropBlocks(rippleContent: any): any[] {
     return [
       {
         icon: '🚀',
@@ -966,7 +966,7 @@ class SparkContentService {
     };
   }
 
-  private createInteractiveElements(sparkContent: any): any[] {
+  private createInteractiveElements(rippleContent: any): any[] {
     return [
       {
         type: 'quiz',
@@ -981,7 +981,7 @@ class SparkContentService {
     ];
   }
 
-  private generateSmartCTAs(sparkContent: any): any[] {
+  private generateSmartCTAs(rippleContent: any): any[] {
     return [
       {
         text: 'See It In Action',
@@ -1030,22 +1030,22 @@ class SparkContentService {
     ];
   }
 
-  private calculateHourlyEngagement(sparks: SparkContent[]): any {
+  private calculateHourlyEngagement(sparks: RippleContent[]): any {
     // Implementation for hourly engagement patterns
     return {};
   }
 
-  private calculateDailyPatterns(sparks: SparkContent[]): any {
+  private calculateDailyPatterns(sparks: RippleContent[]): any {
     // Implementation for daily engagement patterns
     return {};
   }
 
-  private calculateContentZoneEngagement(sparks: SparkContent[]): any {
+  private calculateContentZoneEngagement(sparks: RippleContent[]): any {
     // Implementation for content zone engagement
     return {};
   }
 }
 
 // Export singleton instance
-export const rippleContentService = new SparkContentService();
+export const rippleContentService = new RippleContentService();
 export default rippleContentService;

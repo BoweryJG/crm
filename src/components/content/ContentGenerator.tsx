@@ -62,7 +62,7 @@ import {
   Description
 } from '@mui/icons-material';
 import { contentGeneratorService, ContentTemplate, GeneratedContent, ContentGenerationRequest } from '../../services/contentGeneratorService';
-import { rippleContentService, SparkContent as RippleContent, SparkDeliveryOptions as RippleDeliveryOptions } from '../../services/rippleContentService';
+import { rippleContentService, RippleContent, RippleDeliveryOptions } from '../../services/rippleContentService';
 import { contentEngagementNotificationService, ContentEngagementNotification } from '../../services/contentEngagementNotificationService';
 
 interface ContentGeneratorProps {
