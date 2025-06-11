@@ -41,6 +41,7 @@ const KnowledgeDental = lazy(() => import('./pages/KnowledgeDental'));
 const KnowledgeAesthetic = lazy(() => import('./pages/KnowledgeAesthetic'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Profile = lazy(() => import('./pages/Profile'));
+const RipplePage = lazy(() => import('./pages/RipplePage'));
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -77,6 +78,9 @@ const App: React.FC = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                
+                {/* Public Ripple Route - no layout needed */}
+                <Route path="/ripple/:rippleToken" element={<Suspense fallback={<SphereLoadingScreen loadingText="RIPPLE" message="LOADING PERSONALIZED CONTENT" />}><RipplePage /></Suspense>} />
                 
                 {/* All Routes - no authentication required */}
                 <Route path="/" element={<Layout />}>

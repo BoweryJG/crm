@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// Global Call Panel - Integrated with Twilio Call Service
+import React, { useState, useEffect } from 'react';
 import {
   Fab,
   Drawer,
@@ -13,38 +14,119 @@ import {
   Avatar,
   Divider,
   IconButton,
-  useTheme
+  useTheme,
+  Chip,
+  LinearProgress,
+  Alert,
+  Autocomplete,
+  CircularProgress
 } from '@mui/material';
 import {
   Phone as PhoneIcon,
   Call as CallIcon,
   CallEnd as CallEndIcon,
   Close as CloseIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
+  Business as BusinessIcon,
+  Timer as TimerIcon,
+  Analytics as AnalyticsIcon,
+  Mic as MicIcon,
+  MicOff as MicOffIcon,
+  VolumeUp as VolumeIcon,
+  VolumeOff as VolumeMuteIcon,
+  Psychology as AIIcon
 } from '@mui/icons-material';
-import { formatPhoneNumber, initiateCall } from '../../services/twilio/twilioService';
+import { twilioCallService, TwilioCallRecord } from '../../services/twilioCallService';
+import { conversationIntelligenceService } from '../../services/conversationIntelligenceService';
 import { useAuth } from '../../auth';
 import { useThemeContext } from '../../themes/ThemeContext';
+
+interface Contact {
+  id: string;
+  name: string;
+  phone: string;
+  practice?: string;
+}
 
 const GlobalCallPanel: React.FC = () => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
   const { user } = useAuth();
+  
+  // UI State
   const [open, setOpen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [recentCalls, setRecentCalls] = useState<any[]>([]);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  
+  // Call State
   const [callInProgress, setCallInProgress] = useState(false);
-  const [currentCallInfo, setCurrentCallInfo] = useState<{
-    phoneNumber: string;
-    name?: string;
-    startTime: Date;
-  } | null>(null);
+  const [currentCall, setCurrentCall] = useState<TwilioCallRecord | null>(null);
   const [callDuration, setCallDuration] = useState(0);
   const [durationInterval, setDurationInterval] = useState<NodeJS.Timeout | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
+  const [speakerOn, setSpeakerOn] = useState(false);
+  
+  // Data State
+  const [recentCalls, setRecentCalls] = useState<TwilioCallRecord[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [loading, setLoading] = useState(false);
+  
+  // Real-time Intelligence
+  const [liveInsights, setLiveInsights] = useState<{
+    sentiment: 'positive' | 'neutral' | 'negative';
+    keyPoints: string[];
+    suggestedResponse?: string;
+  } | null>(null);
+
+  // Load recent calls and contacts on mount
+  useEffect(() => {
+    if (user?.id) {
+      loadRecentCalls();
+      loadContacts();
+    }
+  }, [user?.id]);
+
+  // Initialize Twilio service
+  useEffect(() => {
+    const initTwilio = async () => {
+      await twilioCallService.initialize({
+        account_sid: process.env.REACT_APP_TWILIO_ACCOUNT_SID || '',
+        auth_token: process.env.REACT_APP_TWILIO_AUTH_TOKEN || '',
+        phone_number: process.env.REACT_APP_TWILIO_PHONE_NUMBER || '',
+        recording_callback_url: process.env.REACT_APP_TWILIO_RECORDING_CALLBACK || '',
+        transcription_callback_url: process.env.REACT_APP_TWILIO_TRANSCRIPTION_CALLBACK || ''
+      });
+    };
+    initTwilio();
+  }, []);
+
+  // Load recent calls
+  const loadRecentCalls = async () => {
+    try {
+      const calls = await twilioCallService.getUserCalls(user?.id || '', {
+        status: 'completed'
+      });
+      setRecentCalls(calls.slice(0, 5));
+    } catch (error) {
+      console.error('Error loading recent calls:', error);
+    }
+  };
+
+  // Load contacts (mock data for now)
+  const loadContacts = async () => {
+    // In production, this would fetch from your contacts service
+    setContacts([
+      { id: '1', name: 'Dr. Smith', phone: '+1234567890', practice: 'Smith Dental' },
+      { id: '2', name: 'Dr. Johnson', phone: '+0987654321', practice: 'Johnson Aesthetics' },
+      { id: '3', name: 'Dr. Williams', phone: '+1122334455', practice: 'Williams Medical' }
+    ]);
+  };
 
   // Toggle the call panel
   const toggleDrawer = () => {
-    setOpen(!open);
+    if (!callInProgress) {
+      setOpen(!open);
+    }
   };
 
   // Format duration from seconds to MM:SS
@@ -54,82 +136,96 @@ const GlobalCallPanel: React.FC = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Handle making a direct call
+  // Handle making a call
   const handleCall = async () => {
-    if (!phoneNumber) return;
+    if (!phoneNumber && !selectedContact) return;
     
-    const formattedNumber = formatPhoneNumber(phoneNumber);
-    if (!formattedNumber) {
-      alert('Please enter a valid phone number');
-      return;
-    }
-
+    setLoading(true);
     try {
-      // In a real implementation, you would get the 'from' number from user settings
-      const fromNumber = process.env.REACT_APP_TWILIO_PHONE_NUMBER || '';
+      const toNumber = selectedContact?.phone || phoneNumber;
+      const call = await twilioCallService.makeCall(
+        toNumber,
+        user?.id || 'demo-user',
+        selectedContact?.id,
+        selectedContact?.practice
+      );
+
+      setCurrentCall(call);
+      setCallInProgress(true);
       
-      if (!fromNumber) {
-        alert('No outbound phone number configured');
-        return;
-      }
-
-      const result = await initiateCall({
-        to: formattedNumber,
-        from: fromNumber,
-        contactId: 'direct-call', // This would be handled differently in a real app
-        practiceId: 'direct-call',
-        userId: user?.id || 'anonymous'
-      });
-
-      if (result.success) {
-        setCallInProgress(true);
-        setCurrentCallInfo({
-          phoneNumber: formattedNumber,
-          startTime: new Date()
+      // Start tracking call duration
+      const interval = setInterval(() => {
+        setCallDuration(prev => prev + 1);
+      }, 1000);
+      
+      setDurationInterval(interval);
+      
+      // Simulate real-time insights (in production, this would come from WebSocket)
+      setTimeout(() => {
+        setLiveInsights({
+          sentiment: 'positive',
+          keyPoints: ['Discussed pricing', 'Interest in automation features'],
+          suggestedResponse: 'Mention the ROI calculator to address pricing concerns'
         });
-        
-        // Start tracking call duration
-        const interval = setInterval(() => {
-          setCallDuration(prev => prev + 1);
-        }, 1000);
-        
-        setDurationInterval(interval);
-        
-        // Add to recent calls (in a real app, this would come from your database)
-        setRecentCalls(prev => [
-          {
-            id: Date.now().toString(),
-            phoneNumber: formattedNumber,
-            date: new Date(),
-          },
-          ...prev.slice(0, 4) // Keep only the 5 most recent calls
-        ]);
-      } else {
-        alert(`Call failed: ${result.error}`);
-      }
+      }, 5000);
     } catch (error) {
       console.error('Error making call:', error);
       alert('Failed to make call');
+    } finally {
+      setLoading(false);
     }
   };
 
   // Handle ending the current call
-  const handleEndCall = () => {
+  const handleEndCall = async () => {
     if (durationInterval) {
       clearInterval(durationInterval);
       setDurationInterval(null);
     }
     
     setCallInProgress(false);
-    setCurrentCallInfo(null);
+    setLiveInsights(null);
+    
+    // Trigger call analysis
+    if (currentCall) {
+      try {
+        // In production, this would use the actual transcript
+        const mockTranscript = "Sample call transcript...";
+        await twilioCallService.analyzeCall(currentCall.id, mockTranscript);
+        
+        // Show success message
+        console.log('Call analysis completed');
+      } catch (error) {
+        console.error('Error analyzing call:', error);
+      }
+    }
+    
+    setCurrentCall(null);
     setCallDuration(0);
     
-    // In a real implementation, you would update the call status in your database
+    // Reload recent calls
+    loadRecentCalls();
+  };
+
+  // Handle mute toggle
+  const handleMuteToggle = () => {
+    setIsMuted(!isMuted);
+    // In production, this would control actual audio
+  };
+
+  // Handle speaker toggle
+  const handleSpeakerToggle = () => {
+    setSpeakerOn(!speakerOn);
+    // In production, this would control actual audio output
   };
 
   // Handle calling a recent number
-  const handleCallRecent = (phoneNumber: string) => {
-    setPhoneNumber(phoneNumber);
+  const handleCallRecent = (call: TwilioCallRecord) => {
+    setPhoneNumber(call.to_number);
+    if (call.contact_id) {
+      const contact = contacts.find(c => c.id === call.contact_id);
+      setSelectedContact(contact || null);
+    }
     handleCall();
   };
 
@@ -143,11 +239,19 @@ const GlobalCallPanel: React.FC = () => {
           position: 'fixed',
           bottom: 20,
           right: 20,
-          zIndex: 1000
+          zIndex: 1000,
+          ...(callInProgress && {
+            animation: 'pulse 2s infinite',
+            '@keyframes pulse': {
+              '0%': { transform: 'scale(1)' },
+              '50%': { transform: 'scale(1.05)' },
+              '100%': { transform: 'scale(1)' }
+            }
+          })
         }}
         onClick={toggleDrawer}
       >
-        <PhoneIcon />
+        {callInProgress ? <CallIcon /> : <PhoneIcon />}
       </Fab>
 
       {/* Call panel drawer */}
@@ -157,14 +261,14 @@ const GlobalCallPanel: React.FC = () => {
         onClose={callInProgress ? undefined : toggleDrawer}
         sx={{
           '& .MuiDrawer-paper': {
-            width: 350,
+            width: 400,
             padding: 2,
             boxSizing: 'border-box',
             backgroundColor:
               themeMode === 'space'
-                ? 'rgba(22, 27, 44, 0.7)'
-                : 'rgba(255,255,255,0.7)',
-            backdropFilter: 'blur(8px)',
+                ? 'rgba(22, 27, 44, 0.95)'
+                : 'rgba(255,255,255,0.95)',
+            backdropFilter: 'blur(12px)',
             border: `1px solid ${
               themeMode === 'space'
                 ? 'rgba(255, 255, 255, 0.08)'
@@ -175,7 +279,7 @@ const GlobalCallPanel: React.FC = () => {
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6">
-            {callInProgress ? 'Call in Progress' : 'Make a Call'}
+            {callInProgress ? 'Call in Progress' : 'Sphere Call Center'}
           </Typography>
           {!callInProgress && (
             <IconButton onClick={toggleDrawer} edge="end">
@@ -186,38 +290,136 @@ const GlobalCallPanel: React.FC = () => {
 
         <Divider sx={{ mb: 2 }} />
 
-        {callInProgress && currentCallInfo ? (
+        {callInProgress && currentCall ? (
           // Active call UI
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-            <Avatar sx={{ width: 80, height: 80, bgcolor: theme.palette.primary.main }}>
-              <PersonIcon sx={{ fontSize: 40 }} />
-            </Avatar>
-            
-            <Typography variant="h6">
-              {currentCallInfo.name || currentCallInfo.phoneNumber}
-            </Typography>
-            
-            <Typography variant="body2" color="text.secondary">
-              Call started at {currentCallInfo.startTime.toLocaleTimeString()}
-            </Typography>
-            
-            <Typography variant="h4" sx={{ fontFamily: 'monospace', my: 2 }}>
-              {formatDuration(callDuration)}
-            </Typography>
-            
-            <Button
-              variant="contained"
-              color="error"
-              startIcon={<CallEndIcon />}
-              onClick={handleEndCall}
-              sx={{ borderRadius: 28, px: 3 }}
-            >
-              End Call
-            </Button>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+              <Avatar sx={{ width: 80, height: 80, bgcolor: theme.palette.primary.main }}>
+                {selectedContact ? <BusinessIcon sx={{ fontSize: 40 }} /> : <PersonIcon sx={{ fontSize: 40 }} />}
+              </Avatar>
+              
+              <Typography variant="h6">
+                {selectedContact?.name || currentCall.to_number}
+              </Typography>
+              
+              {selectedContact?.practice && (
+                <Typography variant="body2" color="text.secondary">
+                  {selectedContact.practice}
+                </Typography>
+              )}
+              
+              <Typography variant="h3" sx={{ fontFamily: 'monospace', my: 2 }}>
+                {formatDuration(callDuration)}
+              </Typography>
+            </Box>
+
+            {/* Call Controls */}
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2 }}>
+              <IconButton
+                onClick={handleMuteToggle}
+                sx={{
+                  bgcolor: isMuted ? 'error.main' : 'action.hover',
+                  '&:hover': { bgcolor: isMuted ? 'error.dark' : 'action.selected' }
+                }}
+              >
+                {isMuted ? <MicOffIcon /> : <MicIcon />}
+              </IconButton>
+              
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<CallEndIcon />}
+                onClick={handleEndCall}
+                sx={{ borderRadius: 28, px: 3 }}
+              >
+                End Call
+              </Button>
+              
+              <IconButton
+                onClick={handleSpeakerToggle}
+                sx={{
+                  bgcolor: speakerOn ? 'primary.main' : 'action.hover',
+                  '&:hover': { bgcolor: speakerOn ? 'primary.dark' : 'action.selected' }
+                }}
+              >
+                {speakerOn ? <VolumeIcon /> : <VolumeMuteIcon />}
+              </IconButton>
+            </Box>
+
+            {/* Live Insights */}
+            {liveInsights && (
+              <Alert 
+                severity="info" 
+                icon={<AIIcon />}
+                sx={{ borderRadius: 2 }}
+              >
+                <Typography variant="subtitle2" gutterBottom>
+                  Live AI Insights
+                </Typography>
+                <Box sx={{ mt: 1 }}>
+                  <Chip 
+                    label={`Sentiment: ${liveInsights.sentiment}`}
+                    size="small"
+                    color={
+                      liveInsights.sentiment === 'positive' ? 'success' :
+                      liveInsights.sentiment === 'negative' ? 'error' : 'default'
+                    }
+                    sx={{ mb: 1 }}
+                  />
+                  <Typography variant="caption" component="div">
+                    Key Points:
+                  </Typography>
+                  <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+                    {liveInsights.keyPoints.map((point, index) => (
+                      <li key={index}>
+                        <Typography variant="caption">{point}</Typography>
+                      </li>
+                    ))}
+                  </ul>
+                  {liveInsights.suggestedResponse && (
+                    <Alert severity="success" sx={{ mt: 1, py: 0.5 }}>
+                      <Typography variant="caption">
+                        Suggestion: {liveInsights.suggestedResponse}
+                      </Typography>
+                    </Alert>
+                  )}
+                </Box>
+              </Alert>
+            )}
+
+            {/* Recording Indicator */}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+              <Box sx={{ 
+                width: 8, 
+                height: 8, 
+                borderRadius: '50%', 
+                bgcolor: 'error.main',
+                animation: 'blink 1s infinite'
+              }} />
+              <Typography variant="caption" color="text.secondary">
+                Call is being recorded and transcribed
+              </Typography>
+            </Box>
           </Box>
         ) : (
           // Call initiation UI
           <>
+            {/* Contact Selector */}
+            <Autocomplete
+              options={contacts}
+              value={selectedContact}
+              onChange={(_, value) => {
+                setSelectedContact(value);
+                setPhoneNumber(value?.phone || '');
+              }}
+              getOptionLabel={(option) => `${option.name} - ${option.practice || option.phone}`}
+              renderInput={(params) => (
+                <TextField {...params} label="Select Contact" variant="outlined" />
+              )}
+              sx={{ mb: 2 }}
+            />
+            
+            {/* Phone Number Input */}
             <TextField
               label="Phone Number"
               variant="outlined"
@@ -225,23 +427,28 @@ const GlobalCallPanel: React.FC = () => {
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="Enter phone number"
+              disabled={!!selectedContact}
               sx={{ mb: 2 }}
             />
             
+            {/* Call Button */}
             <Button
               variant="contained"
               color="primary"
-              startIcon={<CallIcon />}
+              startIcon={loading ? <CircularProgress size={20} /> : <CallIcon />}
               onClick={handleCall}
               fullWidth
+              disabled={loading || (!phoneNumber && !selectedContact)}
               sx={{ mb: 3 }}
             >
-              Call Now
+              {loading ? 'Connecting...' : 'Start Call'}
             </Button>
             
+            {/* Recent Calls */}
             {recentCalls.length > 0 && (
               <>
-                <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                <Typography variant="subtitle1" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <TimerIcon fontSize="small" />
                   Recent Calls
                 </Typography>
                 
@@ -250,30 +457,74 @@ const GlobalCallPanel: React.FC = () => {
                     <React.Fragment key={call.id}>
                       <ListItem
                         secondaryAction={
-                          <IconButton edge="end" onClick={() => handleCallRecent(call.phoneNumber)}>
-                            <CallIcon color="primary" />
-                          </IconButton>
+                          <Box sx={{ display: 'flex', gap: 1 }}>
+                            <IconButton 
+                              edge="end" 
+                              onClick={() => handleCallRecent(call)}
+                              size="small"
+                            >
+                              <CallIcon color="primary" />
+                            </IconButton>
+                            <IconButton 
+                              edge="end" 
+                              size="small"
+                              onClick={() => {
+                                // Navigate to call analysis
+                                window.location.href = `/call-analysis?callId=${call.id}`;
+                              }}
+                            >
+                              <AnalyticsIcon />
+                            </IconButton>
+                          </Box>
                         }
                       >
                         <ListItemAvatar>
                           <Avatar>
-                            <PersonIcon />
+                            {call.practice_id ? <BusinessIcon /> : <PersonIcon />}
                           </Avatar>
                         </ListItemAvatar>
                         <ListItemText
-                          primary={call.phoneNumber}
-                          secondary={new Date(call.date).toLocaleString()}
+                          primary={call.to_number}
+                          secondary={
+                            <Box>
+                              <Typography variant="caption" component="div">
+                                {new Date(call.created_at).toLocaleString()}
+                              </Typography>
+                              <Typography variant="caption" component="div">
+                                Duration: {formatDuration(call.duration)}
+                              </Typography>
+                            </Box>
+                          }
                         />
                       </ListItem>
                       <Divider variant="inset" component="li" />
                     </React.Fragment>
                   ))}
                 </List>
+                
+                <Button
+                  variant="text"
+                  fullWidth
+                  onClick={() => window.location.href = '/call-analysis'}
+                  sx={{ mt: 1 }}
+                >
+                  View All Call Analytics
+                </Button>
               </>
             )}
           </>
         )}
       </Drawer>
+
+      <style>
+        {`
+          @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+          }
+        `}
+      </style>
     </>
   );
 };

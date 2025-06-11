@@ -37,6 +37,7 @@ import {
   Warning as WarningIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
+import { useSUISForTicker } from '../../hooks/useSUIS';
 
 // Import NowCards data
 const nowCardsData = [
@@ -447,7 +448,10 @@ const generateActionItems = (): ActionItem[] => {
 };
 
 const LiveActionTicker: React.FC = () => {
-  const [items, setItems] = useState<ActionItem[]>(generateActionItems());
+  // Use SUIS data for real intelligence
+  const { tickerData, loading, error } = useSUISForTicker();
+  
+  const [items, setItems] = useState<ActionItem[]>([]);
   const [playing, setPlaying] = useState(true);
   const [expanded, setExpanded] = useState(false);
   const [speed, setSpeed] = useState(1);
@@ -458,6 +462,16 @@ const LiveActionTicker: React.FC = () => {
     success: true
   });
   const [settingsAnchor, setSettingsAnchor] = useState<null | HTMLElement>(null);
+
+  // Update items when SUIS data changes
+  useEffect(() => {
+    if (tickerData && tickerData.length > 0) {
+      setItems(tickerData);
+    } else {
+      // Fallback to generated data if no SUIS data available
+      setItems(generateActionItems());
+    }
+  }, [tickerData]);
 
   // Filter items based on active layers
   const visibleItems = items.filter(item => layers[item.priority]);
