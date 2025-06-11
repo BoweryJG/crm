@@ -7,6 +7,7 @@ import { ThemeProvider } from './themes/ThemeContext';
 import { AuthProvider } from './auth';
 import { AppModeProvider } from './contexts/AppModeContext';
 import { DashboardDataProvider } from './contexts/DashboardDataContext';
+import { SUISProvider } from './suis';
 import SphereLoadingScreen from './components/common/SphereLoadingScreen';
 import StandaloneEliteLoadingScreen from './components/common/StandaloneEliteLoadingScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
@@ -43,8 +44,21 @@ const Settings = lazy(() => import('./pages/Settings'));
 const Profile = lazy(() => import('./pages/Profile'));
 const RipplePage = lazy(() => import('./pages/RipplePage'));
 
+// SUIS Components
+const SUISDemo = lazy(() => import('./components/demo/SUISDemo'));
+const IntelligenceDashboard = lazy(() => import('./suis/components/IntelligenceDashboard'));
+const ContactUniverse = lazy(() => import('./suis/components/ContactUniverse'));
+const ContentGenerator = lazy(() => import('./suis/components/ContentGenerator'));
+const ResearchAssistant = lazy(() => import('./suis/components/ResearchAssistant'));
+const MarketIntelligenceFeed = lazy(() => import('./suis/components/MarketIntelligenceFeed'));
+const LearningPathway = lazy(() => import('./suis/components/LearningPathway'));
+
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
+
+  // Get Supabase configuration
+  const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://cbopynuvhcymbumjnvay.supabase.co';
+  const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNib3B5bnV2aGN5bWJ1bWpudmF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5OTUxNzMsImV4cCI6MjA1OTU3MTE3M30.UZElMkoHugIt984RtYWyfrRuv2rB67opQdCrFVPCfzU';
 
   useEffect(() => {
     // Simulate loading delay to ensure all resources are properly initialized
@@ -69,10 +83,11 @@ const App: React.FC = () => {
     <ThemeProvider>
       <ErrorBoundary>
         <AuthProvider>
-          <AppModeProvider>
-            <DashboardDataProvider>
-              <CssBaseline />
-              <BrowserRouter>
+          <SUISProvider supabaseUrl={supabaseUrl} supabaseAnonKey={supabaseAnonKey}>
+            <AppModeProvider>
+              <DashboardDataProvider>
+                <CssBaseline />
+                <BrowserRouter>
               <Routes>
                 {/* Auth Routes - still available but not required */}
                 <Route path="/login" element={<Login />} />
@@ -109,6 +124,16 @@ const App: React.FC = () => {
                 <Route path="subscribe/cancel" element={<Suspense fallback={<div>Loading...</div>}><SubscribeCancel /></Suspense>} />
                 <Route path="settings" element={<Suspense fallback={<StandaloneEliteLoadingScreen loadingText="Loading Settings" message="Preparing your preferences..." />}><Settings /></Suspense>} />
                 <Route path="profile" element={<Suspense fallback={<StandaloneEliteLoadingScreen loadingText="Loading Profile" message="Retrieving your profile..." />}><Profile /></Suspense>} />
+                
+                {/* SUIS Intelligence Routes */}
+                <Route path="intelligence" element={<Suspense fallback={<SphereLoadingScreen loadingText="INTELLIGENCE" message="INITIALIZING UNIFIED SYSTEM" />}><IntelligenceDashboard /></Suspense>} />
+                <Route path="intelligence/demo" element={<Suspense fallback={<SphereLoadingScreen loadingText="SUIS DEMO" message="LOADING DEMONSTRATION" />}><SUISDemo /></Suspense>} />
+                <Route path="intelligence/contacts" element={<Suspense fallback={<SphereLoadingScreen loadingText="CONTACT UNIVERSE" message="MAPPING NEURAL CONNECTIONS" />}><ContactUniverse /></Suspense>} />
+                <Route path="intelligence/content" element={<Suspense fallback={<SphereLoadingScreen loadingText="CONTENT GENERATOR" message="ACTIVATING AI ENGINE" />}><ContentGenerator /></Suspense>} />
+                <Route path="intelligence/research" element={<Suspense fallback={<SphereLoadingScreen loadingText="RESEARCH ASSISTANT" message="INITIALIZING KNOWLEDGE BASE" />}><ResearchAssistant /></Suspense>} />
+                <Route path="intelligence/market" element={<Suspense fallback={<SphereLoadingScreen loadingText="MARKET INTELLIGENCE" message="ANALYZING MARKET SIGNALS" />}><MarketIntelligenceFeed /></Suspense>} />
+                <Route path="intelligence/learning" element={<Suspense fallback={<SphereLoadingScreen loadingText="LEARNING PATHWAY" message="PERSONALIZING CURRICULUM" />}><LearningPathway /></Suspense>} />
+                
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
             </Routes>
@@ -121,8 +146,9 @@ const App: React.FC = () => {
             <FeatureUpgradeModal />
             <DemoModeIndicator />
           </BrowserRouter>
-            </DashboardDataProvider>
-          </AppModeProvider>
+              </DashboardDataProvider>
+            </AppModeProvider>
+          </SUISProvider>
         </AuthProvider>
       </ErrorBoundary>
     </ThemeProvider>

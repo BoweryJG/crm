@@ -26,7 +26,13 @@ import {
   Settings as SettingsIcon,
   CreditCard as CreditCardIcon,
   School as SchoolIcon,
-  LocalHospital as HospitalIcon
+  LocalHospital as HospitalIcon,
+  Lightbulb as LightbulbIcon,
+  People as PeopleIcon,
+  Create as CreateIcon,
+  Search as SearchIcon,
+  TrendingUp as TrendingUpIcon,
+  Route as RouteIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -61,6 +67,18 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
         { title: 'Practices', path: '/practices', icon: <BusinessIcon /> },
         { title: 'Region Analytics', path: '/analytics', icon: <AssessmentIcon /> },
         { title: 'Rep Analytics', path: '/rep-analytics', icon: <AssessmentIcon /> }
+      ]
+    },
+    {
+      title: 'SUIS Intelligence',
+      items: [
+        { title: 'Intelligence Hub', path: '/intelligence', icon: <LightbulbIcon /> },
+        { title: 'Demo', path: '/intelligence/demo', icon: <ScienceIcon /> },
+        { title: 'Contact Universe', path: '/intelligence/contacts', icon: <PeopleIcon /> },
+        { title: 'Content Generator', path: '/intelligence/content', icon: <CreateIcon /> },
+        { title: 'Research Assistant', path: '/intelligence/research', icon: <SearchIcon /> },
+        { title: 'Market Intelligence', path: '/intelligence/market', icon: <TrendingUpIcon /> },
+        { title: 'Learning Pathway', path: '/intelligence/learning', icon: <RouteIcon /> }
       ]
     },
     {
