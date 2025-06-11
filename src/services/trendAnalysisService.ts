@@ -1,5 +1,5 @@
 // Trend Analysis Service - Advanced trend detection and forecasting
-import { supabase } from '../config/supabase';
+import { supabase } from './supabase/supabase';
 import { marketIntelligenceService, MarketTrend } from './marketIntelligenceService';
 
 export interface TrendSignal {

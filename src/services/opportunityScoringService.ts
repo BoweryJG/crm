@@ -1,5 +1,5 @@
 // Market Opportunity Scoring Service - Advanced opportunity identification and prioritization
-import { supabase } from '../config/supabase';
+import { supabase } from './supabase/supabase';
 import { marketIntelligenceService, MarketOpportunity, MarketTrend } from './marketIntelligenceService';
 import { trendAnalysisService, TrendSignal } from './trendAnalysisService';
 

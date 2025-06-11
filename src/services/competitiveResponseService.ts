@@ -1,5 +1,5 @@
 // Competitive Response Service - Strategic response generation and tracking
-import { supabase } from '../config/supabase';
+import { supabase } from './supabase/supabase';
 import { marketIntelligenceService, CompetitorActivity } from './marketIntelligenceService';
 
 export interface CompetitiveResponse {

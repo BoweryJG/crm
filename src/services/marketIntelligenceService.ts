@@ -1,5 +1,5 @@
 // Market Intelligence Service - Real-time market data and insights
-import { supabase } from '../config/supabase';
+import { supabase } from './supabase/supabase';
 
 export interface MarketFeed {
   id: string;

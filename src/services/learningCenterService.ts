@@ -1,5 +1,5 @@
 // Learning Center Service - Enhanced interactive learning platform for aesthetic and dental professionals
-import { supabase } from '../config/supabase';
+import { supabase } from './supabase/supabase';
 
 export interface LearningModule {
   id: string;

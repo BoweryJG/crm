@@ -1,5 +1,5 @@
 // Twilio Call Service - Integration for call recording, transcription, and analysis
-import { supabase } from '../config/supabase';
+import { supabase } from './supabase/supabase';
 
 export interface TwilioCallRecord {
   id: string;
