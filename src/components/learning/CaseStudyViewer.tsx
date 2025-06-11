@@ -76,9 +76,9 @@ import {
 } from '@mui/icons-material';
 import { procedureTrainingService } from '../../services/procedureTrainingService';
 import type { 
-  CaseStudy, 
-  DecisionNode, 
-  CaseStudyResult,
+  CaseStudyTemplate as CaseStudy, 
+  DecisionPoint as DecisionNode, 
+  OutcomeVariation as CaseStudyResult,
   AnatomyRegion 
 } from '../../services/procedureTrainingService';
 
