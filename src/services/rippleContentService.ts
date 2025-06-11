@@ -1047,5 +1047,5 @@ class SparkContentService {
 }
 
 // Export singleton instance
-export const sparkContentService = new SparkContentService();
-export default sparkContentService;
+export const rippleContentService = new SparkContentService();
+export default rippleContentService;
