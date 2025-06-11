@@ -62,7 +62,7 @@ import {
   LocationOn as LocationIcon
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { rippleContentService, RippleViewer as RippleViewerData } from '../../services/rippleContentService';
+import { rippleContentService, SparkViewer as RippleViewerData } from '../../services/rippleContentService';
 
 interface RippleViewerProps {
   rippleToken: string;
