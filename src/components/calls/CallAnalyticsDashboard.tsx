@@ -31,6 +31,7 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  ListItemIcon,
   ListItemSecondaryAction,
   CircularProgress,
   Alert,
