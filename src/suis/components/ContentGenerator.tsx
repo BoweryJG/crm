@@ -74,14 +74,14 @@ const ContentGenerator: React.FC = () => {
     try {
       const result = await generateContent(contentRequest);
       setGeneratedContent(result);
-      setEditedContent(result?.contentData?.content || '');
+      setEditedContent(result?.contentData?.body || '');
     } catch (err: any) {
       setError(err.message || 'Failed to generate content');
     }
   };
 
   const handleCopy = () => {
-    const content = isEditing ? editedContent : generatedContent?.contentData?.content;
+    const content = isEditing ? editedContent : generatedContent?.contentData?.body;
     if (content) {
       navigator.clipboard.writeText(content);
       // Could show a toast notification here
@@ -95,7 +95,7 @@ const ContentGenerator: React.FC = () => {
         ...generatedContent,
         contentData: {
           ...generatedContent.contentData,
-          content: editedContent
+          body: editedContent
         }
       });
     }
@@ -279,7 +279,7 @@ const ContentGenerator: React.FC = () => {
                         <IconButton 
                           onClick={() => {
                             setIsEditing(false);
-                            setEditedContent(generatedContent?.contentData?.content || '');
+                            setEditedContent(generatedContent?.contentData?.body || '');
                           }} 
                           size="small" 
                           color="error"
@@ -311,7 +311,7 @@ const ContentGenerator: React.FC = () => {
                 <Paper variant="outlined" sx={{ p: 3, minHeight: 400 }}>
                   {!isEditing ? (
                     <Typography style={{ whiteSpace: 'pre-wrap' }}>
-                      {generatedContent.contentData?.content || 'No content generated'}
+                      {generatedContent.contentData?.body || 'No content generated'}
                     </Typography>
                   ) : (
                     <TextField
