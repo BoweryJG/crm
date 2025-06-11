@@ -334,7 +334,7 @@ class MagicLinkContentService {
         .update({
           engagement_tracking: updatedTracking,
           performance_data: {
-            ...magicLinkContent.performance_data,
+            ...((magicLinkContent as any).performance_data || {}),
             engagement_quality: engagementQuality,
             lead_temperature: leadTemperature,
             conversion_score: this.calculateConversionScore(updatedTracking)

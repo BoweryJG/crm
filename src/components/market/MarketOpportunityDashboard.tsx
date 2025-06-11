@@ -82,7 +82,7 @@ import {
   Timeline as ForecastIcon,
   Compare as CompareIcon,
   Flag as MilestoneIcon,
-  Target as TargetIcon,
+  GpsFixed as TargetIcon,
   Insights as PredictiveIcon,
   TrendingFlat as StableIcon
 } from '@mui/icons-material';

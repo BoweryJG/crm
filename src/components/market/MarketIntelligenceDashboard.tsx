@@ -35,14 +35,7 @@ import {
   useTheme,
   alpha,
   Tooltip,
-  Rating,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineOppositeContent
+  Rating
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
@@ -690,45 +683,50 @@ const MarketIntelligenceDashboard: React.FC<MarketIntelligenceDashboardProps> = 
                   <Typography variant="h6" gutterBottom>
                     Recent Activities
                   </Typography>
-                  <Timeline position="alternate">
+                  <List>
                     {competitorActivities.slice(0, 5).map((activity, index) => (
-                      <TimelineItem key={activity.id}>
-                        <TimelineOppositeContent>
-                          <Typography variant="caption" color="text.secondary">
-                            {new Date(activity.detected_date).toLocaleDateString()}
-                          </Typography>
-                        </TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot 
-                            color={activity.impact_score > 7 ? 'error' : 'primary'}
-                          >
+                      <ListItem key={activity.id} sx={{ alignItems: 'flex-start', p: 0, mb: 2 }}>
+                        <ListItemAvatar>
+                          <Avatar sx={{ 
+                            bgcolor: activity.impact_score > 7 ? 'error.main' : 'primary.main',
+                            width: 40,
+                            height: 40
+                          }}>
                             {activity.activity_type === 'product_launch' ? <LaunchIcon /> :
-                             activity.activity_type === 'partnership' ? <BusinessIcon /> :
+                             activity.activity_type === 'partnership' ? <CompetitorIcon /> :
                              <TrendingUpIcon />}
-                          </TimelineDot>
-                          {index < competitorActivities.length - 1 && <TimelineConnector />}
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <Paper elevation={3} sx={{ p: 2 }}>
-                            <Typography variant="subtitle2" fontWeight="bold">
-                              {activity.competitor_name}
-                            </Typography>
-                            <Typography variant="body2">
-                              {activity.title}
-                            </Typography>
-                            {activity.impact_score > 7 && (
-                              <Chip 
-                                label="High Impact"
-                                size="small"
-                                color="error"
-                                sx={{ mt: 1 }}
-                              />
-                            )}
-                          </Paper>
-                        </TimelineContent>
-                      </TimelineItem>
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={
+                            <Box>
+                              <Typography variant="subtitle2" fontWeight="bold">
+                                {activity.competitor_name}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {new Date(activity.detected_date).toLocaleDateString()}
+                              </Typography>
+                            </Box>
+                          }
+                          secondary={
+                            <Box sx={{ mt: 1 }}>
+                              <Typography variant="body2">
+                                {activity.title}
+                              </Typography>
+                              {activity.impact_score > 7 && (
+                                <Chip 
+                                  label="High Impact"
+                                  size="small"
+                                  color="error"
+                                  sx={{ mt: 1 }}
+                                />
+                              )}
+                            </Box>
+                          }
+                        />
+                      </ListItem>
                     ))}
-                  </Timeline>
+                  </List>
                 </Card>
               </Grid>
 

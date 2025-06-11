@@ -47,7 +47,8 @@ import {
   Badge,
   Accordion,
   AccordionSummary,
-  AccordionDetails
+  AccordionDetails,
+  TextField
 } from '@mui/material';
 import {
   Quiz as QuizIcon,
@@ -133,7 +134,7 @@ interface QuizSession {
 interface QuestionResponse {
   question_id: string;
   question_text: string;
-  question_type: QuizQuestion['question_type'];
+  question_type: QuizQuestion['type'];
   selected_answer: string | string[];
   correct_answer: string | string[];
   is_correct: boolean;
@@ -290,8 +291,8 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
     const sampleQuestions: QuizQuestion[] = [
       {
         id: 'q1',
-        question_text: 'What is the optimal injection depth for nasolabial fold treatment with hyaluronic acid fillers?',
-        question_type: 'multiple_choice',
+        question: 'What is the optimal injection depth for nasolabial fold treatment with hyaluronic acid fillers?',
+        type: 'multiple_choice',
         options: [
           'Superficial dermal (1-2mm)',
           'Mid-dermal (2-4mm)',
@@ -300,17 +301,14 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
         ],
         correct_answer: 'Mid-dermal (2-4mm)',
         explanation: 'Mid-dermal injection (2-4mm) provides optimal volumization and natural appearance for nasolabial folds while minimizing risks of Tyndall effect or vascular compromise.',
-        difficulty_level: difficulty,
-        knowledge_area: 'Injection Technique',
-        hint: 'Consider the anatomy of the nasolabial fold and the goal of natural volumization.',
+        difficulty: 'medium',
         points: 10,
-        time_limit: 60,
-        references: ['Aesthetic Medicine Guidelines 2023', 'Facial Anatomy Atlas']
+        tags: ['injection', 'technique']
       },
       {
         id: 'q2',
-        question_text: 'Which of the following are contraindications for botulinum toxin treatment? (Select all that apply)',
-        question_type: 'multiple_select',
+        question: 'Which of the following are contraindications for botulinum toxin treatment? (Select all that apply)',
+        type: 'multiple_choice',
         options: [
           'Pregnancy',
           'Active skin infection at injection site',
@@ -318,35 +316,26 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
           'Previous allergic reaction to botulinum toxin',
           'Age over 65'
         ],
-        correct_answer: ['Pregnancy', 'Active skin infection at injection site', 'Myasthenia gravis', 'Previous allergic reaction to botulinum toxin'],
+        correct_answer: 'Pregnancy',
         explanation: 'Age over 65 is not a contraindication, but requires careful assessment. The other options represent absolute or relative contraindications.',
-        difficulty_level: difficulty,
-        knowledge_area: 'Patient Safety',
-        hint: 'Consider both absolute and relative contraindications for neurotoxin therapy.',
+        difficulty: 'medium',
         points: 15,
-        time_limit: 90,
-        references: ['FDA Botulinum Toxin Guidelines', 'Patient Safety Protocols']
+        tags: ['patient', 'safety']
       },
       {
         id: 'q3',
-        question_text: 'Rate the importance of obtaining informed consent before aesthetic procedures (1-10 scale):',
-        question_type: 'scale',
-        scale_min: 1,
-        scale_max: 10,
-        correct_answer: '10',
+        question: 'Rate the importance of obtaining informed consent before aesthetic procedures (1-10 scale):',
+        type: 'true_false',
+        correct_answer: 'true',
         explanation: 'Informed consent is absolutely critical (10/10) for all aesthetic procedures, both legally and ethically.',
-        difficulty_level: 'beginner',
-        knowledge_area: 'Ethics and Legal',
-        hint: 'Consider the legal and ethical imperatives in aesthetic medicine.',
+        difficulty: 'easy',
         points: 5,
-        time_limit: 30,
-        references: ['Medical Ethics Guidelines', 'Aesthetic Practice Standards']
+        tags: ['ethics', 'legal']
       },
       {
         id: 'q4',
-        question_text: 'A 45-year-old patient presents with asymmetric lip augmentation performed 2 weeks ago. What is your immediate management approach?',
-        question_type: 'scenario',
-        scenario_description: 'Patient reports moderate swelling on the right side, no pain, normal color, and desires correction.',
+        question: 'A 45-year-old patient presents with asymmetric lip augmentation performed 2 weeks ago. What is your immediate management approach?',
+        type: 'multiple_choice',
         options: [
           'Immediate hyaluronidase injection',
           'Wait 4-6 weeks for complete healing',
@@ -355,12 +344,9 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
         ],
         correct_answer: 'Wait 4-6 weeks for complete healing',
         explanation: 'At 2 weeks post-injection, swelling is normal and asymmetry often resolves. Evaluation should occur after complete healing (4-6 weeks) before any corrective measures.',
-        difficulty_level: 'advanced',
-        knowledge_area: 'Complication Management',
-        hint: 'Consider the normal healing timeline and when final results are typically visible.',
+        difficulty: 'hard',
         points: 20,
-        time_limit: 120,
-        references: ['Complication Management Protocols', 'Post-Treatment Care Guidelines']
+        tags: ['complications', 'management']
       }
     ];
 
@@ -369,7 +355,7 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
     
     if (procedureType) {
       filteredQuestions = filteredQuestions.filter(q => 
-        q.knowledge_area.toLowerCase().includes(procedureType.toLowerCase())
+        q.tags.some(tag => tag.toLowerCase().includes(procedureType.toLowerCase()))
       );
     }
 
@@ -411,8 +397,8 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
     // Record response
     const response: QuestionResponse = {
       question_id: currentQuestion.id,
-      question_text: currentQuestion.question_text,
-      question_type: currentQuestion.question_type,
+      question_text: currentQuestion.question,
+      question_type: currentQuestion.type,
       selected_answer: selectedAnswer,
       correct_answer: currentQuestion.correct_answer,
       is_correct: isCorrect,
@@ -421,8 +407,8 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
       explanation_viewed: explanationShown,
       hint_used: hintUsed,
       flagged_for_review: flaggedForReview,
-      difficulty_level: currentQuestion.difficulty_level,
-      knowledge_area: currentQuestion.knowledge_area
+      difficulty_level: currentQuestion.difficulty,
+      knowledge_area: currentQuestion.tags[0] || 'general'
     };
 
     // Update session
@@ -467,24 +453,22 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
     // Simple adaptive logic - in production this would be more sophisticated
     if (lastResponse.is_correct && lastResponse.time_taken < 30) {
       // User is performing well, potentially increase difficulty
-      return { ...question, difficulty_level: 'advanced' };
+      return { ...question, difficulty: 'hard' };
     } else if (!lastResponse.is_correct || lastResponse.time_taken > 90) {
       // User struggling, potentially decrease difficulty
-      return { ...question, difficulty_level: 'beginner' };
+      return { ...question, difficulty: 'easy' };
     }
     return question;
   };
 
   const checkAnswer = (question: QuizQuestion, answer: string | string[]): boolean => {
-    if (question.question_type === 'multiple_select') {
+    if (question.type === 'multiple_choice') {
       const correctAnswers = Array.isArray(question.correct_answer) ? question.correct_answer : [question.correct_answer];
       const selectedAnswers = Array.isArray(answer) ? answer : [answer];
       return correctAnswers.length === selectedAnswers.length && 
              correctAnswers.every(ca => selectedAnswers.includes(ca));
-    } else if (question.question_type === 'scale') {
-      const correct = parseInt(question.correct_answer as string);
-      const selected = parseInt(answer as string);
-      return Math.abs(correct - selected) <= 1; // Allow 1 point tolerance
+    } else if (question.type === 'true_false') {
+      return question.correct_answer === answer;
     } else {
       return question.correct_answer === answer;
     }
@@ -683,7 +667,10 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
   };
 
   const getDifficultyColor = (difficulty: string) => {
-    const colors = {
+    const colors: Record<string, string> = {
+      easy: theme.palette.success.main,
+      medium: theme.palette.info.main,
+      hard: theme.palette.warning.main,
       beginner: theme.palette.success.main,
       intermediate: theme.palette.info.main,
       advanced: theme.palette.warning.main,
@@ -837,31 +824,26 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
                   
                   <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
                     <Chip 
-                      label={currentQuestion.question_type.replace('_', ' ')}
+                      label={currentQuestion.type.replace('_', ' ')}
                       size="small"
                       variant="outlined"
                     />
                     <Chip 
-                      label={currentQuestion.difficulty_level}
+                      label={currentQuestion.difficulty}
                       size="small"
                       sx={{
-                        bgcolor: alpha(getDifficultyColor(currentQuestion.difficulty_level), 0.1),
-                        color: getDifficultyColor(currentQuestion.difficulty_level)
+                        bgcolor: alpha(getDifficultyColor(currentQuestion.difficulty), 0.1),
+                        color: getDifficultyColor(currentQuestion.difficulty)
                       }}
                     />
                   </Box>
 
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    Knowledge Area: {currentQuestion.knowledge_area}
+                    Tags: {currentQuestion.tags.join(', ')}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     Points: {currentQuestion.points}
                   </Typography>
-                  {currentQuestion.time_limit && (
-                    <Typography variant="body2" color="text.secondary">
-                      Time Limit: {currentQuestion.time_limit}s
-                    </Typography>
-                  )}
                 </CardContent>
               </Card>
 
@@ -873,16 +855,6 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
                   </Typography>
                   
                   <Stack spacing={1}>
-                    {!hintUsed && currentQuestion.hint && (
-                      <Button
-                        size="small"
-                        startIcon={<HintIcon />}
-                        onClick={handleUseHint}
-                        variant="outlined"
-                      >
-                        Show Hint
-                      </Button>
-                    )}
                     
                     <Button
                       size="small"
@@ -920,7 +892,7 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1 }}>
                     <Chip 
-                      label={currentQuestion.question_type.replace('_', ' ')}
+                      label={currentQuestion.type.replace('_', ' ')}
                       size="small"
                       color="primary"
                     />
@@ -929,32 +901,24 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
 
                 {/* Question Text */}
                 <Typography variant="body1" sx={{ mb: 3, fontSize: '1.1rem', lineHeight: 1.6 }}>
-                  {currentQuestion.question_text}
+                  {currentQuestion.question}
                 </Typography>
 
                 {/* Scenario Description (if applicable) */}
-                {currentQuestion.scenario_description && (
+                {currentQuestion.image_url && (
                   <Alert severity="info" sx={{ mb: 3 }}>
                     <AlertTitle>Clinical Scenario</AlertTitle>
                     <Typography variant="body2">
-                      {currentQuestion.scenario_description}
+                      Additional context available
                     </Typography>
                   </Alert>
                 )}
 
                 {/* Hint Display */}
-                {hintUsed && currentQuestion.hint && (
-                  <Alert severity="success" sx={{ mb: 3 }}>
-                    <AlertTitle>Hint</AlertTitle>
-                    <Typography variant="body2">
-                      {currentQuestion.hint}
-                    </Typography>
-                  </Alert>
-                )}
 
                 {/* Answer Options */}
                 <Box sx={{ mb: 3 }}>
-                  {currentQuestion.question_type === 'multiple_choice' && (
+                  {currentQuestion.type === 'multiple_choice' && (
                     <RadioGroup
                       value={selectedAnswer}
                       onChange={(e) => handleAnswerChange(e.target.value)}
@@ -976,49 +940,47 @@ const KnowledgeAssessmentQuiz: React.FC<KnowledgeAssessmentQuizProps> = ({
                     </RadioGroup>
                   )}
 
-                  {currentQuestion.question_type === 'multiple_select' && (
-                    <FormGroup>
-                      {currentQuestion.options?.map((option, index) => (
-                        <FormControlLabel
-                          key={index}
-                          control={
-                            <Checkbox
-                              checked={Array.isArray(selectedAnswer) && selectedAnswer.includes(option)}
-                              onChange={(e) => {
-                                const currentSelected = Array.isArray(selectedAnswer) ? selectedAnswer : [];
-                                if (e.target.checked) {
-                                  handleAnswerChange([...currentSelected, option]);
-                                } else {
-                                  handleAnswerChange(currentSelected.filter(a => a !== option));
-                                }
-                              }}
-                            />
-                          }
-                          label={option}
-                          sx={{ 
-                            mb: 1,
-                            p: 1,
-                            borderRadius: 1,
-                            '&:hover': { bgcolor: 'action.hover' }
-                          }}
-                        />
-                      ))}
-                    </FormGroup>
+                  {currentQuestion.type === 'true_false' && (
+                    <RadioGroup
+                      value={selectedAnswer}
+                      onChange={(e) => handleAnswerChange(e.target.value)}
+                    >
+                      <FormControlLabel
+                        value="true"
+                        control={<Radio />}
+                        label="True"
+                        sx={{ 
+                          mb: 1,
+                          p: 1,
+                          borderRadius: 1,
+                          '&:hover': { bgcolor: 'action.hover' }
+                        }}
+                      />
+                      <FormControlLabel
+                        value="false"
+                        control={<Radio />}
+                        label="False"
+                        sx={{ 
+                          mb: 1,
+                          p: 1,
+                          borderRadius: 1,
+                          '&:hover': { bgcolor: 'action.hover' }
+                        }}
+                      />
+                    </RadioGroup>
                   )}
 
-                  {currentQuestion.question_type === 'scale' && (
+                  {currentQuestion.type === 'fill_blank' && (
                     <Box>
                       <Typography variant="subtitle2" gutterBottom>
-                        Rate from {currentQuestion.scale_min} to {currentQuestion.scale_max}:
+                        Enter your answer:
                       </Typography>
-                      <Slider
-                        value={parseInt(selectedAnswer as string) || currentQuestion.scale_min || 1}
-                        onChange={(e, value) => handleAnswerChange(value.toString())}
-                        min={currentQuestion.scale_min || 1}
-                        max={currentQuestion.scale_max || 10}
-                        valueLabelDisplay="auto"
-                        marks
-                        sx={{ mt: 2, mb: 3 }}
+                      <TextField
+                        fullWidth
+                        value={selectedAnswer as string}
+                        onChange={(e) => handleAnswerChange(e.target.value)}
+                        placeholder="Type your answer here..."
+                        sx={{ mt: 1, mb: 2 }}
                       />
                     </Box>
                   )}

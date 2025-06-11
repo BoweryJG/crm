@@ -544,10 +544,10 @@ class ContactUniverseService {
       
       const insight = {
         user_id: userId,
-        insight_type: 'contact_acquisition',
+        insight_type: 'procedure_opportunity' as const,
         data_source: 'contact_universe',
         correlation_score: 85,
-        urgency_level: topOpportunities > 5 ? 'urgent' : 'standard',
+        urgency_level: topOpportunities > 5 ? 'urgent' as const : 'standard' as const,
         insight_data: {
           message: `Contact batch acquired ${practices.length} prospects with ${topOpportunities} high-opportunity targets`,
           batch_id: batch.id,
@@ -557,7 +557,7 @@ class ContactUniverseService {
           estimated_pipeline_value: practices.reduce((sum, p) => sum + this.estimateDealSize(p), 0),
           next_actions: ['Begin outreach sequence', 'Prioritize high-score prospects', 'Prepare demo materials']
         },
-        procedure_tags: [...new Set(practices.flatMap(p => p.high_value_procedures))],
+        procedure_tags: Array.from(new Set(practices.flatMap(p => p.high_value_procedures))),
         territory_relevance: {
           coverage_area: batch.filter_criteria.territories,
           market_penetration: 'expanding'

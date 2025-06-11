@@ -621,10 +621,10 @@ class ContentEngagementNotificationService {
     try {
       const insight = {
         user_id: magicLinkContent.user_id,
-        insight_type: 'content_engagement',
+        insight_type: 'call_analysis' as const,
         data_source: 'magic_link_content',
         correlation_score: notification.prospect_info.engagement_score,
-        urgency_level: notification.priority === 'urgent' ? 'urgent' : 'standard',
+        urgency_level: notification.priority === 'urgent' ? 'urgent' as const : 'standard' as const,
         insight_data: {
           message: `${notification.prospect_info.practice_name} ${engagementData.event_type} your ${magicLinkContent.content_type} content`,
           engagement_type: engagementData.event_type,

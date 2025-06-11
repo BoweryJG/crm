@@ -71,7 +71,7 @@ import {
   Whatshot as HotIcon,
   AcUnit as ColdIcon,
   Bolt as DisruptiveIcon,
-  Eco as EmergingIcon,
+  TrendingUp as EmergingIcon,
   Warning as RiskIcon,
   Lightbulb as OpportunityIcon,
   CheckCircle as ValidatedIcon,
@@ -531,7 +531,7 @@ const TrendAnalysisEngine: React.FC<TrendAnalysisEngineProps> = ({
   };
 
   const generatePrediction = (trend: MarketTrend, horizon: string): string => {
-    const predictions = {
+    const predictions: Record<string, string[]> = {
       short: [
         `Growth rate expected to ${trend.momentum === 'accelerating' ? 'increase' : 'stabilize'} around ${trend.growth_rate + 5}%`,
         `Market adoption will reach critical mass in ${trend.trend_name.toLowerCase()}`,
@@ -1601,11 +1601,11 @@ const TrendAnalysisEngine: React.FC<TrendAnalysisEngineProps> = ({
                         <Box key={sector}>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                             <Typography variant="body2">{sector}</Typography>
-                            <Typography variant="body2">{count}</Typography>
+                            <Typography variant="body2">{count as number}</Typography>
                           </Box>
                           <LinearProgress 
                             variant="determinate"
-                            value={(count / trendInsights.summary.total_signals) * 100}
+                            value={((count as number) / trendInsights.summary.total_signals) * 100}
                             sx={{ height: 6, borderRadius: 3 }}
                           />
                         </Box>

@@ -3,7 +3,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSUIS } from './SUISProvider';
-import { LearningPath, LearningModule, LearningProgress } from '../types';
+import { LearningPath, LearningProgress } from '../types';
+import { LearningModule } from '../../services/learningCenterService';
 import { 
   BookOpen, Award, Clock, CheckCircle, PlayCircle, 
   Lock, TrendingUp, Users, Brain, Trophy, ChevronRight,

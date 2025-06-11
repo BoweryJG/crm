@@ -54,7 +54,7 @@ import {
   ExpandMore as ExpandIcon,
   Layers as LayersIcon,
   ColorLens as ColorIcon,
-  FullscreenIcon,
+  Fullscreen as FullscreenIcon,
   FullscreenExit as FullscreenExitIcon,
   Settings as SettingsIcon,
   Save as SaveIcon,

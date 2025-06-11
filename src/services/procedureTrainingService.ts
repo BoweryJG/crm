@@ -305,7 +305,7 @@ class ProcedureTrainingService {
           warning: zone.description,
           avoidance: zone.avoidance_technique
         }))
-      },
+      } as any,
       interactions: {
         click_areas: anatomyRegion.injection_sites.map(site => ({
           id: site.name,
@@ -831,7 +831,7 @@ class ProcedureTrainingService {
 
   private calculateCECredits(difficulty: string, content: ProcedureContent): number {
     const baseCredits = content.certification_requirements.minimum_hours * 0.1;
-    const difficultyMultiplier = {
+    const difficultyMultiplier: Record<string, number> = {
       beginner: 1,
       intermediate: 1.2,
       advanced: 1.5,
@@ -852,7 +852,7 @@ class ProcedureTrainingService {
   }
 
   private getInstructor(procedureType: string): any {
-    const instructors = {
+    const instructors: Record<string, any> = {
       botox: {
         name: 'Dr. Sarah Chen',
         credentials: 'MD, Dermatology, Board Certified',
@@ -884,7 +884,7 @@ class ProcedureTrainingService {
   }
 
   private getPresentingConcern(procedureType: string): string {
-    const concerns = {
+    const concerns: Record<string, string> = {
       botox: 'Moderate to severe forehead lines and glabellar furrows',
       fillers: 'Volume loss in cheeks and nasolabial folds',
       coolsculpting: 'Stubborn abdominal fat resistant to diet and exercise'
@@ -897,7 +897,7 @@ class ProcedureTrainingService {
   }
 
   private getExpectedOutcomes(procedureType: string): string[] {
-    const outcomes = {
+    const outcomes: Record<string, string[]> = {
       botox: ['Reduced muscle activity', 'Smoother appearance', 'Natural expression maintained'],
       fillers: ['Restored volume', 'Improved contours', 'Youthful appearance']
     };

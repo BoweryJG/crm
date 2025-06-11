@@ -191,7 +191,9 @@ class ConversationIntelligenceService {
     ];
 
     // Check patterns
-    [...objectionPatterns, ...buyingSignalPatterns, ...painPointPatterns].forEach(({ pattern, type, category, response }) => {
+    [...objectionPatterns, ...buyingSignalPatterns, ...painPointPatterns].forEach((patternObj) => {
+      const { pattern, type, category } = patternObj;
+      const response = 'response' in patternObj ? patternObj.response : undefined;
       const matches = transcript.match(pattern);
       if (matches) {
         insights.push({
@@ -441,7 +443,7 @@ class ConversationIntelligenceService {
     recommendations.push('Send follow-up email within 24 hours');
     recommendations.push('Update CRM with call notes and next actions');
 
-    return [...new Set(recommendations)]; // Remove duplicates
+    return Array.from(new Set(recommendations)); // Remove duplicates
   }
 
   // Helper methods

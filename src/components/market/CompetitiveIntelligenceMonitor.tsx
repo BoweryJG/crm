@@ -39,13 +39,6 @@ import {
   alpha,
   Tooltip,
   Rating,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineOppositeContent,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -79,7 +72,7 @@ import {
   Timeline as TimelineIcon,
   Radar as RadarIcon,
   BatteryChargingFull as StrengthIcon,
-  BatteryLow as WeaknessIcon
+  Battery20 as WeaknessIcon
 } from '@mui/icons-material';
 import {
   Chart as ChartJS,
@@ -447,11 +440,11 @@ const CompetitiveIntelligenceMonitor: React.FC<CompetitiveIntelligenceMonitorPro
       product_launch: <LaunchIcon />,
       pricing_change: <PricingIcon />,
       partnership: <PartnershipIcon />,
-      acquisition: <BusinessIcon />,
+      acquisition: <CompetitorIcon />,
       expansion: <ExpansionIcon />,
       leadership_change: <LeadershipIcon />
     };
-    return icons[type] || <TrendingUpIcon />;
+    return icons[type] || <GrowthIcon />;
   };
 
   // Chart configurations
@@ -603,7 +596,7 @@ const CompetitiveIntelligenceMonitor: React.FC<CompetitiveIntelligenceMonitorPro
                     #2
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-                    <TrendingUpIcon sx={{ fontSize: 16, color: 'success.main', mr: 0.5 }} />
+                    <GrowthIcon sx={{ fontSize: 16, color: 'success.main', mr: 0.5 }} />
                     <Typography variant="body2" color="success.main">
                       Up from #3
                     </Typography>
@@ -758,9 +751,9 @@ const CompetitiveIntelligenceMonitor: React.FC<CompetitiveIntelligenceMonitorPro
                             </Typography>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                               {competitor.market_share_trend === 'growing' ? (
-                                <TrendingUpIcon sx={{ fontSize: 16, color: 'error.main' }} />
+                                <GrowthIcon sx={{ fontSize: 16, color: 'error.main' }} />
                               ) : competitor.market_share_trend === 'declining' ? (
-                                <TrendingDownIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                                <DeclineIcon sx={{ fontSize: 16, color: 'success.main' }} />
                               ) : null}
                               <Typography variant="caption" color="text.secondary">
                                 {competitor.market_share_trend}
@@ -1021,26 +1014,19 @@ const CompetitiveIntelligenceMonitor: React.FC<CompetitiveIntelligenceMonitorPro
                 <Typography variant="h6" gutterBottom>
                   Recent Competitor Activities
                 </Typography>
-                <Timeline position="alternate">
+                <List>
                   {competitorActivities.slice(0, 8).map((activity, index) => (
-                    <TimelineItem key={activity.id}>
-                      <TimelineOppositeContent>
-                        <Typography variant="caption" color="text.secondary">
-                          {new Date(activity.detected_date).toLocaleDateString()}
-                        </Typography>
-                      </TimelineOppositeContent>
-                      <TimelineSeparator>
-                        <TimelineDot 
-                          color={activity.impact_score > 7 ? 'error' : 'primary'}
-                          sx={{ p: 1 }}
-                        >
-                          {getActivityIcon(activity.activity_type)}
-                        </TimelineDot>
-                        {index < competitorActivities.length - 1 && <TimelineConnector />}
-                      </TimelineSeparator>
-                      <TimelineContent>
-                        <Card elevation={2} sx={{ p: 2 }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                    <ListItem key={activity.id} sx={{ alignItems: 'flex-start', p: 0, mb: 2 }}>
+                      <Card elevation={2} sx={{ p: 2, width: '100%' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                            <Avatar sx={{ 
+                              bgcolor: activity.impact_score > 7 ? 'error.main' : 'primary.main',
+                              width: 40,
+                              height: 40
+                            }}>
+                              {getActivityIcon(activity.activity_type)}
+                            </Avatar>
                             <Box>
                               <Typography variant="subtitle2" fontWeight="bold">
                                 {activity.competitor_name}
@@ -1048,32 +1034,35 @@ const CompetitiveIntelligenceMonitor: React.FC<CompetitiveIntelligenceMonitorPro
                               <Typography variant="body2">
                                 {activity.title}
                               </Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', gap: 1 }}>
-                              <Chip 
-                                label={`Impact: ${activity.impact_score}/10`}
-                                size="small"
-                                color={activity.impact_score > 7 ? 'error' : 'default'}
-                              />
+                              <Typography variant="caption" color="text.secondary">
+                                {new Date(activity.detected_date).toLocaleDateString()}
+                              </Typography>
                             </Box>
                           </Box>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                            {activity.description}
-                          </Typography>
-                          {activity.competitive_response && (
-                            <Button
+                          <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Chip 
+                              label={`Impact: ${activity.impact_score}/10`}
                               size="small"
-                              startIcon={<StrategyIcon />}
-                              onClick={() => handleCreateResponse(activity)}
-                            >
-                              View Response Strategy
-                            </Button>
-                          )}
-                        </Card>
-                      </TimelineContent>
-                    </TimelineItem>
+                              color={activity.impact_score > 7 ? 'error' : 'default'}
+                            />
+                          </Box>
+                        </Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                          {activity.description}
+                        </Typography>
+                        {activity.competitive_response && (
+                          <Button
+                            size="small"
+                            startIcon={<StrategyIcon />}
+                            onClick={() => handleCreateResponse(activity)}
+                          >
+                            View Response Strategy
+                          </Button>
+                        )}
+                      </Card>
+                    </ListItem>
                   ))}
-                </Timeline>
+                </List>
               </Grid>
             </Grid>
           </Box>
@@ -1112,7 +1101,7 @@ const CompetitiveIntelligenceMonitor: React.FC<CompetitiveIntelligenceMonitorPro
                         ) 
                       }}>
                         {response.response_type === 'counter' ? <DefenseIcon /> :
-                         response.response_type === 'defend' ? <ShieldIcon /> :
+                         response.response_type === 'defend' ? <DefenseIcon /> :
                          response.response_type === 'exploit' ? <StrategyIcon /> :
                          <WatchIcon />}
                       </Avatar>

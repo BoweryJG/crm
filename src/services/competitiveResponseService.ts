@@ -385,7 +385,7 @@ class CompetitiveResponseService {
           'The hidden costs of inferior alternatives',
           'Future-proof your investment with the right partner'
         ],
-        differentiators: context?.their_weaknesses?.map(w => `We excel where they fail: ${w}`) || [
+        differentiators: context?.their_weaknesses?.map((w: string) => `We excel where they fail: ${w}`) || [
           'We excel where they fail: User experience',
           'We excel where they fail: Integration capabilities',
           'We excel where they fail: Scalability'
@@ -576,7 +576,7 @@ class CompetitiveResponseService {
   
   // Helper methods
   private generateResponseTitle(activity: CompetitorActivity, responseType: string): string {
-    const titles = {
+    const titles: Record<string, string> = {
       counter: `Counter-offensive to ${activity.competitor_name}'s ${activity.title}`,
       defend: `Defense strategy against ${activity.competitor_name}'s ${activity.activity_type}`,
       exploit: `Exploit opportunity from ${activity.competitor_name}'s ${activity.title}`,
@@ -617,7 +617,7 @@ class CompetitiveResponseService {
   }
   
   private estimateBudget(tactics: CompetitiveResponse['tactics'], responseType: string): { min: number; max: number } {
-    const baseBudget = {
+    const baseBudget: Record<string, { min: number; max: number }> = {
       counter: { min: 50000, max: 200000 },
       defend: { min: 25000, max: 100000 },
       exploit: { min: 30000, max: 150000 },
@@ -680,7 +680,7 @@ class CompetitiveResponseService {
     responseType: string, 
     strategy: CompetitiveResponse['strategy']
   ): CompetitiveResponse['success_metrics'] {
-    const metricsTemplates = {
+    const metricsTemplates: Record<string, { metric: string; target: string; measurement_method: string; }[]> = {
       counter: [
         { metric: 'Competitive win rate', target: 'Increase by 15%', measurement_method: 'CRM win/loss tracking' },
         { metric: 'Market share', target: 'Gain 2% share', measurement_method: 'Quarterly market analysis' },

@@ -514,7 +514,7 @@ class RippleContentService {
     console.log('Sending Ripple email:', {
       to: rippleContent.recipient_email,
       subject: `💥 ${rippleContent.subject_line}`,
-      ripple_url: rippleUrl,
+      ripple_url: sparkUrl,
       custom_message: customMessage
     });
   }
@@ -523,7 +523,7 @@ class RippleContentService {
     // Increment view count and track unique views
     const { data: ripple } = await supabase
       .from('ripple_content')
-      .select('ripple_analytics')
+      .select('ripple_analytics, ripple_status')
       .eq('id', rippleId)
       .single();
 
@@ -649,8 +649,8 @@ class RippleContentService {
   ): 'blazing' | 'hot' | 'warm' | 'cold' {
     const insights = engagement.prospect_insights;
     
-    if (analytics.conversions > 0 || insights?.buying_signals?.length > 2) return 'blazing';
-    if (analytics.engagement_score > 70 || insights?.interest_level > 80) return 'hot';
+    if (analytics.conversions > 0 || (insights?.buying_signals?.length || 0) > 2) return 'blazing';
+    if (analytics.engagement_score > 70 || (insights?.interest_level || 0) > 80) return 'hot';
     if (analytics.engagement_score > 40 || analytics.time_spent > 60) return 'warm';
     return 'cold';
   }
@@ -659,11 +659,11 @@ class RippleContentService {
     const signals = [];
     
     if (engagement.session_data?.return_visit) signals.push('repeat_visitor');
-    if (engagement.session_data?.duration > 120) signals.push('deep_engagement');
-    if (engagement.session_data?.interactions > 5) signals.push('high_interaction');
+    if ((engagement.session_data?.duration || 0) > 120) signals.push('deep_engagement');
+    if ((engagement.session_data?.interactions || 0) > 5) signals.push('high_interaction');
     if (engagement.engagement_type === 'share') signals.push('content_advocate');
-    if (engagement.prospect_insights?.buying_signals?.length > 0) {
-      signals.push(...engagement.prospect_insights.buying_signals);
+    if ((engagement.prospect_insights?.buying_signals?.length || 0) > 0) {
+      signals.push(...(engagement.prospect_insights?.buying_signals || []));
     }
     
     return signals;
@@ -674,7 +674,7 @@ class RippleContentService {
     engagement: Partial<RippleEngagement>
   ): 'awareness' | 'consideration' | 'decision' | 'purchase' {
     if (analytics.conversions > 0) return 'purchase';
-    if (analytics.engagement_score > 70 || engagement.engagement_depth > 70) return 'decision';
+    if (analytics.engagement_score > 70 || (engagement.engagement_depth || 0) > 70) return 'decision';
     if (analytics.time_spent > 60 || analytics.clicks > 3) return 'consideration';
     return 'awareness';
   }
@@ -691,7 +691,7 @@ class RippleContentService {
     }
     
     // Boost for deep engagement
-    if (engagement.engagement_depth > 80) score += 20;
+    if ((engagement.engagement_depth || 0) > 80) score += 20;
     
     // Boost for return visits
     if (engagement.session_data?.return_visit) score += 15;
@@ -705,7 +705,7 @@ class RippleContentService {
   ): RippleContent['ripple_status'] {
     if (engagement.engagement_type === 'conversion') return 'converted';
     if (temperature === 'blazing') return 'blazing';
-    if (engagement.engagement_depth > 50) return 'engaged';
+    if ((engagement.engagement_depth || 0) > 50) return 'engaged';
     return 'viewed';
   }
 
@@ -716,8 +716,8 @@ class RippleContentService {
     return temperature === 'blazing' || 
            temperature === 'hot' ||
            engagement.engagement_type === 'conversion' ||
-           engagement.engagement_depth > 70 ||
-           engagement.prospect_insights?.buying_signals?.length > 0;
+           (engagement.engagement_depth || 0) > 70 ||
+           (engagement.prospect_insights?.buying_signals?.length || 0) > 0;
   }
 
   private async triggerEngagementNotification(
@@ -729,12 +729,11 @@ class RippleContentService {
     console.log('Triggering Ripple notification:', { rippleId, engagement, temperature });
   }
 
-  private updateRippleStatus(rippleId: string, status: RippleContent['ripple_status']): Promise<void> {
-    return supabase
+  private async updateRippleStatus(rippleId: string, status: RippleContent['ripple_status']): Promise<void> {
+    await supabase
       .from('ripple_content')
       .update({ ripple_status: status, updated_at: new Date().toISOString() })
-      .eq('id', rippleId)
-      .then(() => {});
+      .eq('id', rippleId);
   }
 
   // Analytics helper methods

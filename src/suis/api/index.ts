@@ -245,7 +245,7 @@ export class Sphere1AClient extends BaseAPIClient {
       };
     }
 
-    return response;
+    return response as APIResponse<MarketIntelligence[]>;
   }
 
   async subscribeToProcedureUpdates(callback: (data: any) => void): Promise<void> {
@@ -650,7 +650,12 @@ export class SUISAPIManager {
         periodEnd,
         metrics: data,
         insights: [],
-        benchmarks: {},
+        benchmarks: {
+          industry: {},
+          company: {},
+          peer: {},
+          historical: {}
+        },
         predictions: {
           shortTerm: { timeframe: '30 days', predictions: [] },
           mediumTerm: { timeframe: '90 days', predictions: [] },

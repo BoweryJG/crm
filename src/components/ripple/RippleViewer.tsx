@@ -268,9 +268,20 @@ const RippleViewer: React.FC<RippleViewerProps> = ({ rippleToken }) => {
   ) => {
     if (!viewerData) return;
 
+    // Map event types to allowed engagement types
+    const engagementTypeMap: Record<string, 'view' | 'deep_read' | 'interaction' | 'share' | 'conversion' | 'blazing_interest'> = {
+      'view': 'view',
+      'click': 'interaction',
+      'scroll': 'interaction', 
+      'time_spent': 'interaction',
+      'share': 'share',
+      'conversion': 'conversion',
+      'deep_read': 'deep_read'
+    };
+
     try {
       await rippleContentService.trackRippleEngagement(rippleToken, {
-        engagement_type: eventType,
+        engagement_type: engagementTypeMap[eventType],
         engagement_depth: engagementDepth,
         session_data: {
           duration: timeSpent,
@@ -587,7 +598,7 @@ const RippleViewer: React.FC<RippleViewerProps> = ({ rippleToken }) => {
                         key={index}
                         fullWidth
                         variant={cta.style === 'primary' ? 'contained' : 'outlined'}
-                        color={cta.style === 'primary' ? 'primary' : 'default'}
+                        color={cta.style === 'primary' ? 'primary' : 'inherit'}
                         size="large"
                         onClick={() => handleCTAClick(cta.action)}
                         sx={{ mb: index < viewerData.ripple_experience.smart_ctas.length - 1 ? 1 : 0 }}

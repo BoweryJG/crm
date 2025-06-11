@@ -417,7 +417,7 @@ class OpportunityScoringService {
   }
 
   private getStrengthReason(component: string, opportunity: MarketOpportunity): string {
-    const reasons = {
+    const reasons: Record<string, string> = {
       market_attractiveness: `Large market size of $${(opportunity.market_size / 1000000).toFixed(1)}M with ${opportunity.growth_potential}% growth potential`,
       competitive_advantage: `Strong competitive position with ${opportunity.barriers_to_entry.length} barriers to entry`,
       strategic_fit: `High strategic alignment with ${opportunity.opportunity_type} opportunity type`,
@@ -429,7 +429,7 @@ class OpportunityScoringService {
   }
 
   private getWeaknessReason(component: string, opportunity: MarketOpportunity): string {
-    const reasons = {
+    const reasons: Record<string, string> = {
       market_attractiveness: `Limited market appeal due to ${opportunity.competition_level} competition`,
       competitive_advantage: `Weak competitive position requiring significant capability development`,
       strategic_fit: `Misalignment with current strategic direction and capabilities`,

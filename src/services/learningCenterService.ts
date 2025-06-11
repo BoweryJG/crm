@@ -457,6 +457,9 @@ class LearningCenterService {
         progress = data;
       }
 
+      if (!progress) {
+        throw new Error('Failed to create or retrieve user progress');
+      }
       return progress;
     } catch (error) {
       console.error('Error starting module:', error);
@@ -475,7 +478,7 @@ class LearningCenterService {
       const progress = await this.getUserProgress(userId, moduleId);
       if (!progress) throw new Error('Progress not found');
 
-      const updatedSections = [...new Set([...progress.sections_completed, sectionId])];
+      const updatedSections = Array.from(new Set([...progress.sections_completed, sectionId]));
       const updatedTimeSpent = progress.time_spent + timeSpent;
       
       // Calculate progress percentage
