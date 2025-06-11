@@ -582,24 +582,11 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
   // Generate content
   const generateContent = useCallback(async (params: any): Promise<GeneratedContent> => {
     try {
-      const apiManager = await getSUISAPIManager();
-      const response = await fetch('/api/suis/generate-content', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'x-api-key': apiManager.config.sphere1a.apiKey,
-          'x-openrouter-key': apiManager.config.openRouter.apiKey
-        },
-        body: JSON.stringify({
-          ...params,
-          userId: state.user?.id
-        })
+      const { suisService } = await import('../services/suisService');
+      return await suisService.generateContent({
+        ...params,
+        userId: state.user?.id
       });
-
-      if (!response.ok) throw new Error('Failed to generate content');
-
-      const data = await response.json();
-      return data;
     } catch (error) {
       console.error('Failed to generate content:', error);
       throw error;
@@ -609,21 +596,8 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
   // Analyze call
   const analyzeCall = useCallback(async (callSid: string): Promise<CallIntelligence> => {
     try {
-      const apiManager = await getSUISAPIManager();
-      const response = await fetch('/api/suis/analyze-call', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'x-api-key': apiManager.config.sphere1a.apiKey,
-          'x-openrouter-key': apiManager.config.openRouter.apiKey
-        },
-        body: JSON.stringify({ callSid })
-      });
-
-      if (!response.ok) throw new Error('Failed to analyze call');
-
-      const data = await response.json();
-      return data;
+      const { suisService } = await import('../services/suisService');
+      return await suisService.analyzeCall(callSid);
     } catch (error) {
       console.error('Failed to analyze call:', error);
       throw error;
@@ -633,27 +607,11 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
   // Perform research
   const performResearch = useCallback(async (query: string, context?: any): Promise<ResearchQuery> => {
     try {
-      const apiManager = await getSUISAPIManager();
-      const response = await fetch('/api/suis/research', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'x-api-key': apiManager.config.sphere1a.apiKey,
-          'x-openrouter-key': apiManager.config.openRouter.apiKey
-        },
-        body: JSON.stringify({ 
-          query, 
-          context: {
-            ...context,
-            userId: state.user?.id
-          }
-        })
+      const { suisService } = await import('../services/suisService');
+      return await suisService.performResearch(query, {
+        ...context,
+        userId: state.user?.id
       });
-
-      if (!response.ok) throw new Error('Failed to perform research');
-
-      const data = await response.json();
-      return data;
     } catch (error) {
       console.error('Failed to perform research:', error);
       throw error;

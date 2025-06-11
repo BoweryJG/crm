@@ -40,7 +40,7 @@ export const getSUISConfig = async (): Promise<SUISAPIConfig> => {
       serviceKey: process.env.REACT_APP_SUPABASE_SERVICE_KEY || ''
     },
     sphere1a: {
-      baseUrl: '/api/suis', // Use local API endpoint
+      baseUrl: process.env.REACT_APP_SPHERE1A_URL || 'https://api.sphere1a.com/v1',
       apiKey: cachedSphere1aKey,
       version: 'v1'
     },
@@ -75,7 +75,7 @@ export const getSUISConfigSync = (): SUISAPIConfig => {
       serviceKey: process.env.REACT_APP_SUPABASE_SERVICE_KEY || ''
     },
     sphere1a: {
-      baseUrl: '/api/suis',
+      baseUrl: process.env.REACT_APP_SPHERE1A_URL || 'https://api.sphere1a.com/v1',
       apiKey: cachedSphere1aKey || process.env.REACT_APP_SPHERE1A_API_KEY || '',
       version: 'v1'
     },
