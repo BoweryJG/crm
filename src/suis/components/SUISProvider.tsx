@@ -582,10 +582,18 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
   // Generate content
   const generateContent = useCallback(async (params: any): Promise<GeneratedContent> => {
     try {
+      const apiManager = await getSUISAPIManager();
       const response = await fetch('/api/suis/generate-content', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params)
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-api-key': apiManager.config.sphere1a.apiKey,
+          'x-openrouter-key': apiManager.config.openRouter.apiKey
+        },
+        body: JSON.stringify({
+          ...params,
+          userId: state.user?.id
+        })
       });
 
       if (!response.ok) throw new Error('Failed to generate content');
@@ -596,14 +604,19 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
       console.error('Failed to generate content:', error);
       throw error;
     }
-  }, []);
+  }, [state.user]);
 
   // Analyze call
   const analyzeCall = useCallback(async (callSid: string): Promise<CallIntelligence> => {
     try {
+      const apiManager = await getSUISAPIManager();
       const response = await fetch('/api/suis/analyze-call', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-api-key': apiManager.config.sphere1a.apiKey,
+          'x-openrouter-key': apiManager.config.openRouter.apiKey
+        },
         body: JSON.stringify({ callSid })
       });
 
@@ -620,10 +633,21 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
   // Perform research
   const performResearch = useCallback(async (query: string, context?: any): Promise<ResearchQuery> => {
     try {
+      const apiManager = await getSUISAPIManager();
       const response = await fetch('/api/suis/research', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, context })
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-api-key': apiManager.config.sphere1a.apiKey,
+          'x-openrouter-key': apiManager.config.openRouter.apiKey
+        },
+        body: JSON.stringify({ 
+          query, 
+          context: {
+            ...context,
+            userId: state.user?.id
+          }
+        })
       });
 
       if (!response.ok) throw new Error('Failed to perform research');
@@ -634,7 +658,7 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
       console.error('Failed to perform research:', error);
       throw error;
     }
-  }, []);
+  }, [state.user]);
 
   // Update theme
   const updateTheme = useCallback((theme: Partial<ThemeSystem>) => {

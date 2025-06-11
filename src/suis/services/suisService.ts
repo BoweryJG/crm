@@ -17,7 +17,14 @@ import { getSUISAPIManager } from './suisConfigService';
 import { twilioService } from '../../services/twilio/twilioService';
 
 class SUISService {
-  private apiManager = getSUISAPIManager();
+  private apiManager: any = null;
+
+  private async getApiManager() {
+    if (!this.apiManager) {
+      this.apiManager = await getSUISAPIManager();
+    }
+    return this.apiManager;
+  }
 
   // Intelligence Profile Management
   async createIntelligenceProfile(userId: string, profileData: Partial<IntelligenceProfile>) {
@@ -97,55 +104,11 @@ class SUISService {
       const { data, error } = await query;
       if (error) throw error;
 
-      // If no data, generate sample intelligence
-      if (!data || data.length === 0) {
-        return this.generateSampleMarketIntelligence();
-      }
-
-      return data;
+      return data || [];
     } catch (error) {
       console.error('Error fetching market intelligence:', error);
-      return this.generateSampleMarketIntelligence();
+      throw error;
     }
-  }
-
-  private generateSampleMarketIntelligence(): MarketIntelligence[] {
-    return [
-      {
-        id: '1',
-        source: 'sphere1a',
-        intelligenceType: 'procedure_trend',
-        territoryId: 'territory-1',
-        specialty: 'aesthetics',
-        data: {
-          trend: 'Rising demand for non-invasive procedures',
-          details: 'Botox and dermal fillers seeing 25% YoY growth',
-          impact: 'high',
-          opportunities: ['Target med spas', 'Focus on training programs']
-        },
-        confidenceScore: 0.85,
-        relevanceScores: {},
-        createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        id: '2',
-        source: 'market_feed',
-        intelligenceType: 'competitor_move',
-        territoryId: 'territory-1',
-        specialty: 'dental',
-        data: {
-          competitor: 'CompetitorX',
-          action: 'Launched new implant system with AI guidance',
-          marketImpact: 'medium',
-          responseStrategy: 'Emphasize proven track record and support'
-        },
-        confidenceScore: 0.92,
-        relevanceScores: {},
-        createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
-      }
-    ];
   }
 
   // Contact Universe
@@ -174,10 +137,11 @@ class SUISService {
 
   async enrichContact(contactData: any) {
     try {
-      return await this.apiManager.enrichContact(contactData);
+      const apiManager = await this.getApiManager();
+      return await apiManager.enrichContact(contactData);
     } catch (error) {
       console.error('Error enriching contact:', error);
-      return null;
+      throw error;
     }
   }
 
@@ -198,24 +162,25 @@ class SUISService {
 
       if (error) throw error;
 
-      // Generate AI response (mock for now)
-      const response = {
-        ...data,
-        response_data: {
-          answer: `Based on your query about "${query}", here are the key insights...`,
-          sources: ['Internal knowledge base', 'Market research'],
-          confidence: 0.85,
-          relatedTopics: ['Market trends', 'Competitor analysis', 'Best practices']
-        }
-      };
+      // Call API endpoint for research
+      const apiManager = await this.getApiManager();
+      const apiKey = apiManager.config.sphere1a.apiKey;
+      
+      const response = await fetch('/api/suis/research', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey
+        },
+        body: JSON.stringify({ query, context })
+      });
 
-      // Update with response
-      await supabase
-        .from('suis_research_queries')
-        .update({ response_data: response.response_data })
-        .eq('id', data.id);
+      if (!response.ok) {
+        throw new Error('Research API request failed');
+      }
 
-      return response;
+      const researchData = await response.json();
+      return researchData;
     } catch (error) {
       console.error('Error performing research:', error);
       throw error;
@@ -232,81 +197,43 @@ class SUISService {
           content_type: params.contentType,
           target_audience: params.targetAudience,
           procedure_focus: params.procedureFocus,
-          content_data: {
-            subject: params.subject || 'Generated Content',
-            body: this.generateSampleContent(params.contentType),
-            metadata: params
-          },
+          status: 'generating',
           created_at: new Date().toISOString()
         })
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+
+      // Call API to generate actual content
+      const apiManager = await this.getApiManager();
+      const apiKey = apiManager.config.sphere1a.apiKey;
+      
+      const response = await fetch('/api/suis/generate-content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'x-openrouter-key': apiManager.config.openRouter.apiKey
+        },
+        body: JSON.stringify({
+          ...params,
+          contentId: data.id
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Content generation API request failed');
+      }
+
+      const generatedContent = await response.json();
+      return generatedContent;
     } catch (error) {
       console.error('Error generating content:', error);
       throw error;
     }
   }
 
-  private generateSampleContent(contentType: string): string {
-    const templates: Record<string, string> = {
-      email: `Subject: Innovative Solutions for Your Practice
-
-Dear Dr. [Name],
-
-I hope this email finds you well. I wanted to reach out regarding some exciting developments in [procedure type] that could significantly benefit your practice.
-
-Our latest [product/service] has shown remarkable results:
-• 40% improvement in patient satisfaction
-• 25% reduction in procedure time
-• Proven ROI within 6 months
-
-I'd love to schedule a brief call to discuss how this could fit into your practice goals.
-
-Best regards,
-[Your name]`,
-      
-      presentation: `# Revolutionizing [Procedure Type]
-
-## Agenda
-1. Current Market Challenges
-2. Our Innovative Solution
-3. Clinical Evidence
-4. ROI Analysis
-5. Implementation Timeline
-
-## Key Benefits
-- Enhanced patient outcomes
-- Streamlined workflow
-- Competitive advantage
-- Measurable ROI`,
-      
-      social: `🚀 Exciting news in aesthetic medicine! 
-
-Our latest technology is transforming how practices approach [procedure]. With proven results and happy patients, it's time to elevate your practice.
-
-#MedicalInnovation #AestheticMedicine #PracticeGrowth`,
-      
-      proposal: `# Partnership Proposal
-
-## Executive Summary
-This proposal outlines a strategic partnership opportunity designed to enhance your practice's capabilities and patient outcomes.
-
-## Investment
-- Equipment: $XX,XXX
-- Training: Included
-- Support: 24/7
-
-## Expected ROI
-- Break-even: 6 months
-- Annual revenue increase: 35%
-- Patient satisfaction: 95%+`
-    };
-
-    return templates[contentType] || templates.email;
-  }
 
   // Call Intelligence Integration
   async analyzeCall(callSid: string) {
@@ -320,32 +247,26 @@ This proposal outlines a strategic partnership opportunity designed to enhance y
 
       if (existingCall) return existingCall;
 
-      // If not found, create new analysis
-      const { data, error } = await supabase
-        .from('suis_call_intelligence')
-        .insert({
-          twilio_call_sid: callSid,
-          call_metadata: {
-            duration: 0,
-            status: 'analyzing'
-          },
-          sentiment_analysis: {
-            overall: 'neutral',
-            scores: { positive: 0.33, neutral: 0.34, negative: 0.33 }
-          },
-          key_topics: ['product discussion', 'pricing', 'follow-up'],
-          action_items: [
-            { task: 'Send product brochure', dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString() },
-            { task: 'Schedule follow-up demo', dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() }
-          ],
-          follow_up_required: true,
-          created_at: new Date().toISOString()
-        })
-        .select()
-        .single();
+      // Call API to analyze the call
+      const apiManager = await this.getApiManager();
+      const apiKey = apiManager.config.sphere1a.apiKey;
+      
+      const response = await fetch('/api/suis/analyze-call', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'x-openrouter-key': apiManager.config.openRouter.apiKey
+        },
+        body: JSON.stringify({ callSid })
+      });
 
-      if (error) throw error;
-      return data;
+      if (!response.ok) {
+        throw new Error('Call analysis API request failed');
+      }
+
+      const analysisData = await response.json();
+      return analysisData;
     } catch (error) {
       console.error('Error analyzing call:', error);
       throw error;
@@ -369,78 +290,37 @@ This proposal outlines a strategic partnership opportunity designed to enhance y
 
       if (error) throw error;
 
-      // If no data, generate sample analytics
+      // If no data exists, call API to generate real-time analytics
       if (!data || data.length === 0) {
-        return this.generateSampleAnalytics(userId, startDate, endDate);
+        const apiManager = await this.getApiManager();
+        const apiKey = apiManager.config.sphere1a.apiKey;
+        
+        const response = await fetch('/api/suis/analytics', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey
+          },
+          body: JSON.stringify({
+            userId,
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString()
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Analytics API request failed');
+        }
+
+        const analyticsData = await response.json();
+        return analyticsData;
       }
 
       return data[0];
     } catch (error) {
       console.error('Error fetching unified analytics:', error);
-      return this.generateSampleAnalytics(userId, new Date(), new Date());
+      throw error;
     }
-  }
-
-  private generateSampleAnalytics(userId: string, startDate: Date, endDate: Date): UnifiedAnalytics {
-    return {
-      id: 'sample-analytics',
-      userId,
-      analyticsType: 'rep_performance',
-      periodStart: startDate.toISOString(),
-      periodEnd: endDate.toISOString(),
-      metrics: {
-        revenue: {
-          total: 250000,
-          growth: 0.15,
-          target: 300000,
-          achievement: 0.83
-        },
-        activities: {
-          calls: 120,
-          meetings: 45,
-          demos: 28,
-          proposals: 15
-        },
-        conversion: {
-          leadToMeeting: 0.38,
-          meetingToDemo: 0.62,
-          demoToClose: 0.54,
-          overall: 0.13
-        },
-        territories: {
-          coverage: 0.78,
-          penetration: 0.45,
-          growth: 0.22
-        }
-      },
-      insights: [
-        {
-          type: 'opportunity',
-          message: 'High conversion rate in aesthetic practices - focus expansion here',
-          impact: 'high',
-          action: 'Schedule 5 more aesthetic practice demos this month'
-        },
-        {
-          type: 'improvement',
-          message: 'Call-to-meeting conversion below target',
-          impact: 'medium',
-          action: 'Review call scripts and qualifying questions'
-        }
-      ],
-      benchmarks: {
-        teamAverage: {
-          revenue: 220000,
-          conversion: 0.11,
-          activities: 100
-        },
-        topPerformer: {
-          revenue: 350000,
-          conversion: 0.18,
-          activities: 150
-        }
-      },
-      createdAt: new Date().toISOString()
-    };
   }
 
   // Learning Paths

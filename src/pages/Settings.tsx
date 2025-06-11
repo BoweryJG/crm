@@ -27,11 +27,13 @@ import {
   PhoneAndroid as PhoneIcon,
   Email as EmailIcon,
   Palette as PaletteIcon,
-  Save as SaveIcon
+  Save as SaveIcon,
+  Key as KeyIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../themes/ThemeContext';
 import ThemeToggle from '../components/ui/ThemeToggle';
 import { useAuth } from '../auth';
+import ApiKeyManager from '../components/settings/ApiKeyManager';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -183,6 +185,7 @@ const Settings: React.FC = () => {
             <Tab icon={<SecurityIcon />} label="Privacy & Security" />
             <Tab icon={<PhoneIcon />} label="Communication" />
             <Tab icon={<PaletteIcon />} label="Appearance" />
+            <Tab icon={<KeyIcon />} label="API Keys" />
           </Tabs>
         </Box>
 
@@ -495,6 +498,13 @@ const Settings: React.FC = () => {
                 </Box>
               </Grid>
             </Grid>
+          </Box>
+        </TabPanel>
+
+        {/* API Keys */}
+        <TabPanel value={tabValue} index={5}>
+          <Box sx={{ p: 3 }}>
+            <ApiKeyManager />
           </Box>
         </TabPanel>
 
