@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Box, Grid, Card, CardContent, Typography, Chip, LinearProgress, IconButton, Alert } from '@mui/material';
-import { TrendingUp, TrendingDown, Lightbulb, Warning, CheckCircle, RefreshCw } from 'lucide-react';
+import { TrendingUp, TrendingDown, Lightbulb, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
 import { useSUISFeatures } from '../hooks/useSUISFeatures';
 import { PredictiveInsight, PerformanceMetrics } from '../types';
 
@@ -25,7 +25,7 @@ const IntelligenceDashboard: React.FC = () => {
       case 'opportunity':
         return <CheckCircle className="text-green-500" />;
       case 'risk':
-        return <Warning className="text-red-500" />;
+        return <AlertTriangle className="text-red-500" />;
       case 'trend':
         return <TrendingUp className="text-blue-500" />;
       case 'recommendation':
