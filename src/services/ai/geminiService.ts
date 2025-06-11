@@ -4,6 +4,9 @@ import { supabase } from '../supabase/supabase';
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY || '');
 
+// Backend API configuration
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
+
 export interface GeminiAnalysisResult {
   transcription: string;
   summary: string;
@@ -32,13 +35,15 @@ export interface ProcessRecordingParams {
   userId: string;
   source: 'plaud' | 'manual' | 'other';
   externalId?: string;
+  transcriptionProvider?: 'openai' | 'gemini';
+  analysisProvider?: 'openai' | 'gemini';
 }
 
 class GeminiService {
   private model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
   /**
-   * Process an audio file through Gemini for transcription and analysis
+   * Process an audio file through backend API for transcription and analysis
    */
   async processRecording(params: ProcessRecordingParams): Promise<{
     success: boolean;
@@ -47,7 +52,17 @@ class GeminiService {
     error?: string;
   }> {
     try {
-      const { audioFile, contactId, contactName, practiceId, userId, source, externalId } = params;
+      const { 
+        audioFile, 
+        contactId, 
+        contactName, 
+        practiceId, 
+        userId, 
+        source, 
+        externalId,
+        transcriptionProvider = 'gemini',
+        analysisProvider = 'gemini'
+      } = params;
 
       // Create FormData for the upload
       const formData = new FormData();
@@ -58,29 +73,39 @@ class GeminiService {
       formData.append('userId', userId);
       formData.append('source', source);
       formData.append('externalId', externalId || '');
+      formData.append('transcriptionProvider', transcriptionProvider);
+      formData.append('analysisProvider', analysisProvider);
 
-      // Send to Netlify function
-      const response = await fetch('/.netlify/functions/upload-external-recording', {
+      // Send to backend API
+      const response = await fetch(`${BACKEND_URL}/api/upload-external-recording`, {
         method: 'POST',
         body: formData
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to upload recording');
+        const errorData = await response.json().catch(() => ({ error: 'Failed to parse error response' }));
+        throw new Error(errorData.error || `Failed to upload recording: ${response.statusText}`);
       }
 
       const result = await response.json();
 
-      return {
-        success: result.success,
-        data: result.data,
-        recordingId: result.recordingId,
-        error: result.error
-      };
+      // The backend returns a more comprehensive response structure
+      if (result.success) {
+        return {
+          success: true,
+          data: result.data.analysis || result.data,
+          recordingId: result.data.recordingId || result.recordingId,
+          error: undefined
+        };
+      } else {
+        return {
+          success: false,
+          error: result.error || 'Processing failed'
+        };
+      }
 
     } catch (error) {
-      console.error('Error processing recording with Gemini:', error);
+      console.error('Error processing recording:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred'

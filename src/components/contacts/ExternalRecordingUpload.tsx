@@ -67,6 +67,8 @@ export const ExternalRecordingUpload: React.FC<ExternalRecordingUploadProps> = (
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [transcriptionProvider, setTranscriptionProvider] = useState<'openai' | 'gemini'>('gemini');
+  const [analysisProvider, setAnalysisProvider] = useState<'openai' | 'gemini'>('gemini');
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -101,7 +103,7 @@ export const ExternalRecordingUpload: React.FC<ExternalRecordingUploadProps> = (
         setUploadProgress(prev => Math.min(prev + 10, 90));
       }, 500);
 
-      // Process the recording with Gemini
+      // Process the recording with selected providers
       const result = await geminiService.processRecording({
         audioFile: selectedFile,
         contactId,
@@ -109,7 +111,9 @@ export const ExternalRecordingUpload: React.FC<ExternalRecordingUploadProps> = (
         practiceId,
         userId: user.id,
         source,
-        externalId: notes // Using notes field to store any external ID
+        externalId: notes, // Using notes field to store any external ID
+        transcriptionProvider,
+        analysisProvider
       });
 
       clearInterval(progressInterval);
@@ -142,6 +146,8 @@ export const ExternalRecordingUpload: React.FC<ExternalRecordingUploadProps> = (
     setSuccess(false);
     setAnalysisResult(null);
     setUploadProgress(0);
+    setTranscriptionProvider('gemini');
+    setAnalysisProvider('gemini');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -237,6 +243,53 @@ export const ExternalRecordingUpload: React.FC<ExternalRecordingUploadProps> = (
             </Select>
           </FormControl>
 
+          {/* AI Provider Selection */}
+          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+            <FormControl fullWidth>
+              <InputLabel>Transcription Provider</InputLabel>
+              <Select
+                value={transcriptionProvider}
+                onChange={(e) => setTranscriptionProvider(e.target.value as 'openai' | 'gemini')}
+                label="Transcription Provider"
+              >
+                <MenuItem value="gemini">
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <AIIcon sx={{ mr: 1, fontSize: 20 }} />
+                    Gemini
+                  </Box>
+                </MenuItem>
+                <MenuItem value="openai">
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <AIIcon sx={{ mr: 1, fontSize: 20 }} />
+                    OpenAI Whisper
+                  </Box>
+                </MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth>
+              <InputLabel>Analysis Provider</InputLabel>
+              <Select
+                value={analysisProvider}
+                onChange={(e) => setAnalysisProvider(e.target.value as 'openai' | 'gemini')}
+                label="Analysis Provider"
+              >
+                <MenuItem value="gemini">
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <AIIcon sx={{ mr: 1, fontSize: 20 }} />
+                    Gemini
+                  </Box>
+                </MenuItem>
+                <MenuItem value="openai">
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <AIIcon sx={{ mr: 1, fontSize: 20 }} />
+                    GPT-4
+                  </Box>
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+
           {/* Notes */}
           <TextField
             fullWidth
@@ -260,7 +313,8 @@ export const ExternalRecordingUpload: React.FC<ExternalRecordingUploadProps> = (
           {isUploading && (
             <Box sx={{ mt: 3 }}>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                Processing with Gemini AI...
+                Processing with {transcriptionProvider === 'openai' ? 'OpenAI Whisper' : 'Gemini'} for transcription
+                and {analysisProvider === 'openai' ? 'GPT-4' : 'Gemini'} for analysis...
               </Typography>
               <LinearProgress variant="determinate" value={uploadProgress} />
             </Box>
