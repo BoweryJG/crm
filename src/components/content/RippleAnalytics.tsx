@@ -652,7 +652,7 @@ const RippleAnalytics: React.FC<RippleAnalyticsProps> = ({ userId = 'demo-user' 
                           Peak Engagement Time
                         </Typography>
                         <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-                          <AccessTime sx={{ mr: 1, color: 'primary.main' }} />
+                          <RecentIcon sx={{ mr: 1, color: 'primary.main' }} />
                           <Typography variant="h6">
                             2:00 PM - 4:00 PM
                           </Typography>
