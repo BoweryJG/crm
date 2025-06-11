@@ -1,3 +1,3 @@
-// SUIS Hooks Export
-export { useSUISFeatures } from './useSUISFeatures';
+// SUIS Hooks Exports
 export { useSUIS } from '../components/SUISProvider';
+export { useSUISFeatures } from './useSUISFeatures';
