@@ -2,7 +2,7 @@
 
 A visually stunning and comprehensive CRM specifically designed for medical sales representatives in the aesthetic and dental industries.
 
-Last updated: June 11, 2025
+Last updated: December 6, 2025
 
 🚀 **Live at**: [crm.repspheres.com](https://crm.repspheres.com)
 
@@ -208,7 +208,7 @@ Run migrations from `supabase/migrations/` folder in chronological order.
 - Dedicated success manager
 - Unlimited team members
 
-## Recent Updates (June 2025)
+## Recent Updates (December 2025)
 
 - ✅ SUIS (Sphere Universal Intelligence System) implementation
 - ✅ External recording upload with AI analysis (PLAUD support)
@@ -219,6 +219,9 @@ Run migrations from `supabase/migrations/` folder in chronological order.
 - ✅ Backend API migration for better scalability
 - ✅ Advanced linguistics analysis
 - ✅ Contact enrichment scripts
+- ✅ OAuth authentication with Google/Facebook support
+- ✅ Multi-module authentication flow (CRM, Canvas, Market Data)
+- ✅ Return-to-origin auth redirect system
 
 ## Development Roadmap
 
