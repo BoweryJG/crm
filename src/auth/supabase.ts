@@ -37,13 +37,10 @@ export const supabase = getSupabaseClient();
 export const getAppUrl = () => {
   if (typeof window === 'undefined') return '';
   
-  // In production, use the actual domain
-  if (window.location.hostname !== 'localhost') {
-    return window.location.origin;
-  }
-  
-  // In development, use localhost
-  return 'http://localhost:3000';
+  // Always use the current origin to handle different ports
+  const currentUrl = window.location.origin;
+  console.log('Current app URL for OAuth redirect:', currentUrl);
+  return currentUrl;
 };
 
 // Get redirect URL for OAuth

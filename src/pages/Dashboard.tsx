@@ -27,9 +27,21 @@ const Dashboard: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const { themeMode } = useThemeContext();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { dashboardData, loading, mockActivities, mockTasks } = useDashboardData();
   
+  // Debug auth state
+  React.useEffect(() => {
+    console.log('Dashboard - Auth state:', { user: user?.email, authLoading });
+  }, [user, authLoading]);
+
+  if (authLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Skeleton variant="rectangular" width="100%" height="100%" />
+      </Box>
+    );
+  }
 
   return (
     <Box>

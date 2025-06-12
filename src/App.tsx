@@ -16,6 +16,7 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Auth/Login';
 import Signup from './pages/Auth/Signup';
 import ForgotPassword from './pages/Auth/ForgotPassword';
+import AuthCallback from './pages/AuthCallback';
 import GlobalCallPanel from './components/communications/GlobalCallPanel';
 import { SubscriptionUpgradeModal } from './components/common/SubscriptionUpgradeModal';
 import { FeatureUpgradeModal } from './components/common/FeatureUpgradeModal';
@@ -94,6 +95,7 @@ const App: React.FC = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
                 
                 {/* Public Ripple Route - no layout needed */}
                 <Route path="/ripple/:rippleToken" element={<Suspense fallback={<SphereLoadingScreen loadingText="RIPPLE" message="LOADING PERSONALIZED CONTENT" />}><RipplePage /></Suspense>} />

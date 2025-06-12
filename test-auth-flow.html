@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Auth Flow</title>
+</head>
+<body>
+    <h1>Test RepSpheres Auth Flow</h1>
+    
+    <h2>Steps to Test:</h2>
+    <ol>
+        <li>Open Browser Developer Console (F12)</li>
+        <li>Run the clear storage command below</li>
+        <li>Go to your app and try to login</li>
+        <li>Watch the console for debug messages</li>
+        <li>Note what URL you end up at after OAuth callback</li>
+    </ol>
+    
+    <h2>Clear Storage Command:</h2>
+    <pre>
+// Copy and paste this in your browser console:
+Object.keys(localStorage).filter(k => k.includes('supabase')).forEach(k => {
+    console.log('Removing:', k);
+    localStorage.removeItem(k);
+});
+console.log('Storage cleared! Now try logging in.');
+    </pre>
+    
+    <h2>Expected Console Messages:</h2>
+    <ul>
+        <li>"Supabase URL: https://cbopynuvhcymbumjnvay.supabase.co"</li>
+        <li>"Current app URL for OAuth redirect: http://localhost:3000" (or your current URL)</li>
+        <li>"OAuth sign in - redirect URL: http://localhost:3000/"</li>
+        <li>"Initial auth check: [email] null" (before login)</li>
+        <li>"Auth state changed: SIGNED_IN [email]" (after successful login)</li>
+    </ul>
+    
+    <h2>What to Check:</h2>
+    <ul>
+        <li>Does the OAuth popup/redirect happen?</li>
+        <li>After OAuth, what URL does it redirect to?</li>
+        <li>Do you see "Auth state changed: SIGNED_IN" in console?</li>
+        <li>Are there any error messages?</li>
+    </ul>
+</body>
+</html>

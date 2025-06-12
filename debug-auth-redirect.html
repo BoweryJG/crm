@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Auth Redirect</title>
+</head>
+<body>
+    <h1>Debug Auth Redirect</h1>
+    <div id="info"></div>
+    
+    <script>
+        // This will help debug what's happening after OAuth redirect
+        const info = document.getElementById('info');
+        
+        // Check URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        
+        info.innerHTML = `
+            <h2>Current URL Info:</h2>
+            <p><strong>Full URL:</strong> ${window.location.href}</p>
+            <p><strong>Pathname:</strong> ${window.location.pathname}</p>
+            <p><strong>Search:</strong> ${window.location.search}</p>
+            <p><strong>Hash:</strong> ${window.location.hash}</p>
+            
+            <h2>URL Parameters:</h2>
+            <ul>
+                ${Array.from(urlParams.entries()).map(([key, value]) => 
+                    `<li>${key}: ${value}</li>`
+                ).join('')}
+            </ul>
+            
+            <h2>Hash Parameters:</h2>
+            <ul>
+                ${Array.from(hashParams.entries()).map(([key, value]) => 
+                    `<li>${key}: ${value}</li>`
+                ).join('')}
+            </ul>
+            
+            <h2>LocalStorage (Supabase keys):</h2>
+            <ul>
+                ${Object.keys(localStorage)
+                    .filter(key => key.includes('supabase'))
+                    .map(key => `<li>${key}: ${localStorage.getItem(key)?.substring(0, 100)}...</li>`)
+                    .join('')}
+            </ul>
+        `;
+        
+        // If there's an access_token in the hash, Supabase should handle it
+        if (hashParams.has('access_token')) {
+            info.innerHTML += '<h3 style="color: green;">OAuth callback detected! Supabase should process this.</h3>';
+        }
+    </script>
+</body>
+</html>

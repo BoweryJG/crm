@@ -53,6 +53,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         
+        console.log('Initial auth check:', session?.user?.email, error);
+        
         if (error) throw error;
         
         if (mounted) {
@@ -64,6 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           });
         }
       } catch (error: any) {
+        console.error('Auth initialization error:', error);
         if (mounted) {
           setState({
             user: null,
@@ -79,7 +82,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
         if (mounted) {
           setState(prev => ({
             ...prev,
@@ -105,17 +109,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      // Store the current path so we can return to it after auth
+      const currentPath = window.location.pathname;
+      if (currentPath !== '/login' && currentPath !== '/signup') {
+        localStorage.setItem('authReturnPath', currentPath);
+      }
+      
+      const redirectUrl = options?.redirectTo || getRedirectUrl('/auth/callback');
+      console.log('OAuth sign in - redirect URL:', redirectUrl);
+      console.log('Will return to:', localStorage.getItem('authReturnPath') || '/');
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: provider as any,
         options: {
-          redirectTo: options?.redirectTo || getRedirectUrl('/dashboard'),
+          redirectTo: redirectUrl,
           scopes: options?.scopes,
           queryParams: options?.queryParams,
         },
       });
       
+      console.log('OAuth response:', { data, error });
+      
       if (error) throw error;
     } catch (error: any) {
+      console.error('OAuth sign in error:', error);
       setState(prev => ({ 
         ...prev, 
         loading: false, 

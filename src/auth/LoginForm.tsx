@@ -12,11 +12,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const handleGoogleLogin = async () => {
     setIsSigningIn(true);
     try {
+      // The auth context will handle storing the return path
       await signInWithProvider('google');
-      onSuccess?.();
+      // Don't call onSuccess here - let the OAuth callback handle navigation
     } catch (err) {
       console.error('Login failed:', err);
-    } finally {
       setIsSigningIn(false);
     }
   };
@@ -24,11 +24,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const handleFacebookLogin = async () => {
     setIsSigningIn(true);
     try {
+      // The auth context will handle storing the return path
       await signInWithProvider('facebook');
-      onSuccess?.();
+      // Don't call onSuccess here - let the OAuth callback handle navigation
     } catch (err) {
       console.error('Login failed:', err);
-    } finally {
       setIsSigningIn(false);
     }
   };
