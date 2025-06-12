@@ -19,3 +19,1505 @@ To create a production build, use npm run build.
 
 webpack compiled successfully
 No issues found.
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+ERROR in src/components/contacts/BusinessCardScanner.tsx:26:27
+TS2307: Cannot find module './CameraCapture' or its corresponding type declarations.
+    24 |   CloudUpload as CloudUploadIcon
+    25 | } from '@mui/icons-material';
+  > 26 | import CameraCapture from './CameraCapture';
+       |                           ^^^^^^^^^^^^^^^^^
+    27 | import CardProcessor from './CardProcessor';
+    28 | import ContactReview from './ContactReview';
+    29 | import { Contact } from '../../types/models';
+
+ERROR in src/components/contacts/BusinessCardScanner.tsx:27:27
+TS2307: Cannot find module './CardProcessor' or its corresponding type declarations.
+    25 | } from '@mui/icons-material';
+    26 | import CameraCapture from './CameraCapture';
+  > 27 | import CardProcessor from './CardProcessor';
+       |                           ^^^^^^^^^^^^^^^^^
+    28 | import ContactReview from './ContactReview';
+    29 | import { Contact } from '../../types/models';
+    30 |
+
+ERROR in src/components/contacts/BusinessCardScanner.tsx:28:27
+TS2307: Cannot find module './ContactReview' or its corresponding type declarations.
+    26 | import CameraCapture from './CameraCapture';
+    27 | import CardProcessor from './CardProcessor';
+  > 28 | import ContactReview from './ContactReview';
+       |                           ^^^^^^^^^^^^^^^^^
+    29 | import { Contact } from '../../types/models';
+    30 |
+    31 | interface BusinessCardScannerProps {
+
+ERROR in src/components/contacts/BusinessCardScanner.tsx:131:23
+TS7006: Parameter 'err' implicitly has an 'any' type.
+    129 |           <CameraCapture
+    130 |             onCapture={handleCapture}
+  > 131 |             onError={(err) => setError(err)}
+        |                       ^^^
+    132 |           />
+    133 |         );
+    134 |       
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+ERROR in src/components/contacts/BusinessCardScanner.tsx:27:27
+TS2307: Cannot find module './CardProcessor' or its corresponding type declarations.
+    25 | } from '@mui/icons-material';
+    26 | import CameraCapture from './CameraCapture';
+  > 27 | import CardProcessor from './CardProcessor';
+       |                           ^^^^^^^^^^^^^^^^^
+    28 | import ContactReview from './ContactReview';
+    29 | import { Contact } from '../../types/models';
+    30 |
+
+ERROR in src/components/contacts/BusinessCardScanner.tsx:28:27
+TS2307: Cannot find module './ContactReview' or its corresponding type declarations.
+    26 | import CameraCapture from './CameraCapture';
+    27 | import CardProcessor from './CardProcessor';
+  > 28 | import ContactReview from './ContactReview';
+       |                           ^^^^^^^^^^^^^^^^^
+    29 | import { Contact } from '../../types/models';
+    30 |
+    31 | interface BusinessCardScannerProps {
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+ERROR in src/components/contacts/BusinessCardScanner.tsx:28:27
+TS2307: Cannot find module './ContactReview' or its corresponding type declarations.
+    26 | import CameraCapture from './CameraCapture';
+    27 | import CardProcessor from './CardProcessor';
+  > 28 | import ContactReview from './ContactReview';
+       |                           ^^^^^^^^^^^^^^^^^
+    29 | import { Contact } from '../../types/models';
+    30 |
+    31 | interface BusinessCardScannerProps {
+
+ERROR in src/components/contacts/CardProcessor.tsx:138:7
+TS2322: Type 'string' is not assignable to type '"dental" | "aesthetic" | "both" | "other" | undefined'.
+    136 |       title: title || '',
+    137 |       practice_name: company || '',
+  > 138 |       specialization,
+        |       ^^^^^^^^^^^^^^
+    139 |       practiceType,
+    140 |       website,
+    141 |       linkedIn,
+
+ERROR in src/components/contacts/CardProcessor.tsx:201:16
+TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+    199 |     if (text.includes('filler')) tags.push('Fillers');
+    200 |     
+  > 201 |     return [...new Set(tags)]; // Remove duplicates
+        |                ^^^^^^^^^^^^^
+    202 |   }
+    203 |
+    204 |   private mockProcessing(imageData: string): Partial<Contact> {
+
+ERROR in src/components/contacts/CardProcessor.tsx:223:7
+TS2322: Type 'string' is not assignable to type '"dental" | "aesthetic" | "both" | "other" | undefined'.
+    221 |       title: mock.title,
+    222 |       practice_name: mock.company,
+  > 223 |       specialization,
+        |       ^^^^^^^^^^^^^^
+    224 |       practiceType: this.detectPracticeType(mock.title, mock.company, specialization),
+    225 |       notes: 'Demo: Scanned from business card',
+    226 |       tags: this.generateTags(mock.title, mock.company, specialization)
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/components/contacts/CardProcessor.tsx:138:7
+TS2322: Type 'string' is not assignable to type '"dental" | "aesthetic" | "both" | "other" | undefined'.
+    136 |       title: title || '',
+    137 |       practice_name: company || '',
+  > 138 |       specialization,
+        |       ^^^^^^^^^^^^^^
+    139 |       practiceType,
+    140 |       website,
+    141 |       linkedIn,
+
+ERROR in src/components/contacts/CardProcessor.tsx:201:16
+TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+    199 |     if (text.includes('filler')) tags.push('Fillers');
+    200 |     
+  > 201 |     return [...new Set(tags)]; // Remove duplicates
+        |                ^^^^^^^^^^^^^
+    202 |   }
+    203 |
+    204 |   private mockProcessing(imageData: string): Partial<Contact> {
+
+ERROR in src/components/contacts/CardProcessor.tsx:223:7
+TS2322: Type 'string' is not assignable to type '"dental" | "aesthetic" | "both" | "other" | undefined'.
+    221 |       title: mock.title,
+    222 |       practice_name: mock.company,
+  > 223 |       specialization,
+        |       ^^^^^^^^^^^^^^
+    224 |       practiceType: this.detectPracticeType(mock.title, mock.company, specialization),
+    225 |       notes: 'Demo: Scanned from business card',
+    226 |       tags: this.generateTags(mock.title, mock.company, specialization)
+
+ERROR in src/components/contacts/ContactReview.tsx:49:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Nursing"' have no overlap.
+    47 |     ...data,
+    48 |     status: 'active',
+  > 49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+
+ERROR in src/components/contacts/ContactReview.tsx:50:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Plastic Surgery"' have no overlap.
+    48 |     status: 'active',
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+  > 50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:51:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Dermatology"' have no overlap.
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+  > 51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:52:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Medicine"' have no overlap.
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+  > 52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+
+ERROR in src/components/contacts/ContactReview.tsx:53:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Orthodontics"' have no overlap.
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+  > 53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:54:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Periodontics"' have no overlap.
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+  > 54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+
+ERROR in src/components/contacts/ContactReview.tsx:55:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Oral Surgery"' have no overlap.
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+  > 55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+    58 |   });
+
+ERROR in src/components/contacts/ContactReview.tsx:56:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Endodontics"' have no overlap.
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+  > 56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    57 |           'dentist'
+    58 |   });
+    59 |   
+
+ERROR in src/components/contacts/ContactReview.tsx:285:25
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    283 |                 />
+    284 |               </Grid>
+  > 285 |               {formData.website && (
+        |                         ^^^^^^^
+    286 |                 <Grid item xs={12} sm={6}>
+    287 |                   <TextField
+    288 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:290:37
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    288 |                     fullWidth
+    289 |                     label="Website"
+  > 290 |                     value={formData.website || ''}
+        |                                     ^^^^^^^
+    291 |                     onChange={handleChange('website')}
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:291:44
+TS2345: Argument of type '"website"' is not assignable to parameter of type 'keyof Contact'.
+    289 |                     label="Website"
+    290 |                     value={formData.website || ''}
+  > 291 |                     onChange={handleChange('website')}
+        |                                            ^^^^^^^^^
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+    294 |                     }}
+
+ERROR in src/components/contacts/ContactReview.tsx:298:25
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    296 |                 </Grid>
+    297 |               )}
+  > 298 |               {formData.linkedIn && (
+        |                         ^^^^^^^^
+    299 |                 <Grid item xs={12} sm={6}>
+    300 |                   <TextField
+    301 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:303:37
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    301 |                     fullWidth
+    302 |                     label="LinkedIn"
+  > 303 |                     value={formData.linkedIn || ''}
+        |                                     ^^^^^^^^
+    304 |                     onChange={handleChange('linkedIn')}
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:304:44
+TS2345: Argument of type '"linkedIn"' is not assignable to parameter of type 'keyof Contact'.
+    302 |                     label="LinkedIn"
+    303 |                     value={formData.linkedIn || ''}
+  > 304 |                     onChange={handleChange('linkedIn')}
+        |                                            ^^^^^^^^^^
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+    307 |                     }}
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+ERROR in src/components/contacts/CardProcessor.tsx:145:7
+TS2322: Type 'string' is not assignable to type '"dental" | "aesthetic" | "both" | "other" | undefined'.
+    143 |       title: title || '',
+    144 |       practice_name: company || '',
+  > 145 |       specialization,
+        |       ^^^^^^^^^^^^^^
+    146 |       practiceType,
+    147 |       website,
+    148 |       linkedIn,
+
+ERROR in src/components/contacts/CardProcessor.tsx:208:16
+TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+    206 |     if (text.includes('filler')) tags.push('Fillers');
+    207 |     
+  > 208 |     return [...new Set(tags)]; // Remove duplicates
+        |                ^^^^^^^^^^^^^
+    209 |   }
+    210 |
+    211 |   private mockProcessing(imageData: string): Partial<Contact> {
+
+ERROR in src/components/contacts/CardProcessor.tsx:230:7
+TS2322: Type 'string' is not assignable to type '"dental" | "aesthetic" | "both" | "other" | undefined'.
+    228 |       title: mock.title,
+    229 |       practice_name: mock.company,
+  > 230 |       specialization,
+        |       ^^^^^^^^^^^^^^
+    231 |       practiceType: this.detectPracticeType(mock.title, mock.company, specialization),
+    232 |       notes: 'Demo: Scanned from business card',
+    233 |       tags: this.generateTags(mock.title, mock.company, specialization)
+
+ERROR in src/components/contacts/ContactReview.tsx:49:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Nursing"' have no overlap.
+    47 |     ...data,
+    48 |     status: 'active',
+  > 49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+
+ERROR in src/components/contacts/ContactReview.tsx:50:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Plastic Surgery"' have no overlap.
+    48 |     status: 'active',
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+  > 50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:51:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Dermatology"' have no overlap.
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+  > 51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:52:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Medicine"' have no overlap.
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+  > 52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+
+ERROR in src/components/contacts/ContactReview.tsx:53:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Orthodontics"' have no overlap.
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+  > 53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:54:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Periodontics"' have no overlap.
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+  > 54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+
+ERROR in src/components/contacts/ContactReview.tsx:55:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Oral Surgery"' have no overlap.
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+  > 55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+    58 |   });
+
+ERROR in src/components/contacts/ContactReview.tsx:56:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Endodontics"' have no overlap.
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+  > 56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    57 |           'dentist'
+    58 |   });
+    59 |   
+
+ERROR in src/components/contacts/ContactReview.tsx:285:25
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    283 |                 />
+    284 |               </Grid>
+  > 285 |               {formData.website && (
+        |                         ^^^^^^^
+    286 |                 <Grid item xs={12} sm={6}>
+    287 |                   <TextField
+    288 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:290:37
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    288 |                     fullWidth
+    289 |                     label="Website"
+  > 290 |                     value={formData.website || ''}
+        |                                     ^^^^^^^
+    291 |                     onChange={handleChange('website')}
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:291:44
+TS2345: Argument of type '"website"' is not assignable to parameter of type 'keyof Contact'.
+    289 |                     label="Website"
+    290 |                     value={formData.website || ''}
+  > 291 |                     onChange={handleChange('website')}
+        |                                            ^^^^^^^^^
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+    294 |                     }}
+
+ERROR in src/components/contacts/ContactReview.tsx:298:25
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    296 |                 </Grid>
+    297 |               )}
+  > 298 |               {formData.linkedIn && (
+        |                         ^^^^^^^^
+    299 |                 <Grid item xs={12} sm={6}>
+    300 |                   <TextField
+    301 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:303:37
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    301 |                     fullWidth
+    302 |                     label="LinkedIn"
+  > 303 |                     value={formData.linkedIn || ''}
+        |                                     ^^^^^^^^
+    304 |                     onChange={handleChange('linkedIn')}
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:304:44
+TS2345: Argument of type '"linkedIn"' is not assignable to parameter of type 'keyof Contact'.
+    302 |                     label="LinkedIn"
+    303 |                     value={formData.linkedIn || ''}
+  > 304 |                     onChange={handleChange('linkedIn')}
+        |                                            ^^^^^^^^^^
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+    307 |                     }}
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+ERROR in src/components/contacts/CardProcessor.tsx:145:7
+TS2322: Type 'string' is not assignable to type '"dental" | "aesthetic" | "both" | "other" | undefined'.
+    143 |       title: title || '',
+    144 |       practice_name: company || '',
+  > 145 |       specialization,
+        |       ^^^^^^^^^^^^^^
+    146 |       practiceType,
+    147 |       website,
+    148 |       linkedIn,
+
+ERROR in src/components/contacts/CardProcessor.tsx:208:16
+TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+    206 |     if (text.includes('filler')) tags.push('Fillers');
+    207 |     
+  > 208 |     return [...new Set(tags)]; // Remove duplicates
+        |                ^^^^^^^^^^^^^
+    209 |   }
+    210 |
+    211 |   private mockProcessing(imageData: string): Partial<Contact> {
+
+ERROR in src/components/contacts/CardProcessor.tsx:230:7
+TS2322: Type 'string' is not assignable to type '"dental" | "aesthetic" | "both" | "other" | undefined'.
+    228 |       title: mock.title,
+    229 |       practice_name: mock.company,
+  > 230 |       specialization,
+        |       ^^^^^^^^^^^^^^
+    231 |       practiceType: this.detectPracticeType(mock.title, mock.company, specialization),
+    232 |       notes: 'Demo: Scanned from business card',
+    233 |       tags: this.generateTags(mock.title, mock.company, specialization)
+
+ERROR in src/components/contacts/ContactReview.tsx:49:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Nursing"' have no overlap.
+    47 |     ...data,
+    48 |     status: 'active',
+  > 49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+
+ERROR in src/components/contacts/ContactReview.tsx:50:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Plastic Surgery"' have no overlap.
+    48 |     status: 'active',
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+  > 50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:51:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Dermatology"' have no overlap.
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+  > 51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:52:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Medicine"' have no overlap.
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+  > 52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+
+ERROR in src/components/contacts/ContactReview.tsx:53:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Orthodontics"' have no overlap.
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+  > 53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:54:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Periodontics"' have no overlap.
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+  > 54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+
+ERROR in src/components/contacts/ContactReview.tsx:55:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Oral Surgery"' have no overlap.
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+  > 55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+    58 |   });
+
+ERROR in src/components/contacts/ContactReview.tsx:56:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Endodontics"' have no overlap.
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+  > 56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    57 |           'dentist'
+    58 |   });
+    59 |   
+
+ERROR in src/components/contacts/ContactReview.tsx:285:25
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    283 |                 />
+    284 |               </Grid>
+  > 285 |               {formData.website && (
+        |                         ^^^^^^^
+    286 |                 <Grid item xs={12} sm={6}>
+    287 |                   <TextField
+    288 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:290:37
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    288 |                     fullWidth
+    289 |                     label="Website"
+  > 290 |                     value={formData.website || ''}
+        |                                     ^^^^^^^
+    291 |                     onChange={handleChange('website')}
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:291:44
+TS2345: Argument of type '"website"' is not assignable to parameter of type 'keyof Contact'.
+    289 |                     label="Website"
+    290 |                     value={formData.website || ''}
+  > 291 |                     onChange={handleChange('website')}
+        |                                            ^^^^^^^^^
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+    294 |                     }}
+
+ERROR in src/components/contacts/ContactReview.tsx:298:25
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    296 |                 </Grid>
+    297 |               )}
+  > 298 |               {formData.linkedIn && (
+        |                         ^^^^^^^^
+    299 |                 <Grid item xs={12} sm={6}>
+    300 |                   <TextField
+    301 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:303:37
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    301 |                     fullWidth
+    302 |                     label="LinkedIn"
+  > 303 |                     value={formData.linkedIn || ''}
+        |                                     ^^^^^^^^
+    304 |                     onChange={handleChange('linkedIn')}
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:304:44
+TS2345: Argument of type '"linkedIn"' is not assignable to parameter of type 'keyof Contact'.
+    302 |                     label="LinkedIn"
+    303 |                     value={formData.linkedIn || ''}
+  > 304 |                     onChange={handleChange('linkedIn')}
+        |                                            ^^^^^^^^^^
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+    307 |                     }}
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+ERROR in src/components/contacts/CardProcessor.tsx:145:7
+TS2322: Type 'string' is not assignable to type '"dental" | "aesthetic" | "both" | "other" | undefined'.
+    143 |       title: title || '',
+    144 |       practice_name: company || '',
+  > 145 |       specialization,
+        |       ^^^^^^^^^^^^^^
+    146 |       practiceType,
+    147 |       website,
+    148 |       linkedIn,
+
+ERROR in src/components/contacts/CardProcessor.tsx:208:16
+TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+    206 |     if (text.includes('filler')) tags.push('Fillers');
+    207 |     
+  > 208 |     return [...new Set(tags)]; // Remove duplicates
+        |                ^^^^^^^^^^^^^
+    209 |   }
+    210 |
+    211 |   private mockProcessing(imageData: string): Partial<Contact> {
+
+ERROR in src/components/contacts/CardProcessor.tsx:230:7
+TS2322: Type 'string' is not assignable to type '"dental" | "aesthetic" | "both" | "other" | undefined'.
+    228 |       title: mock.title,
+    229 |       practice_name: mock.company,
+  > 230 |       specialization,
+        |       ^^^^^^^^^^^^^^
+    231 |       practiceType: this.detectPracticeType(mock.title, mock.company, specialization),
+    232 |       notes: 'Demo: Scanned from business card',
+    233 |       tags: this.generateTags(mock.title, mock.company, specialization)
+
+ERROR in src/components/contacts/ContactReview.tsx:49:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Nursing"' have no overlap.
+    47 |     ...data,
+    48 |     status: 'active',
+  > 49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+
+ERROR in src/components/contacts/ContactReview.tsx:50:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Plastic Surgery"' have no overlap.
+    48 |     status: 'active',
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+  > 50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:51:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Dermatology"' have no overlap.
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+  > 51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:52:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Medicine"' have no overlap.
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+  > 52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+
+ERROR in src/components/contacts/ContactReview.tsx:53:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Orthodontics"' have no overlap.
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+  > 53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:54:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Periodontics"' have no overlap.
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+  > 54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+
+ERROR in src/components/contacts/ContactReview.tsx:55:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Oral Surgery"' have no overlap.
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+  > 55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+    58 |   });
+
+ERROR in src/components/contacts/ContactReview.tsx:56:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Endodontics"' have no overlap.
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+  > 56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    57 |           'dentist'
+    58 |   });
+    59 |   
+
+ERROR in src/components/contacts/ContactReview.tsx:285:25
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    283 |                 />
+    284 |               </Grid>
+  > 285 |               {formData.website && (
+        |                         ^^^^^^^
+    286 |                 <Grid item xs={12} sm={6}>
+    287 |                   <TextField
+    288 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:290:37
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    288 |                     fullWidth
+    289 |                     label="Website"
+  > 290 |                     value={formData.website || ''}
+        |                                     ^^^^^^^
+    291 |                     onChange={handleChange('website')}
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:291:44
+TS2345: Argument of type '"website"' is not assignable to parameter of type 'keyof Contact'.
+    289 |                     label="Website"
+    290 |                     value={formData.website || ''}
+  > 291 |                     onChange={handleChange('website')}
+        |                                            ^^^^^^^^^
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+    294 |                     }}
+
+ERROR in src/components/contacts/ContactReview.tsx:298:25
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    296 |                 </Grid>
+    297 |               )}
+  > 298 |               {formData.linkedIn && (
+        |                         ^^^^^^^^
+    299 |                 <Grid item xs={12} sm={6}>
+    300 |                   <TextField
+    301 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:303:37
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    301 |                     fullWidth
+    302 |                     label="LinkedIn"
+  > 303 |                     value={formData.linkedIn || ''}
+        |                                     ^^^^^^^^
+    304 |                     onChange={handleChange('linkedIn')}
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:304:44
+TS2345: Argument of type '"linkedIn"' is not assignable to parameter of type 'keyof Contact'.
+    302 |                     label="LinkedIn"
+    303 |                     value={formData.linkedIn || ''}
+  > 304 |                     onChange={handleChange('linkedIn')}
+        |                                            ^^^^^^^^^^
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+    307 |                     }}
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+ERROR in src/components/contacts/CardProcessor.tsx:213:16
+TS2802: Type 'Set<string>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+    211 |     if (text.includes('filler')) tags.push('Fillers');
+    212 |     
+  > 213 |     return [...new Set(tags)]; // Remove duplicates
+        |                ^^^^^^^^^^^^^
+    214 |   }
+    215 |
+    216 |   private mockProcessing(imageData: string): Partial<Contact> {
+
+ERROR in src/components/contacts/CardProcessor.tsx:235:7
+TS2322: Type 'string' is not assignable to type '"dental" | "aesthetic" | "both" | "other" | undefined'.
+    233 |       title: mock.title,
+    234 |       practice_name: mock.company,
+  > 235 |       specialization,
+        |       ^^^^^^^^^^^^^^
+    236 |       practiceType: this.detectPracticeType(mock.title, mock.company, specialization),
+    237 |       notes: 'Demo: Scanned from business card',
+    238 |       tags: this.generateTags(mock.title, mock.company, specialization)
+
+ERROR in src/components/contacts/ContactReview.tsx:49:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Nursing"' have no overlap.
+    47 |     ...data,
+    48 |     status: 'active',
+  > 49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+
+ERROR in src/components/contacts/ContactReview.tsx:50:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Plastic Surgery"' have no overlap.
+    48 |     status: 'active',
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+  > 50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:51:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Dermatology"' have no overlap.
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+  > 51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:52:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Medicine"' have no overlap.
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+  > 52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+
+ERROR in src/components/contacts/ContactReview.tsx:53:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Orthodontics"' have no overlap.
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+  > 53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:54:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Periodontics"' have no overlap.
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+  > 54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+
+ERROR in src/components/contacts/ContactReview.tsx:55:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Oral Surgery"' have no overlap.
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+  > 55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+    58 |   });
+
+ERROR in src/components/contacts/ContactReview.tsx:56:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Endodontics"' have no overlap.
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+  > 56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    57 |           'dentist'
+    58 |   });
+    59 |   
+
+ERROR in src/components/contacts/ContactReview.tsx:285:25
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    283 |                 />
+    284 |               </Grid>
+  > 285 |               {formData.website && (
+        |                         ^^^^^^^
+    286 |                 <Grid item xs={12} sm={6}>
+    287 |                   <TextField
+    288 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:290:37
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    288 |                     fullWidth
+    289 |                     label="Website"
+  > 290 |                     value={formData.website || ''}
+        |                                     ^^^^^^^
+    291 |                     onChange={handleChange('website')}
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:291:44
+TS2345: Argument of type '"website"' is not assignable to parameter of type 'keyof Contact'.
+    289 |                     label="Website"
+    290 |                     value={formData.website || ''}
+  > 291 |                     onChange={handleChange('website')}
+        |                                            ^^^^^^^^^
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+    294 |                     }}
+
+ERROR in src/components/contacts/ContactReview.tsx:298:25
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    296 |                 </Grid>
+    297 |               )}
+  > 298 |               {formData.linkedIn && (
+        |                         ^^^^^^^^
+    299 |                 <Grid item xs={12} sm={6}>
+    300 |                   <TextField
+    301 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:303:37
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    301 |                     fullWidth
+    302 |                     label="LinkedIn"
+  > 303 |                     value={formData.linkedIn || ''}
+        |                                     ^^^^^^^^
+    304 |                     onChange={handleChange('linkedIn')}
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:304:44
+TS2345: Argument of type '"linkedIn"' is not assignable to parameter of type 'keyof Contact'.
+    302 |                     label="LinkedIn"
+    303 |                     value={formData.linkedIn || ''}
+  > 304 |                     onChange={handleChange('linkedIn')}
+        |                                            ^^^^^^^^^^
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+    307 |                     }}
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+ERROR in src/components/contacts/CardProcessor.tsx:235:7
+TS2322: Type 'string' is not assignable to type '"dental" | "aesthetic" | "both" | "other" | undefined'.
+    233 |       title: mock.title,
+    234 |       practice_name: mock.company,
+  > 235 |       specialization,
+        |       ^^^^^^^^^^^^^^
+    236 |       practiceType: this.detectPracticeType(mock.title, mock.company, specialization),
+    237 |       notes: 'Demo: Scanned from business card',
+    238 |       tags: this.generateTags(mock.title, mock.company, specialization)
+
+ERROR in src/components/contacts/ContactReview.tsx:49:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Nursing"' have no overlap.
+    47 |     ...data,
+    48 |     status: 'active',
+  > 49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+
+ERROR in src/components/contacts/ContactReview.tsx:50:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Plastic Surgery"' have no overlap.
+    48 |     status: 'active',
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+  > 50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:51:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Dermatology"' have no overlap.
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+  > 51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:52:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Medicine"' have no overlap.
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+  > 52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+
+ERROR in src/components/contacts/ContactReview.tsx:53:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Orthodontics"' have no overlap.
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+  > 53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:54:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Periodontics"' have no overlap.
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+  > 54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+
+ERROR in src/components/contacts/ContactReview.tsx:55:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Oral Surgery"' have no overlap.
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+  > 55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+    58 |   });
+
+ERROR in src/components/contacts/ContactReview.tsx:56:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Endodontics"' have no overlap.
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+  > 56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    57 |           'dentist'
+    58 |   });
+    59 |   
+
+ERROR in src/components/contacts/ContactReview.tsx:285:25
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    283 |                 />
+    284 |               </Grid>
+  > 285 |               {formData.website && (
+        |                         ^^^^^^^
+    286 |                 <Grid item xs={12} sm={6}>
+    287 |                   <TextField
+    288 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:290:37
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    288 |                     fullWidth
+    289 |                     label="Website"
+  > 290 |                     value={formData.website || ''}
+        |                                     ^^^^^^^
+    291 |                     onChange={handleChange('website')}
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:291:44
+TS2345: Argument of type '"website"' is not assignable to parameter of type 'keyof Contact'.
+    289 |                     label="Website"
+    290 |                     value={formData.website || ''}
+  > 291 |                     onChange={handleChange('website')}
+        |                                            ^^^^^^^^^
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+    294 |                     }}
+
+ERROR in src/components/contacts/ContactReview.tsx:298:25
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    296 |                 </Grid>
+    297 |               )}
+  > 298 |               {formData.linkedIn && (
+        |                         ^^^^^^^^
+    299 |                 <Grid item xs={12} sm={6}>
+    300 |                   <TextField
+    301 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:303:37
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    301 |                     fullWidth
+    302 |                     label="LinkedIn"
+  > 303 |                     value={formData.linkedIn || ''}
+        |                                     ^^^^^^^^
+    304 |                     onChange={handleChange('linkedIn')}
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:304:44
+TS2345: Argument of type '"linkedIn"' is not assignable to parameter of type 'keyof Contact'.
+    302 |                     label="LinkedIn"
+    303 |                     value={formData.linkedIn || ''}
+  > 304 |                     onChange={handleChange('linkedIn')}
+        |                                            ^^^^^^^^^^
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+    307 |                     }}
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+ERROR in src/components/contacts/ContactReview.tsx:49:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Nursing"' have no overlap.
+    47 |     ...data,
+    48 |     status: 'active',
+  > 49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+
+ERROR in src/components/contacts/ContactReview.tsx:50:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Plastic Surgery"' have no overlap.
+    48 |     status: 'active',
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+  > 50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:51:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Dermatology"' have no overlap.
+    49 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+  > 51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:52:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Medicine"' have no overlap.
+    50 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+  > 52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+
+ERROR in src/components/contacts/ContactReview.tsx:53:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Orthodontics"' have no overlap.
+    51 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+  > 53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:54:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Periodontics"' have no overlap.
+    52 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+  > 54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+
+ERROR in src/components/contacts/ContactReview.tsx:55:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Oral Surgery"' have no overlap.
+    53 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+  > 55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    57 |           'dentist'
+    58 |   });
+
+ERROR in src/components/contacts/ContactReview.tsx:56:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Endodontics"' have no overlap.
+    54 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    55 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+  > 56 |           data.specialization === 'Endodontics' ? 'endodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    57 |           'dentist'
+    58 |   });
+    59 |   
+
+ERROR in src/components/contacts/ContactReview.tsx:285:25
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    283 |                 />
+    284 |               </Grid>
+  > 285 |               {formData.website && (
+        |                         ^^^^^^^
+    286 |                 <Grid item xs={12} sm={6}>
+    287 |                   <TextField
+    288 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:290:37
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    288 |                     fullWidth
+    289 |                     label="Website"
+  > 290 |                     value={formData.website || ''}
+        |                                     ^^^^^^^
+    291 |                     onChange={handleChange('website')}
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:291:44
+TS2345: Argument of type '"website"' is not assignable to parameter of type 'keyof Contact'.
+    289 |                     label="Website"
+    290 |                     value={formData.website || ''}
+  > 291 |                     onChange={handleChange('website')}
+        |                                            ^^^^^^^^^
+    292 |                     InputProps={{
+    293 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+    294 |                     }}
+
+ERROR in src/components/contacts/ContactReview.tsx:298:25
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    296 |                 </Grid>
+    297 |               )}
+  > 298 |               {formData.linkedIn && (
+        |                         ^^^^^^^^
+    299 |                 <Grid item xs={12} sm={6}>
+    300 |                   <TextField
+    301 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:303:37
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    301 |                     fullWidth
+    302 |                     label="LinkedIn"
+  > 303 |                     value={formData.linkedIn || ''}
+        |                                     ^^^^^^^^
+    304 |                     onChange={handleChange('linkedIn')}
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:304:44
+TS2345: Argument of type '"linkedIn"' is not assignable to parameter of type 'keyof Contact'.
+    302 |                     label="LinkedIn"
+    303 |                     value={formData.linkedIn || ''}
+  > 304 |                     onChange={handleChange('linkedIn')}
+        |                                            ^^^^^^^^^^
+    305 |                     InputProps={{
+    306 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+    307 |                     }}
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/components/contacts/ContactReview.tsx:50:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Nursing"' have no overlap.
+    48 |     ...data,
+    49 |     status: 'active',
+  > 50 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    51 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    52 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    53 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+
+ERROR in src/components/contacts/ContactReview.tsx:51:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Plastic Surgery"' have no overlap.
+    49 |     status: 'active',
+    50 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+  > 51 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    52 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    53 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    54 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:52:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Dermatology"' have no overlap.
+    50 |     type: data.specialization === 'Aesthetic Nursing' ? 'nurse_practitioner' : 
+    51 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+  > 52 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    53 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    54 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    55 |           data.specialization === 'Periodontics' ? 'periodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:53:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Aesthetic Medicine"' have no overlap.
+    51 |           data.specialization === 'Plastic Surgery' ? 'plastic_surgeon' :
+    52 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+  > 53 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    54 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    55 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    56 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+
+ERROR in src/components/contacts/ContactReview.tsx:54:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Orthodontics"' have no overlap.
+    52 |           data.specialization === 'Dermatology' ? 'dermatologist' :
+    53 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+  > 54 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    55 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    56 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    57 |           data.specialization === 'Endodontics' ? 'endodontist' :
+
+ERROR in src/components/contacts/ContactReview.tsx:55:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Periodontics"' have no overlap.
+    53 |           data.specialization === 'Aesthetic Medicine' ? 'aesthetic_doctor' :
+    54 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+  > 55 |           data.specialization === 'Periodontics' ? 'periodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    56 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+    57 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    58 |           'dentist'
+
+ERROR in src/components/contacts/ContactReview.tsx:56:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Oral Surgery"' have no overlap.
+    54 |           data.specialization === 'Orthodontics' ? 'orthodontist' :
+    55 |           data.specialization === 'Periodontics' ? 'periodontist' :
+  > 56 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    57 |           data.specialization === 'Endodontics' ? 'endodontist' :
+    58 |           'dentist'
+    59 |   });
+
+ERROR in src/components/contacts/ContactReview.tsx:57:11
+TS2367: This comparison appears to be unintentional because the types '"dental" | "aesthetic" | "both" | "other" | undefined' and '"Endodontics"' have no overlap.
+    55 |           data.specialization === 'Periodontics' ? 'periodontist' :
+    56 |           data.specialization === 'Oral Surgery' ? 'oral_surgeon' :
+  > 57 |           data.specialization === 'Endodontics' ? 'endodontist' :
+       |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    58 |           'dentist'
+    59 |   });
+    60 |   
+
+ERROR in src/components/contacts/ContactReview.tsx:286:25
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    284 |                 />
+    285 |               </Grid>
+  > 286 |               {formData.website && (
+        |                         ^^^^^^^
+    287 |                 <Grid item xs={12} sm={6}>
+    288 |                   <TextField
+    289 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:291:37
+TS2339: Property 'website' does not exist on type 'Partial<Contact>'.
+    289 |                     fullWidth
+    290 |                     label="Website"
+  > 291 |                     value={formData.website || ''}
+        |                                     ^^^^^^^
+    292 |                     onChange={handleChange('website')}
+    293 |                     InputProps={{
+    294 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:292:44
+TS2345: Argument of type '"website"' is not assignable to parameter of type 'keyof Contact'.
+    290 |                     label="Website"
+    291 |                     value={formData.website || ''}
+  > 292 |                     onChange={handleChange('website')}
+        |                                            ^^^^^^^^^
+    293 |                     InputProps={{
+    294 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+    295 |                     }}
+
+ERROR in src/components/contacts/ContactReview.tsx:299:25
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    297 |                 </Grid>
+    298 |               )}
+  > 299 |               {formData.linkedIn && (
+        |                         ^^^^^^^^
+    300 |                 <Grid item xs={12} sm={6}>
+    301 |                   <TextField
+    302 |                     fullWidth
+
+ERROR in src/components/contacts/ContactReview.tsx:304:37
+TS2339: Property 'linkedIn' does not exist on type 'Partial<Contact>'.
+    302 |                     fullWidth
+    303 |                     label="LinkedIn"
+  > 304 |                     value={formData.linkedIn || ''}
+        |                                     ^^^^^^^^
+    305 |                     onChange={handleChange('linkedIn')}
+    306 |                     InputProps={{
+    307 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+
+ERROR in src/components/contacts/ContactReview.tsx:305:44
+TS2345: Argument of type '"linkedIn"' is not assignable to parameter of type 'keyof Contact'.
+    303 |                     label="LinkedIn"
+    304 |                     value={formData.linkedIn || ''}
+  > 305 |                     onChange={handleChange('linkedIn')}
+        |                                            ^^^^^^^^^^
+    306 |                     InputProps={{
+    307 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+    308 |                     }}
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+ERROR in src/components/contacts/ContactReview.tsx:292:44
+TS2345: Argument of type '"website"' is not assignable to parameter of type 'keyof Contact'.
+    290 |                     label="Website"
+    291 |                     value={formData.website || ''}
+  > 292 |                     onChange={handleChange('website')}
+        |                                            ^^^^^^^^^
+    293 |                     InputProps={{
+    294 |                       startAdornment: <WebsiteIcon sx={{ mr: 1, color: 'action.active' }} />
+    295 |                     }}
+
+ERROR in src/components/contacts/ContactReview.tsx:305:44
+TS2345: Argument of type '"linkedIn"' is not assignable to parameter of type 'keyof Contact'.
+    303 |                     label="LinkedIn"
+    304 |                     value={formData.linkedIn || ''}
+  > 305 |                     onChange={handleChange('linkedIn')}
+        |                                            ^^^^^^^^^^
+    306 |                     InputProps={{
+    307 |                       startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+    308 |                     }}
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+No issues found.
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+No issues found.
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+No issues found.
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src/pages/Contacts.tsx
+  Line 36:8:  'BusinessCardScanner' is defined but never used  @typescript-eslint/no-unused-vars
+  Line 73:9:  'navigate' is assigned a value but never used    @typescript-eslint/no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/pages/Contacts.tsx
+  Line 36:8:  'BusinessCardScanner' is defined but never used  @typescript-eslint/no-unused-vars
+  Line 73:9:  'navigate' is assigned a value but never used    @typescript-eslint/no-unused-vars
+
+webpack compiled with 1 warning
+No issues found.
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src/components/contacts/CameraCapture.tsx
+  Line 37:6:  React Hook useEffect has a missing dependency: 'startCamera'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src/components/contacts/CardProcessor.tsx
+  Line 10:11:  'ExtractedCardData' is defined but never used  @typescript-eslint/no-unused-vars
+  Line 87:26:  Unnecessary escape character: \+               no-useless-escape
+  Line 87:50:  Unnecessary escape character: \.               no-useless-escape
+  Line 87:74:  Unnecessary escape character: \.               no-useless-escape
+
+src/components/contacts/ContactReview.tsx
+  Line 29:10:  'Contact' is defined but never used  @typescript-eslint/no-unused-vars
+
+src/pages/Contacts.tsx
+  Line 73:9:  'navigate' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/contacts/CameraCapture.tsx
+  Line 37:6:  React Hook useEffect has a missing dependency: 'startCamera'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src/components/contacts/CardProcessor.tsx
+  Line 10:11:  'ExtractedCardData' is defined but never used  @typescript-eslint/no-unused-vars
+  Line 87:26:  Unnecessary escape character: \+               no-useless-escape
+  Line 87:50:  Unnecessary escape character: \.               no-useless-escape
+  Line 87:74:  Unnecessary escape character: \.               no-useless-escape
+
+src/components/contacts/ContactReview.tsx
+  Line 29:10:  'Contact' is defined but never used  @typescript-eslint/no-unused-vars
+
+src/pages/Contacts.tsx
+  Line 73:9:  'navigate' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+webpack compiled with 1 warning
+No issues found.
