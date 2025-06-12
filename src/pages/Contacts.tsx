@@ -33,7 +33,6 @@ import {
   StarBorder as StarBorderIcon
 } from '@mui/icons-material';
 import CallButton from '../components/contacts/CallButton';
-import BusinessCardScanner from '../components/contacts/BusinessCardScanner';
 import { Contact } from '../types/models';
 import { supabase } from '../services/supabase/supabase';
 import mockDataService from '../services/mockData/mockDataService';
@@ -266,13 +265,6 @@ const Contacts: React.FC = () => {
           >
             Import/Export
           </Button>
-          <BusinessCardScanner 
-            isPublicDemo={true}
-            onContactCreated={(contact) => {
-              console.log('New contact:', contact);
-              // In production, this would refresh the contacts list
-            }}
-          />
           <Button 
             variant="contained" 
             startIcon={<AddIcon />}
