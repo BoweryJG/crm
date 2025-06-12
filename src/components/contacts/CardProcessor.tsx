@@ -19,61 +19,131 @@ interface ExtractedCardData {
 }
 
 class CardProcessor {
-  private apiKey: string | null;
+  private openRouterKey: string | null;
   
   constructor() {
-    // Get API key from environment or user settings
-    this.apiKey = process.env.REACT_APP_GOOGLE_VISION_API_KEY || null;
+    // Get OpenRouter API key from environment
+    this.openRouterKey = process.env.REACT_APP_OPENROUTER_API_KEY || null;
   }
 
   async processBusinessCard(imageData: string): Promise<BusinessCardContact> {
     try {
-      // For demo purposes, use mock data if no API key
-      if (!this.apiKey) {
-        return this.mockProcessing(imageData);
+      // Use OpenRouter with GPT-4 Vision if API key available
+      if (this.openRouterKey) {
+        return this.processWithOpenRouter(imageData);
       }
-
-      // Extract base64 data from data URL
-      const base64Image = imageData.split(',')[1];
-
-      // Call Google Vision API
-      const response = await fetch(
-        `https://vision.googleapis.com/v1/images:annotate?key=${this.apiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            requests: [{
-              image: {
-                content: base64Image
-              },
-              features: [
-                {
-                  type: 'TEXT_DETECTION',
-                  maxResults: 1
-                }
-              ]
-            }]
-          })
-        }
-      );
-
-      const result = await response.json();
       
-      if (result.error) {
-        throw new Error(result.error.message);
-      }
-
-      const text = result.responses?.[0]?.fullTextAnnotation?.text || '';
-      return this.parseBusinessCardText(text);
+      // Fallback to mock data for demo
+      return this.mockProcessing(imageData);
       
     } catch (error) {
       console.error('Card processing error:', error);
       // Fallback to mock data for demo
       return this.mockProcessing(imageData);
     }
+  }
+
+  private async processWithOpenRouter(imageData: string): Promise<BusinessCardContact> {
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.openRouterKey}`,
+          'HTTP-Referer': window.location.origin,
+          'X-Title': 'Sphere OS CRM',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'openai/gpt-4-vision-preview',
+          messages: [
+            {
+              role: 'system',
+              content: `You are a business card OCR specialist. Extract contact information from the business card image and return it as JSON. 
+              
+              Required fields:
+              - name (full name)
+              - title (job title)
+              - company
+              - email
+              - phone
+              - website (if present)
+              - linkedIn (if present)
+              - address (if present)
+              
+              Also determine if this is a dental or aesthetic professional based on their title/company.
+              
+              Return ONLY valid JSON, no additional text.`
+            },
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: 'Extract the contact information from this business card:'
+                },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: imageData
+                  }
+                }
+              ]
+            }
+          ],
+          max_tokens: 500,
+          temperature: 0.1
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`OpenRouter API error: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      const content = result.choices?.[0]?.message?.content || '';
+      
+      try {
+        const extracted = JSON.parse(content);
+        return this.formatExtractedData(extracted);
+      } catch (parseError) {
+        console.error('Failed to parse AI response:', content);
+        // Try to extract text manually
+        return this.parseBusinessCardText(content);
+      }
+      
+    } catch (error) {
+      console.error('OpenRouter processing error:', error);
+      throw error;
+    }
+  }
+
+  private formatExtractedData(data: any): BusinessCardContact {
+    // Parse name into first and last
+    const nameParts = (data.name || '').split(' ').filter(Boolean);
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+    
+    // Detect specialty and practice type
+    const specialization_detail = this.detectSpecialization(data.title || '', data.company || '');
+    const practiceType = this.detectPracticeType(data.title || '', data.company || '', specialization_detail);
+    const specialization: 'dental' | 'aesthetic' | 'both' | 'other' = 
+      practiceType === 'dental' ? 'dental' : 'aesthetic';
+    
+    return {
+      first_name: firstName,
+      last_name: lastName,
+      email: data.email || '',
+      phone: data.phone || '',
+      title: data.title || '',
+      practice_name: data.company || '',
+      specialization,
+      specialization_detail,
+      practiceType,
+      website: data.website,
+      linkedIn: data.linkedIn,
+      notes: `Scanned from business card`,
+      tags: this.generateTags(data.title || '', data.company || '', specialization_detail)
+    };
   }
 
   private parseBusinessCardText(text: string): BusinessCardContact {
