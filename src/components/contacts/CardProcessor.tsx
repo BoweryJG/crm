@@ -54,7 +54,7 @@ class CardProcessor {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'openai/gpt-4-vision-preview',
+          model: 'openai/gpt-4o-mini', // Much cheaper at $0.15/1M input, $0.60/1M output
           messages: [
             {
               role: 'system',

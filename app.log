@@ -1563,3 +1563,43 @@ webpack compiled with 1 warning
 Files successfully emitted, waiting for typecheck results...
 Issues checking in progress...
 No issues found.
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src/components/contacts/CameraCapture.tsx
+  Line 37:6:  React Hook useEffect has a missing dependency: 'startCamera'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src/components/contacts/CardProcessor.tsx
+  Line 10:11:   'ExtractedCardData' is defined but never used  @typescript-eslint/no-unused-vars
+  Line 157:26:  Unnecessary escape character: \+               no-useless-escape
+  Line 157:50:  Unnecessary escape character: \.               no-useless-escape
+  Line 157:74:  Unnecessary escape character: \.               no-useless-escape
+
+src/components/contacts/ContactReview.tsx
+  Line 29:10:  'Contact' is defined but never used  @typescript-eslint/no-unused-vars
+
+src/pages/Contacts.tsx
+  Line 73:9:  'navigate' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/contacts/CameraCapture.tsx
+  Line 37:6:  React Hook useEffect has a missing dependency: 'startCamera'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src/components/contacts/CardProcessor.tsx
+  Line 10:11:   'ExtractedCardData' is defined but never used  @typescript-eslint/no-unused-vars
+  Line 157:26:  Unnecessary escape character: \+               no-useless-escape
+  Line 157:50:  Unnecessary escape character: \.               no-useless-escape
+  Line 157:74:  Unnecessary escape character: \.               no-useless-escape
+
+src/components/contacts/ContactReview.tsx
+  Line 29:10:  'Contact' is defined but never used  @typescript-eslint/no-unused-vars
+
+src/pages/Contacts.tsx
+  Line 73:9:  'navigate' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+webpack compiled with 1 warning
+No issues found.
