@@ -4,7 +4,7 @@ import ContactDetail from './pages/ContactDetail';
 import Practices from './pages/Practices';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './themes/ThemeContext';
-import { AuthProvider } from './auth';
+import { AuthProvider, AuthGuard } from './auth';
 import { AppModeProvider } from './contexts/AppModeContext';
 import { DashboardDataProvider } from './contexts/DashboardDataContext';
 import { SUISProvider } from './suis';
@@ -100,8 +100,22 @@ const App: React.FC = () => {
                 {/* Public Ripple Route - no layout needed */}
                 <Route path="/ripple/:rippleToken" element={<Suspense fallback={<SphereLoadingScreen loadingText="RIPPLE" message="LOADING PERSONALIZED CONTENT" />}><RipplePage /></Suspense>} />
                 
-                {/* All Routes - no authentication required */}
-                <Route path="/" element={<Layout />}>
+                {/* All Routes - now with public access to full CRM */}
+                <Route path="/" element={
+                  <AuthGuard
+                    allowPublic={true}
+                    publicComponent={<Layout />}
+                    redirectTo={`https://repspheres.com/login?redirect=${encodeURIComponent(window.location.href)}`}
+                    fallback={
+                      <SphereLoadingScreen 
+                        loadingText="SPHERE oS"
+                        message="INITIALIZING CRM SYSTEMS"
+                      />
+                    }
+                  >
+                    <Layout />
+                  </AuthGuard>
+                }>
                 <Route index element={<Dashboard />} />
                 <Route path="contacts" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="CONTACTS" message="NEURAL DATABASE SYNC" />}><Contacts /></React.Suspense>} />
                 <Route path="contacts/:id" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="PROFILE" message="EXTRACTING DATA MATRIX" />}><ContactDetail /></React.Suspense>} />

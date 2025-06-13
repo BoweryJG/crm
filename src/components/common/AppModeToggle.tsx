@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAppMode } from '../../contexts/AppModeContext';
+import { useAuth } from '../../auth';
 import { 
   Switch, 
   FormControlLabel, 
@@ -13,6 +14,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import { Link } from 'react-router-dom';
 
 export const AppModeToggle: React.FC = () => {
+  const { user } = useAuth();
   const { 
     mode, 
     setMode, 
@@ -20,6 +22,11 @@ export const AppModeToggle: React.FC = () => {
     canAccessLiveMode, 
     subscriptionStatus 
   } = useAppMode();
+  
+  // Hide toggle for non-authenticated users (public mode)
+  if (!user) {
+    return null;
+  }
   
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     await setMode(event.target.checked ? 'live' : 'demo');

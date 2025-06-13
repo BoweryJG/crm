@@ -41,6 +41,7 @@ export const AppModeProvider: React.FC<{children: React.ReactNode}> = ({ childre
   useEffect(() => {
     const loadUserSettings = async () => {
       if (!user) {
+        // Force demo mode for non-authenticated users (public mode)
         setModeState('demo');
         setFeatureTierState('basic');
         setSubscriptionStatus('inactive');

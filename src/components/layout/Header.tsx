@@ -29,6 +29,7 @@ import { useAuth } from '../../auth';
 import { useNavigate } from 'react-router-dom';
 import { AppModeToggle } from '../common/AppModeToggle';
 import AuthModal from '../common/AuthModal';
+import { CRMQuickLoginModal } from '../common/CRMQuickLoginModal';
 import ThemeToggle from '../ui/ThemeToggle';
 
 interface HeaderProps {
@@ -329,7 +330,15 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
         )}
       </Toolbar>
     </AppBar>
-    <AuthModal open={loginOpen} onClose={() => setLoginOpen(false)} mode="login" />
+    {/* Use CRM Quick Login for public users, fallback to AuthModal for authenticated users */}
+    <CRMQuickLoginModal 
+      open={loginOpen} 
+      onClose={() => setLoginOpen(false)}
+      onSuccess={() => {
+        setLoginOpen(false);
+        window.location.reload();
+      }}
+    />
     <AuthModal open={signupOpen} onClose={() => setSignupOpen(false)} mode="signup" />
     </>
   );
