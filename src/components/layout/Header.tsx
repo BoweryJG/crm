@@ -30,6 +30,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppModeToggle } from '../common/AppModeToggle';
 import AuthModal from '../common/AuthModal';
 import { CRMQuickLoginModal } from '../common/CRMQuickLoginModal';
+import { RepSpheresAppSwitcher } from '../common/RepSpheresAppSwitcher';
 import ThemeToggle from '../ui/ThemeToggle';
 
 interface HeaderProps {
@@ -149,6 +150,9 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
         <Box sx={{ mx: 1 }}>
           <AppModeToggle />
         </Box>
+
+        {/* RepSpheres App Switcher */}
+        <RepSpheresAppSwitcher />
         
         {/* Auth Buttons - Only show when not logged in */}
         {!user && (
