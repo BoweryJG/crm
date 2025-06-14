@@ -20,7 +20,10 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   allowPublic = false,
   publicComponent
 }) => {
-  const { user, loading } = allowPublic ? useAuth() : useRequireAuth(redirectTo);
+  const authResult = useAuth();
+  const requireAuthResult = useRequireAuth(redirectTo);
+  
+  const { user, loading } = allowPublic ? authResult : requireAuthResult;
   
   if (loading) {
     return <>{fallback}</>;
