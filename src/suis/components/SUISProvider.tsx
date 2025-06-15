@@ -3,7 +3,8 @@
 // Version: 1.0.0
 
 import React, { createContext, useContext, useReducer, useEffect, useState, useMemo, useCallback } from 'react';
-import { createClient, SupabaseClient, RealtimeChannel } from '@supabase/supabase-js';
+import { SupabaseClient, RealtimeChannel } from '@supabase/supabase-js';
+import { supabase as supabaseClient } from '../../auth/supabase';
 import { 
   IntelligenceProfile, 
   MarketIntelligence, 
@@ -413,8 +414,8 @@ const SUISContext = createContext<{
 
 interface SUISProviderProps {
   children: React.ReactNode;
-  supabaseUrl: string;
-  supabaseAnonKey: string;
+  supabaseUrl?: string; // Made optional since we're using the existing client
+  supabaseAnonKey?: string; // Made optional since we're using the existing client
 }
 
 // Export SUISContext for use in hooks
@@ -426,9 +427,7 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
   supabaseAnonKey
 }) => {
   const [state, dispatch] = useReducer(suisReducer, initialState);
-  const [supabase] = useState<SupabaseClient>(() => 
-    createClient(supabaseUrl, supabaseAnonKey)
-  );
+  const supabase = supabaseClient;
   const [realtimeChannels, setRealtimeChannels] = useState<Map<string, RealtimeChannel>>(new Map());
 
   // Initialize SUIS system

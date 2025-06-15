@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../services/supabase/supabase';
 import { useAuth } from '../auth';
+import { isAdminUser } from '../config/adminUsers';
 
 export type AppMode = 'demo' | 'live';
 export type FeatureTier = 'basic' | 'premium';
@@ -47,6 +48,20 @@ export const AppModeProvider: React.FC<{children: React.ReactNode}> = ({ childre
         setSubscriptionStatus('inactive');
         setCanAccessLiveMode(false);
         setCanAccessPremiumFeatures(false);
+        return;
+      }
+      
+      // Check if user is admin
+      const isAdmin = isAdminUser(user.email);
+      
+      if (isAdmin) {
+        // Admins get everything
+        setModeState('live');
+        setFeatureTierState('premium');
+        setSubscriptionStatus('active');
+        setCanAccessLiveMode(true);
+        setCanAccessPremiumFeatures(true);
+        setSubscriptionTier('enterprise');
         return;
       }
       

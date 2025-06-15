@@ -26,6 +26,7 @@ import { DemoModeIndicator } from './components/common/DemoModeIndicator';
 import CssBaseline from '@mui/material/CssBaseline';
 
 // Lazy loaded components for code splitting
+const LuxuryLandingWrapper = lazy(() => import('./pages/LuxuryLandingWrapper'));
 const DentalImplantMarketDashboard = lazy(() => import('./components/marketResearch/DentalImplantMarketDashboard'));
 const PracticeInteractionTracker = lazy(() => import('./components/marketResearch/PracticeInteractionTracker'));
 const AestheticMarketDashboard = lazy(() => import('./components/marketResearch/AestheticMarketDashboard'));
@@ -91,6 +92,13 @@ const App: React.FC = () => {
                 <CssBaseline />
                 <BrowserRouter>
               <Routes>
+                {/* Luxury Landing Page - default for non-authenticated users */}
+                <Route path="/welcome" element={
+                  <Suspense fallback={<SphereLoadingScreen loadingText="SPHERE OS" message="INITIALIZING QUANTUM INTERFACE" />}>
+                    <LuxuryLandingWrapper />
+                  </Suspense>
+                } />
+                
                 {/* Auth Routes - still available but not required */}
                 <Route path="/login" element={<SimpleLogin />} />
                 <Route path="/signup" element={<Signup />} />

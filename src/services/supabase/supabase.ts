@@ -24,9 +24,9 @@ const rawSupabaseAnonKey = process.env.REACT_APP_SUPABASE_KEY || process.env.REA
 console.log('Raw REACT_APP_SUPABASE_URL:', rawSupabaseUrl ? `Set (ends with "${rawSupabaseUrl.slice(-10)}")` : 'Not Set');
 console.log('Raw REACT_APP_SUPABASE_KEY/ANON_KEY:', rawSupabaseAnonKey ? `Set (starts with "${rawSupabaseAnonKey.substring(0, 10)}...", ends with "${rawSupabaseAnonKey.slice(-4)}")` : 'Not Set');
 
-// Replace these with your Supabase credentials
-const supabaseUrl = rawSupabaseUrl || 'https://example.supabase.co';
-const supabaseAnonKey = rawSupabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example';
+// Use the actual Supabase credentials from environment variables
+const supabaseUrl = rawSupabaseUrl || 'https://cbopynuvhcymbumjnvay.supabase.co';
+const supabaseAnonKey = rawSupabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNib3B5bnV2aGN5bWJ1bWpudmF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5OTUxNzMsImV4cCI6MjA1OTU3MTE3M30.UZElMkoHugIt984RtYWyfrRuv2rB67opQdCrFVPCfzU';
 
 // Log the values being used
 console.log('Effective Supabase URL being used:', supabaseUrl);
@@ -389,8 +389,11 @@ let supabase: SupabaseClient;
 const isPlaceholderValue = 
   supabaseUrl === 'https://example.supabase.co' || 
   supabaseUrl === 'your_supabase_url' ||
+  supabaseUrl === 'https://your-project.supabase.co' ||
   supabaseAnonKey === 'your_supabase_anon_key' ||
-  supabaseAnonKey === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example';
+  supabaseAnonKey === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example' ||
+  supabaseAnonKey.includes('your_supab') ||
+  supabaseAnonKey.includes('here');
 
 try {
   // Validate URL format

@@ -24,11 +24,11 @@ export const getSupabaseClient = (): SupabaseClient => {
         persistSession: true,
         detectSessionInUrl: true,
         storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-        storageKey: 'repspheres-auth',
+        storageKey: 'crm-auth-session',
         cookieOptions: {
-          domain: '.repspheres.com',
+          domain: window.location.hostname,
           sameSite: 'lax',
-          secure: true,
+          secure: window.location.protocol === 'https:',
           maxAge: 60 * 60 * 24 * 7 // 7 days
         },
         // Fallback for local development

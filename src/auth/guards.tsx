@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from './AuthContext';
 import { useRequireAuth } from './hooks';
+import { isAdminUser } from '../config/adminUsers';
 
 interface AuthGuardProps {
   children: React.ReactNode;
