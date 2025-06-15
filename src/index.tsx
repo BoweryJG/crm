@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-// Temporarily disable SimpleAuth wrapper to debug
-// import AppWithSimpleAuth from './AppWithSimpleAuth';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(

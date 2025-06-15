@@ -5,7 +5,6 @@ import Practices from './pages/Practices';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './themes/ThemeContext';
 import { AuthProvider, AuthGuard } from './auth';
-import { SimpleAuthGuard } from './components/common/SimpleAuthGuard';
 import { AppModeProvider } from './contexts/AppModeContext';
 import { DashboardDataProvider } from './contexts/DashboardDataContext';
 import { SUISProvider } from './suis';
@@ -14,7 +13,7 @@ import StandaloneEliteLoadingScreen from './components/common/StandaloneEliteLoa
 import ErrorBoundary from './components/common/ErrorBoundary';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
-import Login from './pages/Auth/Login';
+import SimpleLogin from './pages/Auth/SimpleLogin';
 import Signup from './pages/Auth/Signup';
 import ForgotPassword from './pages/Auth/ForgotPassword';
 import AuthCallback from './pages/AuthCallback';
@@ -22,7 +21,6 @@ import GlobalCallPanel from './components/communications/GlobalCallPanel';
 import { SubscriptionUpgradeModal } from './components/common/SubscriptionUpgradeModal';
 import { FeatureUpgradeModal } from './components/common/FeatureUpgradeModal';
 import { DemoModeIndicator } from './components/common/DemoModeIndicator';
-import { AuthDebugCRM } from './components/common/AuthDebugCRM';
 
 // CSS baseline reset
 import CssBaseline from '@mui/material/CssBaseline';
@@ -94,7 +92,7 @@ const App: React.FC = () => {
                 <BrowserRouter>
               <Routes>
                 {/* Auth Routes - still available but not required */}
-                <Route path="/login" element={<Login />} />
+                <Route path="/login" element={<SimpleLogin />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
@@ -104,9 +102,10 @@ const App: React.FC = () => {
                 
                 {/* All Routes - now with public access to full CRM */}
                 <Route path="/" element={
-                  <SimpleAuthGuard
+                  <AuthGuard
                     allowPublic={true}
                     publicComponent={<Layout />}
+                    redirectTo="/login"
                     fallback={
                       <SphereLoadingScreen 
                         loadingText="SPHERE oS"
@@ -115,7 +114,7 @@ const App: React.FC = () => {
                     }
                   >
                     <Layout />
-                  </SimpleAuthGuard>
+                  </AuthGuard>
                 }>
                 <Route index element={<Dashboard />} />
                 <Route path="contacts" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="CONTACTS" message="NEURAL DATABASE SYNC" />}><Contacts /></React.Suspense>} />
@@ -164,9 +163,6 @@ const App: React.FC = () => {
             <SubscriptionUpgradeModal />
             <FeatureUpgradeModal />
             <DemoModeIndicator />
-            
-            {/* Auth Debug (Dev only) */}
-            <AuthDebugCRM />
           </BrowserRouter>
               </DashboardDataProvider>
             </AppModeProvider>
