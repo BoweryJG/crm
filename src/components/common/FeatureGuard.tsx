@@ -28,7 +28,7 @@ export const FeatureGuard: React.FC<FeatureGuardProps> = ({
   customMessage 
 }) => {
   const { user } = useAuth();
-  const { isPremium, showFeatureUpgradeModal } = useAppMode();
+  const { isPremium, openFeatureUpgradeModal } = useAppMode();
   
   // Admins have access to everything
   if (user && isAdminUser(user.email)) {
@@ -58,7 +58,7 @@ export const FeatureGuard: React.FC<FeatureGuardProps> = ({
         <Button
           variant="contained"
           color="primary"
-          onClick={() => showFeatureUpgradeModal()}
+          onClick={() => openFeatureUpgradeModal()}
         >
           Upgrade to Premium
         </Button>

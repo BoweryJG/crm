@@ -111,7 +111,7 @@ export const updatePaymentStatus = async (
     
     // If payment completed, convert to permanent contacts
     if (status === 'completed') {
-      await convertToPermaentContacts(sessionId);
+      await convertToPermanentContacts(sessionId);
     }
     
     return true;
@@ -122,7 +122,7 @@ export const updatePaymentStatus = async (
 };
 
 // Convert enriched contacts to permanent storage after payment
-export const convertToPermaentContacts = async (
+export const convertToPermanentContacts = async (
   sessionId: string,
   userId?: string
 ): Promise<boolean> => {

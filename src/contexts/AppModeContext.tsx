@@ -23,6 +23,7 @@ interface AppModeContextType {
   showFeatureUpgradeModal: boolean;
   closeUpgradeModal: () => void;
   closeFeatureUpgradeModal: () => void;
+  openFeatureUpgradeModal: () => void;
 }
 
 const AppModeContext = createContext<AppModeContextType | undefined>(undefined);
@@ -217,6 +218,10 @@ export const AppModeProvider: React.FC<{children: React.ReactNode}> = ({ childre
     setShowFeatureUpgradeModal(false);
   };
   
+  const openFeatureUpgradeModal = () => {
+    setShowFeatureUpgradeModal(true);
+  };
+  
   const value = {
     mode,
     featureTier,
@@ -233,7 +238,8 @@ export const AppModeProvider: React.FC<{children: React.ReactNode}> = ({ childre
     showUpgradeModal,
     showFeatureUpgradeModal,
     closeUpgradeModal,
-    closeFeatureUpgradeModal
+    closeFeatureUpgradeModal,
+    openFeatureUpgradeModal
   };
   
   return (
