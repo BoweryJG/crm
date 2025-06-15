@@ -5,6 +5,7 @@ import Practices from './pages/Practices';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './themes/ThemeContext';
 import { AuthProvider, AuthGuard } from './auth';
+import { SimpleAuthGuard } from './components/common/SimpleAuthGuard';
 import { AppModeProvider } from './contexts/AppModeContext';
 import { DashboardDataProvider } from './contexts/DashboardDataContext';
 import { SUISProvider } from './suis';
@@ -21,6 +22,7 @@ import GlobalCallPanel from './components/communications/GlobalCallPanel';
 import { SubscriptionUpgradeModal } from './components/common/SubscriptionUpgradeModal';
 import { FeatureUpgradeModal } from './components/common/FeatureUpgradeModal';
 import { DemoModeIndicator } from './components/common/DemoModeIndicator';
+import { AuthDebugCRM } from './components/common/AuthDebugCRM';
 
 // CSS baseline reset
 import CssBaseline from '@mui/material/CssBaseline';
@@ -102,10 +104,9 @@ const App: React.FC = () => {
                 
                 {/* All Routes - now with public access to full CRM */}
                 <Route path="/" element={
-                  <AuthGuard
+                  <SimpleAuthGuard
                     allowPublic={true}
                     publicComponent={<Layout />}
-                    redirectTo={`https://repspheres.com/login?redirect=${encodeURIComponent(window.location.href)}`}
                     fallback={
                       <SphereLoadingScreen 
                         loadingText="SPHERE oS"
@@ -114,7 +115,7 @@ const App: React.FC = () => {
                     }
                   >
                     <Layout />
-                  </AuthGuard>
+                  </SimpleAuthGuard>
                 }>
                 <Route index element={<Dashboard />} />
                 <Route path="contacts" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="CONTACTS" message="NEURAL DATABASE SYNC" />}><Contacts /></React.Suspense>} />
@@ -163,6 +164,9 @@ const App: React.FC = () => {
             <SubscriptionUpgradeModal />
             <FeatureUpgradeModal />
             <DemoModeIndicator />
+            
+            {/* Auth Debug (Dev only) */}
+            <AuthDebugCRM />
           </BrowserRouter>
               </DashboardDataProvider>
             </AppModeProvider>
