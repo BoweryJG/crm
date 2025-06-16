@@ -80,24 +80,31 @@ const Contacts: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [totalContacts, setTotalContacts] = useState<number>(0);
+  const [searchDebounce, setSearchDebounce] = useState<NodeJS.Timeout | null>(null);
   const CONTACTS_PER_PAGE = 100;
 
-  const fetchContactsPage = async (page: number, append: boolean = false) => {
+  const fetchContactsPage = async (page: number, append: boolean = false, search: string = '') => {
     try {
       if (!append) setLoading(true);
       else setLoadingMore(true);
       
-      // First get the total count
-      const { count } = await supabase
-        .from('contacts')
-        .select('*', { count: 'exact', head: true });
+      // Build query
+      let countQuery = supabase.from('contacts').select('*', { count: 'exact', head: true });
+      let dataQuery = supabase.from('contacts').select('*');
       
+      // Add search filters if search term exists
+      if (search.trim()) {
+        const searchFilter = `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,practice_name.ilike.%${search}%`;
+        countQuery = countQuery.or(searchFilter);
+        dataQuery = dataQuery.or(searchFilter);
+      }
+      
+      // Get total count with search filter
+      const { count } = await countQuery;
       if (count) setTotalContacts(count);
       
-      // Fetch contacts from the contacts table with pagination
-      const { data, error } = await supabase
-        .from('contacts')
-        .select('*')
+      // Fetch contacts with search filter and pagination
+      const { data, error } = await dataQuery
         .order('overall_score', { ascending: false })
         .range(page * CONTACTS_PER_PAGE, (page + 1) * CONTACTS_PER_PAGE - 1);
         
@@ -175,13 +182,13 @@ const Contacts: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchContactsPage(0, false);
+    fetchContactsPage(0, false, '');
   }, []);
 
   const handleLoadMore = () => {
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
-    fetchContactsPage(nextPage, true);
+    fetchContactsPage(nextPage, true, searchTerm);
   };
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -189,7 +196,21 @@ const Contacts: React.FC = () => {
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+    const newSearchTerm = event.target.value;
+    setSearchTerm(newSearchTerm);
+    
+    // Clear existing debounce
+    if (searchDebounce) {
+      clearTimeout(searchDebounce);
+    }
+    
+    // Set new debounce
+    const newDebounce = setTimeout(() => {
+      setCurrentPage(0);
+      fetchContactsPage(0, false, newSearchTerm);
+    }, 300); // 300ms delay
+    
+    setSearchDebounce(newDebounce);
   };
 
   const handleFilterTypeChange = (event: SelectChangeEvent) => {
@@ -227,13 +248,8 @@ const Contacts: React.FC = () => {
     }
   };
 
+  // Client-side filtering for tabs and filters (search is server-side)
   const filteredContacts = contacts.filter((contact) => {
-    const matchesSearch =
-      searchTerm === '' ||
-      `${contact.first_name} ${contact.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (contact.email && contact.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (contact.practice_name && contact.practice_name.toLowerCase().includes(searchTerm.toLowerCase()));
-
     const matchesTab =
       (tabValue === 0) || // All contacts
       (tabValue === 1 && contact.isStarred) || // Starred
@@ -248,7 +264,7 @@ const Contacts: React.FC = () => {
     const matchesSpecialty =
       filterSpecialty === 'all' || contactSpecialty === filterSpecialty;
 
-    return matchesSearch && matchesTab && matchesType && matchesSpecialty;
+    return matchesTab && matchesType && matchesSpecialty;
   });
 
   // Extract unique specialties for filter dropdown
