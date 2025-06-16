@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { getStandardAuthConfig } from '../utils/crossDomainAuth';
 
 // Get environment variables with fallbacks for development
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://cbopynuvhcymbumjnvay.supabase.co';
@@ -18,30 +19,7 @@ let supabaseInstance: SupabaseClient | null = null;
 
 export const getSupabaseClient = (): SupabaseClient => {
   if (!supabaseInstance) {
-    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true,
-        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-        storageKey: 'crm-auth-session',
-        cookieOptions: {
-          domain: window.location.hostname,
-          sameSite: 'lax',
-          secure: window.location.protocol === 'https:',
-          maxAge: 60 * 60 * 24 * 7 // 7 days
-        },
-        // Fallback for local development
-        ...(typeof window !== 'undefined' && window.location.hostname === 'localhost' && {
-          cookieOptions: {
-            domain: 'localhost',
-            sameSite: 'lax',
-            secure: false,
-            maxAge: 60 * 60 * 24 * 7 // 7 days
-          }
-        })
-      },
-    });
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, getStandardAuthConfig());
   }
   return supabaseInstance;
 };

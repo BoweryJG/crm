@@ -1,5 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase, getRedirectUrl } from './supabase';
+import { 
+  setupCrossDomainAuthListener, 
+  broadcastAuthState, 
+  storeReturnUrl, 
+  getMainDomain,
+  handleCrossDomainRedirect,
+  isOnSubdomain 
+} from '../utils/crossDomainAuth';
 import type { User, AuthSession, AuthState, AuthProvider as AuthProviderType, SignInOptions } from './types';
 import type { Session } from '@supabase/supabase-js';
 
@@ -51,6 +59,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const initializeAuth = async () => {
       try {
+        // Set up cross-domain auth listener
+        setupCrossDomainAuthListener(supabase);
+        
+        // Check for cross-domain redirect
+        const wasRedirected = await handleCrossDomainRedirect(supabase);
+        if (wasRedirected) return;
+        
         const { data: { session }, error } = await supabase.auth.getSession();
         
         console.log('Initial auth check:', session?.user?.email, error);
@@ -64,6 +79,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             loading: false,
             error: null,
           });
+          
+          // Broadcast initial auth state if we have a session
+          if (session) {
+            broadcastAuthState(session);
+          }
         }
       } catch (error: any) {
         console.error('Auth initialization error:', error);
@@ -92,6 +112,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             loading: false,
             error: null,
           }));
+          
+          // Broadcast auth state changes to other domains
+          broadcastAuthState(session);
         }
       }
     );
@@ -109,20 +132,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      // Store the current path so we can return to it after auth
-      const currentPath = window.location.pathname;
-      if (currentPath !== '/login' && currentPath !== '/signup') {
-        localStorage.setItem('authReturnPath', currentPath);
-      }
+      // Store current URL before redirecting
+      storeReturnUrl(window.location.href);
       
-      const redirectUrl = options?.redirectTo || getRedirectUrl('/auth/callback');
+      // Always redirect to main domain for OAuth
+      const mainDomain = getMainDomain();
+      const redirectUrl = `${mainDomain}/auth/callback`;
+      
       console.log('OAuth sign in - redirect URL:', redirectUrl);
-      console.log('Will return to:', localStorage.getItem('authReturnPath') || '/');
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: provider as any,
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: options?.redirectTo || redirectUrl,
           scopes: options?.scopes,
           queryParams: options?.queryParams,
         },
@@ -160,6 +182,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         loading: false,
         error: null,
       }));
+      
+      // Broadcast auth state to other domains
+      if (data.session) {
+        broadcastAuthState(data.session);
+      }
     } catch (error: any) {
       setState(prev => ({ 
         ...prev, 
@@ -195,6 +222,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         loading: false,
         error: null,
       }));
+      
+      // Broadcast auth state to other domains
+      if (data.session) {
+        broadcastAuthState(data.session);
+      }
     } catch (error: any) {
       setState(prev => ({ 
         ...prev, 
@@ -218,6 +250,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         loading: false,
         error: null,
       });
+      
+      // Broadcast logout to other domains
+      broadcastAuthState(null);
     } catch (error: any) {
       setState(prev => ({ 
         ...prev, 
