@@ -392,8 +392,9 @@ const isPlaceholderValue =
   supabaseUrl === 'https://your-project.supabase.co' ||
   supabaseAnonKey === 'your_supabase_anon_key' ||
   supabaseAnonKey === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example' ||
-  supabaseAnonKey.includes('your_supab') ||
-  supabaseAnonKey.includes('here');
+  supabaseAnonKey === 'your_supabase_anon_key_here' ||
+  !supabaseUrl ||
+  !supabaseAnonKey;
 
 try {
   // Validate URL format

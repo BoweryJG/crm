@@ -85,7 +85,7 @@ const Contacts: React.FC = () => {
         const { data, error } = await supabase
           .from('contacts')
           .select('*')
-          .order('value_score', { ascending: false })
+          .order('overall_score', { ascending: false })
           .limit(100); // Start with top 100 for performance
         
         if (error) {
