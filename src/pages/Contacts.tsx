@@ -71,22 +71,35 @@ const Contacts: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [tabValue, setTabValue] = useState<number>(0);
   const [filterType, setFilterType] = useState<string>('all');
   const [filterSpecialty, setFilterSpecialty] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [totalContacts, setTotalContacts] = useState<number>(0);
+  const CONTACTS_PER_PAGE = 100;
 
-  useEffect(() => {
-    const fetchContacts = async () => {
-      try {
-        setLoading(true);
-        // Fetch contacts from the contacts table
-        const { data, error } = await supabase
-          .from('contacts')
-          .select('*')
-          .order('overall_score', { ascending: false })
-          .limit(100); // Start with top 100 for performance
+  const fetchContactsPage = async (page: number, append: boolean = false) => {
+    try {
+      if (!append) setLoading(true);
+      else setLoadingMore(true);
+      
+      // First get the total count
+      const { count } = await supabase
+        .from('contacts')
+        .select('*', { count: 'exact', head: true });
+      
+      if (count) setTotalContacts(count);
+      
+      // Fetch contacts from the contacts table with pagination
+      const { data, error } = await supabase
+        .from('contacts')
+        .select('*')
+        .order('overall_score', { ascending: false })
+        .range(page * CONTACTS_PER_PAGE, (page + 1) * CONTACTS_PER_PAGE - 1);
         
         if (error) {
           console.error('Error fetching contacts from public_contacts:', error);
@@ -131,12 +144,20 @@ const Contacts: React.FC = () => {
             practiceType: c.practiceType
           })));
           
-          setContacts(mappedData);
+          if (append) {
+            setContacts(prev => [...prev, ...mappedData]);
+          } else {
+            setContacts(mappedData);
+          }
+          
+          // Check if there are more contacts to load
+          setHasMore(mappedData.length === CONTACTS_PER_PAGE);
         } else {
           // No data returned, use mock data
           console.log('No data returned from public_contacts, using mock data');
           const mockContacts = mockDataService.generateMockContacts(20);
           setContacts(mockContacts);
+          setHasMore(false);
         }
       } catch (error) {
         console.error('Error fetching contacts:', error);
@@ -144,13 +165,24 @@ const Contacts: React.FC = () => {
         // Use mock data if there's an exception
         const mockContacts = mockDataService.generateMockContacts(20);
         setContacts(mockContacts);
+        setHasMore(false);
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
     };
 
-    fetchContacts();
+  };
+
+  useEffect(() => {
+    fetchContactsPage(0, false);
   }, []);
+
+  const handleLoadMore = () => {
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    fetchContactsPage(nextPage, true);
+  };
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -388,6 +420,21 @@ const Contacts: React.FC = () => {
               />
             </TabPanel>
           </Box>
+          
+          {/* Load More Button */}
+          {hasMore && !loading && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+              <Button
+                variant="outlined"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                startIcon={loadingMore ? <CircularProgress size={20} /> : null}
+                sx={{ px: 4, py: 1.5 }}
+              >
+                {loadingMore ? 'Loading...' : `Load More (${contacts.length} of ${totalContacts || '...'})`}
+              </Button>
+            </Box>
+          )}
         </Box>
       </Box>
     </Box>
