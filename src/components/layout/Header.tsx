@@ -32,6 +32,7 @@ import AuthModal from '../common/AuthModal';
 import { CRMQuickLoginModal } from '../common/CRMQuickLoginModal';
 import { RepSpheresAppSwitcher } from '../common/RepSpheresAppSwitcher';
 import ThemeToggle from '../ui/ThemeToggle';
+import { getUserDisplayName, getUserInitials } from '../../utils/userHelpers';
 
 interface HeaderProps {
   onSidebarToggle: () => void;
@@ -227,7 +228,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
                   height: 32
                 }}
               >
-                {user.email ? user.email.substring(0, 2).toUpperCase() : 'U'}
+                {getUserInitials(user)}
               </Avatar>
             </IconButton>
           <Menu
@@ -259,10 +260,10 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
           >
             <Box sx={{ px: 2, py: 1.5 }}>
               <Typography variant="subtitle1" fontWeight={600}>
-                John Smith
+                {getUserDisplayName(user)}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                john.smith@sphereos.com
+                {user?.email || 'No email'}
               </Typography>
             </Box>
             <Divider 

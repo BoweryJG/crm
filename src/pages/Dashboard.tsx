@@ -17,6 +17,7 @@ import { useThemeContext } from '../themes/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '../contexts/DashboardDataContext';
 import { useAuth } from '../auth';
+import { getUserDisplayName } from '../utils/userHelpers';
 
 // Helper function to generate random integers
 const getRandomInt = (min: number, max: number): number => {
@@ -32,7 +33,12 @@ const Dashboard: React.FC = () => {
   
   // Debug auth state
   React.useEffect(() => {
-    console.log('Dashboard - Auth state:', { user: user?.email, authLoading });
+    console.log('Dashboard - Auth state:', { 
+      user: user?.email, 
+      authLoading,
+      fullName: user?.user_metadata?.full_name,
+      displayName: getUserDisplayName(user)
+    });
   }, [user, authLoading]);
 
   if (authLoading) {
@@ -52,7 +58,7 @@ const Dashboard: React.FC = () => {
 
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" component="h1" fontWeight={600} gutterBottom>
-          Welcome back, {user?.email?.split('@')[0] || user?.user_metadata?.full_name || 'User'}
+          Welcome back, {getUserDisplayName(user)}
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Here's an overview of your sales performance and activity
