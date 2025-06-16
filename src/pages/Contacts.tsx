@@ -179,8 +179,6 @@ const Contacts: React.FC = () => {
       }
     };
 
-  };
-
   useEffect(() => {
     fetchContactsPage(0, false, '');
   }, []);
