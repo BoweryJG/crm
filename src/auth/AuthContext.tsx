@@ -1,13 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase, getRedirectUrl } from './supabase';
-import { 
-  setupCrossDomainAuthListener, 
-  broadcastAuthState, 
-  storeReturnUrl, 
-  getMainDomain,
-  handleCrossDomainRedirect,
-  isOnSubdomain 
-} from '../utils/crossDomainAuth';
+// Cross-domain auth removed - local auth only
 import type { User, AuthSession, AuthState, AuthProvider as AuthProviderType, SignInOptions } from './types';
 import type { Session } from '@supabase/supabase-js';
 
@@ -59,13 +52,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const initializeAuth = async () => {
       try {
-        // Set up cross-domain auth listener
-        setupCrossDomainAuthListener(supabase);
-        
-        // Check for cross-domain redirect
-        const wasRedirected = await handleCrossDomainRedirect(supabase);
-        if (wasRedirected) return;
-        
         const { data: { session }, error } = await supabase.auth.getSession();
         
         console.log('Initial auth check:', session?.user?.email, error);
@@ -79,11 +65,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             loading: false,
             error: null,
           });
-          
-          // Broadcast initial auth state if we have a session
-          if (session) {
-            broadcastAuthState(session);
-          }
         }
       } catch (error: any) {
         console.error('Auth initialization error:', error);
@@ -112,9 +93,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             loading: false,
             error: null,
           }));
-          
-          // Broadcast auth state changes to other domains
-          broadcastAuthState(session);
         }
       }
     );
@@ -132,12 +110,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      // Store current URL before redirecting
-      storeReturnUrl(window.location.href);
-      
-      // Always redirect to main domain for OAuth
-      const mainDomain = getMainDomain();
-      const redirectUrl = `${mainDomain}/auth/callback`;
+      // Use local domain for OAuth redirect
+      const redirectUrl = `${window.location.origin}/auth/callback`;
       
       console.log('OAuth sign in - redirect URL:', redirectUrl);
       
@@ -183,10 +157,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error: null,
       }));
       
-      // Broadcast auth state to other domains
-      if (data.session) {
-        broadcastAuthState(data.session);
-      }
     } catch (error: any) {
       setState(prev => ({ 
         ...prev, 
@@ -223,10 +193,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error: null,
       }));
       
-      // Broadcast auth state to other domains
-      if (data.session) {
-        broadcastAuthState(data.session);
-      }
     } catch (error: any) {
       setState(prev => ({ 
         ...prev, 
@@ -251,8 +217,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error: null,
       });
       
-      // Broadcast logout to other domains
-      broadcastAuthState(null);
     } catch (error: any) {
       setState(prev => ({ 
         ...prev, 
