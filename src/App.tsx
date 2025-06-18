@@ -112,7 +112,6 @@ const App: React.FC = () => {
                 <Route path="/" element={
                   <AuthGuard
                     allowPublic={true}
-                    publicComponent={<Layout />}
                     redirectTo="/login"
                     fallback={
                       <SphereLoadingScreen 

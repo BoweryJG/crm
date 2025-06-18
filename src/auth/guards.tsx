@@ -31,8 +31,9 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   }
   
   if (!user) {
-    if (allowPublic && publicComponent) {
-      return <>{publicComponent}</>;
+    if (allowPublic) {
+      // When allowPublic is true, render either publicComponent or children
+      return <>{publicComponent || children}</>;
     }
     return null;
   }

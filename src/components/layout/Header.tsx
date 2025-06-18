@@ -67,9 +67,10 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
   };
   
   const handleLogout = async () => {
-    console.log('Mock logout called');
+    console.log('Logging out to demo mode');
     await signOut();
-    // No need to navigate since we're always authenticated
+    // Stay on current page in demo mode
+    window.location.reload(); // Reload to ensure demo mode is active
   };
 
   return (
