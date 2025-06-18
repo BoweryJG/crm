@@ -12,29 +12,15 @@ import {
 } from '../types';
 
 export const useSUISFeatures = () => {
-  let user;
-  try {
-    const auth = useAuth();
-    user = auth.user;
-  } catch (error) {
-    console.warn('useSUISFeatures: useAuth not available, returning empty state');
-    return {
-      insights: [],
-      metrics: null,
-      notifications: [],
-      notificationSummary: null,
-      loading: false,
-      refreshInsights: async () => {},
-      refreshMetrics: async () => {},
-      refreshNotifications: async () => {}
-    };
-  }
-  
+  // Always call hooks in the same order
   const [insights, setInsights] = useState<PredictiveInsight[]>([]);
   const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
   const [notifications, setNotifications] = useState<SUISNotification[]>([]);
   const [notificationSummary, setNotificationSummary] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  
+  // Try to get auth context - this will throw if not in provider
+  const { user } = useAuth();
 
   // Load predictive insights
   const loadInsights = useCallback(async () => {
