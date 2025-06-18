@@ -5,62 +5,28 @@ require('dotenv').config({ path: '.env.local' });
 
 // Supabase configuration
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://cbopynuvhcymbumjnvay.supabase.co';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY;
-
-if (!supabaseServiceKey) {
-  console.error('Error: SUPABASE_SERVICE_KEY or REACT_APP_SUPABASE_ANON_KEY not found in environment variables');
-  process.exit(1);
-}
+const supabaseServiceKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Create practices table SQL
-const createPracticesTableSQL = `
-CREATE TABLE IF NOT EXISTS public.practices (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT,
-  city TEXT,
-  state TEXT,
-  zip_code TEXT,
-  phone TEXT,
-  email TEXT,
-  website TEXT,
-  type TEXT,
-  size TEXT,
-  specialty TEXT,
-  contact_count INTEGER DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Add practice_id to contacts table if it doesn't exist
-DO $$ 
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                WHERE table_name = 'contacts' 
-                AND column_name = 'practice_id') THEN
-    ALTER TABLE public.contacts ADD COLUMN practice_id UUID REFERENCES practices(id);
-  END IF;
-END $$;
-
--- Create indexes
-CREATE INDEX IF NOT EXISTS idx_practices_city_state ON practices(city, state);
-CREATE INDEX IF NOT EXISTS idx_contacts_practice_id ON contacts(practice_id);
-`;
-
-async function createPracticesTable() {
-  console.log('Creating practices table...');
-  const { error } = await supabase.rpc('exec_sql', { sql: createPracticesTableSQL });
+async function checkPracticesTable() {
+  console.log('Checking if practices table exists...');
+  const { data, error } = await supabase
+    .from('practices')
+    .select('id')
+    .limit(1);
   
-  if (error) {
-    console.error('Error creating practices table:', error);
-    // Try alternative approach
-    console.log('Trying to create table directly...');
-    // You may need to run this SQL directly in Supabase dashboard
-    console.log(createPracticesTableSQL);
-  } else {
-    console.log('Practices table created successfully');
+  if (error && error.code === '42P01') {
+    console.log('\n❌ PRACTICES TABLE DOES NOT EXIST!');
+    console.log('\nPlease run the following SQL in your Supabase dashboard first:');
+    console.log('----------------------------------------');
+    console.log(fs.readFileSync('./create_practices_table.sql', 'utf8'));
+    console.log('----------------------------------------');
+    return false;
   }
+  
+  console.log('✅ Practices table exists');
+  return true;
 }
 
 async function importPractices() {
@@ -135,10 +101,23 @@ async function importPractices() {
 }
 
 async function uploadPracticesToSupabase(practicesArray) {
-  console.log(`Uploading ${practicesArray.length} practices to Supabase...`);
+  console.log(`\nUploading ${practicesArray.length} practices to Supabase...`);
   
-  // Upload in batches of 500
-  const batchSize = 500;
+  // First, clear existing practices (optional)
+  console.log('Clearing existing practices...');
+  const { error: deleteError } = await supabase
+    .from('practices')
+    .delete()
+    .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+  
+  if (deleteError) {
+    console.log('Warning: Could not clear existing practices:', deleteError.message);
+  }
+  
+  // Upload in batches of 100
+  const batchSize = 100;
+  let successCount = 0;
+  
   for (let i = 0; i < practicesArray.length; i += batchSize) {
     const batch = practicesArray.slice(i, i + batchSize);
     
@@ -148,13 +127,15 @@ async function uploadPracticesToSupabase(practicesArray) {
       .select();
     
     if (error) {
-      console.error(`Error uploading batch ${i / batchSize + 1}:`, error);
+      console.error(`Error uploading batch ${i / batchSize + 1}:`, error.message);
     } else {
-      console.log(`Uploaded batch ${i / batchSize + 1} (${data.length} practices)`);
+      successCount += data.length;
+      console.log(`✓ Uploaded batch ${i / batchSize + 1} (${data.length} practices) - Total: ${successCount}/${practicesArray.length}`);
     }
   }
   
   // Fetch all practices to get their IDs
+  console.log('\nFetching practice IDs...');
   const { data: allPractices, error } = await supabase
     .from('practices')
     .select('id, city, state');
@@ -163,6 +144,8 @@ async function uploadPracticesToSupabase(practicesArray) {
     console.error('Error fetching practices:', error);
     return null;
   }
+  
+  console.log(`✅ Successfully fetched ${allPractices.length} practices`);
   
   // Create lookup map
   const practiceIdMap = new Map();
@@ -175,7 +158,7 @@ async function uploadPracticesToSupabase(practicesArray) {
 }
 
 async function updateContactsWithPracticeIds(contactPracticeMap, practiceIdMap) {
-  console.log('Updating contacts with practice IDs...');
+  console.log('\nUpdating contacts with practice IDs...');
   
   // First, get all contacts from database
   const { data: contacts, error } = await supabase
@@ -213,7 +196,9 @@ async function updateContactsWithPracticeIds(contactPracticeMap, practiceIdMap) 
   console.log(`Matched ${matchCount} contacts to practices`);
   
   // Update contacts in batches
-  const batchSize = 100;
+  const batchSize = 50;
+  let updateCount = 0;
+  
   for (let i = 0; i < updates.length; i += batchSize) {
     const batch = updates.slice(i, i + batchSize);
     
@@ -225,21 +210,30 @@ async function updateContactsWithPracticeIds(contactPracticeMap, practiceIdMap) 
         .eq('id', update.id);
       
       if (error) {
-        console.error(`Error updating contact ${update.id}:`, error);
+        console.error(`Error updating contact ${update.id}:`, error.message);
+      } else {
+        updateCount++;
       }
     }
     
-    console.log(`Updated batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(updates.length / batchSize)}`);
+    console.log(`✓ Updated batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(updates.length / batchSize)} - Total: ${updateCount}/${updates.length}`);
   }
+  
+  console.log(`✅ Successfully updated ${updateCount} contacts`);
 }
 
 async function main() {
   try {
-    // Step 1: Create practices table
-    await createPracticesTable();
+    console.log('🚀 Starting Practice Import Process');
+    console.log('===================================\n');
     
-    // Wait a moment for table creation
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Step 1: Check if practices table exists
+    const tableExists = await checkPracticesTable();
+    if (!tableExists) {
+      console.log('\n⚠️  Please create the practices table first by running the SQL above in your Supabase dashboard.');
+      console.log('Then run this script again.');
+      process.exit(1);
+    }
     
     // Step 2: Import and process CSV
     const { practicesArray, contactPracticeMap } = await importPractices();
@@ -252,7 +246,7 @@ async function main() {
       await updateContactsWithPracticeIds(contactPracticeMap, practiceIdMap);
     }
     
-    console.log('Import complete!');
+    console.log('\n✅ Import complete!');
     
     // Show summary
     const { count: practiceCount } = await supabase

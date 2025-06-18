@@ -37,6 +37,22 @@ export interface Contact extends BaseModel {
   // Properties for UI compatibility
   isStarred?: boolean;
   practiceType?: 'dental' | 'aesthetic' | 'both' | 'other';
+  // Related practice object
+  practice?: {
+    id: string;
+    name: string;
+    city: string;
+    state: string;
+    phone?: string;
+    email?: string;
+    type?: string;
+    specialty?: string;
+  };
+  // Additional contact fields from actual schema
+  city?: string;
+  state?: string;
+  specialty?: string;
+  overall_score?: number;
 }
 
 // Practice Types

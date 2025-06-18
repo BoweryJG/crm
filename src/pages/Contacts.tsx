@@ -90,9 +90,21 @@ const Contacts: React.FC = () => {
       if (!append) setLoading(true);
       else setLoadingMore(true);
       
-      // Build query to match actual table structure
+      // Build query to match actual table structure and include practice relationship
       let countQuery = supabase.from('contacts').select('*', { count: 'exact', head: true });
-      let dataQuery = supabase.from('contacts').select('*');
+      let dataQuery = supabase.from('contacts').select(`
+        *,
+        practice:practice_id (
+          id,
+          name,
+          city,
+          state,
+          phone,
+          email,
+          type,
+          specialty
+        )
+      `);
       
       // Add search filters if search term exists
       if (search.trim()) {
@@ -532,10 +544,13 @@ const ContactsList: React.FC<ContactsListProps> = ({
                     <Typography variant="body2" color="text.secondary">
                       {contact.specialty || 'Healthcare Professional'}
                     </Typography>
-                    {(contact.city || contact.state) && (
+                    {(contact.practice?.city || contact.city || contact.practice?.state || contact.state) && (
                       <Typography variant="caption" color="primary">
                         <BusinessIcon sx={{ fontSize: 14, verticalAlign: 'middle', mr: 0.5 }} />
-                        {[contact.city, contact.state].filter(Boolean).join(', ')}
+                        {[
+                          contact.practice?.city || contact.city, 
+                          contact.practice?.state || contact.state
+                        ].filter(Boolean).join(', ')}
                       </Typography>
                     )}
                   </Box>
@@ -557,7 +572,7 @@ const ContactsList: React.FC<ContactsListProps> = ({
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <BusinessIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
                 <Typography variant="body2" color="text.secondary">
-                  {contact.practice_name}
+                  {contact.practice?.name || contact.practice_name || 'No practice assigned'}
                 </Typography>
               </Box>
 
