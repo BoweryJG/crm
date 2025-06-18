@@ -23,6 +23,12 @@ interface Message {
 const ResearchAssistant: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { state, actions } = useSUIS();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showContext, setShowContext] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // If no user, show login prompt
   if (!user) {
@@ -39,13 +45,6 @@ const ResearchAssistant: React.FC = () => {
       </div>
     );
   }
-  
-  const { state, actions } = useSUIS();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [showContext, setShowContext] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const contextOptions = {
     goals: state.intelligenceProfile?.goals || {},

@@ -198,6 +198,10 @@ const PathwayProgress: React.FC<PathwayProgressProps> = ({ path, totalCredits, c
 const LearningPathway: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { state, actions } = useSUIS();
+  const [selectedPath, setSelectedPath] = useState<LearningPath | null>(null);
+  const [userProgress, setUserProgress] = useState<Map<string, UserProgress>>(new Map());
+  const [activeModule, setActiveModule] = useState<LearningModule | null>(null);
   
   // If no user, show login prompt
   if (!user) {
@@ -214,11 +218,6 @@ const LearningPathway: React.FC = () => {
       </div>
     );
   }
-  
-  const { state, actions } = useSUIS();
-  const [selectedPath, setSelectedPath] = useState<LearningPath | null>(null);
-  const [userProgress, setUserProgress] = useState<Map<string, UserProgress>>(new Map());
-  const [activeModule, setActiveModule] = useState<LearningModule | null>(null);
 
   // Mock learning paths
   const learningPaths: LearningPath[] = [

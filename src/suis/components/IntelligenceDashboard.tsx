@@ -12,6 +12,17 @@ import { PredictiveInsight, PerformanceMetrics } from '../types';
 const IntelligenceDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { 
+    insights, 
+    metrics, 
+    notifications,
+    notificationSummary,
+    loading,
+    refreshInsights,
+    refreshMetrics
+  } = useSUISFeatures();
+
+  const [selectedInsight, setSelectedInsight] = useState<PredictiveInsight | null>(null);
   
   // If no user, show login prompt
   if (!user) {
@@ -34,18 +45,6 @@ const IntelligenceDashboard: React.FC = () => {
       </Box>
     );
   }
-  
-  const { 
-    insights, 
-    metrics, 
-    notifications,
-    notificationSummary,
-    loading,
-    refreshInsights,
-    refreshMetrics
-  } = useSUISFeatures();
-
-  const [selectedInsight, setSelectedInsight] = useState<PredictiveInsight | null>(null);
 
   const getInsightIcon = (type: string) => {
     switch (type) {

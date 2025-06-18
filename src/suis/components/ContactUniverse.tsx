@@ -114,6 +114,12 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onSelect }) => {
 const ContactUniverse: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { state, actions } = useSUIS();
+  const [contacts, setContacts] = useState<ContactType[]>([]);
+  const [selectedTier, setSelectedTier] = useState<ContactTier | 'all'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedContact, setSelectedContact] = useState<ContactType | null>(null);
+  const [showAcquisitionModal, setShowAcquisitionModal] = useState(false);
   
   // If no user, show login prompt
   if (!user) {
@@ -130,13 +136,6 @@ const ContactUniverse: React.FC = () => {
       </div>
     );
   }
-  
-  const { state, actions } = useSUIS();
-  const [contacts, setContacts] = useState<ContactType[]>([]);
-  const [selectedTier, setSelectedTier] = useState<ContactTier | 'all'>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedContact, setSelectedContact] = useState<ContactType | null>(null);
-  const [showAcquisitionModal, setShowAcquisitionModal] = useState(false);
 
   const tiers = [
     { id: 'tier_20', name: 'Tier 20', description: 'High-value prospects', color: 'purple' },

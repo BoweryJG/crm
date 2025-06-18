@@ -73,29 +73,6 @@ const steps = [
 const IntelligenceProfileSetup: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  
-  // If no user, show login prompt
-  if (!user) {
-    return (
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        height: '100vh',
-        gap: 2 
-      }}>
-        <Typography variant="h5">Authentication Required</Typography>
-        <Typography variant="body1" color="text.secondary">
-          The SUIS Intelligence Profile Setup requires authentication to access.
-        </Typography>
-        <Button variant="contained" onClick={() => navigate('/login')}>
-          Go to Login
-        </Button>
-      </Box>
-    );
-  }
-  
   const { state, actions } = useSUIS();
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -149,6 +126,28 @@ const IntelligenceProfileSetup: React.FC = () => {
       navigate('/intelligence');
     }
   }, [state.intelligenceProfile, navigate]);
+  
+  // If no user, show login prompt
+  if (!user) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        height: '100vh',
+        gap: 2 
+      }}>
+        <Typography variant="h5">Authentication Required</Typography>
+        <Typography variant="body1" color="text.secondary">
+          The SUIS Intelligence Profile Setup requires authentication to access.
+        </Typography>
+        <Button variant="contained" onClick={() => navigate('/login')}>
+          Go to Login
+        </Button>
+      </Box>
+    );
+  }
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);

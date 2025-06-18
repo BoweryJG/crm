@@ -32,6 +32,22 @@ interface ContentRequest {
 const ContentGenerator: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { generateContent, loading } = useSUISFeatures();
+  
+  const [contentRequest, setContentRequest] = useState<ContentRequest>({
+    type: 'email',
+    targetAudience: {
+      specialty: 'dental',
+      role: 'practice_owner'
+    },
+    tone: 'professional',
+    length: 'medium'
+  });
+  
+  const [generatedContent, setGeneratedContent] = useState<any>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState('');
+  const [error, setError] = useState<string | null>(null);
   
   // If no user, show login prompt
   if (!user) {
@@ -54,23 +70,6 @@ const ContentGenerator: React.FC = () => {
       </Box>
     );
   }
-  
-  const { generateContent, loading } = useSUISFeatures();
-  
-  const [contentRequest, setContentRequest] = useState<ContentRequest>({
-    type: 'email',
-    targetAudience: {
-      specialty: 'dental',
-      role: 'practice_owner'
-    },
-    tone: 'professional',
-    length: 'medium'
-  });
-  
-  const [generatedContent, setGeneratedContent] = useState<any>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedContent, setEditedContent] = useState('');
-  const [error, setError] = useState<string | null>(null);
 
   const contentTypes = [
     { value: 'email', label: 'Email', icon: <Mail size={20} /> },

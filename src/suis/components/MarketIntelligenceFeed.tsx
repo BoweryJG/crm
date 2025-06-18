@@ -180,6 +180,11 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onRea
 const MarketIntelligenceFeed: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { state, actions } = useSUIS();
+  const [selectedIntelligence, setSelectedIntelligence] = useState<MarketIntelligence | null>(null);
+  const [activeTab, setActiveTab] = useState<'intelligence' | 'notifications'>('intelligence');
+  const [filterSource, setFilterSource] = useState<string>('all');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   // If no user, show login prompt
   if (!user) {
@@ -196,12 +201,6 @@ const MarketIntelligenceFeed: React.FC = () => {
       </div>
     );
   }
-  
-  const { state, actions } = useSUIS();
-  const [selectedIntelligence, setSelectedIntelligence] = useState<MarketIntelligence | null>(null);
-  const [activeTab, setActiveTab] = useState<'intelligence' | 'notifications'>('intelligence');
-  const [filterSource, setFilterSource] = useState<string>('all');
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const sources = ['all', 'sphere1a', 'market_feed', 'competitor', 'news', 'regulatory'];
 
