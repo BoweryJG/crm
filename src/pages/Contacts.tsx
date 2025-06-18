@@ -342,7 +342,7 @@ const Contacts: React.FC = () => {
         activeFilters={[
           ...(searchTerm ? [`Search: "${searchTerm}"`] : []),
           ...(filterType !== 'all' ? [`Type: ${filterType}`] : []),
-          ...(filterSpecialization !== 'all' ? [`Specialization: ${filterSpecialization}`] : [])
+          ...(filterSpecialty !== 'all' ? [`Specialization: ${filterSpecialty}`] : [])
         ]}
       />
 
