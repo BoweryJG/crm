@@ -127,8 +127,8 @@ const ContactUniverse: React.FC = () => {
     setFilteredContacts(filtered);
   }, [contacts, searchTerm, filterLocation, filterSpecialty, filterChannel, engagementRange, aiScoreRange, showOnlyStarred]);
 
-  const uniqueLocations = ['all', ...new Set(contacts.map(c => c.location))];
-  const uniqueSpecialties = ['all', ...new Set(contacts.map(c => c.specialty))];
+  const uniqueLocations = ['all', ...Array.from(new Set(contacts.map(c => c.location)))];
+  const uniqueSpecialties = ['all', ...Array.from(new Set(contacts.map(c => c.specialty)))];
 
   const getEngagementColor = (score: number) => {
     if (score >= 80) return 'success';
