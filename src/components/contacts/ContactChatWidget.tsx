@@ -27,6 +27,7 @@ import {
 } from '@mui/icons-material';
 import { contactAssistantService } from '../../services/contacts/contactAssistantService';
 import { Contact } from '../../types/models';
+import { useSpeechRecognition } from '../../hooks/useSpeechRecognition';
 
 interface Message {
   id: string;
@@ -53,6 +54,17 @@ const ContactChatWidget: React.FC<ContactChatWidgetProps> = ({ onContactsUpdate 
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  
+  // Speech recognition
+  const {
+    transcript,
+    interimTranscript,
+    isListening,
+    isSupported,
+    startListening,
+    stopListening,
+    resetTranscript
+  } = useSpeechRecognition();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -61,6 +73,22 @@ const ContactChatWidget: React.FC<ContactChatWidgetProps> = ({ onContactsUpdate 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Update input value with speech transcript
+  useEffect(() => {
+    if (transcript) {
+      setInputValue(prev => prev + transcript);
+      resetTranscript();
+    }
+  }, [transcript, resetTranscript]);
+
+  // Auto-send when speech stops
+  useEffect(() => {
+    if (!isListening && inputValue.trim() && transcript) {
+      handleSend();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isListening]);
 
   const handleSend = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -255,20 +283,60 @@ const ContactChatWidget: React.FC<ContactChatWidgetProps> = ({ onContactsUpdate 
               <TextField
                 fullWidth
                 size="small"
-                placeholder="Ask about your contacts..."
-                value={inputValue}
+                placeholder={isListening ? "Listening..." : "Ask about your contacts..."}
+                value={inputValue + (isListening ? interimTranscript : '')}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                disabled={isLoading}
+                disabled={isLoading || isListening}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: isListening ? 'action.hover' : 'background.paper'
+                  }
+                }}
               />
+              {isSupported && (
+                <Tooltip title={isListening ? "Stop listening" : "Click to speak"}>
+                  <IconButton
+                    color={isListening ? "error" : "primary"}
+                    onClick={isListening ? stopListening : startListening}
+                    disabled={isLoading}
+                    sx={{
+                      animation: isListening ? 'pulse 1.5s infinite' : 'none',
+                      '@keyframes pulse': {
+                        '0%': { transform: 'scale(1)' },
+                        '50%': { transform: 'scale(1.1)' },
+                        '100%': { transform: 'scale(1)' }
+                      }
+                    }}
+                  >
+                    {isListening ? <MicIcon /> : <MicOffIcon />}
+                  </IconButton>
+                </Tooltip>
+              )}
               <IconButton
                 color="primary"
                 onClick={handleSend}
-                disabled={!inputValue.trim() || isLoading}
+                disabled={!inputValue.trim() || isLoading || isListening}
               >
                 <SendIcon />
               </IconButton>
             </Box>
+            {isListening && (
+              <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    bgcolor: 'error.main',
+                    animation: 'blink 1s infinite'
+                  }}
+                />
+                <Typography variant="caption" color="text.secondary">
+                  Listening... Speak naturally, I'll send when you pause.
+                </Typography>
+              </Box>
+            )}
           </Box>
         </Paper>
       </Collapse>
