@@ -124,8 +124,10 @@ const Contacts: React.FC = () => {
       if (count) setTotalContacts(count);
       
       // Fetch contacts with search filter and pagination
+      // Use different ordering based on table (overall_score exists only in contacts table)
+      const orderColumn = tableName === 'contacts' ? 'overall_score' : 'created_at';
       const { data, error } = await dataQuery
-        .order('overall_score', { ascending: false })
+        .order(orderColumn, { ascending: false })
         .range(page * CONTACTS_PER_PAGE, (page + 1) * CONTACTS_PER_PAGE - 1);
         
         if (error) {
