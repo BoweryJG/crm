@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useRequireAuth } from './hooks';
 import { isAdminUser } from '../config/adminUsers';
@@ -21,10 +22,18 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   allowPublic = false,
   publicComponent
 }) => {
-  const authResult = useAuth();
-  const requireAuthResult = useRequireAuth(redirectTo);
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   
-  const { user, loading } = allowPublic ? authResult : requireAuthResult;
+  React.useEffect(() => {
+    // Only redirect if auth is required and user is not authenticated
+    if (!allowPublic && !loading && !user) {
+      // Store the attempted location
+      localStorage.setItem('authReturnPath', window.location.pathname + window.location.search);
+      console.log('AuthGuard - Storing return path:', window.location.pathname + window.location.search);
+      navigate(redirectTo);
+    }
+  }, [user, loading, allowPublic, redirectTo, navigate]);
   
   if (loading) {
     return <>{fallback}</>;
