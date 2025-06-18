@@ -492,6 +492,14 @@ const Contacts: React.FC = () => {
           )}
         </Box>
       </Box>
+      
+      {/* Contact Assistant Chat Widget */}
+      <ContactChatWidget 
+        onContactsUpdate={(newContacts) => {
+          setContacts(newContacts);
+          setTotalContacts(newContacts.length);
+        }}
+      />
     </Box>
   );
 };
@@ -631,14 +639,6 @@ const ContactsList: React.FC<ContactsListProps> = ({
           </Card>
         </Box>
       ))}
-      
-      {/* Contact Assistant Chat Widget */}
-      <ContactChatWidget 
-        onContactsUpdate={(newContacts) => {
-          setContacts(newContacts);
-          setTotalContacts(newContacts.length);
-        }}
-      />
     </Box>
   );
 };
