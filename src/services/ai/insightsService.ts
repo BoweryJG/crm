@@ -37,12 +37,12 @@ export class AIInsightsService {
   static async generateInsights(limit: number = 10): Promise<AIInsight[]> {
     try {
       // Get recent call analyses with linguistics data
-      // Specify the exact foreign key relationship to avoid ambiguity
+      // Use inner join syntax to avoid foreign key ambiguity
       const { data: callAnalyses, error } = await supabase
         .from('call_analysis')
         .select(`
           *,
-          linguistics_analysis!call_analysis_linguistics_analysis_id_fkey (*)
+          linguistics_analysis!inner (*)
         `)
         .order('created_at', { ascending: false })
         .limit(50);
