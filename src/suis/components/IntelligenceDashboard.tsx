@@ -2,12 +2,39 @@
 // Main dashboard showing predictive insights and analytics
 
 import React, { useEffect, useState } from 'react';
-import { Box, Grid, Card, CardContent, Typography, Chip, LinearProgress, IconButton, Alert } from '@mui/material';
+import { Box, Grid, Card, CardContent, Typography, Chip, LinearProgress, IconButton, Alert, Button } from '@mui/material';
 import { TrendingUp, TrendingDown, Lightbulb, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
+import { useAuth } from '../../auth';
+import { useNavigate } from 'react-router-dom';
 import { useSUISFeatures } from '../hooks/useSUISFeatures';
 import { PredictiveInsight, PerformanceMetrics } from '../types';
 
 const IntelligenceDashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  // If no user, show login prompt
+  if (!user) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        height: '100vh',
+        gap: 2 
+      }}>
+        <Typography variant="h5">Authentication Required</Typography>
+        <Typography variant="body1" color="text.secondary">
+          The SUIS Intelligence Dashboard requires authentication to access.
+        </Typography>
+        <Button variant="contained" onClick={() => navigate('/login')}>
+          Go to Login
+        </Button>
+      </Box>
+    );
+  }
+  
   const { 
     insights, 
     metrics, 

@@ -38,6 +38,8 @@ import ContactChatWidget from '../components/contacts/ContactChatWidget';
 import { Contact } from '../types/models';
 import { supabase } from '../services/supabase/supabase';
 import mockDataService from '../services/mockData/mockDataService';
+import { useAppMode } from '../contexts/AppModeContext';
+import { useAuth } from '../auth';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -72,6 +74,8 @@ function a11yProps(index: number) {
 const Contacts: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isDemo, mode } = useAppMode();
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -90,9 +94,13 @@ const Contacts: React.FC = () => {
       if (!append) setLoading(true);
       else setLoadingMore(true);
       
+      // Determine which table to use based on mode and authentication
+      const tableName = (!user || isDemo) ? 'public_contacts' : 'contacts';
+      console.log(`Using ${tableName} table (user: ${user?.email}, mode: ${mode})`);
+      
       // Build query to match actual table structure and include practice relationship
-      let countQuery = supabase.from('contacts').select('*', { count: 'exact', head: true });
-      let dataQuery = supabase.from('contacts').select(`
+      let countQuery = supabase.from(tableName).select('*', { count: 'exact', head: true });
+      let dataQuery = supabase.from(tableName).select(`
         *,
         practice:practice_id (
           id,
@@ -123,7 +131,7 @@ const Contacts: React.FC = () => {
         .range(page * CONTACTS_PER_PAGE, (page + 1) * CONTACTS_PER_PAGE - 1);
         
         if (error) {
-          console.error('Error fetching contacts from public_contacts:', error);
+          console.error(`Error fetching contacts from ${tableName}:`, error);
           console.log('Falling back to mock contacts data');
           // Use mock data if the table doesn't exist (404) or there's another error
           const mockContacts = mockDataService.generateMockContacts(20);
@@ -175,7 +183,7 @@ const Contacts: React.FC = () => {
           setHasMore(mappedData.length === CONTACTS_PER_PAGE);
         } else {
           // No data returned, use mock data
-          console.log('No data returned from public_contacts, using mock data');
+          console.log(`No data returned from ${tableName}, using mock data`);
           const mockContacts = mockDataService.generateMockContacts(20);
           setContacts(mockContacts);
           setHasMore(false);
@@ -234,14 +242,21 @@ const Contacts: React.FC = () => {
   };
 
   const toggleStarred = async (id: string) => {
+    // Don't allow toggling in demo mode or when not authenticated
+    if (!user || isDemo) {
+      console.log('Cannot toggle starred status in demo mode');
+      return;
+    }
+    
     try {
       // Find the contact to toggle
       const contactToUpdate = contacts.find(c => c.id === id);
       if (!contactToUpdate) return;
 
-      // Update the contact in the database
+      // Update the contact in the database (only in live mode with authenticated user)
+      const tableName = 'contacts'; // Only authenticated users can toggle stars
       const { error } = await supabase
-        .from('public_contacts')
+        .from(tableName)
         .update({ is_starred: !contactToUpdate.isStarred })
         .eq('id', id);
 

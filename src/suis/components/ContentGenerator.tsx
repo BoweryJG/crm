@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useSUISFeatures } from '../hooks/useSUISFeatures';
 import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 interface ContentRequest {
   type: 'email' | 'presentation' | 'social' | 'proposal' | 'follow_up';
@@ -29,7 +30,31 @@ interface ContentRequest {
 }
 
 const ContentGenerator: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
+  
+  // If no user, show login prompt
+  if (!user) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        height: '100vh',
+        gap: 2 
+      }}>
+        <Typography variant="h5">Authentication Required</Typography>
+        <Typography variant="body1" color="text.secondary">
+          The SUIS Content Generator requires authentication to access.
+        </Typography>
+        <Button variant="contained" onClick={() => navigate('/login')}>
+          Go to Login
+        </Button>
+      </Box>
+    );
+  }
+  
   const { generateContent, loading } = useSUISFeatures();
   
   const [contentRequest, setContentRequest] = useState<ContentRequest>({

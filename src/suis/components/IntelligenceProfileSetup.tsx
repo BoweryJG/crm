@@ -45,6 +45,7 @@ import {
 import { useSUIS } from '../../hooks/useSUIS';
 import { IntelligenceProfile } from '../types';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth';
 
 const steps = [
   {
@@ -71,6 +72,30 @@ const steps = [
 
 const IntelligenceProfileSetup: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  // If no user, show login prompt
+  if (!user) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        height: '100vh',
+        gap: 2 
+      }}>
+        <Typography variant="h5">Authentication Required</Typography>
+        <Typography variant="body1" color="text.secondary">
+          The SUIS Intelligence Profile Setup requires authentication to access.
+        </Typography>
+        <Button variant="contained" onClick={() => navigate('/login')}>
+          Go to Login
+        </Button>
+      </Box>
+    );
+  }
+  
   const { state, actions } = useSUIS();
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);

@@ -8,6 +8,8 @@ import {
   Brain, Search, Send, Loader, Copy, ThumbsUp, ThumbsDown,
   BookOpen, Target, TrendingUp, AlertCircle, ChevronDown
 } from 'lucide-react';
+import { useAuth } from '../../auth';
+import { useNavigate } from 'react-router-dom';
 
 interface Message {
   id: string;
@@ -19,6 +21,25 @@ interface Message {
 }
 
 const ResearchAssistant: React.FC = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  // If no user, show login prompt
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <h2 className="text-xl font-semibold">Authentication Required</h2>
+        <p className="text-gray-600">The SUIS Research Assistant requires authentication to access.</p>
+        <button 
+          onClick={() => navigate('/login')}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Go to Login
+        </button>
+      </div>
+    );
+  }
+  
   const { state, actions } = useSUIS();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');

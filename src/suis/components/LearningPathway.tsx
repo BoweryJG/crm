@@ -9,6 +9,8 @@ import {
   Lock, TrendingUp, Users, Brain, Trophy, ChevronRight,
   Star, BarChart, Target, Zap
 } from 'lucide-react';
+import { useAuth } from '../../auth';
+import { useNavigate } from 'react-router-dom';
 
 // Local interface for mock learning paths
 interface LearningPath {
@@ -194,6 +196,25 @@ const PathwayProgress: React.FC<PathwayProgressProps> = ({ path, totalCredits, c
 };
 
 const LearningPathway: React.FC = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  // If no user, show login prompt
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <h2 className="text-xl font-semibold">Authentication Required</h2>
+        <p className="text-gray-600">The SUIS Learning Pathway requires authentication to access.</p>
+        <button 
+          onClick={() => navigate('/login')}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Go to Login
+        </button>
+      </div>
+    );
+  }
+  
   const { state, actions } = useSUIS();
   const [selectedPath, setSelectedPath] = useState<LearningPath | null>(null);
   const [userProgress, setUserProgress] = useState<Map<string, UserProgress>>(new Map());

@@ -8,6 +8,8 @@ import {
   Users, UserPlus, Filter, Search, Star, Mail, Phone,
   Calendar, TrendingUp, Award, Target, Activity
 } from 'lucide-react';
+import { useAuth } from '../../auth';
+import { useNavigate } from 'react-router-dom';
 
 interface ContactCardProps {
   contact: ContactType;
@@ -110,6 +112,25 @@ const ContactCard: React.FC<ContactCardProps> = ({ contact, onSelect }) => {
 };
 
 const ContactUniverse: React.FC = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  // If no user, show login prompt
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <h2 className="text-xl font-semibold">Authentication Required</h2>
+        <p className="text-gray-600">The SUIS Contact Universe requires authentication to access.</p>
+        <button 
+          onClick={() => navigate('/login')}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Go to Login
+        </button>
+      </div>
+    );
+  }
+  
   const { state, actions } = useSUIS();
   const [contacts, setContacts] = useState<ContactType[]>([]);
   const [selectedTier, setSelectedTier] = useState<ContactTier | 'all'>('all');
