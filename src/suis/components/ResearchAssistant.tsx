@@ -30,6 +30,11 @@ const ResearchAssistant: React.FC = () => {
   const [showContext, setShowContext] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
+  // Move useEffect before conditional return to follow Rules of Hooks
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+  
   // If no user, show login prompt
   if (!user) {
     return (
@@ -51,10 +56,6 @@ const ResearchAssistant: React.FC = () => {
     specializations: state.intelligenceProfile?.specializations || [],
     recentInsights: state.marketIntelligence.slice(0, 3)
   };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

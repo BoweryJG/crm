@@ -202,22 +202,6 @@ const LearningPathway: React.FC = () => {
   const [selectedPath, setSelectedPath] = useState<LearningPath | null>(null);
   const [userProgress, setUserProgress] = useState<Map<string, UserProgress>>(new Map());
   const [activeModule, setActiveModule] = useState<LearningModule | null>(null);
-  
-  // If no user, show login prompt
-  if (!user) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4">
-        <h2 className="text-xl font-semibold">Authentication Required</h2>
-        <p className="text-gray-600">The SUIS Learning Pathway requires authentication to access.</p>
-        <button 
-          onClick={() => navigate('/login')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          Go to Login
-        </button>
-      </div>
-    );
-  }
 
   // Mock learning paths
   const learningPaths: LearningPath[] = [
@@ -363,7 +347,7 @@ const LearningPathway: React.FC = () => {
     }
   ];
 
-  // Mock progress data
+  // Mock progress data - moved before conditional return to follow Rules of Hooks
   useEffect(() => {
     const mockProgress = new Map<string, UserProgress>();
     mockProgress.set('mod1', {
