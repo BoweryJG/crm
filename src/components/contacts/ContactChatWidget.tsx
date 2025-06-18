@@ -161,10 +161,10 @@ const ContactChatWidget: React.FC<ContactChatWidgetProps> = ({ onContactsUpdate 
         secondary={
           <Box>
             <Typography variant="caption" display="block">
-              {contact.practice_type === 'aesthetic' ? '💉' : '🦷'} {contact.practice_name}
+              {contact.practiceType === 'aesthetic' ? '💉' : '🦷'} {contact.practice_name}
             </Typography>
-            {contact.specialty && (
-              <Chip label={contact.specialty} size="small" sx={{ mt: 0.5 }} />
+            {contact.specialization && (
+              <Chip label={contact.specialization} size="small" sx={{ mt: 0.5 }} />
             )}
           </Box>
         }
