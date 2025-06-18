@@ -33,6 +33,8 @@ import {
   StarBorder as StarBorderIcon
 } from '@mui/icons-material';
 import CallButton from '../components/contacts/CallButton';
+import ContactMetrics from '../components/contacts/ContactMetrics';
+import ContactChatWidget from '../components/contacts/ContactChatWidget';
 import { Contact } from '../types/models';
 import { supabase } from '../services/supabase/supabase';
 import mockDataService from '../services/mockData/mockDataService';
@@ -88,9 +90,20 @@ const Contacts: React.FC = () => {
       if (!append) setLoading(true);
       else setLoadingMore(true);
       
-      // Build query
+      // Build query with practice/company data
       let countQuery = supabase.from('contacts').select('*', { count: 'exact', head: true });
-      let dataQuery = supabase.from('contacts').select('*');
+      let dataQuery = supabase.from('contacts').select(`
+        *,
+        practices (
+          id,
+          name,
+          type,
+          city,
+          state,
+          size,
+          website
+        )
+      `);
       
       // Add search filters if search term exists
       if (search.trim()) {
@@ -321,6 +334,18 @@ const Contacts: React.FC = () => {
         </Box>
       </Box>
 
+      {/* Contact Metrics Display */}
+      <ContactMetrics
+        totalContacts={totalContacts}
+        viewingStart={currentPage * CONTACTS_PER_PAGE + 1}
+        viewingEnd={Math.min((currentPage + 1) * CONTACTS_PER_PAGE, totalContacts)}
+        activeFilters={[
+          ...(searchTerm ? [`Search: "${searchTerm}"`] : []),
+          ...(filterType !== 'all' ? [`Type: ${filterType}`] : []),
+          ...(filterSpecialization !== 'all' ? [`Specialization: ${filterSpecialization}`] : [])
+        ]}
+      />
+
       <Box sx={{ display: 'grid', gap: 3 }}>
         <Box>
           <Card variant="outlined">
@@ -518,6 +543,12 @@ const ContactsList: React.FC<ContactsListProps> = ({
                     <Typography variant="body2" color="text.secondary">
                       {contact.title}
                     </Typography>
+                    {contact.practices && (
+                      <Typography variant="caption" color="primary">
+                        <BusinessIcon sx={{ fontSize: 14, verticalAlign: 'middle', mr: 0.5 }} />
+                        {contact.practices.name} • {contact.practices.city}, {contact.practices.state}
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
                 <IconButton 
@@ -581,6 +612,14 @@ const ContactsList: React.FC<ContactsListProps> = ({
           </Card>
         </Box>
       ))}
+      
+      {/* Contact Assistant Chat Widget */}
+      <ContactChatWidget 
+        onContactsUpdate={(newContacts) => {
+          setContacts(newContacts);
+          setTotalContacts(newContacts.length);
+        }}
+      />
     </Box>
   );
 };
