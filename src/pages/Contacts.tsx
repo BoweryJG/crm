@@ -98,21 +98,9 @@ const Contacts: React.FC = () => {
       const tableName = (!user || isDemo) ? 'public_contacts' : 'contacts';
       console.log(`Using ${tableName} table (user: ${user?.email}, mode: ${mode})`);
       
-      // Build query to match actual table structure and include practice relationship
+      // Build query to match actual table structure
       let countQuery = supabase.from(tableName).select('*', { count: 'exact', head: true });
-      let dataQuery = supabase.from(tableName).select(`
-        *,
-        practice:practice_id (
-          id,
-          name,
-          city,
-          state,
-          phone,
-          email,
-          type,
-          specialty
-        )
-      `);
+      let dataQuery = supabase.from(tableName).select('*');
       
       // Add search filters if search term exists
       if (search.trim()) {
