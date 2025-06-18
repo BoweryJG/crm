@@ -2,379 +2,557 @@
 // Contact Universe Management Component
 
 import React, { useState, useEffect } from 'react';
-import { useSUIS } from './SUISProvider';
-import { ContactUniverse as ContactType, ContactTier } from '../types';
+import { 
+  Box, 
+  Grid, 
+  Card, 
+  CardContent, 
+  Typography, 
+  Chip, 
+  LinearProgress, 
+  IconButton, 
+  TextField,
+  InputAdornment,
+  Button, 
+  Avatar, 
+  Badge,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Divider,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Paper,
+  ToggleButton,
+  ToggleButtonGroup,
+  useTheme,
+  Slider,
+  Autocomplete
+} from '@mui/material';
 import { 
   Users, UserPlus, Filter, Search, Star, Mail, Phone,
-  Calendar, TrendingUp, Award, Target, Activity
+  Calendar, TrendingUp, Award, Target, Activity,
+  MapPin, Building, Briefcase, DollarSign, Clock,
+  ChevronRight, Download, Upload, Brain
 } from 'lucide-react';
 import { useAuth } from '../../auth';
 import { useNavigate } from 'react-router-dom';
-
-interface ContactCardProps {
-  contact: ContactType;
-  onSelect: (contact: ContactType) => void;
-}
-
-const ContactCard: React.FC<ContactCardProps> = ({ contact, onSelect }) => {
-  const getTierColor = (tier: ContactTier) => {
-    switch (tier) {
-      case 'tier_20':
-        return 'bg-purple-100 text-purple-800 border-purple-300';
-      case 'tier_50':
-        return 'bg-blue-100 text-blue-800 border-blue-300';
-      case 'tier_100':
-        return 'bg-gray-100 text-gray-800 border-gray-300';
-    }
-  };
-
-  const getQualityIndicator = (score: number) => {
-    if (score >= 0.8) return { color: 'text-green-500', label: 'High' };
-    if (score >= 0.5) return { color: 'text-yellow-500', label: 'Medium' };
-    return { color: 'text-red-500', label: 'Low' };
-  };
-
-  const quality = getQualityIndicator(contact.qualityScore);
-
-  return (
-    <div 
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6 cursor-pointer"
-      onClick={() => onSelect(contact)}
-    >
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {contact.contactData.firstName} {contact.contactData.lastName}
-          </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {contact.contactData.title} at {contact.contactData.company}
-          </p>
-        </div>
-        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getTierColor(contact.contactTier)}`}>
-          {contact.contactTier.replace('_', ' ').toUpperCase()}
-        </span>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="flex items-center text-sm">
-          <Star className={`w-4 h-4 mr-2 ${quality.color}`} />
-          <span className="text-gray-600 dark:text-gray-400">
-            Quality: <span className="font-medium">{quality.label}</span>
-          </span>
-        </div>
-        <div className="flex items-center text-sm">
-          <Activity className="w-4 h-4 mr-2 text-blue-500" />
-          <span className="text-gray-600 dark:text-gray-400">
-            Engagement: <span className="font-medium">{Math.round(contact.engagementScore * 100)}%</span>
-          </span>
-        </div>
-      </div>
-
-      {contact.procedureInterests.length > 0 && (
-        <div className="mb-4">
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Interests:</p>
-          <div className="flex flex-wrap gap-2">
-            {contact.procedureInterests.slice(0, 3).map((interest, idx) => (
-              <span key={idx} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">
-                {interest}
-              </span>
-            ))}
-            {contact.procedureInterests.length > 3 && (
-              <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">
-                +{contact.procedureInterests.length - 3} more
-              </span>
-            )}
-          </div>
-        </div>
-      )}
-
-      <div className="flex justify-between items-center">
-        <div className="flex space-x-3">
-          <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
-            <Mail className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          </button>
-          <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
-            <Phone className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          </button>
-          <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
-            <Calendar className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          </button>
-        </div>
-        {contact.conversionProbability > 0.7 && (
-          <div className="flex items-center text-green-600">
-            <TrendingUp className="w-4 h-4 mr-1" />
-            <span className="text-xs font-medium">High Potential</span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+import { useAppMode } from '../../contexts/AppModeContext';
+import { generateContactUniverseData, ContactUniverseData } from '../../services/mockData/suisIntelligenceMockData';
 
 const ContactUniverse: React.FC = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { state, actions } = useSUIS();
-  const [contacts, setContacts] = useState<ContactType[]>([]);
-  const [selectedTier, setSelectedTier] = useState<ContactTier | 'all'>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedContact, setSelectedContact] = useState<ContactType | null>(null);
-  const [showAcquisitionModal, setShowAcquisitionModal] = useState(false);
+  const { isDemo } = useAppMode();
   
-  // If no user, show login prompt
-  if (!user) {
+  const [contacts, setContacts] = useState<ContactUniverseData[]>([]);
+  const [filteredContacts, setFilteredContacts] = useState<ContactUniverseData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedContact, setSelectedContact] = useState<ContactUniverseData | null>(null);
+  
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [filterLocation, setFilterLocation] = useState('all');
+  const [filterSpecialty, setFilterSpecialty] = useState('all');
+  const [filterChannel, setFilterChannel] = useState('all');
+  const [engagementRange, setEngagementRange] = useState<number[]>([0, 100]);
+  const [aiScoreRange, setAiScoreRange] = useState<number[]>([0, 100]);
+  const [showOnlyStarred, setShowOnlyStarred] = useState(false);
+
+  useEffect(() => {
+    // Load mock data in demo mode
+    if (isDemo || !user) {
+      setTimeout(() => {
+        const mockContacts = generateContactUniverseData(150);
+        setContacts(mockContacts);
+        setFilteredContacts(mockContacts);
+        setLoading(false);
+      }, 1000);
+    } else {
+      // Load real data for authenticated users
+      setLoading(false);
+    }
+  }, [isDemo, user]);
+
+  useEffect(() => {
+    // Apply filters
+    let filtered = [...contacts];
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(contact => 
+        `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.practice.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Location filter
+    if (filterLocation !== 'all') {
+      filtered = filtered.filter(contact => contact.location === filterLocation);
+    }
+
+    // Specialty filter
+    if (filterSpecialty !== 'all') {
+      filtered = filtered.filter(contact => contact.specialty === filterSpecialty);
+    }
+
+    // Channel filter
+    if (filterChannel !== 'all') {
+      filtered = filtered.filter(contact => contact.preferredChannel === filterChannel);
+    }
+
+    // Engagement score filter
+    filtered = filtered.filter(contact => 
+      contact.engagementScore >= engagementRange[0] && 
+      contact.engagementScore <= engagementRange[1]
+    );
+
+    // AI score filter
+    filtered = filtered.filter(contact => 
+      contact.aiScore >= aiScoreRange[0] && 
+      contact.aiScore <= aiScoreRange[1]
+    );
+
+    // Starred filter
+    if (showOnlyStarred) {
+      filtered = filtered.filter(contact => contact.tags.includes('VIP'));
+    }
+
+    setFilteredContacts(filtered);
+  }, [contacts, searchTerm, filterLocation, filterSpecialty, filterChannel, engagementRange, aiScoreRange, showOnlyStarred]);
+
+  const uniqueLocations = ['all', ...new Set(contacts.map(c => c.location))];
+  const uniqueSpecialties = ['all', ...new Set(contacts.map(c => c.specialty))];
+
+  const getEngagementColor = (score: number) => {
+    if (score >= 80) return 'success';
+    if (score >= 60) return 'warning';
+    return 'error';
+  };
+
+  const getAIScoreGradient = (score: number) => {
+    const hue = (score / 100) * 120; // 0 = red, 120 = green
+    return `linear-gradient(135deg, hsl(${hue}, 70%, 50%) 0%, hsl(${hue}, 70%, 40%) 100%)`;
+  };
+
+  if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4">
-        <h2 className="text-xl font-semibold">Authentication Required</h2>
-        <p className="text-gray-600">The SUIS Contact Universe requires authentication to access.</p>
-        <button 
-          onClick={() => navigate('/login')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          Go to Login
-        </button>
-      </div>
+      <Box sx={{ p: 3 }}>
+        <LinearProgress />
+        <Typography sx={{ mt: 2 }}>Loading Contact Universe...</Typography>
+      </Box>
     );
   }
 
-  const tiers = [
-    { id: 'tier_20', name: 'Tier 20', description: 'High-value prospects', color: 'purple' },
-    { id: 'tier_50', name: 'Tier 50', description: 'Qualified leads', color: 'blue' },
-    { id: 'tier_100', name: 'Tier 100', description: 'Market coverage', color: 'gray' }
-  ];
-
-  const filteredContacts = contacts.filter(contact => {
-    const matchesTier = selectedTier === 'all' || contact.contactTier === selectedTier;
-    const matchesSearch = searchQuery === '' || 
-      `${contact.contactData.firstName} ${contact.contactData.lastName} ${contact.contactData.company}`
-        .toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesTier && matchesSearch;
-  });
-
-  const getTierStats = (tier: ContactTier) => {
-    const tierContacts = contacts.filter(c => c.contactTier === tier);
-    return {
-      count: tierContacts.length,
-      avgQuality: tierContacts.reduce((acc, c) => acc + c.qualityScore, 0) / tierContacts.length || 0,
-      avgEngagement: tierContacts.reduce((acc, c) => acc + c.engagementScore, 0) / tierContacts.length || 0
-    };
-  };
-
   return (
-    <div className="space-y-6">
+    <Box sx={{ p: 3 }}>
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Contact Universe</h2>
-          <p className="text-gray-600 dark:text-gray-400">Manage your tiered contact system</p>
-        </div>
-        <button
-          onClick={() => setShowAcquisitionModal(true)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          <UserPlus className="w-5 h-5 mr-2" />
-          Acquire Contacts
-        </button>
-      </div>
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box>
+          <Typography variant="h4" fontWeight="bold">
+            Contact Universe
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            AI-powered contact intelligence and engagement
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          {(isDemo || !user) && (
+            <Chip label="Demo Mode" color="primary" variant="outlined" size="small" />
+          )}
+          <Button variant="outlined" startIcon={<Upload />}>
+            Import
+          </Button>
+          <Button variant="outlined" startIcon={<Download />}>
+            Export
+          </Button>
+          <Button variant="contained" startIcon={<UserPlus />}>
+            Add Contact
+          </Button>
+        </Box>
+      </Box>
 
-      {/* Tier Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {tiers.map(tier => {
-          const stats = getTierStats(tier.id as ContactTier);
-          return (
-            <div
-              key={tier.id}
-              className={`bg-white dark:bg-gray-800 rounded-lg p-6 border-2 cursor-pointer transition-all ${
-                selectedTier === tier.id ? 'border-blue-500' : 'border-transparent'
-              }`}
-              onClick={() => setSelectedTier(selectedTier === tier.id ? 'all' : tier.id as ContactTier)}
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="font-semibold text-lg">{tier.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{tier.description}</p>
-                </div>
-                <Award className={`w-8 h-8 text-${tier.color}-500`} />
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Contacts</span>
-                  <span className="font-semibold">{stats.count}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Avg Quality</span>
-                  <span className="font-semibold">{(stats.avgQuality * 100).toFixed(0)}%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Avg Engagement</span>
-                  <span className="font-semibold">{(stats.avgEngagement * 100).toFixed(0)}%</span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {/* AI Summary */}
+      <Card sx={{ mb: 3, background: getAIScoreGradient(75) }}>
+        <CardContent>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: 'white' }}>
+            <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 56, height: 56 }}>
+              <Brain size={32} />
+            </Avatar>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6" fontWeight="bold">
+                AI Contact Intelligence
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                {filteredContacts.length} contacts analyzed • {contacts.filter(c => c.aiScore >= 80).length} high-value targets identified • {contacts.filter(c => c.tags.includes('VIP')).length} VIP contacts
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'right' }}>
+              <Typography variant="h3" fontWeight="bold">
+                {Math.round(filteredContacts.reduce((acc, c) => acc + c.aiScore, 0) / filteredContacts.length || 0)}
+              </Typography>
+              <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                Avg AI Score
+              </Typography>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
 
-      {/* Search and Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-        <div className="flex items-center space-x-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
+      {/* Filters and Search */}
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
               placeholder="Search contacts..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search size={20} />
+                  </InputAdornment>
+                ),
+              }}
             />
-          </div>
-          <button
-            onClick={() => setSelectedTier('all')}
-            className={`px-4 py-2 rounded-lg ${
-              selectedTier === 'all' 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            All Tiers
-          </button>
-          <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-            <Filter className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
+          </Grid>
+          
+          <Grid item xs={12} md={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Location</InputLabel>
+              <Select
+                value={filterLocation}
+                onChange={(e) => setFilterLocation(e.target.value)}
+                label="Location"
+              >
+                {uniqueLocations.map(loc => (
+                  <MenuItem key={loc} value={loc}>
+                    {loc === 'all' ? 'All Locations' : loc}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
 
-      {/* Contact Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredContacts.length > 0 ? (
-          filteredContacts.map(contact => (
-            <ContactCard
-              key={contact.id}
-              contact={contact}
-              onSelect={setSelectedContact}
-            />
-          ))
-        ) : (
-          <div className="col-span-full text-center py-12">
-            <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">No contacts found</p>
-          </div>
-        )}
-      </div>
+          <Grid item xs={12} md={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Specialty</InputLabel>
+              <Select
+                value={filterSpecialty}
+                onChange={(e) => setFilterSpecialty(e.target.value)}
+                label="Specialty"
+              >
+                {uniqueSpecialties.map(spec => (
+                  <MenuItem key={spec} value={spec}>
+                    {spec === 'all' ? 'All Specialties' : spec}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
 
-      {/* Mock Data for Demo */}
-      {contacts.length === 0 && (
-        <div className="text-center">
-          <button
-            onClick={() => {
-              // Add mock contacts
-              const mockContacts: ContactType[] = [
-                {
-                  id: '1',
-                  userId: state.user?.id || '',
-                  contactTier: 'tier_20',
-                  contactData: {
-                    firstName: 'Dr. Sarah',
-                    lastName: 'Johnson',
-                    title: 'Medical Director',
-                    company: 'Elite Aesthetics Center',
-                    email: 'sarah.johnson@eliteaesthetics.com',
-                    phone: '555-0100'
+          <Grid item xs={12} md={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Channel</InputLabel>
+              <Select
+                value={filterChannel}
+                onChange={(e) => setFilterChannel(e.target.value)}
+                label="Channel"
+              >
+                <MenuItem value="all">All Channels</MenuItem>
+                <MenuItem value="email">Email</MenuItem>
+                <MenuItem value="phone">Phone</MenuItem>
+                <MenuItem value="in-person">In-Person</MenuItem>
+                <MenuItem value="digital">Digital</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} md={2}>
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+              <ToggleButton
+                value="starred"
+                selected={showOnlyStarred}
+                onChange={() => setShowOnlyStarred(!showOnlyStarred)}
+                sx={{ px: 2 }}
+              >
+                <Star size={18} />
+              </ToggleButton>
+              <ToggleButtonGroup
+                value={viewMode}
+                exclusive
+                onChange={(e, newMode) => newMode && setViewMode(newMode)}
+                size="small"
+              >
+                <ToggleButton value="grid">Grid</ToggleButton>
+                <ToggleButton value="list">List</ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+          </Grid>
+        </Grid>
+
+        {/* Advanced Filters */}
+        <Box sx={{ mt: 3, pt: 3, borderTop: 1, borderColor: 'divider' }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Typography gutterBottom>
+                Engagement Score: {engagementRange[0]} - {engagementRange[1]}
+              </Typography>
+              <Slider
+                value={engagementRange}
+                onChange={(e, newValue) => setEngagementRange(newValue as number[])}
+                valueLabelDisplay="auto"
+                min={0}
+                max={100}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography gutterBottom>
+                AI Score: {aiScoreRange[0]} - {aiScoreRange[1]}
+              </Typography>
+              <Slider
+                value={aiScoreRange}
+                onChange={(e, newValue) => setAiScoreRange(newValue as number[])}
+                valueLabelDisplay="auto"
+                min={0}
+                max={100}
+                sx={{
+                  '& .MuiSlider-thumb': {
+                    background: getAIScoreGradient(75)
                   },
-                  practiceInformation: {
-                    practiceSize: 'large',
-                    proceduresPerformed: ['Botox', 'Fillers', 'Laser'],
-                    annualVolume: 500000,
-                    equipment: [],
-                    competitors: [],
-                    decisionMakers: []
-                  },
-                  procedureInterests: ['Injectables', 'Laser Treatments', 'Body Contouring'],
-                  acquisitionSource: 'Conference',
-                  enrichmentData: {
-                    dataProviders: ['LinkedIn'],
-                    lastEnriched: new Date().toISOString(),
-                    completenessScore: 0.85,
-                    verificationStatus: 'verified',
-                    additionalData: {}
-                  },
-                  qualityScore: 0.92,
-                  engagementScore: 0.78,
-                  conversionProbability: 0.75,
-                  engagementHistory: [],
-                  communicationPreferences: {
-                    preferredChannel: 'email',
-                    preferredTime: {
-                      dayOfWeek: ['Tuesday', 'Thursday'],
-                      timeOfDay: ['Morning'],
-                      timezone: 'EST'
-                    },
-                    frequency: 'medium',
-                    language: 'en',
-                    timezone: 'America/New_York'
-                  },
-                  lifecycleStage: 'opportunity',
-                  createdAt: new Date().toISOString(),
-                  updatedAt: new Date().toISOString()
-                },
-                {
-                  id: '2',
-                  userId: state.user?.id || '',
-                  contactTier: 'tier_50',
-                  contactData: {
-                    firstName: 'Dr. Michael',
-                    lastName: 'Chen',
-                    title: 'Practice Owner',
-                    company: 'Modern Dental Group',
-                    email: 'mchen@moderndental.com',
-                    phone: '555-0101'
-                  },
-                  practiceInformation: {
-                    practiceSize: 'medium',
-                    proceduresPerformed: ['Implants', 'Orthodontics'],
-                    annualVolume: 300000,
-                    equipment: [],
-                    competitors: [],
-                    decisionMakers: []
-                  },
-                  procedureInterests: ['Dental Implants', 'Digital Dentistry'],
-                  acquisitionSource: 'Referral',
-                  enrichmentData: {
-                    dataProviders: ['Website'],
-                    lastEnriched: new Date().toISOString(),
-                    completenessScore: 0.72,
-                    verificationStatus: 'verified',
-                    additionalData: {}
-                  },
-                  qualityScore: 0.68,
-                  engagementScore: 0.55,
-                  conversionProbability: 0.45,
-                  engagementHistory: [],
-                  communicationPreferences: {
-                    preferredChannel: 'phone',
-                    preferredTime: {
-                      dayOfWeek: ['Monday', 'Wednesday'],
-                      timeOfDay: ['Afternoon'],
-                      timezone: 'PST'
-                    },
-                    frequency: 'low',
-                    language: 'en',
-                    timezone: 'America/Los_Angeles'
-                  },
-                  lifecycleStage: 'qualified',
-                  createdAt: new Date().toISOString(),
-                  updatedAt: new Date().toISOString()
-                }
-              ];
-              setContacts(mockContacts);
-            }}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Load Demo Contacts
-          </button>
-        </div>
+                  '& .MuiSlider-track': {
+                    background: getAIScoreGradient(75)
+                  }
+                }}
+              />
+            </Grid>
+          </Grid>
+        </Box>
+      </Paper>
+
+      {/* Results Summary */}
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="body2" color="text.secondary">
+          Showing {filteredContacts.length} of {contacts.length} contacts
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Chip label={`${contacts.filter(c => c.tags.includes('High Volume')).length} High Volume`} size="small" />
+          <Chip label={`${contacts.filter(c => c.tags.includes('Early Adopter')).length} Early Adopters`} size="small" />
+          <Chip label={`${contacts.filter(c => c.tags.includes('Opinion Leader')).length} Opinion Leaders`} size="small" />
+        </Box>
+      </Box>
+
+      {/* Contact Grid/List */}
+      {viewMode === 'grid' ? (
+        <Grid container spacing={3}>
+          {filteredContacts.slice(0, 12).map((contact) => (
+            <Grid item xs={12} md={6} lg={4} key={contact.id}>
+              <Card 
+                sx={{ 
+                  height: '100%',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 4
+                  }
+                }}
+                onClick={() => setSelectedContact(contact)}
+              >
+                <CardContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Avatar sx={{ width: 48, height: 48, bgcolor: theme.palette.primary.main }}>
+                        {contact.firstName[0]}{contact.lastName[0]}
+                      </Avatar>
+                      <Box>
+                        <Typography variant="h6" sx={{ lineHeight: 1.2 }}>
+                          {contact.firstName} {contact.lastName}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {contact.title}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Box sx={{ textAlign: 'right' }}>
+                      <Box 
+                        sx={{ 
+                          width: 40, 
+                          height: 40, 
+                          borderRadius: '50%',
+                          background: getAIScoreGradient(contact.aiScore),
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'white',
+                          fontWeight: 'bold',
+                          fontSize: '0.9rem'
+                        }}
+                      >
+                        {contact.aiScore}
+                      </Box>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ mb: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <Building size={14} />
+                      <Typography variant="body2">{contact.practice}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <MapPin size={14} />
+                      <Typography variant="body2" color="text.secondary">{contact.location}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Briefcase size={14} />
+                      <Typography variant="body2" color="text.secondary">{contact.specialty}</Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ mb: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="caption">Engagement</Typography>
+                      <Typography variant="caption" fontWeight="bold">
+                        {contact.engagementScore}%
+                      </Typography>
+                    </Box>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={contact.engagementScore} 
+                      color={getEngagementColor(contact.engagementScore)}
+                      sx={{ height: 6, borderRadius: 3 }}
+                    />
+                  </Box>
+
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="caption" color="text.secondary" gutterBottom>
+                      Next Best Action:
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                      {contact.nextBestAction}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    {contact.tags.map((tag, idx) => (
+                      <Chip 
+                        key={idx} 
+                        label={tag} 
+                        size="small"
+                        color={tag === 'VIP' ? 'primary' : 'default'}
+                      />
+                    ))}
+                  </Box>
+
+                  <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-around' }}>
+                    <IconButton size="small">
+                      <Mail size={18} />
+                    </IconButton>
+                    <IconButton size="small">
+                      <Phone size={18} />
+                    </IconButton>
+                    <IconButton size="small">
+                      <Calendar size={18} />
+                    </IconButton>
+                    <IconButton size="small">
+                      <ChevronRight size={18} />
+                    </IconButton>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      ) : (
+        <List>
+          {filteredContacts.slice(0, 20).map((contact, index) => (
+            <React.Fragment key={contact.id}>
+              {index > 0 && <Divider />}
+              <ListItem 
+                button 
+                onClick={() => setSelectedContact(contact)}
+                sx={{ py: 2 }}
+              >
+                <ListItemAvatar>
+                  <Badge
+                    overlap="circular"
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    badgeContent={
+                      <Avatar 
+                        sx={{ 
+                          width: 22, 
+                          height: 22, 
+                          background: getAIScoreGradient(contact.aiScore),
+                          fontSize: '0.7rem'
+                        }}
+                      >
+                        {contact.aiScore}
+                      </Avatar>
+                    }
+                  >
+                    <Avatar sx={{ width: 48, height: 48, bgcolor: theme.palette.primary.main }}>
+                      {contact.firstName[0]}{contact.lastName[0]}
+                    </Avatar>
+                  </Badge>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        {contact.firstName} {contact.lastName}
+                      </Typography>
+                      {contact.tags.includes('VIP') && <Star size={16} color={theme.palette.warning.main} />}
+                      <Typography variant="body2" color="text.secondary">
+                        • {contact.title} at {contact.practice}
+                      </Typography>
+                    </Box>
+                  }
+                  secondary={
+                    <Box sx={{ mt: 1 }}>
+                      <Box sx={{ display: 'flex', gap: 3, mb: 1 }}>
+                        <Typography variant="caption" color="text.secondary">
+                          <MapPin size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                          {contact.location}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          <Briefcase size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                          {contact.specialty}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          <Activity size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                          {contact.engagementScore}% engaged
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2">
+                        Next: {contact.nextBestAction}
+                      </Typography>
+                    </Box>
+                  }
+                />
+                <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
+                  <IconButton size="small">
+                    <Mail size={18} />
+                  </IconButton>
+                  <IconButton size="small">
+                    <Phone size={18} />
+                  </IconButton>
+                  <IconButton size="small">
+                    <Calendar size={18} />
+                  </IconButton>
+                </Box>
+              </ListItem>
+            </React.Fragment>
+          ))}
+        </List>
       )}
-    </div>
+    </Box>
   );
 };
 
