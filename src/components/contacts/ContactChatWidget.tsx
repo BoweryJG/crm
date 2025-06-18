@@ -13,14 +13,17 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Fab
+  Fab,
+  Tooltip
 } from '@mui/material';
 import {
   Chat as ChatIcon,
   Send as SendIcon,
   Close as CloseIcon,
   SmartToy as BotIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
+  Mic as MicIcon,
+  MicOff as MicOffIcon
 } from '@mui/icons-material';
 import { contactAssistantService } from '../../services/contacts/contactAssistantService';
 import { Contact } from '../../types/models';
@@ -122,15 +125,15 @@ const ContactChatWidget: React.FC<ContactChatWidgetProps> = ({ onContactsUpdate 
     >
       <ListItemAvatar>
         <Avatar>
-          {contact.firstName?.[0]}{contact.lastName?.[0]}
+          {contact.first_name?.[0]}{contact.last_name?.[0]}
         </Avatar>
       </ListItemAvatar>
       <ListItemText
-        primary={`${contact.firstName} ${contact.lastName}`}
+        primary={`${contact.first_name} ${contact.last_name}`}
         secondary={
           <Box>
             <Typography variant="caption" display="block">
-              {contact.practiceType === 'aesthetic' ? '💉' : '🦷'} {contact.practiceName}
+              {contact.practice_type === 'aesthetic' ? '💉' : '🦷'} {contact.practice_name}
             </Typography>
             {contact.specialty && (
               <Chip label={contact.specialty} size="small" sx={{ mt: 0.5 }} />
