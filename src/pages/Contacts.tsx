@@ -90,24 +90,13 @@ const Contacts: React.FC = () => {
       if (!append) setLoading(true);
       else setLoadingMore(true);
       
-      // Build query with practice/company data
+      // Build query to match actual table structure
       let countQuery = supabase.from('contacts').select('*', { count: 'exact', head: true });
-      let dataQuery = supabase.from('contacts').select(`
-        *,
-        practices (
-          id,
-          name,
-          type,
-          city,
-          state,
-          size,
-          website
-        )
-      `);
+      let dataQuery = supabase.from('contacts').select('*');
       
       // Add search filters if search term exists
       if (search.trim()) {
-        const searchFilter = `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,practice_name.ilike.%${search}%`;
+        const searchFilter = `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,city.ilike.%${search}%`;
         countQuery = countQuery.or(searchFilter);
         dataQuery = dataQuery.or(searchFilter);
       }
@@ -541,12 +530,12 @@ const ContactsList: React.FC<ContactsListProps> = ({
                       {contact.first_name} {contact.last_name}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {contact.title}
+                      {contact.specialty || 'Healthcare Professional'}
                     </Typography>
-                    {contact.practices && (
+                    {(contact.city || contact.state) && (
                       <Typography variant="caption" color="primary">
                         <BusinessIcon sx={{ fontSize: 14, verticalAlign: 'middle', mr: 0.5 }} />
-                        {contact.practices.name} • {contact.practices.city}, {contact.practices.state}
+                        {[contact.city, contact.state].filter(Boolean).join(', ')}
                       </Typography>
                     )}
                   </Box>
