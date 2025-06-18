@@ -21,6 +21,7 @@ import {
   SUISSubscription
 } from '../types';
 import { getSUISAPIManager, checkAPIConfiguration } from '../services/suisConfigService';
+import { handleSUISError, isCriticalError } from '../utils/suisErrorHandler';
 
 // ==================================================================
 // SUIS PROVIDER CONTEXT
@@ -442,21 +443,22 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
       if (user) {
         dispatch({ type: 'SET_USER', payload: user });
 
-        // Fetch intelligence profile
-        const { data: profile, error: profileError } = await supabase
-          .from('suis_intelligence_profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
+        // Fetch intelligence profile with better error handling
+        try {
+          const { data: profile, error: profileError } = await supabase
+            .from('suis_intelligence_profiles')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
 
-        if (profile) {
-          dispatch({ type: 'SET_INTELLIGENCE_PROFILE', payload: profile });
-        } else if (!profileError || profileError.code === 'PGRST116') {
-          // Create default profile if none exists
-          const defaultProfile: Partial<IntelligenceProfile> = {
-            userId: user.id,
-            profileType: 'rep',
-            specializations: [],
+          if (profile) {
+            dispatch({ type: 'SET_INTELLIGENCE_PROFILE', payload: profile });
+          } else if (!profileError || profileError.code === 'PGRST116') {
+            // Create default profile if none exists
+            const defaultProfile: Partial<IntelligenceProfile> = {
+              userId: user.id,
+              profileType: 'rep',
+              specializations: [],
             territoryIds: [],
             goals: {
               salesTargets: { monthly: 0, quarterly: 0, annual: 0 },
@@ -491,14 +493,34 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
             }
           };
 
+          // Convert camelCase to snake_case for database insert
+          const dbProfile = {
+            user_id: defaultProfile.userId,
+            profile_type: defaultProfile.profileType,
+            specializations: defaultProfile.specializations,
+            territory_ids: defaultProfile.territoryIds,
+            goals: defaultProfile.goals,
+            preferences: defaultProfile.preferences,
+            ai_settings: defaultProfile.aiSettings,
+            performance_baseline: defaultProfile.performanceBaseline
+          };
+
           const { data: newProfile, error: createError } = await supabase
             .from('suis_intelligence_profiles')
-            .insert(defaultProfile)
+            .insert(dbProfile)
             .select()
             .single();
 
           if (createError) throw createError;
           dispatch({ type: 'SET_INTELLIGENCE_PROFILE', payload: newProfile });
+        }
+        } catch (profileFetchError) {
+          const suisError = handleSUISError(profileFetchError, 'initializeSystem.profile');
+          if (suisError && isCriticalError(suisError)) {
+            throw new Error(suisError.message);
+          }
+          // Continue with system initialization for non-critical errors
+          console.info('SUIS: Continuing without user profile');
         }
 
         // Fetch initial market intelligence

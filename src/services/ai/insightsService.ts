@@ -37,16 +37,21 @@ export class AIInsightsService {
   static async generateInsights(limit: number = 10): Promise<AIInsight[]> {
     try {
       // Get recent call analyses with linguistics data
+      // Specify the exact foreign key relationship to avoid ambiguity
       const { data: callAnalyses, error } = await supabase
         .from('call_analysis')
         .select(`
           *,
-          linguistics_analysis (*)
+          linguistics_analysis!call_analysis_linguistics_analysis_id_fkey (*)
         `)
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (error) throw error;
+      if (error) {
+        console.warn('Failed to fetch call analyses:', error.message);
+        // Return empty array instead of throwing to prevent UI errors
+        return [];
+      }
 
       const insights: AIInsight[] = [];
 
