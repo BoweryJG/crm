@@ -104,7 +104,17 @@ const Contacts: React.FC = () => {
       
       // Add search filters if search term exists
       if (search.trim()) {
-        const searchFilter = `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,city.ilike.%${search}%`;
+        // Search across multiple fields for better results
+        const searchFilter = [
+          `first_name.ilike.%${search}%`,
+          `last_name.ilike.%${search}%`,
+          `email.ilike.%${search}%`,
+          `city.ilike.%${search}%`,
+          `state.ilike.%${search}%`,
+          `specialty.ilike.%${search}%`,
+          `phone.ilike.%${search}%`
+        ].join(',');
+        
         countQuery = countQuery.or(searchFilter);
         dataQuery = dataQuery.or(searchFilter);
       }
@@ -212,11 +222,16 @@ const Contacts: React.FC = () => {
       clearTimeout(searchDebounce);
     }
     
-    // Set new debounce
+    // Don't search if less than 2 characters (unless clearing)
+    if (newSearchTerm.length > 0 && newSearchTerm.length < 2) {
+      return;
+    }
+    
+    // Set new debounce with longer delay
     const newDebounce = setTimeout(() => {
       setCurrentPage(0);
       fetchContactsPage(0, false, newSearchTerm);
-    }, 300); // 300ms delay
+    }, 500); // 500ms delay for better UX
     
     setSearchDebounce(newDebounce);
   };
@@ -358,7 +373,7 @@ const Contacts: React.FC = () => {
                   <Box>
                   <TextField
                     fullWidth
-                    placeholder="Search contacts..."
+                    placeholder="Search by name, email, city, state, specialty..."
                     value={searchTerm}
                     onChange={handleSearchChange}
                     InputProps={{
@@ -367,7 +382,13 @@ const Contacts: React.FC = () => {
                           <SearchIcon />
                         </InputAdornment>
                       ),
+                      endAdornment: loading && searchTerm ? (
+                        <InputAdornment position="end">
+                          <CircularProgress size={20} />
+                        </InputAdornment>
+                      ) : null,
                     }}
+                    helperText={searchTerm.length === 1 ? "Type at least 2 characters to search" : ""}
                   />
                   </Box>
                   <Box>
