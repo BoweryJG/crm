@@ -47,16 +47,12 @@ class ContactAssistantService {
 
   async parseQuery(query: string): Promise<ParsedQuery> {
     try {
-      const response = await openRouterService.chat([
-        { role: 'system', content: this.systemPrompt },
-        { 
-          role: 'user', 
-          content: `Parse this query: "${query}"\n\nReturn ONLY a JSON object with filters.` 
-        }
-      ], {
-        model: 'openai/gpt-3.5-turbo',
-        temperature: 0.1,
-        max_tokens: 500
+      const response = await openRouterService.generateResponse(
+        `${this.systemPrompt}\n\nParse this query: "${query}"\n\nReturn ONLY a JSON object with filters.`,
+        {
+          model: 'openai/gpt-3.5-turbo',
+          temperature: 0.1,
+          max_tokens: 500
       });
 
       const content = response.choices[0].message.content;
