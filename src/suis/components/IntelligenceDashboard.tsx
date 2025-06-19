@@ -49,6 +49,18 @@ import { PredictiveInsight, PerformanceMetrics } from '../types';
 import { useAppMode } from '../../contexts/AppModeContext';
 import { generateAllSUISMockData, IntelligenceMetrics, IntelligenceInsight } from '../../services/mockData/suisIntelligenceMockData';
 
+// Helper type to unify IntelligenceInsight and PredictiveInsight
+type UnifiedInsight = {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  priority: 'high' | 'medium' | 'low';
+  impact: number;
+  aiGenerated?: boolean;
+  timestamp: string;
+};
+
 const IntelligenceDashboard: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -64,7 +76,7 @@ const IntelligenceDashboard: React.FC = () => {
     refreshMetrics
   } = useSUISFeatures();
 
-  const [selectedInsight, setSelectedInsight] = useState<IntelligenceInsight | null>(null);
+  const [selectedInsight, setSelectedInsight] = useState<UnifiedInsight | null>(null);
   const [mockData, setMockData] = useState<ReturnType<typeof generateAllSUISMockData> | null>(null);
   const [demoLoading, setDemoLoading] = useState(true);
 
@@ -90,7 +102,29 @@ const IntelligenceDashboard: React.FC = () => {
 
   // Use mock data in demo mode or when not authenticated
   const displayMetrics: IntelligenceMetrics | null = (isDemo || !user) && mockData ? mockData.metrics : null;
-  const displayInsights = (isDemo || !user) && mockData ? mockData.insights : insights;
+  
+  // Convert insights to unified format
+  const displayInsights: UnifiedInsight[] = (isDemo || !user) && mockData 
+    ? mockData.insights.map(i => ({
+        id: i.id,
+        type: i.type,
+        title: i.title,
+        description: i.description,
+        priority: i.priority,
+        impact: i.impact,
+        aiGenerated: i.aiGenerated,
+        timestamp: i.timestamp
+      }))
+    : insights.map((i, idx) => ({
+        id: idx.toString(),
+        type: i.type,
+        title: i.title,
+        description: i.description,
+        priority: i.impact === 'high' ? 'high' : i.impact === 'medium' ? 'medium' : 'low',
+        impact: i.impact === 'high' ? 8 : i.impact === 'medium' ? 5 : 3,
+        aiGenerated: true,
+        timestamp: new Date().toISOString()
+      }));
 
   const getInsightIcon = (type: string) => {
     switch (type) {
@@ -203,7 +237,7 @@ const IntelligenceDashboard: React.FC = () => {
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.9 }}>
                 {displayInsights && displayInsights.length > 0 
-                  ? `${displayInsights.filter((i: IntelligenceInsight) => i.priority === 'high').length} high-priority insights require your attention. AI has analyzed ${displayMetrics?.dataPoints?.toLocaleString() || '0'} data points across your territory.`
+                  ? `${displayInsights.filter(i => i.priority === 'high').length} high-priority insights require your attention. AI has analyzed ${displayMetrics?.dataPoints?.toLocaleString() || '0'} data points across your territory.`
                   : 'Analyzing territory data to generate insights...'}
               </Typography>
             </Box>
