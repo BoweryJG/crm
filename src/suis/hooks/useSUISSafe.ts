@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { SUISContext } from '../components/SUISProvider';
 import { generateAllSUISMockData } from '../../services/mockData/suisIntelligenceMockData';
-import { InsightType, RecommendationType, EffortLevel, ImpactLevel, ContentType, PersonalizationLevel, TonePreference, DecisionLevel } from '../types';
+import { InsightType, RecommendationType, EffortLevel, ImpactLevel, ContentType, PersonalizationLevel, TonePreference, DecisionLevel, ComplexityLevel, EmotionType, ContentLength, ApprovalStatus } from '../types';
 import type { Priority } from '../types';
 
 /**
@@ -264,30 +264,44 @@ export const useSUISSafe = () => {
           subject: `Demo ${params.type || 'email'} Content`,
           body: `This is a demo generated ${params.type || 'email'} content.`,
           metadata: {
+            wordCount: 50,
+            readingTime: 1,
+            sentiment: {
+              overall: 0.8,
+              bySegment: [],
+              emotions: [
+                { emotion: 'joy' as EmotionType, score: 0.9, confidence: 0.85 },
+                { emotion: 'trust' as EmotionType, score: 0.8, confidence: 0.82 }
+              ],
+              confidence: 0.85
+            },
+            keywords: ['demo', 'medical device', 'sales'],
             tone: params.tone || 'professional',
-            length: params.length || 'medium',
-            callToAction: 'Learn More',
-            keywords: ['demo', 'medical device', 'sales']
+            complexity: 'moderate' as ComplexityLevel
           },
           variants: []
         },
         generationParameters: {
-          template: 'Demo Template',
-          personalizationLevel: 'medium' as PersonalizationLevel,
-          includeDataPoints: true,
-          complianceCheck: true,
-          brandGuidelines: true
+          tone: params.tone || 'professional',
+          length: (params.length || 'medium') as ContentLength,
+          includeCallToAction: true,
+          personalizations: ['company_name', 'contact_name', 'specialty'],
+          templateId: 'demo-template-1',
+          customInstructions: 'Demo mode content generation'
         },
         aiModelUsed: 'Demo AI',
         personalizationLevel: 'medium' as PersonalizationLevel,
         performanceMetrics: {
-          opens: 0,
-          clicks: 0,
-          conversions: 0,
-          engagement: 0,
-          shareRate: 0,
-          feedbackScore: 0
+          deliveryRate: 0.98,
+          openRate: 0.25,
+          clickRate: 0.12,
+          responseRate: 0.08,
+          conversionRate: 0.05,
+          engagementScore: 0.68,
+          sharingRate: 0.02
         },
+        version: 1,
+        approvalStatus: 'approved' as ApprovalStatus,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }),
