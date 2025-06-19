@@ -1,5 +1,5 @@
 // AI Transcription Service - OpenAI Whisper & OpenRouter Integration
-import { openRouterService } from './openRouterService';
+import openRouterService from '../openRouterService';
 
 export interface TranscriptionResult {
   text: string;
@@ -187,11 +187,14 @@ class TranscriptionService {
         ]
       }`;
 
-      const response = await openRouterService.query(prompt, {
-        model: 'anthropic/claude-3-opus',
-        temperature: 0.1,
-        max_tokens: 4000
-      });
+      const { response } = await openRouterService.generateResponse(
+        'anthropic/claude-3-opus',
+        prompt,
+        {
+          temperature: 0.1,
+          max_tokens: 4000
+        }
+      );
 
       // Parse the response
       try {
@@ -291,11 +294,14 @@ class TranscriptionService {
     Return as JSON: { keyPhrases: [], sentiment: "", topics: [] }`;
     
     try {
-      const response = await openRouterService.query(analysisPrompt, {
-        model: 'anthropic/claude-3-haiku',
-        temperature: 0.1,
-        max_tokens: 1000
-      });
+      const { response } = await openRouterService.generateResponse(
+        'anthropic/claude-3-haiku',
+        analysisPrompt,
+        {
+          temperature: 0.1,
+          max_tokens: 1000
+        }
+      );
       
       const analysis = JSON.parse(response);
       return {
