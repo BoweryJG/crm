@@ -1,6 +1,8 @@
 import { useContext } from 'react';
 import { SUISContext } from '../components/SUISProvider';
 import { generateAllSUISMockData } from '../../services/mockData/suisIntelligenceMockData';
+import { InsightType, RecommendationType, EffortLevel, ImpactLevel, ContentType, PersonalizationLevel, TonePreference, DecisionLevel } from '../types';
+import type { Priority } from '../types';
 
 /**
  * Safe version of useSUIS hook that returns default/mock state instead of throwing errors
@@ -26,30 +28,149 @@ export const useSUISSafe = () => {
       marketIntelligence: mockData.marketIntelligence,
       notifications: [],
       analytics: {
+        id: 'demo-analytics-safe',
         userId: 'demo',
-        period: 'monthly',
+        analyticsType: 'rep_performance',
+        periodStart: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        periodEnd: new Date().toISOString(),
         metrics: {
-          totalContacts: mockData.contacts.length,
-          activeEngagements: mockData.contacts.filter(c => c.engagementScore > 70).length,
-          contentGenerated: mockData.contentTemplates.length,
-          researchProjects: mockData.researchProjects.length,
-          callsAnalyzed: 47,
-          marketInsights: mockData.marketIntelligence.length,
-          learningProgress: 78,
-          aiAccuracy: 92
+          sales: {
+            revenue: 452000,
+            deals: 18,
+            averageDealSize: 25111,
+            conversionRate: 0.32,
+            salesCycle: 45,
+            pipelineValue: 875000
+          },
+          activity: {
+            calls: 142,
+            emails: 384,
+            meetings: 56,
+            demos: 23,
+            proposals: 12,
+            followUps: 89
+          },
+          engagement: {
+            responseRate: 0.42,
+            meetingAcceptanceRate: 0.68,
+            contentEngagement: 0.35,
+            socialInteractions: 89,
+            referrals: 12
+          },
+          performance: {
+            conversionRate: 0.32,
+            averageDealSize: 25111,
+            salesCycleLength: 45,
+            winRate: 0.28,
+            activityLevel: 0.85,
+            engagementScore: 0.72
+          }
         },
-        trends: {
-          contactGrowth: 12.5,
-          engagementRate: 8.3,
-          contentPerformance: 15.7,
-          researchROI: 245,
-          callConversion: 34.2,
-          marketShare: 5.8,
-          learningCompletion: 89,
-          aiOptimization: 18.9
+        insights: mockData.insights.slice(0, 5).map(i => ({
+          type: i.type as InsightType,
+          title: i.title,
+          description: i.description,
+          data: { impact: i.impact, aiGenerated: i.aiGenerated },
+          confidence: i.impact / 10,
+          actionable: true,
+          priority: i.priority as Priority
+        })),
+        benchmarks: {
+          industry: {
+            revenue: 425000,
+            deals: 15,
+            conversionRate: 0.28,
+            engagementRate: 0.38
+          },
+          company: {
+            revenue: 452000,
+            deals: 18,
+            conversionRate: 0.32,
+            engagementRate: 0.42
+          },
+          peer: {
+            revenue: 485000,
+            deals: 20,
+            conversionRate: 0.35,
+            engagementRate: 0.45
+          },
+          historical: {
+            revenue: 380000,
+            deals: 14,
+            conversionRate: 0.25,
+            engagementRate: 0.35
+          }
         },
-        insights: mockData.insights.slice(0, 5),
-        lastUpdated: new Date().toISOString()
+        predictions: {
+          shortTerm: {
+            timeframe: '30 days',
+            predictions: [
+              { metric: 'revenue', predictedValue: 498000, confidence: 0.78, factors: ['strong pipeline', 'new product launch'] },
+              { metric: 'deals', predictedValue: 20, confidence: 0.82, factors: ['increased activity', 'market growth'] }
+            ]
+          },
+          mediumTerm: {
+            timeframe: '90 days',
+            predictions: [
+              { metric: 'revenue', predictedValue: 580000, confidence: 0.72, factors: ['Q2 expansion', 'seasonal demand'] },
+              { metric: 'deals', predictedValue: 24, confidence: 0.75, factors: ['territory growth', 'improved conversion'] }
+            ]
+          },
+          longTerm: {
+            timeframe: '180 days',
+            predictions: [
+              { metric: 'revenue', predictedValue: 720000, confidence: 0.65, factors: ['market trends', 'competitive position'] },
+              { metric: 'deals', predictedValue: 30, confidence: 0.68, factors: ['account expansion', 'new territories'] }
+            ]
+          }
+        },
+        recommendations: [
+          {
+            id: 'rec-1',
+            type: 'strategic' as RecommendationType,
+            title: 'Focus on high-value prosthodontic accounts',
+            description: 'Target accounts with higher revenue potential in prosthodontics',
+            priority: 'high' as Priority,
+            effort: 'medium' as EffortLevel,
+            expectedImpact: 'high' as ImpactLevel,
+            timeframe: '30 days',
+            actions: [],
+            relatedInsights: []
+          },
+          {
+            id: 'rec-2',
+            type: 'operational' as RecommendationType,
+            title: 'Increase digital engagement by 25%',
+            description: 'Boost online presence and digital touchpoints with clients',
+            priority: 'medium' as Priority,
+            effort: 'low' as EffortLevel,
+            expectedImpact: 'medium' as ImpactLevel,
+            timeframe: '60 days',
+            actions: [],
+            relatedInsights: []
+          },
+          {
+            id: 'rec-3',
+            type: 'tactical' as RecommendationType,
+            title: 'Schedule more product demonstrations',
+            description: 'Increase hands-on product demos to improve conversion rates',
+            priority: 'high' as Priority,
+            effort: 'medium' as EffortLevel,
+            expectedImpact: 'high' as ImpactLevel,
+            timeframe: '14 days',
+            actions: [],
+            relatedInsights: []
+          }
+        ],
+        dataSources: ['supabase', 'sphere1a', 'twilio'],
+        calculationMetadata: {
+          algorithm: 'v2.1',
+          lastCalculated: new Date().toISOString(),
+          dataPoints: 48392,
+          confidence: 0.89
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       theme: {
         currentTheme: 'light',
@@ -120,21 +241,55 @@ export const useSUISSafe = () => {
       fetchMarketIntelligence: async () => { console.log('Demo mode: fetchMarketIntelligence'); },
       generateContent: async (params: any) => ({
         id: `demo-content-${Date.now()}`,
-        type: params.type || 'email',
-        content: `This is a demo generated ${params.type || 'email'} content.`,
-        metadata: {
-          template: 'Demo Template',
-          tone: params.tone || 'professional',
-          length: params.length || 'medium',
-          aiModel: 'Demo AI'
+        userId: 'demo',
+        contentType: (params.type || 'email') as ContentType,
+        targetAudience: {
+          demographics: {
+            ageRange: '35-55',
+            location: 'United States'
+          },
+          professionalProfile: {
+            title: 'Dental Practitioner',
+            industry: params.specialty || 'dental',
+            experience: '10+ years',
+            companySize: 'medium',
+            decisionLevel: 'decision_maker' as DecisionLevel
+          },
+          interests: ['new technology', 'patient outcomes', 'efficiency'],
+          painPoints: ['time management', 'patient acquisition', 'technology adoption'],
+          preferredTone: 'professional' as TonePreference
         },
-        performance: {
+        procedureFocus: params.procedure || 'implants',
+        contentData: {
+          subject: `Demo ${params.type || 'email'} Content`,
+          body: `This is a demo generated ${params.type || 'email'} content.`,
+          metadata: {
+            tone: params.tone || 'professional',
+            length: params.length || 'medium',
+            callToAction: 'Learn More',
+            keywords: ['demo', 'medical device', 'sales']
+          },
+          variants: []
+        },
+        generationParameters: {
+          template: 'Demo Template',
+          personalizationLevel: 'medium' as PersonalizationLevel,
+          includeDataPoints: true,
+          complianceCheck: true,
+          brandGuidelines: true
+        },
+        aiModelUsed: 'Demo AI',
+        personalizationLevel: 'medium' as PersonalizationLevel,
+        performanceMetrics: {
           opens: 0,
           clicks: 0,
           conversions: 0,
-          engagement: 0
+          engagement: 0,
+          shareRate: 0,
+          feedbackScore: 0
         },
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       }),
       analyzeCall: async () => ({
         callSid: 'demo-call',
