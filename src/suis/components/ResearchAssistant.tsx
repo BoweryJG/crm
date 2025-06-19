@@ -154,7 +154,13 @@ const ResearchAssistant: React.FC = () => {
         credibility: f.confidence / 100,
         relevance: 0.9
       })),
-      confidence: relatedProject.findings.reduce((acc, f) => acc + f.confidence, 0) / relatedProject.findings.length / 100
+      confidence: relatedProject.findings.reduce((acc, f) => acc + f.confidence, 0) / relatedProject.findings.length / 100,
+      limitations: [],
+      followUpQuestions: [
+        `What specific ${query} models are you considering?`,
+        `What is your current patient volume for ${query}?`,
+        `What are your main challenges with ${query}?`
+      ]
     };
   };
 
