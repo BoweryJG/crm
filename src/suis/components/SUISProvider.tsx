@@ -468,24 +468,49 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
           {
             id: 'demo-1',
             userId: 'demo',
-            type: 'insight',
-            title: 'New High-Value Contact Identified',
-            message: 'AI analysis identified Dr. Sarah Chen as a high-potential prosthodontist',
+            notificationType: 'insight',
             priority: 'high',
-            readAt: undefined,
-            createdAt: new Date().toISOString(),
-            metadata: { contactId: 'contact-1' }
+            title: 'New High-Value Contact Identified',
+            content: {
+              summary: 'AI analysis identified Dr. Sarah Chen as a high-potential prosthodontist',
+              details: 'Based on recent market activity and practice growth patterns'
+            },
+            contextData: { contactId: 'contact-1' },
+            actionRequired: true,
+            actionItems: [
+              {
+                id: 'action-1',
+                label: 'View Contact',
+                actionType: 'navigate',
+                url: '/contacts/contact-1',
+                primary: true
+              }
+            ],
+            deliveryMethod: 'in_app',
+            createdAt: new Date().toISOString()
           },
           {
             id: 'demo-2',
             userId: 'demo',
-            type: 'content',
-            title: 'Content Performance Alert',
-            message: 'Your latest email campaign achieved 43% higher open rates',
+            notificationType: 'alert',
             priority: 'medium',
-            readAt: undefined,
-            createdAt: new Date().toISOString(),
-            metadata: { campaignId: 'campaign-1' }
+            title: 'Content Performance Alert',
+            content: {
+              summary: 'Your latest email campaign achieved 43% higher open rates',
+              details: 'Campaign: Q1 Implant Promotion'
+            },
+            contextData: { campaignId: 'campaign-1' },
+            actionRequired: false,
+            actionItems: [
+              {
+                id: 'action-2',
+                label: 'View Analytics',
+                actionType: 'navigate',
+                url: '/analytics/campaigns/campaign-1'
+              }
+            ],
+            deliveryMethod: 'in_app',
+            createdAt: new Date().toISOString()
           }
         ];
         mockNotifications.forEach(notif => {
