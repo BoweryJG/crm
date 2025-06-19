@@ -461,8 +461,7 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
         const mockData = generateAllSUISMockData();
         dispatch({ type: 'SET_MOCK_DATA', payload: mockData });
         
-        // Set mock data in state
-        dispatch({ type: 'SET_MARKET_INTELLIGENCE', payload: mockData.marketIntelligence });
+        // Mock data is already set via SET_MOCK_DATA above
         
         // Add some mock notifications
         const mockNotifications: SUISNotification[] = [
