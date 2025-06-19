@@ -147,7 +147,13 @@ const ResearchAssistant: React.FC = () => {
         implications: []
       })),
       recommendations: relatedProject.aiAnalysis.recommendations,
-      sources: relatedProject.findings.map(f => `${f.title} (${f.sources} sources)`),
+      sources: relatedProject.findings.map((f, idx) => ({
+        id: `source-${idx}`,
+        title: f.title,
+        type: 'industry_report' as const,
+        credibility: f.confidence / 100,
+        relevance: 0.9
+      })),
       confidence: relatedProject.findings.reduce((acc, f) => acc + f.confidence, 0) / relatedProject.findings.length / 100,
       relatedQueries: [
         `${query} ROI analysis`,
