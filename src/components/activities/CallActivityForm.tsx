@@ -259,7 +259,12 @@ const CallActivityForm: React.FC<CallActivityFormProps> = ({
                 label="Call Date & Time"
                 value={formData.callDate}
                 onChange={(value) => value && setFormData({ ...formData, callDate: value })}
-                renderInput={(params) => <TextField {...params} required />}
+                slotProps={{
+                  textField: {
+                    required: true,
+                    fullWidth: true
+                  }
+                }}
               />
 
               <TextField
