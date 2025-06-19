@@ -2,7 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
-import { ThemeContextProvider } from './themes/ThemeContext';
+import { ThemeProvider as ThemeContextProvider } from './themes/ThemeContext';
 import { AppModeProvider } from './contexts/AppModeContext';
 import { AuthProvider } from './auth/AuthContext';
 import { DashboardDataProvider } from './contexts/DashboardDataContext';
