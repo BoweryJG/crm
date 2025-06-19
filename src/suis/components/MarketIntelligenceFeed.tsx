@@ -190,19 +190,19 @@ const MarketIntelligenceFeed: React.FC = () => {
 
   const sources = ['all', 'sphere1a', 'market_feed', 'competitor', 'news', 'regulatory'];
 
-  const marketIntelligenceArray = Array.isArray(state.marketIntelligence) 
-    ? state.marketIntelligence 
+  const marketIntelligenceArray: MarketIntelligence[] = Array.isArray(state.marketIntelligence) 
+    ? (state.marketIntelligence as MarketIntelligence[])
     : [];
   
-  const filteredIntelligence = marketIntelligenceArray.filter((item: any) => 
+  const filteredIntelligence = marketIntelligenceArray.filter(item => 
     filterSource === 'all' || item.source === filterSource
   );
 
-  const notificationsArray = Array.isArray(state.notifications) 
-    ? state.notifications 
+  const notificationsArray: SUISNotification[] = Array.isArray(state.notifications) 
+    ? (state.notifications as SUISNotification[])
     : [];
     
-  const unreadNotifications = notificationsArray.filter((n: any) => !n.readAt);
+  const unreadNotifications = notificationsArray.filter(n => !n.readAt);
 
   const handleRefresh = async () => {
     if (isDemo || !user) {
