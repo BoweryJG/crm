@@ -89,7 +89,7 @@ const IntelligenceDashboard: React.FC = () => {
   }
 
   // Use mock data in demo mode or when not authenticated
-  const displayMetrics = (isDemo || !user) && mockData ? mockData.metrics : metrics;
+  const displayMetrics: IntelligenceMetrics | null = (isDemo || !user) && mockData ? mockData.metrics : null;
   const displayInsights = (isDemo || !user) && mockData ? mockData.insights : insights;
 
   const getInsightIcon = (type: string) => {
@@ -203,7 +203,7 @@ const IntelligenceDashboard: React.FC = () => {
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.9 }}>
                 {displayInsights && displayInsights.length > 0 
-                  ? `${displayInsights.filter(i => i.priority === 'high').length} high-priority insights require your attention. AI has analyzed ${displayMetrics?.dataPoints?.toLocaleString() || '0'} data points across your territory.`
+                  ? `${displayInsights.filter((i: IntelligenceInsight) => i.priority === 'high').length} high-priority insights require your attention. AI has analyzed ${displayMetrics?.dataPoints?.toLocaleString() || '0'} data points across your territory.`
                   : 'Analyzing territory data to generate insights...'}
               </Typography>
             </Box>

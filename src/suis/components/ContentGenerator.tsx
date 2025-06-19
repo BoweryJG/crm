@@ -108,7 +108,7 @@ const ContentGenerator: React.FC = () => {
   };
   
   const generateDemoContent = (request: ContentRequest) => {
-    const templates = {
+    const templates: Record<string, Record<string, string>> = {
       email: {
         dental: `Subject: Revolutionize Your Practice with Advanced Implant Solutions
 
