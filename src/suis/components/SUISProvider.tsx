@@ -506,7 +506,8 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
                 id: 'action-2',
                 label: 'View Analytics',
                 actionType: 'navigate',
-                url: '/analytics/campaigns/campaign-1'
+                url: '/analytics/campaigns/campaign-1',
+                primary: false
               }
             ],
             deliveryMethod: 'in_app',
