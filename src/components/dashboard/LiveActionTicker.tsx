@@ -460,11 +460,12 @@ const LiveActionTicker: React.FC = () => {
     // Convert market intelligence to ticker items
     if (marketIntelligence && marketIntelligence.length > 0) {
       marketIntelligence.forEach((intel: any) => {
-        items.push({
-          id: intel.id,
+        if (intel) {
+          items.push({
+            id: intel.id || `intel-${Date.now()}`,
           priority: intel.data?.impact === 'high' ? 'critical' : 'urgent',
           icon: intel.intelligenceType === 'competitor_move' ? <UrgentIcon /> : <OpportunityIcon />,
-          title: intel.intelligenceType.toUpperCase(),
+          title: intel.intelligenceType ? intel.intelligenceType.toUpperCase() : 'MARKET UPDATE',
           message: intel.data?.trend || intel.data?.action || 'Market Intelligence Update',
           value: intel.confidenceScore ? `${Math.round(intel.confidenceScore * 100)}% AI` : '',
           time: '2 min',
@@ -479,18 +480,19 @@ const LiveActionTicker: React.FC = () => {
             deadline: intel.expiresAt ? new Date(intel.expiresAt).toLocaleDateString() : 'N/A'
           }
         });
+        }
       });
     }
     
     // Convert notifications to ticker items
     if (notifications && notifications.length > 0) {
       notifications.slice(0, 5).forEach((notif: any) => {
-        if (!notif.readAt) {
+        if (notif && !notif.readAt) {
           items.push({
-            id: notif.id,
+            id: notif.id || `notif-${Date.now()}`,
             priority: notif.priority === 'high' ? 'critical' : 'urgent',
             icon: notif.type === 'alert' ? <AlertIcon /> : <AnalyticsIcon />,
-            title: notif.type.toUpperCase(),
+            title: notif.type ? notif.type.toUpperCase() : 'NOTIFICATION',
             message: notif.message || 'New notification',
             time: 'Just now',
             action: {

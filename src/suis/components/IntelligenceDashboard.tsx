@@ -312,7 +312,23 @@ const IntelligenceDashboard: React.FC = () => {
                 />
               </Box>
               
-              <List sx={{ maxHeight: 400, overflow: 'auto' }}>
+              <List sx={{ 
+                maxHeight: 400, 
+                overflow: 'auto',
+                '&::-webkit-scrollbar': {
+                  width: '8px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  background: 'transparent',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: theme.palette.grey[300],
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb:hover': {
+                  background: theme.palette.grey[400],
+                },
+              }}>
                 {displayInsights && displayInsights.slice(0, 8).map((insight, index) => (
                   <React.Fragment key={insight.id}>
                     {index > 0 && <Divider />}

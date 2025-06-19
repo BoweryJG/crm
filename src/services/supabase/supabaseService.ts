@@ -201,11 +201,32 @@ export const fetchMarketIntelligenceByCategory = async (category: string): Promi
   return { data, error };
 };
 
+// Interface for call analysis data
+export interface CallAnalysisData {
+  title: string;
+  call_date: string;
+  duration: number;
+  contact_id?: string;
+  practice_id?: string;
+  recording_url?: string;
+  transcript?: string;
+  summary?: string;
+  sentiment_score?: number;
+  linguistics_analysis_id?: string;
+  tags?: string[];
+  notes?: string;
+}
+
 // Sales Activities for calls
 export const createCallActivity = async (
-  callData: CallActivityData
+  callData: CallActivityData,
+  userId?: string,
+  callAnalysisId?: string
 ): Promise<{ data: SalesActivity | null; error: Error | null }> => {
-  const salesActivity: Omit<SalesActivity, 'id' | 'created_at' | 'updated_at'> = {
+  const salesActivity: Omit<SalesActivity, 'id' | 'created_at' | 'updated_at'> & { 
+    user_id?: string; 
+    call_analysis_id?: string 
+  } = {
     type: 'call',
     contact_id: callData.contact_id,
     practice_id: callData.practice_id,
@@ -214,6 +235,8 @@ export const createCallActivity = async (
     notes: callData.notes,
     outcome: callData.outcome,
     next_steps: callData.next_steps,
+    user_id: userId,
+    call_analysis_id: callAnalysisId,
     // Additional metadata can be stored in the notes field if needed
   };
 
@@ -260,6 +283,73 @@ export const fetchRecentCallActivities = async (limit: number = 10): Promise<Fet
     .limit(limit);
     
   return { data, error };
+};
+
+// Call Analysis
+export const createCallAnalysis = async (
+  analysisData: CallAnalysisData
+): Promise<{ data: any | null; error: Error | null }> => {
+  const { data, error } = await supabase
+    .from('call_analysis')
+    .insert(analysisData)
+    .select()
+    .single();
+    
+  return { data, error };
+};
+
+export const updateCallAnalysis = async (
+  id: string,
+  updates: Partial<CallAnalysisData>
+): Promise<{ data: any | null; error: Error | null }> => {
+  const { data, error } = await supabase
+    .from('call_analysis')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+    
+  return { data, error };
+};
+
+export const fetchCallAnalysisByContact = async (
+  contactId: string
+): Promise<FetchResult<any>> => {
+  const { data, error } = await supabase
+    .from('call_analysis')
+    .select('*')
+    .eq('contact_id', contactId)
+    .order('call_date', { ascending: false });
+    
+  return { data, error };
+};
+
+export const createCallActivityWithAnalysis = async (
+  callData: CallActivityData,
+  analysisData: CallAnalysisData,
+  userId?: string
+): Promise<{ 
+  activity: SalesActivity | null; 
+  analysis: any | null; 
+  error: Error | null 
+}> => {
+  try {
+    // First create the call analysis
+    const { data: analysis, error: analysisError } = await createCallAnalysis(analysisData);
+    if (analysisError) throw analysisError;
+
+    // Then create the sales activity linked to the analysis
+    const { data: activity, error: activityError } = await createCallActivity(
+      callData,
+      userId,
+      analysis?.id
+    );
+    if (activityError) throw activityError;
+
+    return { activity, analysis, error: null };
+  } catch (error) {
+    return { activity: null, analysis: null, error: error as Error };
+  }
 };
 
 // Ensure this file is treated as a module

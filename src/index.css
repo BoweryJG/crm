@@ -11,3 +11,44 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* SUIS Module Scroll Fixes */
+.suis-scrollable {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Prevent scroll getting stuck on mobile */
+.suis-scrollable::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.suis-scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.suis-scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 4px;
+}
+
+.suis-scrollable::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.8);
+}
+
+/* Ensure smooth scrolling on all browsers */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Fix for horizontal scrolling containers */
+.horizontal-scroll-container {
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+
+.horizontal-scroll-container > * {
+  scroll-snap-align: start;
+}

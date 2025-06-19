@@ -460,7 +460,10 @@ const LearningPathway: React.FC = () => {
       </div>
 
       {/* Pathway Selector */}
-      <div className="flex space-x-4 overflow-x-auto pb-2">
+      <div className="flex space-x-4 overflow-x-auto pb-2 suis-scrollable horizontal-scroll-container" style={{
+        scrollbarWidth: 'thin',
+        scrollbarColor: '#d1d5db transparent'
+      }}>
         {learningPaths.map(path => (
           <button
             key={path.id}
