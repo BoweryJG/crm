@@ -472,7 +472,7 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
             title: 'New High-Value Contact Identified',
             message: 'AI analysis identified Dr. Sarah Chen as a high-potential prosthodontist',
             priority: 'high',
-            readAt: null,
+            readAt: undefined,
             createdAt: new Date().toISOString(),
             metadata: { contactId: 'contact-1' }
           },
@@ -483,7 +483,7 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
             title: 'Content Performance Alert',
             message: 'Your latest email campaign achieved 43% higher open rates',
             priority: 'medium',
-            readAt: null,
+            readAt: undefined,
             createdAt: new Date().toISOString(),
             metadata: { campaignId: 'campaign-1' }
           }
