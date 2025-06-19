@@ -216,6 +216,161 @@ Our advanced energy-based devices are helping med spas achieve results that were
 Ready to elevate your treatment menu? Link in bio!
 
 #MedSpa #Aesthetics #NonInvasive #BeautyTech`
+      },
+      proposal: {
+        dental: `EXECUTIVE SUMMARY
+[Practice Name] Digital Transformation Proposal
+
+OBJECTIVES:
+• Enhance patient experience through digital workflow
+• Increase practice efficiency by 40%
+• Improve clinical outcomes with precision technology
+• Generate additional revenue streams
+
+PROPOSED SOLUTION:
+We recommend implementing our comprehensive digital dentistry suite:
+
+1. Intraoral Scanning System
+   - 3-minute full arch scans
+   - Direct lab integration
+   - Patient education tools
+   - Investment: $45,000
+
+2. CAD/CAM Milling Unit
+   - Same-day crown delivery
+   - Multiple material options
+   - 98.5% fit accuracy
+   - Investment: $85,000
+
+3. 3D Imaging System
+   - Cone beam CT capabilities
+   - Implant planning software
+   - Orthodontic analysis
+   - Investment: $125,000
+
+FINANCIAL ANALYSIS:
+• Total Investment: $255,000
+• Projected Monthly Revenue Increase: $35,000
+• ROI Timeline: 8-10 months
+• 5-Year Net Profit Projection: $1.8M
+
+IMPLEMENTATION TIMELINE:
+Week 1-2: Equipment installation
+Week 3-4: Team training
+Week 5-6: Soft launch with select patients
+Week 7-8: Full implementation
+
+Next Steps: Schedule executive meeting to discuss terms`,
+        aesthetic: `MEDICAL SPA ENHANCEMENT PROPOSAL
+[Practice Name] - Next Generation Aesthetics
+
+EXECUTIVE OVERVIEW:
+This proposal outlines a strategic investment in advanced energy-based devices to position your practice at the forefront of non-invasive aesthetics.
+
+MARKET OPPORTUNITY:
+• 78% annual growth in body contouring
+• $4.2B market size by 2025
+• 92% patient preference for non-surgical options
+• Average treatment revenue: $3,500 per patient
+
+RECOMMENDED TECHNOLOGY STACK:
+
+1. BTL EMFACE
+   - Revolutionary facial treatment
+   - Simultaneous muscle toning & skin tightening
+   - No needles, no downtime
+   - Investment: $165,000
+
+2. CoolSculpting Elite
+   - Dual applicators for efficiency
+   - Improved patient comfort
+   - Proven fat reduction results
+   - Investment: $125,000
+
+3. Sofwave
+   - Next-gen skin tightening
+   - Single treatment protocol
+   - Minimal discomfort
+   - Investment: $95,000
+
+REVENUE PROJECTIONS:
+Year 1: $450,000
+Year 2: $720,000
+Year 3: $980,000
+
+TRAINING & SUPPORT:
+• Comprehensive staff certification
+• Marketing launch package
+• Ongoing clinical support
+• KOL networking opportunities
+
+FINANCING OPTIONS:
+• 0% financing for 24 months
+• Operating lease programs
+• Revenue share partnerships
+
+Contact us to schedule a detailed ROI analysis.`
+      },
+      follow_up: {
+        dental: `Subject: Following Up - Digital Dentistry Demo
+
+Hi Dr. [Name],
+
+I wanted to follow up on our conversation last week about upgrading your practice's digital capabilities.
+
+You mentioned that reducing remake rates and improving patient experience were top priorities. Based on our discussion, I've put together some specific case studies from practices similar to yours:
+
+• Dr. Smith (Chicago): Reduced remakes by 87% in first 6 months
+• Premier Dental Group: Increased case acceptance by 42%
+• Family Dentistry Associates: Added $280K annual revenue
+
+I'm also excited to share that we have a special promotion this month:
+- 15% discount on scanner bundles
+- Free advanced training package ($5,000 value)
+- Extended warranty coverage
+
+Would you be available for a 30-minute demo next Tuesday or Wednesday? I can bring the scanner to your office so your team can experience it firsthand.
+
+Looking forward to helping you transform your practice!
+
+Best regards,
+[Your Name]
+RepSphere AI`,
+        aesthetic: `Subject: Quick Follow-Up - Treatment Menu Expansion
+
+Dear [Name],
+
+Thank you for taking the time to meet with me yesterday. Your vision for expanding the practice's body contouring services really resonated with me.
+
+As promised, I'm sending over the key points we discussed:
+
+✓ Current Challenges:
+- Limited non-invasive body options
+- Patient demand exceeding capacity
+- Competition from new med spas
+
+✓ Proposed Solution Benefits:
+- Treat 4x more patients per day
+- No consumables = higher profit margins
+- Minimal staff training required
+- Proven ROI within 4-6 months
+
+I've also attached:
+- Clinical white papers you requested
+- ROI calculator customized for your practice
+- Patient before/after gallery
+- Competitive financing options
+
+Next Steps:
+1. Schedule live demo with your providers
+2. Review financing terms
+3. Plan marketing launch strategy
+
+I have a cancellation next Thursday at 2 PM if you'd like to see the device in action at our demo facility. Shall I reserve that time for you?
+
+Best regards,
+[Your Name]
+RepSphere AI`
       }
     };
     

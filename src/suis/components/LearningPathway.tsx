@@ -2,7 +2,7 @@
 // AI-Powered Learning Pathway Component
 
 import React, { useState, useEffect } from 'react';
-import { useSUIS } from './SUISProvider';
+import { useSUISSafe } from '../hooks/useSUISSafe';
 import { LearningModule, UserProgress } from '../../services/learningCenterService';
 import { 
   BookOpen, Award, Clock, CheckCircle, PlayCircle, 
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../auth';
 import { useNavigate } from 'react-router-dom';
+import { useAppMode } from '../../contexts/AppModeContext';
 
 // Local interface for mock learning paths
 interface LearningPath {
@@ -198,7 +199,8 @@ const PathwayProgress: React.FC<PathwayProgressProps> = ({ path, totalCredits, c
 const LearningPathway: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { state, actions } = useSUIS();
+  const { isDemo } = useAppMode();
+  const { state, actions } = useSUISSafe();
   const [selectedPath, setSelectedPath] = useState<LearningPath | null>(null);
   const [userProgress, setUserProgress] = useState<Map<string, UserProgress>>(new Map());
   const [activeModule, setActiveModule] = useState<LearningModule | null>(null);
@@ -437,10 +439,15 @@ const LearningPathway: React.FC = () => {
             Learning Center
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Enhance your skills with AI-powered learning pathways
+            {isDemo || !user ? 'Demo mode - Explore AI-powered learning pathways' : 'Enhance your skills with AI-powered learning pathways'}
           </p>
         </div>
         <div className="flex items-center space-x-4">
+          {(isDemo || !user) && (
+            <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
+              Demo Mode
+            </span>
+          )}
           <button className="flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200">
             <BarChart className="w-5 h-5 mr-2" />
             My Progress

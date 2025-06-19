@@ -2,7 +2,7 @@
 // Real-time Market Intelligence Feed Component
 
 import React, { useState, useEffect } from 'react';
-import { useSUIS } from './SUISProvider';
+import { useSUISSafe } from '../hooks/useSUISSafe';
 import { MarketIntelligence, SUISNotification } from '../types';
 import { 
   TrendingUp, AlertTriangle, Info, Bell, Filter, 
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../auth';
 import { useNavigate } from 'react-router-dom';
+import { useAppMode } from '../../contexts/AppModeContext';
 
 interface IntelligenceItemProps {
   item: MarketIntelligence;
@@ -180,27 +181,12 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onRea
 const MarketIntelligenceFeed: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { state, actions } = useSUIS();
+  const { isDemo } = useAppMode();
+  const { state, actions } = useSUISSafe();
   const [selectedIntelligence, setSelectedIntelligence] = useState<MarketIntelligence | null>(null);
   const [activeTab, setActiveTab] = useState<'intelligence' | 'notifications'>('intelligence');
   const [filterSource, setFilterSource] = useState<string>('all');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
-  // If no user, show login prompt
-  if (!user) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4">
-        <h2 className="text-xl font-semibold">Authentication Required</h2>
-        <p className="text-gray-600">The SUIS Market Intelligence Feed requires authentication to access.</p>
-        <button 
-          onClick={() => navigate('/login')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          Go to Login
-        </button>
-      </div>
-    );
-  }
 
   const sources = ['all', 'sphere1a', 'market_feed', 'competitor', 'news', 'regulatory'];
 
@@ -211,6 +197,13 @@ const MarketIntelligenceFeed: React.FC = () => {
   const unreadNotifications = state.notifications.filter(n => !n.readAt);
 
   const handleRefresh = async () => {
+    if (isDemo || !user) {
+      // In demo mode, just simulate a refresh
+      setIsRefreshing(true);
+      setTimeout(() => setIsRefreshing(false), 1000);
+      return;
+    }
+    
     setIsRefreshing(true);
     try {
       await actions.fetchMarketIntelligence();
@@ -247,17 +240,24 @@ const MarketIntelligenceFeed: React.FC = () => {
             Market Intelligence & Alerts
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Real-time insights and notifications
+            {isDemo || !user ? 'Demo mode - Experience AI market intelligence' : 'Real-time insights and notifications'}
           </p>
         </div>
-        <button
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-          className="flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
-        >
-          <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          {(isDemo || !user) && (
+            <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
+              Demo Mode
+            </span>
+          )}
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
