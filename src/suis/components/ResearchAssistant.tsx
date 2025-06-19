@@ -154,13 +154,7 @@ const ResearchAssistant: React.FC = () => {
         credibility: f.confidence / 100,
         relevance: 0.9
       })),
-      confidence: relatedProject.findings.reduce((acc, f) => acc + f.confidence, 0) / relatedProject.findings.length / 100,
-      relatedQueries: [
-        `${query} ROI analysis`,
-        `Best practices for ${query}`,
-        `Market trends in ${query}`,
-        `Competitive landscape for ${query}`
-      ]
+      confidence: relatedProject.findings.reduce((acc, f) => acc + f.confidence, 0) / relatedProject.findings.length / 100
     };
   };
 
