@@ -143,7 +143,8 @@ const ResearchAssistant: React.FC = () => {
       keyFindings: relatedProject.findings.map(f => ({
         finding: f.insight,
         confidence: f.confidence / 100,
-        source: f.sources.join(', ')
+        sources: f.sources,
+        implications: []
       })),
       recommendations: relatedProject.aiAnalysis.recommendations,
       sources: relatedProject.findings.flatMap(f => f.sources),
