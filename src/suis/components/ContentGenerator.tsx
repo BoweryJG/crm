@@ -1,7 +1,7 @@
 // SUIS Content Generator
 // AI-Powered content generation with real integration
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, Card, CardContent, Typography, TextField, Button, 
   Select, MenuItem, FormControl, InputLabel, Chip, Grid,
@@ -12,8 +12,10 @@ import {
   Wand2, Edit3, Save, X
 } from 'lucide-react';
 import { useSUISFeatures } from '../hooks/useSUISFeatures';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../auth';
 import { useNavigate } from 'react-router-dom';
+import { useAppMode } from '../../contexts/AppModeContext';
+import { generateContentTemplates } from '../../services/mockData/suisIntelligenceMockData';
 
 interface ContentRequest {
   type: 'email' | 'presentation' | 'social' | 'proposal' | 'follow_up';
@@ -32,6 +34,7 @@ interface ContentRequest {
 const ContentGenerator: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isDemo } = useAppMode();
   const { generateContent, loading } = useSUISFeatures();
   
   const [contentRequest, setContentRequest] = useState<ContentRequest>({
@@ -48,28 +51,8 @@ const ContentGenerator: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState('');
   const [error, setError] = useState<string | null>(null);
-  
-  // If no user, show login prompt
-  if (!user) {
-    return (
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        height: '100vh',
-        gap: 2 
-      }}>
-        <Typography variant="h5">Authentication Required</Typography>
-        <Typography variant="body1" color="text.secondary">
-          The SUIS Content Generator requires authentication to access.
-        </Typography>
-        <Button variant="contained" onClick={() => navigate('/login')}>
-          Go to Login
-        </Button>
-      </Box>
-    );
-  }
+  const [demoLoading, setDemoLoading] = useState(false);
+  const [mockTemplates] = useState(generateContentTemplates());
 
   const contentTypes = [
     { value: 'email', label: 'Email', icon: <Mail size={20} /> },
@@ -95,13 +78,174 @@ const ContentGenerator: React.FC = () => {
 
   const handleGenerate = async () => {
     setError(null);
-    try {
-      const result = await generateContent(contentRequest);
-      setGeneratedContent(result);
-      setEditedContent(result?.contentData?.body || '');
-    } catch (err: any) {
-      setError(err.message || 'Failed to generate content');
+    
+    if (isDemo || !user) {
+      // Demo mode content generation
+      setDemoLoading(true);
+      try {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Generate demo content based on request
+        const demoContent = generateDemoContent(contentRequest);
+        setGeneratedContent(demoContent);
+        setEditedContent(demoContent.contentData.body);
+      } catch (err: any) {
+        setError('Failed to generate demo content');
+      } finally {
+        setDemoLoading(false);
+      }
+    } else {
+      // Real content generation
+      try {
+        const result = await generateContent(contentRequest);
+        setGeneratedContent(result);
+        setEditedContent(result?.contentData?.body || '');
+      } catch (err: any) {
+        setError(err.message || 'Failed to generate content');
+      }
     }
+  };
+  
+  const generateDemoContent = (request: ContentRequest) => {
+    const templates = {
+      email: {
+        dental: `Subject: Revolutionize Your Practice with Advanced Implant Solutions
+
+Dear Dr. [Name],
+
+I hope this message finds you well. I wanted to reach out regarding the latest advancements in dental implant technology that are transforming practices across [Location].
+
+Our new YOMI robotic surgery system has helped practices like yours:
+• Increase implant placement accuracy by 92%
+• Reduce chair time by 45%
+• Improve patient satisfaction scores by 38%
+
+I'd love to schedule a brief 15-minute demo to show you how this technology could benefit your specific practice needs.
+
+Best regards,
+[Your Name]
+[Your Title]
+RepSphere AI`,
+        aesthetic: `Subject: Elevate Your Med Spa with Next-Gen Body Contouring
+
+Dear [Name],
+
+I'm reaching out because I noticed your practice's commitment to offering cutting-edge aesthetic treatments.
+
+Our latest BTL Exilis Ultra 360 system is revolutionizing non-invasive body contouring:
+• Simultaneous fat reduction and skin tightening
+• Zero downtime for patients
+• 96% patient satisfaction rate
+• ROI typically achieved within 4 months
+
+Several leading med spas in your area have already integrated this technology. I'd be happy to share their success stories and discuss how this could fit into your current treatment menu.
+
+Would you have 20 minutes this week for a virtual demonstration?
+
+Warm regards,
+[Your Name]
+RepSphere AI`
+      },
+      presentation: {
+        dental: `SLIDE 1: Title
+"Digital Dentistry Revolution: Transforming Patient Care"
+
+SLIDE 2: Current Challenges
+• Increasing patient expectations
+• Competition from DSOs
+• Need for predictable outcomes
+• Time efficiency demands
+
+SLIDE 3: Our Solution
+[Product Name] - Complete Digital Workflow
+• Intraoral scanning in 3 minutes
+• Same-day crown delivery
+• 98.5% first-fit accuracy
+• Seamless lab integration
+
+SLIDE 4: ROI Analysis
+• Average case increase: $2,500/month
+• Time saved: 8 hours/week
+• Patient retention: +34%
+• 5-star reviews: +67%
+
+SLIDE 5: Next Steps
+• Hands-on demo at your practice
+• Custom ROI calculation
+• Flexible financing options
+• Dedicated training support`,
+        aesthetic: `SLIDE 1: Title
+"The Future of Non-Invasive Aesthetics"
+
+SLIDE 2: Market Opportunity
+• 78% growth in body contouring demand
+• Patients seeking non-surgical options
+• Average spend per patient: $3,500
+• High retention and referral rates
+
+SLIDE 3: Technology Overview
+[Product Name] - Multi-Application Platform
+• RF + Ultrasound combination
+• Face & body applications
+• No consumables required
+• Minimal training needed
+
+SLIDE 4: Clinical Results
+• 94% patient satisfaction
+• Visible results in 4-6 weeks
+• No downtime or recovery
+• FDA cleared for multiple indications
+
+SLIDE 5: Practice Integration
+• Complements existing services
+• Simple delegation to staff
+• Marketing support included
+• Proven revenue generator`
+      },
+      social: {
+        dental: `🦷 Did you know? The latest digital implant planning technology can reduce surgery time by 50% while improving accuracy! 
+
+Our partner practices are seeing incredible results with guided implant surgery. Swipe to see before/after cases!
+
+#DigitalDentistry #DentalImplants #PracticeGrowth #DentalTechnology`,
+        aesthetic: `✨ Transform your practice with the power of combination therapies! 
+
+Our advanced energy-based devices are helping med spas achieve results that were previously only possible with surgery. 
+
+Ready to elevate your treatment menu? Link in bio!
+
+#MedSpa #Aesthetics #NonInvasive #BeautyTech`
+      }
+    };
+    
+    const content = templates[request.type]?.[request.targetAudience.specialty] || 
+      `This is a demo ${request.type} for ${request.targetAudience.specialty} targeting ${request.targetAudience.role}. 
+      
+In the full version, our AI will generate completely personalized content based on:
+- Your specific products and services
+- Target audience insights
+- Historical performance data
+- Current market trends
+- Compliance requirements
+
+The content will be optimized for ${request.tone} tone and ${request.length} length.`;
+    
+    // Find a matching template
+    const template = mockTemplates.find(t => t.type === request.type) || mockTemplates[0];
+    
+    return {
+      id: `demo-${Date.now()}`,
+      contentData: {
+        body: content,
+        metadata: {
+          model: 'SUIS AI Demo',
+          template: template.name,
+          performance: template.performance
+        }
+      },
+      created_at: new Date().toISOString()
+    };
   };
 
   const handleCopy = () => {
@@ -128,9 +272,14 @@ const ContentGenerator: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" fontWeight="bold" gutterBottom>
-        AI Content Generator
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+        <Typography variant="h4" fontWeight="bold">
+          AI Content Generator
+        </Typography>
+        {(isDemo || !user) && (
+          <Chip label="Demo Mode" color="primary" variant="outlined" size="small" />
+        )}
+      </Box>
       
       <Grid container spacing={3}>
         {/* Configuration Panel */}
@@ -269,9 +418,9 @@ const ContentGenerator: React.FC = () => {
                 variant="contained"
                 startIcon={<Wand2 />}
                 onClick={handleGenerate}
-                disabled={loading}
+                disabled={loading || demoLoading}
               >
-                {loading ? 'Generating...' : 'Generate Content'}
+                {(loading || demoLoading) ? 'Generating...' : 'Generate Content'}
               </Button>
             </CardContent>
           </Card>
@@ -316,11 +465,11 @@ const ContentGenerator: React.FC = () => {
                 )}
               </Box>
 
-              {loading && (
+              {(loading || demoLoading) && (
                 <Box sx={{ py: 4 }}>
                   <LinearProgress />
                   <Typography align="center" sx={{ mt: 2 }}>
-                    Generating AI content...
+                    {isDemo || !user ? 'Generating demo content...' : 'Generating AI content...'}
                   </Typography>
                 </Box>
               )}
@@ -331,7 +480,7 @@ const ContentGenerator: React.FC = () => {
                 </Alert>
               )}
 
-              {generatedContent && !loading && (
+              {generatedContent && !loading && !demoLoading && (
                 <Paper variant="outlined" sx={{ p: 3, minHeight: 400 }}>
                   {!isEditing ? (
                     <Typography style={{ whiteSpace: 'pre-wrap' }}>
@@ -367,7 +516,7 @@ const ContentGenerator: React.FC = () => {
                 </Paper>
               )}
 
-              {!generatedContent && !loading && (
+              {!generatedContent && !loading && !demoLoading && (
                 <Box sx={{ textAlign: 'center', py: 8 }}>
                   <Typography color="textSecondary">
                     Configure your content preferences and click "Generate Content" to create AI-powered content

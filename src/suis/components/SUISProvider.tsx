@@ -22,6 +22,7 @@ import {
 } from '../types';
 import { getSUISAPIManager, checkAPIConfiguration } from '../services/suisConfigService';
 import { handleSUISError, isCriticalError } from '../utils/suisErrorHandler';
+import { generateAllSUISMockData } from '../../services/mockData/suisIntelligenceMockData';
 
 // ==================================================================
 // SUIS PROVIDER CONTEXT
@@ -29,6 +30,7 @@ import { handleSUISError, isCriticalError } from '../utils/suisErrorHandler';
 
 interface SUISState {
   isInitialized: boolean;
+  isDemo: boolean;
   user: any;
   intelligenceProfile: IntelligenceProfile | null;
   marketIntelligence: MarketIntelligence[];
@@ -38,6 +40,7 @@ interface SUISState {
   config: SUISConfig;
   loading: boolean;
   error: string | null;
+  mockData?: ReturnType<typeof generateAllSUISMockData>;
 }
 
 interface SUISActions {
@@ -57,6 +60,8 @@ type SUISAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'SET_INITIALIZED'; payload: boolean }
+  | { type: 'SET_DEMO_MODE'; payload: boolean }
+  | { type: 'SET_MOCK_DATA'; payload: ReturnType<typeof generateAllSUISMockData> }
   | { type: 'SET_USER'; payload: any }
   | { type: 'SET_INTELLIGENCE_PROFILE'; payload: IntelligenceProfile }
   | { type: 'SET_MARKET_INTELLIGENCE'; payload: MarketIntelligence[] }
@@ -73,6 +78,10 @@ const suisReducer = (state: SUISState, action: SUISAction): SUISState => {
       return { ...state, error: action.payload, loading: false };
     case 'SET_INITIALIZED':
       return { ...state, isInitialized: action.payload };
+    case 'SET_DEMO_MODE':
+      return { ...state, isDemo: action.payload };
+    case 'SET_MOCK_DATA':
+      return { ...state, mockData: action.payload };
     case 'SET_USER':
       return { ...state, user: action.payload };
     case 'SET_INTELLIGENCE_PROFILE':
@@ -102,11 +111,13 @@ const suisReducer = (state: SUISState, action: SUISAction): SUISState => {
 
 const initialState: SUISState = {
   isInitialized: false,
+  isDemo: false,
   user: null,
   intelligenceProfile: null,
   marketIntelligence: [],
   notifications: [],
   analytics: null,
+  mockData: undefined,
   theme: {
     currentTheme: 'light',
     themes: {
@@ -438,9 +449,79 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
 
       // Get current user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError) throw userError;
-
-      if (user) {
+      
+      // Check if we're in demo mode
+      const isDemo = !user || !!userError;
+      dispatch({ type: 'SET_DEMO_MODE', payload: isDemo });
+      
+      if (isDemo) {
+        console.info('SUIS: Running in demo mode with mock data');
+        
+        // Generate and set mock data for demo mode
+        const mockData = generateAllSUISMockData();
+        dispatch({ type: 'SET_MOCK_DATA', payload: mockData });
+        
+        // Set mock data in state
+        dispatch({ type: 'SET_MARKET_INTELLIGENCE', payload: mockData.marketIntelligence });
+        
+        // Add some mock notifications
+        const mockNotifications: SUISNotification[] = [
+          {
+            id: 'demo-1',
+            userId: 'demo',
+            type: 'insight',
+            title: 'New High-Value Contact Identified',
+            message: 'AI analysis identified Dr. Sarah Chen as a high-potential prosthodontist',
+            priority: 'high',
+            readAt: null,
+            createdAt: new Date().toISOString(),
+            metadata: { contactId: 'contact-1' }
+          },
+          {
+            id: 'demo-2',
+            userId: 'demo',
+            type: 'content',
+            title: 'Content Performance Alert',
+            message: 'Your latest email campaign achieved 43% higher open rates',
+            priority: 'medium',
+            readAt: null,
+            createdAt: new Date().toISOString(),
+            metadata: { campaignId: 'campaign-1' }
+          }
+        ];
+        mockNotifications.forEach(notif => {
+          dispatch({ type: 'ADD_NOTIFICATION', payload: notif });
+        });
+        
+        // Set up demo analytics
+        const demoAnalytics: UnifiedAnalytics = {
+          userId: 'demo',
+          period: 'monthly',
+          metrics: {
+            totalContacts: mockData.contacts.length,
+            activeEngagements: mockData.contacts.filter(c => c.engagementScore > 70).length,
+            contentGenerated: mockData.contentTemplates.length,
+            researchProjects: mockData.researchProjects.length,
+            callsAnalyzed: 47,
+            marketInsights: mockData.marketIntelligence.length,
+            learningProgress: 78,
+            aiAccuracy: 92
+          },
+          trends: {
+            contactGrowth: 12.5,
+            engagementRate: 8.3,
+            contentPerformance: 15.7,
+            researchROI: 245,
+            callConversion: 34.2,
+            marketShare: 5.8,
+            learningCompletion: 89,
+            aiOptimization: 18.9
+          },
+          insights: mockData.insights.slice(0, 5),
+          lastUpdated: new Date().toISOString()
+        };
+        dispatch({ type: 'SET_ANALYTICS', payload: demoAnalytics });
+      } else if (user) {
         dispatch({ type: 'SET_USER', payload: user });
 
         // Fetch intelligence profile with better error handling
@@ -543,10 +624,10 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
 
         // Set up real-time subscriptions
         setupRealtimeSubscriptions(user.id);
-
-        dispatch({ type: 'SET_INITIALIZED', payload: true });
       }
 
+      // Mark as initialized even without user (demo mode)
+      dispatch({ type: 'SET_INITIALIZED', payload: true });
       dispatch({ type: 'SET_LOADING', payload: false });
     } catch (error) {
       console.error('Failed to initialize SUIS:', error);
@@ -585,6 +666,12 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
   // Update intelligence profile
   const updateIntelligenceProfile = useCallback(async (updates: Partial<IntelligenceProfile>) => {
     try {
+      if (state.isDemo) {
+        // In demo mode, just update local state
+        console.info('SUIS: Demo mode - profile update simulated');
+        return;
+      }
+      
       if (!state.user || !state.intelligenceProfile) return;
 
       const { data, error } = await supabase
@@ -601,11 +688,36 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
       console.error('Failed to update intelligence profile:', error);
       throw error;
     }
-  }, [supabase, state.user, state.intelligenceProfile]);
+  }, [supabase, state.user, state.intelligenceProfile, state.isDemo]);
 
   // Generate content
   const generateContent = useCallback(async (params: any): Promise<GeneratedContent> => {
     try {
+      if (state.isDemo) {
+        // Return mock generated content for demo mode
+        const templates = state.mockData?.contentTemplates || [];
+        const template = templates[Math.floor(Math.random() * templates.length)];
+        
+        return {
+          id: `demo-content-${Date.now()}`,
+          type: params.type || 'email',
+          content: `This is a demo generated ${params.type || 'email'} content based on your request. In the full version, AI will generate personalized content tailored to your specific needs.`,
+          metadata: {
+            template: template?.name || 'Demo Template',
+            tone: params.tone || 'professional',
+            length: params.length || 'medium',
+            aiModel: 'Demo AI'
+          },
+          performance: template?.performance || {
+            opens: 0,
+            clicks: 0,
+            conversions: 0,
+            engagement: 0
+          },
+          createdAt: new Date().toISOString()
+        };
+      }
+      
       const { suisService } = await import('../services/suisService');
       return await suisService.generateContent({
         ...params,
@@ -615,7 +727,7 @@ export const SUISProvider: React.FC<SUISProviderProps> = ({
       console.error('Failed to generate content:', error);
       throw error;
     }
-  }, [state.user]);
+  }, [state.user, state.isDemo, state.mockData]);
 
   // Analyze call
   const analyzeCall = useCallback(async (callSid: string): Promise<CallIntelligence> => {

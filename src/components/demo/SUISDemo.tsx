@@ -21,12 +21,13 @@ import {
   AttachMoney as MoneyIcon,
   Star as StarIcon
 } from '@mui/icons-material';
-import { useSUIS } from '../../hooks/useSUIS';
+import { useSUISSafe } from '../../hooks/useSUIS';
 
 const SUISDemo: React.FC = () => {
   const theme = useTheme();
-  const suisContext = useSUIS();
-  const { state } = suisContext || { state: null };
+  
+  // Use safe hook that won't throw if not in provider
+  const { state } = useSUISSafe();
   const isLoading = state?.loading || false;
   const error = state?.error || null;
   

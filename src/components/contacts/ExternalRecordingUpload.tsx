@@ -35,7 +35,7 @@ import {
   Description as TranscriptIcon
 } from '@mui/icons-material';
 import { geminiService } from '../../services/ai/geminiService';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../auth';
 
 interface ExternalRecordingUploadProps {
   contactId: string;

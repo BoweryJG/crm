@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../auth';
 import { useNavigate } from 'react-router-dom';
+import { useAppMode } from '../../contexts/AppModeContext';
+import { generateResearchProjects } from '../../services/mockData/suisIntelligenceMockData';
 
 interface Message {
   id: string;
@@ -23,33 +25,19 @@ interface Message {
 const ResearchAssistant: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isDemo } = useAppMode();
   const { state, actions } = useSUIS();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showContext, setShowContext] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Move useEffect before conditional return to follow Rules of Hooks
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-  
-  // If no user, show login prompt
-  if (!user) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4">
-        <h2 className="text-xl font-semibold">Authentication Required</h2>
-        <p className="text-gray-600">The SUIS Research Assistant requires authentication to access.</p>
-        <button 
-          onClick={() => navigate('/login')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          Go to Login
-        </button>
-      </div>
-    );
-  }
 
   const contextOptions = {
     goals: state.intelligenceProfile?.goals || {},
@@ -63,7 +51,7 @@ const ResearchAssistant: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || demoLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -74,39 +62,99 @@ const ResearchAssistant: React.FC = () => {
 
     setMessages(prev => [...prev, userMessage]);
     setInput('');
-    setIsLoading(true);
+    
+    if (isDemo || !user) {
+      // Demo mode research
+      setDemoLoading(true);
+      try {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Generate demo response
+        const demoResponse = generateDemoResponse(input);
+        
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          type: 'assistant',
+          content: demoResponse.summary,
+          timestamp: new Date(),
+          data: demoResponse
+        };
 
-    try {
-      const response = await actions.performResearch(input, {
-        currentOpportunities: [],
-        activeProjects: [],
-        recentInteractions: [],
-        userGoals: contextOptions.goals && 'salesTargets' in contextOptions.goals 
-          ? Object.values(contextOptions.goals.salesTargets || {}) 
-          : [],
-        marketConditions: {}
-      });
+        setMessages(prev => [...prev, assistantMessage]);
+      } catch (error) {
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          type: 'system',
+          content: 'Sorry, I encountered an error in demo mode. Please try again.',
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      } finally {
+        setDemoLoading(false);
+      }
+    } else {
+      // Real research
+      setIsLoading(true);
+      try {
+        const response = await actions.performResearch(input, {
+          currentOpportunities: [],
+          activeProjects: [],
+          recentInteractions: [],
+          userGoals: contextOptions.goals && 'salesTargets' in contextOptions.goals 
+            ? Object.values(contextOptions.goals.salesTargets || {}) 
+            : [],
+          marketConditions: {}
+        });
 
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'assistant',
-        content: response.responseData?.summary || 'I found some insights for you.',
-        timestamp: new Date(),
-        data: response.responseData
-      };
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          type: 'assistant',
+          content: response.responseData?.summary || 'I found some insights for you.',
+          timestamp: new Date(),
+          data: response.responseData
+        };
 
-      setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'system',
-        content: 'Sorry, I encountered an error while researching. Please try again.',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
+        setMessages(prev => [...prev, assistantMessage]);
+      } catch (error) {
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          type: 'system',
+          content: 'Sorry, I encountered an error while researching. Please try again.',
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      } finally {
+        setIsLoading(false);
+      }
     }
+  };
+  
+  const generateDemoResponse = (query: string): ResearchResponse => {
+    const mockProjects = generateResearchProjects();
+    const relatedProject = mockProjects.find(p => 
+      query.toLowerCase().includes('implant') || 
+      query.toLowerCase().includes('aesthetic') ||
+      query.toLowerCase().includes('market')
+    ) || mockProjects[0];
+    
+    return {
+      summary: `Based on my analysis of "${query}", I've identified several key insights that can help inform your strategy. ${relatedProject.aiAnalysis.summary}`,
+      keyFindings: relatedProject.findings.map(f => ({
+        finding: f.insight,
+        confidence: f.confidence / 100,
+        source: f.sources.join(', ')
+      })),
+      recommendations: relatedProject.aiAnalysis.recommendations,
+      sources: relatedProject.findings.flatMap(f => f.sources),
+      confidence: relatedProject.findings.reduce((acc, f) => acc + f.confidence, 0) / relatedProject.findings.length / 100,
+      relatedQueries: [
+        `${query} ROI analysis`,
+        `Best practices for ${query}`,
+        `Market trends in ${query}`,
+        `Competitive landscape for ${query}`
+      ]
+    };
   };
 
   const handleFeedback = (messageId: string, helpful: boolean) => {
@@ -139,17 +187,24 @@ const ResearchAssistant: React.FC = () => {
                 AI Research Assistant
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Powered by advanced AI for medical device insights
+                {isDemo || !user ? 'Demo mode - Experience AI research capabilities' : 'Powered by advanced AI for medical device insights'}
               </p>
             </div>
           </div>
-          <button
-            onClick={() => setShowContext(!showContext)}
-            className="flex items-center px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
-          >
-            Context
-            <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${showContext ? 'rotate-180' : ''}`} />
-          </button>
+          <div className="flex items-center gap-2">
+            {(isDemo || !user) && (
+              <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
+                Demo Mode
+              </span>
+            )}
+            <button
+              onClick={() => setShowContext(!showContext)}
+              className="flex items-center px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+            >
+              Context
+              <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${showContext ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
         </div>
 
         {/* Context Panel */}
@@ -302,12 +357,14 @@ const ResearchAssistant: React.FC = () => {
           </div>
         ))}
 
-        {isLoading && (
+        {(isLoading || demoLoading) && (
           <div className="flex justify-start">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-2">
                 <Loader className="w-4 h-4 animate-spin text-blue-600" />
-                <p className="text-sm text-gray-600 dark:text-gray-400">Researching...</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {demoLoading ? 'Generating demo insights...' : 'Researching...'}
+                </p>
               </div>
             </div>
           </div>
@@ -326,11 +383,11 @@ const ResearchAssistant: React.FC = () => {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about procedures, market trends, competitors..."
               className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              disabled={isLoading}
+              disabled={isLoading || demoLoading}
             />
             <button
               type="submit"
-              disabled={!input.trim() || isLoading}
+              disabled={!input.trim() || isLoading || demoLoading}
               className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-blue-600 hover:text-blue-700 disabled:text-gray-400"
             >
               <Send className="w-5 h-5" />
