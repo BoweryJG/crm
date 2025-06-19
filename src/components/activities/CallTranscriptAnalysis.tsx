@@ -16,17 +16,19 @@ import {
   LinearProgress,
   Avatar,
   AvatarGroup,
+  Button,
+  IconButton,
+  Tooltip
+} from '@mui/material';
+import {
   Timeline,
   TimelineItem,
   TimelineSeparator,
   TimelineConnector,
   TimelineContent,
   TimelineDot,
-  TimelineOppositeContent,
-  Button,
-  IconButton,
-  Tooltip
-} from '@mui/material';
+  TimelineOppositeContent
+} from '@mui/lab';
 import {
   TrendingDown as LostRevenueIcon,
   Web as WebsiteIcon,
