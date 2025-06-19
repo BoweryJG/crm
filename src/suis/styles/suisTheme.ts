@@ -118,55 +118,71 @@ export const suisTheme = (baseTheme: Theme) => createTheme({
   components: {
     MuiCard: {
       styleOverrides: {
-        root: ({ theme }) => (suisComponentStyles.card)
+        root: {
+          borderRadius: 12,
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+          }
+        }
       }
     },
     MuiButton: {
       styleOverrides: {
-        root: ({ theme }) => ({
-          ...suisComponentStyles.button
-        }),
-        contained: ({ theme }) => ({
+        root: {
+          borderRadius: 8,
+          textTransform: 'none' as const,
+          fontWeight: 600,
+          padding: '10px 20px',
+          transition: 'all 0.2s ease',
+          '&:hover': {
+            transform: 'translateY(-1px)',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+          }
+        },
+        contained: {
           boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
           '&:hover': {
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
           }
-        })
+        }
       }
     },
     MuiTextField: {
       styleOverrides: {
-        root: ({ theme }) => (suisComponentStyles.input)
+        root: suisComponentStyles.input
       }
     },
     MuiPaper: {
       styleOverrides: {
-        root: ({ theme }) => ({
+        root: {
           borderRadius: 12
-        })
+        }
       }
     },
     MuiChip: {
       styleOverrides: {
-        root: ({ theme }) => ({
+        root: {
           borderRadius: 6,
           fontWeight: 500
-        })
+        }
       }
     },
     MuiAvatar: {
       styleOverrides: {
-        root: ({ theme }) => ({
+        root: {
           fontWeight: 600
-        })
+        }
       }
     },
     MuiLinearProgress: {
       styleOverrides: {
-        root: ({ theme }) => ({
+        root: {
           borderRadius: 4,
           height: 6
-        })
+        }
       }
     }
   },
@@ -176,7 +192,7 @@ export const suisTheme = (baseTheme: Theme) => createTheme({
   typography: {
     ...baseTheme.typography,
     button: {
-      textTransform: 'none',
+      textTransform: 'none' as const,
       fontWeight: 600
     }
   }
