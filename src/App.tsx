@@ -10,6 +10,7 @@ import { AppModeProvider } from './contexts/AppModeContext';
 import { DashboardDataProvider } from './contexts/DashboardDataContext';
 import { SUISProvider } from './suis';
 import SphereLoadingScreen from './components/common/SphereLoadingScreen';
+import PremiumLoadingScreen from './components/common/PremiumLoadingScreen';
 import StandaloneEliteLoadingScreen from './components/common/StandaloneEliteLoadingScreen';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import Layout from './components/layout/Layout';
@@ -68,20 +69,20 @@ const App: React.FC = () => {
   const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNib3B5bnV2aGN5bWJ1bWpudmF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5OTUxNzMsImV4cCI6MjA1OTU3MTE3M30.UZElMkoHugIt984RtYWyfrRuv2rB67opQdCrFVPCfzU';
 
   useEffect(() => {
-    // Simulate loading delay to ensure all resources are properly initialized
+    // Premium loading experience with minimum duration
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 3500); // Increased for premium experience
     
     return () => clearTimeout(timer);
   }, []);
 
   if (isLoading) {
     return (
-      <SphereLoadingScreen 
-        loadingText="SPHERE oS"
-        message="QUANTUM SYNC IN PROGRESS"
-        showPreview={true}
+      <PremiumLoadingScreen 
+        loadingText="REPSPHERES"
+        message="Crafting your experience"
+        minimumDuration={3500}
       />
     );
   }
@@ -98,7 +99,7 @@ const App: React.FC = () => {
               <Routes>
                 {/* Luxury Landing Page - default for non-authenticated users */}
                 <Route path="/welcome" element={
-                  <Suspense fallback={<SphereLoadingScreen loadingText="SPHERE OS" message="INITIALIZING QUANTUM INTERFACE" />}>
+                  <Suspense fallback={<PremiumLoadingScreen loadingText="REPSPHERES" message="Preparing luxury experience" minimumDuration={2000} />}>
                     <LuxuryLandingWrapper />
                   </Suspense>
                 } />
@@ -127,7 +128,7 @@ const App: React.FC = () => {
                   </AuthGuard>
                 }>
                 <Route index element={<Dashboard />} />
-                <Route path="command-room" element={<Suspense fallback={<SphereLoadingScreen loadingText="COMMAND ROOM" message="INITIALIZING GALLERY OF DOMINANCE" />}><CommandRoom /></Suspense>} />
+                <Route path="command-room" element={<Suspense fallback={<PremiumLoadingScreen loadingText="GALLERY" message="Curating your dominance" minimumDuration={2500} />}><CommandRoom /></Suspense>} />
                 <Route path="relationships" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="SMART CRM" message="INITIALIZING AI INTELLIGENCE" />}><SmartCRM /></React.Suspense>} />
                 <Route path="contacts" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="CONTACTS" message="NEURAL DATABASE SYNC" />}><Contacts /></React.Suspense>} />
                 <Route path="contacts/:id" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="PROFILE" message="EXTRACTING DATA MATRIX" />}><ContactDetail /></React.Suspense>} />
