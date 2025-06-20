@@ -12,6 +12,7 @@ import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
 import NowCardsStack from '../components/dashboard/NowCardsStack'; // Added import
 import ClassicRevenueGauge from '../components/gauges/ClassicRevenueGauge';
+import LuxuryGauge from '../components/gauges/LuxuryGauge';
 import LiveActionTicker from '../components/dashboard/LiveActionTicker';
 import { useThemeContext } from '../themes/ThemeContext';
 import { useNavigate } from 'react-router-dom';
@@ -66,14 +67,25 @@ const Dashboard: React.FC = () => {
       </Box>
 
       {/* Revenue Gauges Dashboard */}
-      <Box sx={{ mb: 4 }}>
+      <Box sx={{ mb: 4, overflow: 'hidden' }}>
         <Box sx={{ 
           display: 'grid', 
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(4, 1fr)' },
-          gap: 3,
+          gridTemplateColumns: { 
+            xs: '1fr', 
+            sm: 'repeat(2, 1fr)', 
+            md: 'repeat(3, 1fr)', 
+            lg: 'repeat(4, 1fr)' 
+          },
+          gap: { xs: 2, sm: 3 },
           justifyContent: 'center',
           justifyItems: 'center',
-          alignItems: 'center'
+          alignItems: 'center',
+          width: '100%',
+          maxWidth: '100%',
+          '& > *': {
+            maxWidth: '100%',
+            overflow: 'hidden'
+          }
         }}>
           {loading || !dashboardData ? (
             // Show loading skeletons
@@ -82,41 +94,49 @@ const Dashboard: React.FC = () => {
             ))
           ) : (
             <>
-              <ClassicRevenueGauge 
-                value={(dashboardData.revenue_generated / 100000) / 1000 * 180} // 793K/1000K = 0.793, * 180 = 142.74°
-                displayValue={Math.round(dashboardData.revenue_generated / 100000)} // Convert cents to K for LED display
+              <LuxuryGauge 
+                value={Math.round(dashboardData.revenue_generated / 100000)} // Value in K
+                displayValue={Math.round(dashboardData.revenue_generated / 100000)} // Display in K
                 label="REVENUE"
+                unit="K"
+                max={1000} // Max 1M
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={0}
-                scaleLabels={['0', '100K', '200K', '300K', '400K', '500K', '600K', '700K', '800K', '1M']}
+                colorMode="gold"
               />
-              <ClassicRevenueGauge 
-                value={(dashboardData.pipeline_value / 100000) / 2000 * 180} // 1190K/2000K = 0.595, * 180 = 107.1°
-                displayValue={Math.round(dashboardData.pipeline_value / 100000)} // Convert cents to K for LED display
+              <LuxuryGauge 
+                value={Math.round(dashboardData.pipeline_value / 100000)} // Value in K
+                displayValue={Math.round(dashboardData.pipeline_value / 100000)} // Display in K
                 label="PIPELINE"
+                unit="K"
+                max={2000} // Max 2M
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={200}
-                scaleLabels={['0', '200K', '400K', '600K', '800K', '1M', '1.2M', '1.4M', '1.6M', '2M']}
+                colorMode="primary"
               />
-              <ClassicRevenueGauge 
-                value={(dashboardData.quota_percentage / 100) * 180} // 61%/100% = 0.61, * 180 = 109.8°
-                displayValue={dashboardData.quota_percentage} // Show percentage in LED
+              <LuxuryGauge 
+                value={dashboardData.quota_percentage} // Already a percentage
+                displayValue={dashboardData.quota_percentage}
                 label="QUOTA"
+                unit="%"
+                max={100}
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={400}
-                scaleLabels={['0%', '10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '100%']}
+                colorMode="auto"
               />
-              <ClassicRevenueGauge 
-                value={(dashboardData.conversion_rate / 100) * 180} // 45%/100% = 0.45, * 180 = 81°
-                displayValue={dashboardData.conversion_rate} // Show percentage in LED
+              <LuxuryGauge 
+                value={dashboardData.conversion_rate} // Already a percentage
+                displayValue={dashboardData.conversion_rate}
                 label="CONVERSION"
+                unit="%"
+                max={100}
                 size="medium"
                 onClick={() => navigate('/analytics')}
                 animationDelay={600}
-                scaleLabels={['0%', '10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '100%']}
+                colorMode="auto"
               />
             </>
           )}

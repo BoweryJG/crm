@@ -53,7 +53,7 @@ const Layout: React.FC = () => {
         sx={{
           flexGrow: 1,
           width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
-          ml: { xs: 0, md: 0 }, // Drawer handles its own positioning
+          ml: { xs: 0, md: `${drawerWidth}px` }, // Proper offset for desktop
           overflow: 'auto',
           position: 'relative',
           minHeight: '100vh',
