@@ -36,31 +36,20 @@ const needleSweep = keyframes`
 // Main container with leather texture
 const GaugeContainer = styled(Box)<{ size: string; delay?: number }>(({ size, delay = 0 }) => {
   const dimensions = {
-    small: { base: 200, xs: 160, sm: 180, md: 200 },
-    medium: { base: 260, xs: 200, sm: 220, md: 240, lg: 260 },
-    large: { base: 320, xs: 240, sm: 280, md: 300, lg: 320 }
+    small: 200,
+    medium: 260,
+    large: 320
   };
   const dim = dimensions[size as keyof typeof dimensions] || dimensions.medium;
   
   return {
-    width: {
-      xs: dim.xs || dim.base,
-      sm: dim.sm || dim.base,
-      md: dim.md || dim.base,
-      lg: dim.lg || dim.base
-    },
-    height: {
-      xs: dim.xs || dim.base,
-      sm: dim.sm || dim.base,
-      md: dim.md || dim.base,
-      lg: dim.lg || dim.base
-    },
+    width: dim,
+    height: dim,
     maxWidth: '100%',
     maxHeight: '100%',
-    aspectRatio: '1 / 1',
     position: 'relative',
     borderRadius: 16,
-    padding: { xs: 10, sm: 15, md: 20 },
+    padding: 20,
     background: `
       radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0a0a0a 50%, #000000 100%)
     `,

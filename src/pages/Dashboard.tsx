@@ -94,50 +94,58 @@ const Dashboard: React.FC = () => {
             ))
           ) : (
             <>
-              <LuxuryGauge 
-                value={Math.round(dashboardData.revenue_generated / 100000)} // Value in K
-                displayValue={Math.round(dashboardData.revenue_generated / 100000)} // Display in K
-                label="REVENUE"
-                unit="K"
-                max={1000} // Max 1M
-                size="medium"
-                onClick={() => navigate('/analytics')}
-                animationDelay={0}
-                colorMode="gold"
-              />
-              <LuxuryGauge 
-                value={Math.round(dashboardData.pipeline_value / 100000)} // Value in K
-                displayValue={Math.round(dashboardData.pipeline_value / 100000)} // Display in K
-                label="PIPELINE"
-                unit="K"
-                max={2000} // Max 2M
-                size="medium"
-                onClick={() => navigate('/analytics')}
-                animationDelay={200}
-                colorMode="primary"
-              />
-              <LuxuryGauge 
-                value={dashboardData.quota_percentage} // Already a percentage
-                displayValue={dashboardData.quota_percentage}
-                label="QUOTA"
-                unit="%"
-                max={100}
-                size="medium"
-                onClick={() => navigate('/analytics')}
-                animationDelay={400}
-                colorMode="auto"
-              />
-              <LuxuryGauge 
-                value={dashboardData.conversion_rate} // Already a percentage
-                displayValue={dashboardData.conversion_rate}
-                label="CONVERSION"
-                unit="%"
-                max={100}
-                size="medium"
-                onClick={() => navigate('/analytics')}
-                animationDelay={600}
-                colorMode="auto"
-              />
+              <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
+                <LuxuryGauge 
+                  value={Math.round(dashboardData.revenue_generated / 100000)} // Value in K
+                  displayValue={Math.round(dashboardData.revenue_generated / 100000)} // Display in K
+                  label="REVENUE"
+                  unit="K"
+                  max={1000} // Max 1M
+                  size="medium"
+                  onClick={() => navigate('/analytics')}
+                  animationDelay={0}
+                  colorMode="gold"
+                />
+              </Box>
+              <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
+                <LuxuryGauge 
+                  value={Math.round(dashboardData.pipeline_value / 100000)} // Value in K
+                  displayValue={Math.round(dashboardData.pipeline_value / 100000)} // Display in K
+                  label="PIPELINE"
+                  unit="K"
+                  max={2000} // Max 2M
+                  size="medium"
+                  onClick={() => navigate('/analytics')}
+                  animationDelay={200}
+                  colorMode="primary"
+                />
+              </Box>
+              <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
+                <LuxuryGauge 
+                  value={dashboardData.quota_percentage} // Already a percentage
+                  displayValue={dashboardData.quota_percentage}
+                  label="QUOTA"
+                  unit="%"
+                  max={100}
+                  size="medium"
+                  onClick={() => navigate('/analytics')}
+                  animationDelay={400}
+                  colorMode="auto"
+                />
+              </Box>
+              <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
+                <LuxuryGauge 
+                  value={dashboardData.conversion_rate} // Already a percentage
+                  displayValue={dashboardData.conversion_rate}
+                  label="CONVERSION"
+                  unit="%"
+                  max={100}
+                  size="medium"
+                  onClick={() => navigate('/analytics')}
+                  animationDelay={600}
+                  colorMode="auto"
+                />
+              </Box>
             </>
           )}
         </Box>
