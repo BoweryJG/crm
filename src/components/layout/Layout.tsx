@@ -3,6 +3,7 @@ import { Box, Toolbar } from '@mui/material';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import SculpturalSidebar from './SculpturalSidebar';
+import ThemeSwitcherPanel from '../theme/ThemeSwitcherPanel';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
 
@@ -13,8 +14,8 @@ const Layout: React.FC = () => {
   const drawerWidth = 280;
   const { themeMode } = useThemeContext();
   
-  // Use SculpturalSidebar for gallery-dominance theme or command room
-  const usesSculpturalSidebar = themeMode === 'gallery-dominance' || location.pathname.startsWith('/command-room');
+  // Always use SculpturalSidebar for the premium experience
+  const usesSculpturalSidebar = true;
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -83,6 +84,9 @@ const Layout: React.FC = () => {
           <Outlet /> {/* This renders the current route's element */}
         </Box>
       </Box>
+      
+      {/* Theme Switcher Panel */}
+      <ThemeSwitcherPanel />
     </Box>
   );
 };

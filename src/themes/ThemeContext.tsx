@@ -6,7 +6,7 @@ import corporateTheme from './corporateTheme';
 import luxuryTheme from './luxuryTheme';
 import sculptureTheme from './sculptureTheme';
 import { 
-  themeLibrary, 
+  allThemes, 
   getThemeById, 
   legacyThemeMap,
   ExtendedTheme 
@@ -142,7 +142,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   const getAllAvailableThemes = () => {
-    return [...themeLibrary, ...userPreferences.customThemes];
+    return [...allThemes, ...userPreferences.customThemes];
   };
 
   const getCurrentTheme = () => {

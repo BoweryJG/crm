@@ -1,4 +1,5 @@
 import { ThemeOptions } from '@mui/material/styles';
+import { enhancedThemes } from './enhancedThemeLibrary';
 
 export interface ExtendedTheme {
   id: string;
@@ -654,15 +655,18 @@ export const themeLibrary: ExtendedTheme[] = [
   }
 ];
 
+// Combine with enhanced themes
+export const allThemes = [...themeLibrary, ...enhancedThemes];
+
 // Helper functions
 export const getThemesByCategory = (category: string) => 
-  themeLibrary.filter(theme => theme.category === category);
+  allThemes.filter(theme => theme.category === category);
 
 export const getPremiumThemes = () => 
-  themeLibrary.filter(theme => theme.premium);
+  allThemes.filter(theme => theme.premium);
 
 export const getThemeById = (id: string) => 
-  themeLibrary.find(theme => theme.id === id);
+  allThemes.find(theme => theme.id === id);
 
 export const getAllCategories = () => 
   Object.keys(themeCategories);
