@@ -2,13 +2,19 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Box, Toolbar } from '@mui/material';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import SculpturalSidebar from './SculpturalSidebar';
 import { Outlet, useLocation } from 'react-router-dom';
+import { useThemeContext } from '../../themes/ThemeContext';
 
 const Layout: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const mainRef = useRef<HTMLDivElement | null>(null);
   const drawerWidth = 280;
+  const { themeMode } = useThemeContext();
+  
+  // Use SculpturalSidebar for gallery-dominance theme or command room
+  const usesSculpturalSidebar = themeMode === 'gallery-dominance' || location.pathname.startsWith('/command-room');
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -28,8 +34,12 @@ const Layout: React.FC = () => {
       {/* Header */}
       <Header onSidebarToggle={handleDrawerToggle} drawerWidth={drawerWidth} />
       
-      {/* Sidebar */}
-      <Sidebar open={mobileOpen} onClose={handleDrawerToggle} drawerWidth={drawerWidth} />
+      {/* Sidebar - Use Sculptural version for gallery theme */}
+      {usesSculpturalSidebar ? (
+        <SculpturalSidebar open={mobileOpen} onClose={handleDrawerToggle} drawerWidth={drawerWidth} />
+      ) : (
+        <Sidebar open={mobileOpen} onClose={handleDrawerToggle} drawerWidth={drawerWidth} />
+      )}
       
       {/* Main content */}
       <Box
