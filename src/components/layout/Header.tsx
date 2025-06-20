@@ -26,24 +26,27 @@ import {
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useAuth } from '../../auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AppModeToggle } from '../common/AppModeToggle';
 import AuthModal from '../common/AuthModal';
 import { CRMQuickLoginModal } from '../common/CRMQuickLoginModal';
 import { RepSpheresAppSwitcher } from '../common/RepSpheresAppSwitcher';
 import ThemeToggle from '../ui/ThemeToggle';
 import { getUserDisplayName, getUserInitials } from '../../utils/userHelpers';
+import SculpturalMenuToggle from './SculpturalMenuToggle';
 
 interface HeaderProps {
   onSidebarToggle: () => void;
   drawerWidth: number;
+  mobileOpen?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
+const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpen = false }) => {
   const theme = useTheme();
   const { themeMode, toggleTheme } = useThemeContext();
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // User profile menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -52,6 +55,9 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
   // Auth modal state
   const [loginOpen, setLoginOpen] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
+  
+  // Check if we should use sculptural components
+  const usesSculpturalDesign = themeMode === 'gallery-dominance' || location.pathname.startsWith('/command-room');
   
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -79,33 +85,50 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth }) => {
       position="fixed"
       elevation={0}
       sx={{
-        width: { md: `calc(100% - ${drawerWidth}px)` },
-        ml: { md: `${drawerWidth}px` },
-        backdropFilter: 'blur(8px)',
+        width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
+        ml: { xs: 0, md: `${drawerWidth}px` },
+        backdropFilter: 'blur(12px)',
         backgroundColor: themeMode === 'space' 
           ? 'rgba(22, 27, 44, 0.8)'
           : themeMode === 'luxury'
           ? 'rgba(26, 26, 26, 0.9)'
+          : themeMode === 'gallery-dominance'
+          ? 'rgba(13, 13, 13, 0.95)'
           : 'rgba(255, 255, 255, 0.8)',
         borderBottom: `1px solid ${
           themeMode === 'space' 
             ? 'rgba(255, 255, 255, 0.08)'
             : themeMode === 'luxury'
-            ? 'rgba(201, 176, 55, 0.3)' 
+            ? 'rgba(201, 176, 55, 0.3)'
+            : themeMode === 'gallery-dominance'
+            ? 'rgba(212, 175, 55, 0.2)' 
             : 'rgba(0, 0, 0, 0.06)'
-        }`
+        }`,
+        transition: 'all 0.3s ease',
+        zIndex: theme.zIndex.drawer + 1,
       }}
     >
       <Toolbar>
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          edge="start"
-          onClick={onSidebarToggle}
-          sx={{ mr: 2, display: { md: 'none' } }}
-        >
-          <MenuIcon />
-        </IconButton>
+        {/* Mobile Menu Toggle - Sculptural or Standard */}
+        {usesSculpturalDesign ? (
+          <Box sx={{ mr: 2, display: { md: 'none' } }}>
+            <SculpturalMenuToggle 
+              open={mobileOpen} 
+              onClick={onSidebarToggle}
+              size="medium"
+            />
+          </Box>
+        ) : (
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={onSidebarToggle}
+            sx={{ mr: 2, display: { md: 'none' } }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
 
         {/* Search bar - placeholder for now */}
         <Box

@@ -31,8 +31,12 @@ const Layout: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      {/* Header */}
-      <Header onSidebarToggle={handleDrawerToggle} drawerWidth={drawerWidth} />
+      {/* Header - pass mobile open state for sculptural menu */}
+      <Header 
+        onSidebarToggle={handleDrawerToggle} 
+        drawerWidth={drawerWidth} 
+        mobileOpen={mobileOpen}
+      />
       
       {/* Sidebar - Use Sculptural version for gallery theme */}
       {usesSculpturalSidebar ? (
@@ -47,15 +51,37 @@ const Layout: React.FC = () => {
         ref={mainRef}
         sx={{
           flexGrow: 1,
-          width: { md: `calc(100% - ${drawerWidth}px)` },
+          width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
+          ml: { xs: 0, md: 0 }, // Drawer handles its own positioning
           overflow: 'auto',
-          pt: 2,
-          px: 3,
-          pb: 4
+          position: 'relative',
+          minHeight: '100vh',
+          // Responsive padding that works with both sidebar types
+          pt: { xs: 1, sm: 2 },
+          px: { 
+            xs: 2, // Mobile padding
+            sm: 3, // Tablet padding
+            md: 4, // Desktop padding
+            lg: 5  // Large desktop padding
+          },
+          pb: { xs: 3, sm: 4, md: 5 },
+          // Ensure content doesn't get too wide on large screens
+          maxWidth: { xl: 'calc(100% - 80px)' },
+          mx: { xl: 'auto' },
+          transition: 'all 0.3s ease', // Smooth transitions when switching themes
         }}
       >
         <Toolbar /> {/* This creates space for the fixed header */}
-        <Outlet /> {/* This renders the current route's element */}
+        <Box
+          sx={{
+            // Additional container for better content control
+            width: '100%',
+            maxWidth: { xs: '100%', xl: '1600px' },
+            mx: 'auto',
+          }}
+        >
+          <Outlet /> {/* This renders the current route's element */}
+        </Box>
       </Box>
     </Box>
   );

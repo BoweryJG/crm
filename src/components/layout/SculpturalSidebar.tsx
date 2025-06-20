@@ -73,7 +73,9 @@ const MonolithTab: React.FC<{
           : `2px solid ${alpha(theme.palette.primary.main, 0.1)}`,
         boxShadow: isActive
           ? `0 10px 40px ${alpha(theme.palette.primary.main, 0.3)}, inset 0 0 0 1px ${alpha(theme.palette.primary.main, 0.2)}`
-          : `0 4px 20px ${alpha('#000', 0.2)}`,
+          : theme.palette.mode === 'dark'
+          ? `0 4px 20px ${alpha('#000', 0.4)}`
+          : `0 4px 20px ${alpha('#000', 0.1)}`,
         
         // Padding and spacing
         px: 3,
@@ -171,7 +173,17 @@ const MonolithTab: React.FC<{
               height: 8,
               backgroundColor: theme.palette.primary.main,
               boxShadow: `0 0 10px ${theme.palette.primary.main}`,
-              animation: `${animations.loading.goldPulse}`,
+              animation: `pulse 2s ease-in-out infinite`,
+              '@keyframes pulse': {
+                '0%, 100%': {
+                  opacity: 1,
+                  transform: 'scale(1)',
+                },
+                '50%': {
+                  opacity: 0.8,
+                  transform: 'scale(1.2)',
+                },
+              },
             }}
           />
         )}
@@ -183,6 +195,7 @@ const MonolithTab: React.FC<{
 // Section Divider Component
 const SculpturalDivider: React.FC<{ pattern?: 'dots' | 'zigzag' | 'gradient' }> = ({ pattern = 'gradient' }) => {
   const theme = useTheme();
+  const opacity = theme.palette.mode === 'dark' ? 0.2 : 0.15;
   
   if (pattern === 'zigzag') {
     return (
@@ -190,7 +203,7 @@ const SculpturalDivider: React.FC<{ pattern?: 'dots' | 'zigzag' | 'gradient' }> 
         <svg width="100%" height="20" viewBox="0 0 200 20" preserveAspectRatio="none">
           <path
             d="M0,10 L10,5 L20,15 L30,5 L40,15 L50,5 L60,15 L70,5 L80,15 L90,5 L100,15 L110,5 L120,15 L130,5 L140,15 L150,5 L160,15 L170,5 L180,15 L190,5 L200,10"
-            stroke={alpha(theme.palette.primary.main, 0.2)}
+            stroke={alpha(theme.palette.primary.main, opacity)}
             strokeWidth="1"
             fill="none"
           />
@@ -205,7 +218,7 @@ const SculpturalDivider: React.FC<{ pattern?: 'dots' | 'zigzag' | 'gradient' }> 
         sx={{
           height: 30,
           my: 2,
-          backgroundImage: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.2)} 1px, transparent 1px)`,
+          backgroundImage: `radial-gradient(circle, ${alpha(theme.palette.primary.main, opacity)} 1px, transparent 1px)`,
           backgroundSize: '10px 10px',
           backgroundPosition: 'center',
         }}
@@ -220,7 +233,7 @@ const SculpturalDivider: React.FC<{ pattern?: 'dots' | 'zigzag' | 'gradient' }> 
         height: 1,
         my: 3,
         mx: 2,
-        background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.primary.main, 0.3)}, transparent)`,
+        background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.3 : 0.2)}, transparent)`,
       }}
     />
   );
@@ -357,11 +370,11 @@ const SculpturalSidebar: React.FC<{
       sx={{
         height: '100%',
         backgroundColor: theme.palette.background.default,
-        borderRight: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+        borderRight: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.1 : 0.05)}`,
         position: 'relative',
         overflow: 'hidden',
         
-        // Subtle background pattern
+        // Subtle background pattern - theme aware
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -370,7 +383,13 @@ const SculpturalSidebar: React.FC<{
           right: 0,
           bottom: 0,
           backgroundImage: `
-            repeating-linear-gradient(45deg, transparent, transparent 35px, ${alpha(theme.palette.primary.main, 0.02)} 35px, ${alpha(theme.palette.primary.main, 0.02)} 70px)
+            repeating-linear-gradient(
+              45deg, 
+              transparent, 
+              transparent 35px, 
+              ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.02 : 0.01)} 35px, 
+              ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.02 : 0.01)} 70px
+            )
           `,
           pointerEvents: 'none',
         },
@@ -380,13 +399,13 @@ const SculpturalSidebar: React.FC<{
       <Box
         sx={{
           p: 3,
-          borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-          background: `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.05)}, transparent)`,
+          borderBottom: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.1 : 0.05)}`,
+          background: `linear-gradient(180deg, ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.05 : 0.02)}, transparent)`,
           position: 'relative',
           cursor: 'pointer',
           transition: 'all 0.6s ease',
           '&:hover': {
-            backgroundColor: alpha(theme.palette.primary.main, 0.03),
+            backgroundColor: alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.03 : 0.01),
           },
         }}
         onClick={() => window.open('https://repspheres.com', '_blank')}
@@ -398,10 +417,12 @@ const SculpturalSidebar: React.FC<{
             letterSpacing: '0.3em',
             textAlign: 'center',
             textTransform: 'uppercase',
-            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.common.white})`,
+            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${
+              theme.palette.mode === 'dark' ? theme.palette.primary.light || theme.palette.primary.main : theme.palette.primary.dark || theme.palette.primary.main
+            })`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            textShadow: `0 0 30px ${alpha(theme.palette.primary.main, 0.3)}`,
+            textShadow: `0 0 30px ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.3 : 0.2)}`,
           }}
         >
           Repspheres
@@ -417,7 +438,13 @@ const SculpturalSidebar: React.FC<{
             fontSize: '0.625rem',
           }}
         >
-          GALLERY OF DOMINANCE
+          {themeMode === 'gallery-dominance' ? 'GALLERY OF DOMINANCE' :
+           themeMode === 'boeing-cockpit' ? 'FLIGHT COMMAND' :
+           themeMode === 'cyber-neon' ? 'NEON INTERFACE' :
+           themeMode === 'chanel-noir' ? 'HAUTE NAVIGATION' :
+           themeMode === 'ocean-depths' ? 'AQUATIC CONTROL' :
+           themeMode === 'cartier-gold' ? 'LUXURY COMMAND' :
+           'ELITE NAVIGATION'}
         </Typography>
       </Box>
       
@@ -456,8 +483,8 @@ const SculpturalSidebar: React.FC<{
       <Box
         sx={{
           p: 2,
-          borderTop: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-          background: `linear-gradient(0deg, ${alpha(theme.palette.primary.main, 0.05)}, transparent)`,
+          borderTop: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.1 : 0.05)}`,
+          background: `linear-gradient(0deg, ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.05 : 0.02)}, transparent)`,
         }}
       >
         <Typography
@@ -471,7 +498,13 @@ const SculpturalSidebar: React.FC<{
             opacity: 0.5,
           }}
         >
-          ELITE ACCESS ONLY
+          {themeMode === 'gallery-dominance' ? 'ELITE ACCESS ONLY' :
+           themeMode === 'boeing-cockpit' ? 'AUTHORIZED PILOTS' :
+           themeMode === 'cyber-neon' ? 'SYSTEM ACCESS' :
+           themeMode === 'chanel-noir' ? 'EXCLUSIVE MEMBERS' :
+           themeMode === 'ocean-depths' ? 'DEEP EXPLORERS' :
+           themeMode === 'cartier-gold' ? 'PREMIUM ACCESS' :
+           'AUTHORIZED USERS'}
         </Typography>
       </Box>
     </Box>
