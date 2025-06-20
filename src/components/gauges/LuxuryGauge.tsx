@@ -25,15 +25,23 @@ const GaugeContainer = styled(Box)<{ size: string }>(({ theme, size }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  background: 'linear-gradient(to bottom, #0a0a0a, #1a1a1a)',
+  background: 'linear-gradient(145deg, #0f0f0f, #0a0a0a)',
   borderRadius: '50%',
-  boxShadow: '0 0 35px rgba(255,255,255,0.2)',
-  border: '2px solid #333',
+  boxShadow: `
+    0 0 35px rgba(255,255,255,0.15),
+    inset 0 2px 6px rgba(255,255,255,0.08),
+    inset 0 -2px 6px rgba(0,0,0,0.8)
+  `,
+  border: '4px solid #222',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
   '&:hover': {
     transform: 'scale(1.02)',
-    boxShadow: '0 0 45px rgba(255,255,255,0.3)',
+    boxShadow: `
+      0 0 45px rgba(255,255,255,0.25),
+      inset 0 2px 6px rgba(255,255,255,0.08),
+      inset 0 -2px 6px rgba(0,0,0,0.8)
+    `,
   }
 }));
 
@@ -164,11 +172,12 @@ function LuxuryGauge({
       >
         <Box
           sx={{
-            width: '6px',
-            height: `${96 * scaleFactor}px`,
-            background: `linear-gradient(to bottom, ${needleColor} 0%, ${needleColor}dd 70%, ${needleColor}aa 100%)`,
-            borderRadius: '3px',
-            boxShadow: `0 0 10px ${needleColor}`,
+            width: '2px',
+            height: `${95 * scaleFactor}px`,
+            background: `linear-gradient(to bottom, #ffffff 0%, ${needleColor} 50%, ${needleColor === '#ef4444' ? '#7f1d1d' : needleColor === '#10b981' ? '#064e3b' : '#713f12'} 100%)`,
+            borderRadius: '9999px',
+            boxShadow: `0 3px 12px ${needleColor}99`,
+            filter: 'blur(0.5px)',
             position: 'relative',
             '&::before': {
               content: '""',
@@ -194,8 +203,18 @@ function LuxuryGauge({
           height: '24px',
           borderRadius: '50%',
           background: 'radial-gradient(circle at 30% 30%, #666, #222)',
-          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5), 0 1px 2px rgba(255,255,255,0.2)',
-          border: '1px solid #444',
+          boxShadow: 'inset 0 2px 6px rgba(255,255,255,0.08), 0 1px 2px rgba(255,255,255,0.2)',
+          border: '4px solid #222',
+          outline: '4px solid #222',
+          outlineOffset: '-4px',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%)',
+            pointerEvents: 'none',
+          }
         }}
       />
       
