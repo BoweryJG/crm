@@ -60,56 +60,24 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
 
   const navigationSections: NavigationSection[] = [
     {
-      title: 'Main',
+      title: 'Command Center',
       items: [
-        { title: 'Dashboard', path: '/', icon: <DashboardIcon /> },
-        { title: 'Contacts', path: '/contacts', icon: <PersonIcon /> },
-        { title: 'Practices', path: '/practices', icon: <BusinessIcon /> },
-        { title: 'Region Analytics', path: '/analytics', icon: <AssessmentIcon /> },
-        { title: 'Rep Analytics', path: '/rep-analytics', icon: <AssessmentIcon /> }
+        { title: 'Dashboard', path: '/', icon: <DashboardIcon /> }
       ]
     },
     {
-      title: 'SUIS Intelligence',
+      title: 'Relationships',
       items: [
-        { title: 'Intelligence Hub', path: '/intelligence', icon: <LightbulbIcon /> },
-        { title: 'Demo', path: '/intelligence/demo', icon: <ScienceIcon /> },
-        { title: 'Contact Universe', path: '/intelligence/contacts', icon: <PeopleIcon /> },
-        { title: 'Content Generator', path: '/intelligence/content', icon: <CreateIcon /> },
-        { title: 'Research Assistant', path: '/intelligence/research', icon: <SearchIcon /> },
-        { title: 'Market Intelligence', path: '/intelligence/market', icon: <TrendingUpIcon /> },
-        { title: 'Learning Pathway', path: '/intelligence/learning', icon: <RouteIcon /> }
+        { title: 'Smart CRM', path: '/relationships', icon: <PeopleIcon /> }
       ]
     },
     {
-      title: 'AI Tools',
+      title: 'Sales Intelligence',
       items: [
-        { title: 'Research Module', path: '/research', icon: <PsychologyIcon /> },
-        { title: 'Content Generator', path: '/content', icon: <CampaignIcon /> },
-        { title: 'Call Analysis', path: '/call-analysis', icon: <PhoneIcon /> },
-        { title: 'Market Intelligence', path: '/market', icon: <AutoGraphIcon /> }
-      ]
-    },
-    {
-      title: 'Market Research',
-      items: [
-        { title: 'Practice Interactions', path: '/market/practice-interaction', icon: <BusinessIcon /> },
-        { title: 'Dental Implant Market', path: '/market/dental-implants', icon: <MedicalIcon /> },
-        { title: 'Aesthetic Market', path: '/market/aesthetic', icon: <BiotechIcon /> }
-      ]
-    },
-    {
-      title: 'Knowledge Academy',
-      items: [
-        { title: 'Learning Center', path: '/knowledge', icon: <SchoolIcon /> },
-        { title: 'Dental Procedures', path: '/knowledge/dental', icon: <HospitalIcon /> },
-        { title: 'Aesthetic Procedures', path: '/knowledge/aesthetic', icon: <BiotechIcon /> }
-      ]
-    },
-    {
-      title: 'Membership',
-      items: [
-        { title: 'Subscribe', path: '/subscribe', icon: <CreditCardIcon /> }
+        { title: 'Content Studio', path: '/intelligence/content', icon: <CreateIcon /> },
+        { title: 'Research Lab', path: '/intelligence/research', icon: <SearchIcon /> },
+        { title: 'Call Coach', path: '/intelligence/calls', icon: <PhoneIcon /> },
+        { title: 'Growth Tracker', path: '/intelligence/growth', icon: <TrendingUpIcon /> }
       ]
     }
   ];
@@ -267,6 +235,17 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
         }} 
       />
       
+      <Typography
+        variant="overline"
+        sx={{
+          display: 'block',
+          padding: theme.spacing(2, 2, 1),
+          color: theme.palette.text.secondary,
+          fontWeight: 500
+        }}
+      >
+        Settings
+      </Typography>
       <List>
         <ListItem disablePadding>
           <ListItemButton
@@ -297,7 +276,7 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
             >
               <SettingsIcon />
             </ListItemIcon>
-            <ListItemText primary="Settings" />
+            <ListItemText primary="Account & Subscription" />
           </ListItemButton>
         </ListItem>
       </List>

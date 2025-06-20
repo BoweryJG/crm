@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useState, useEffect } from 'react';
 import Contacts from './pages/Contacts';
 import ContactDetail from './pages/ContactDetail';
 import Practices from './pages/Practices';
+import Relationships from './pages/Relationships';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './themes/ThemeContext';
 import { AuthProvider, AuthGuard } from './auth';
@@ -123,6 +124,7 @@ const App: React.FC = () => {
                   </AuthGuard>
                 }>
                 <Route index element={<Dashboard />} />
+                <Route path="relationships" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="SMART CRM" message="SYNCHRONIZING RELATIONSHIPS" />}><Relationships /></React.Suspense>} />
                 <Route path="contacts" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="CONTACTS" message="NEURAL DATABASE SYNC" />}><Contacts /></React.Suspense>} />
                 <Route path="contacts/:id" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="PROFILE" message="EXTRACTING DATA MATRIX" />}><ContactDetail /></React.Suspense>} />
                 <Route path="practices" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="PRACTICES" message="MAPPING NEURAL NETWORKS" />}><Practices /></React.Suspense>} />
@@ -157,6 +159,8 @@ const App: React.FC = () => {
                 <Route path="intelligence/research" element={<Suspense fallback={<SphereLoadingScreen loadingText="RESEARCH ASSISTANT" message="INITIALIZING KNOWLEDGE BASE" />}><ResearchAssistant /></Suspense>} />
                 <Route path="intelligence/market" element={<Suspense fallback={<SphereLoadingScreen loadingText="MARKET INTELLIGENCE" message="ANALYZING MARKET SIGNALS" />}><MarketIntelligenceFeed /></Suspense>} />
                 <Route path="intelligence/learning" element={<Suspense fallback={<SphereLoadingScreen loadingText="LEARNING PATHWAY" message="PERSONALIZING CURRICULUM" />}><LearningPathway /></Suspense>} />
+                <Route path="intelligence/calls" element={<Suspense fallback={<SphereLoadingScreen loadingText="CALL COACH" message="PREPARING CALL ANALYSIS" />}><CallAnalysis /></Suspense>} />
+                <Route path="intelligence/growth" element={<Suspense fallback={<SphereLoadingScreen loadingText="GROWTH TRACKER" message="ANALYZING PROGRESS" />}><LearningPathway /></Suspense>} />
                 
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
