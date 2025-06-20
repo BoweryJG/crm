@@ -269,7 +269,7 @@ const SmartCRM: React.FC = () => {
 
     // Timeline filter
     if (filters.timeline !== 'all') {
-      const timelineMap = {
+      const timelineMap: Record<string, string> = {
         immediate: 'Immediate (0-30 days)',
         short: 'Short-term (1-3 months)',
         mid: 'Mid-term (3-6 months)',
@@ -313,8 +313,9 @@ const SmartCRM: React.FC = () => {
           bVal = b.estimated_deal_value;
           break;
         case 'date':
-          aVal = new Date(a.created_at || 0).getTime();
-          bVal = new Date(b.created_at || 0).getTime();
+          // EnrichedContact doesn't have created_at, use overall_score as proxy
+          aVal = a.overall_score;
+          bVal = b.overall_score;
           break;
         default:
           aVal = a.overall_score;
@@ -1275,7 +1276,8 @@ const SmartCRM: React.FC = () => {
               <Button 
                 variant="contained" 
                 startIcon={<PhoneIcon />}
-                onClick={() => navigate(`/contacts/${selectedContact.id}`)}
+                disabled
+                title="Contact ID not available in enriched data"
               >
                 View Full Profile
               </Button>

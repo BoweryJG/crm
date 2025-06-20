@@ -625,6 +625,32 @@ export const themeLibrary: ExtendedTheme[] = [
     },
     gaugeStyle: 'modern',
     animations: true
+  },
+  
+  // SCULPTURE COLLECTION - NEW!
+  {
+    id: 'gallery-dominance',
+    name: 'Gallery of Dominance',
+    category: 'luxury',
+    description: 'Minimalist sculpture meets CRM - where data becomes art in an exclusive gallery after hours',
+    preview: {
+      primary: '#D4AF37',
+      secondary: '#C0C0C0',
+      background: '#0D0D0D',
+      surface: '#1F1F1F'
+    },
+    config: {
+      palette: {
+        mode: 'dark',
+        primary: { main: '#D4AF37' },
+        secondary: { main: '#C0C0C0' },
+        background: { default: '#0D0D0D', paper: '#1F1F1F' },
+        text: { primary: '#ECECEC', secondary: '#C0C0C0' }
+      }
+    },
+    gaugeStyle: 'luxury',
+    animations: true,
+    premium: true
   }
 ];
 

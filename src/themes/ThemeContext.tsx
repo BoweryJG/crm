@@ -4,6 +4,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import spaceTheme from './spaceTheme';
 import corporateTheme from './corporateTheme';
 import luxuryTheme from './luxuryTheme';
+import sculptureTheme from './sculptureTheme';
 import { 
   themeLibrary, 
   getThemeById, 
@@ -163,6 +164,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     // Check if it's from the theme library
     const themeDefinition = getCurrentTheme();
     if (themeDefinition) {
+      // Special handling for gallery-dominance to use full sculptureTheme
+      if (themeDefinition.id === 'gallery-dominance') {
+        console.log('🎨 Using sculpture theme:', themeMode);
+        return sculptureTheme;
+      }
       const muiTheme = createTheme(themeDefinition.config);
       console.log('🎯 Theme created from library:', themeMode, themeDefinition.name);
       return muiTheme;

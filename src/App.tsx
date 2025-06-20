@@ -46,6 +46,7 @@ const KnowledgeAesthetic = lazy(() => import('./pages/KnowledgeAesthetic'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Profile = lazy(() => import('./pages/Profile'));
 const RipplePage = lazy(() => import('./pages/RipplePage'));
+const CommandRoom = lazy(() => import('./pages/CommandRoom'));
 
 // SUIS Components
 const SUISDemo = lazy(() => import('./components/demo/SUISDemo'));
@@ -126,6 +127,7 @@ const App: React.FC = () => {
                   </AuthGuard>
                 }>
                 <Route index element={<Dashboard />} />
+                <Route path="command-room" element={<Suspense fallback={<SphereLoadingScreen loadingText="COMMAND ROOM" message="INITIALIZING GALLERY OF DOMINANCE" />}><CommandRoom /></Suspense>} />
                 <Route path="relationships" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="SMART CRM" message="INITIALIZING AI INTELLIGENCE" />}><SmartCRM /></React.Suspense>} />
                 <Route path="contacts" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="CONTACTS" message="NEURAL DATABASE SYNC" />}><Contacts /></React.Suspense>} />
                 <Route path="contacts/:id" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="PROFILE" message="EXTRACTING DATA MATRIX" />}><ContactDetail /></React.Suspense>} />
