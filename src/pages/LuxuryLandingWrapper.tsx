@@ -1,7 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import SphereLoadingScreen from '../components/common/SphereLoadingScreen';
+import PremiumLoadingScreen from '../components/common/PremiumLoadingScreen';
 
 const LuxuryLanding = lazy(() => import('./LuxuryLanding'));
 const LuxuryLandingMobile = lazy(() => import('./LuxuryLandingMobile'));
@@ -13,9 +13,10 @@ const LuxuryLandingWrapper: React.FC = () => {
   return (
     <Suspense 
       fallback={
-        <SphereLoadingScreen 
-          loadingText="SPHERE OS" 
-          message="INITIALIZING QUANTUM INTERFACE" 
+        <PremiumLoadingScreen 
+          loadingText="REPSPHERES" 
+          message="Preparing experience" 
+          minimumDuration={1500}
         />
       }
     >

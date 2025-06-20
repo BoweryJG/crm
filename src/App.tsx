@@ -118,9 +118,10 @@ const App: React.FC = () => {
                   <AuthGuard
                     allowPublic={true}
                     fallback={
-                      <SphereLoadingScreen 
-                        loadingText="SPHERE oS"
-                        message="INITIALIZING CRM SYSTEMS"
+                      <PremiumLoadingScreen 
+                        loadingText="REPSPHERES"
+                        message="Initializing systems"
+                        minimumDuration={1000}
                       />
                     }
                   >

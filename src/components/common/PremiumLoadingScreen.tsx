@@ -120,9 +120,7 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        background: theme.palette.mode === 'dark' 
-          ? 'radial-gradient(circle at center, #0a0a0a 0%, #000000 100%)'
-          : 'radial-gradient(circle at center, #ffffff 0%, #f5f5f5 100%)',
+        background: 'radial-gradient(circle at center, #0a0a0a 0%, #000000 100%)',
         overflow: 'hidden',
         zIndex: 9999,
         animation: showContent ? `${reveal} 0.8s ease-out forwards` : 'none',
@@ -229,9 +227,9 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
               letterSpacing: '0.3em',
               background: `linear-gradient(
                 90deg,
-                ${theme.palette.text.primary} 40%,
+                #ffffff 40%,
                 ${theme.palette.primary.main} 50%,
-                ${theme.palette.text.primary} 60%
+                #ffffff 60%
               )`,
               backgroundSize: '200% 100%',
               WebkitBackgroundClip: 'text',
@@ -295,7 +293,7 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
           <Typography
             variant="body2"
             sx={{
-              color: theme.palette.text.secondary,
+              color: 'rgba(255, 255, 255, 0.6)',
               letterSpacing: '0.2em',
               fontSize: '0.75rem',
               opacity: 0.8,
@@ -319,7 +317,7 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
         <Typography
           variant="body1"
           sx={{
-            color: theme.palette.text.secondary,
+            color: 'rgba(255, 255, 255, 0.5)',
             letterSpacing: '0.15em',
             fontSize: '0.9rem',
             textTransform: 'uppercase',
