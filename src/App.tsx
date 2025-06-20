@@ -54,6 +54,8 @@ const IntelligenceProfileSetup = lazy(() => import('./suis/components/Intelligen
 const ContactUniverse = lazy(() => import('./suis/components/ContactUniverse'));
 const ContentGenerator = lazy(() => import('./suis/components/ContentGenerator'));
 const ResearchAssistant = lazy(() => import('./suis/components/ResearchAssistant'));
+const ResearchLab = lazy(() => import('./suis/components/ResearchLab'));
+const GrowthTracker = lazy(() => import('./suis/components/GrowthTracker'));
 const MarketIntelligenceFeed = lazy(() => import('./suis/components/MarketIntelligenceFeed'));
 const LearningPathway = lazy(() => import('./suis/components/LearningPathway'));
 
@@ -156,11 +158,11 @@ const App: React.FC = () => {
                 <Route path="intelligence/demo" element={<Suspense fallback={<SphereLoadingScreen loadingText="SUIS DEMO" message="LOADING DEMONSTRATION" />}><SUISDemo /></Suspense>} />
                 <Route path="intelligence/contacts" element={<Suspense fallback={<SphereLoadingScreen loadingText="CONTACT UNIVERSE" message="MAPPING NEURAL CONNECTIONS" />}><ContactUniverse /></Suspense>} />
                 <Route path="intelligence/content" element={<Suspense fallback={<SphereLoadingScreen loadingText="CONTENT GENERATOR" message="ACTIVATING AI ENGINE" />}><ContentGenerator /></Suspense>} />
-                <Route path="intelligence/research" element={<Suspense fallback={<SphereLoadingScreen loadingText="RESEARCH ASSISTANT" message="INITIALIZING KNOWLEDGE BASE" />}><ResearchAssistant /></Suspense>} />
+                <Route path="intelligence/research" element={<Suspense fallback={<SphereLoadingScreen loadingText="RESEARCH LAB" message="INITIALIZING AI RESEARCH" />}><ResearchLab /></Suspense>} />
                 <Route path="intelligence/market" element={<Suspense fallback={<SphereLoadingScreen loadingText="MARKET INTELLIGENCE" message="ANALYZING MARKET SIGNALS" />}><MarketIntelligenceFeed /></Suspense>} />
                 <Route path="intelligence/learning" element={<Suspense fallback={<SphereLoadingScreen loadingText="LEARNING PATHWAY" message="PERSONALIZING CURRICULUM" />}><LearningPathway /></Suspense>} />
                 <Route path="intelligence/calls" element={<Suspense fallback={<SphereLoadingScreen loadingText="CALL COACH" message="PREPARING CALL ANALYSIS" />}><CallAnalysis /></Suspense>} />
-                <Route path="intelligence/growth" element={<Suspense fallback={<SphereLoadingScreen loadingText="GROWTH TRACKER" message="ANALYZING PROGRESS" />}><LearningPathway /></Suspense>} />
+                <Route path="intelligence/growth" element={<Suspense fallback={<SphereLoadingScreen loadingText="GROWTH TRACKER" message="ANALYZING PROGRESS" />}><GrowthTracker /></Suspense>} />
                 
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
