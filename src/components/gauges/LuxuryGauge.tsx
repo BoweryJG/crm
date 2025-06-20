@@ -12,61 +12,61 @@ type GaugeProps = {
   onClick?: () => void;
   animationDelay?: number;
   colorMode?: 'auto' | 'primary' | 'gold' | 'silver';
-  variant?: 'default' | 'crystal' | 'hud' | 'plasma' | 'luxury' | 'ai';
+  variant?: 'default' | 'revenue-gold' | 'pipeline-plasma' | 'quota-crimson' | 'conversion-neon';
 };
 
-const getVariantStyles = (variant: string) => {
+const getVariantStyles = (variant: string, colorMode: string) => {
+  // All variants share consistent rim depth and structure
+  const baseRim = {
+    borderWidth: '3px',
+    borderStyle: 'solid',
+  };
+
   switch (variant) {
-    case 'crystal':
+    case 'revenue-gold': // Gold with carbon face
       return {
-        background: 'conic-gradient(from 180deg, #4e4eff, #000011, #000)',
-        border: '2px solid rgba(78, 78, 255, 0.3)',
-        boxShadow: '0 0 40px rgba(78, 78, 255, 0.4), inset 0 0 20px rgba(78, 78, 255, 0.2)',
+        ...baseRim,
+        background: `
+          radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0a0a0a 60%, #000 100%),
+          url("/carbon-texture.svg")
+        `,
+        backgroundSize: '100% 100%, 4px 4px',
+        backgroundBlendMode: 'normal, overlay',
+        borderColor: '#B8860B',
+        boxShadow: '0 0 40px rgba(255, 215, 0, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.9)',
       };
-    case 'hud':
+    case 'pipeline-plasma': // Violet plasma halo
       return {
-        background: 'rgba(0, 0, 0, 0.5)',
-        backdropFilter: 'blur(12px)',
-        border: '1px solid #a78bfa',
-        boxShadow: '0 0 30px rgba(167, 139, 250, 0.3)',
+        ...baseRim,
+        background: 'radial-gradient(circle at 50% 50%, #0a0616 0%, #000 100%)',
+        borderColor: '#8B7BE8',
+        boxShadow: '0 0 60px rgba(139, 123, 232, 0.5), inset 0 0 40px rgba(139, 123, 232, 0.2)',
       };
-    case 'plasma':
+    case 'quota-crimson': // Crimson with fighter jet gauge lines
       return {
-        background: '#000000',
-        border: '3px solid transparent',
-        backgroundImage: 'linear-gradient(#000, #000), conic-gradient(from 0deg, #ff0, #f0f, #00f)',
-        backgroundOrigin: 'border-box',
-        backgroundClip: 'padding-box, border-box',
-        boxShadow: '0 0 30px rgba(255, 255, 255, 0.2)',
+        ...baseRim,
+        background: 'radial-gradient(circle at 50% 50%, #1a0a0a 0%, #000 100%)',
+        borderColor: '#DC143C',
+        boxShadow: '0 0 50px rgba(220, 20, 60, 0.4), inset 0 0 30px rgba(0, 0, 0, 0.9)',
       };
-    case 'luxury':
+    case 'conversion-neon': // Neon orange with Tron-style
       return {
-        background: 'url("/carbon-texture.png"), linear-gradient(145deg, #1a1a1a, #0a0a0a)',
-        backgroundSize: 'cover, 100% 100%',
-        backgroundBlendMode: 'overlay',
-        border: '4px solid #374151',
-        boxShadow: '0 0 40px rgba(255, 255, 255, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.8)',
-      };
-    case 'ai':
-      return {
-        background: 'linear-gradient(to bottom, #090909, #1c1c1c)',
-        border: '2px solid #1f2937',
-        boxShadow: '0 0 50px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.1)',
+        ...baseRim,
+        background: 'radial-gradient(circle at 50% 50%, #0a0a0a 0%, #000 100%)',
+        borderColor: '#FF4500',
+        boxShadow: '0 0 50px rgba(255, 69, 0, 0.6), inset 0 0 20px rgba(255, 69, 0, 0.1)',
       };
     default:
       return {
-        background: 'linear-gradient(145deg, #0f0f0f, #0a0a0a)',
-        border: '4px solid #222',
-        boxShadow: `
-          0 0 35px rgba(255,255,255,0.15),
-          inset 0 2px 6px rgba(255,255,255,0.08),
-          inset 0 -2px 6px rgba(0,0,0,0.8)
-        `,
+        ...baseRim,
+        background: 'radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%)',
+        borderColor: '#333',
+        boxShadow: '0 0 30px rgba(255, 255, 255, 0.1), inset 0 0 30px rgba(0, 0, 0, 0.8)',
       };
   }
 };
 
-const GaugeContainer = styled(Box)<{ size: string; variant: string }>(({ theme, size, variant }) => ({
+const GaugeContainer = styled(Box)<{ size: string; variant: string; colorMode: string }>(({ theme, size, variant, colorMode }) => ({
   width: '100%',
   height: '100%',
   maxWidth: size === 'small' ? 200 : size === 'large' ? 320 : 260,
@@ -80,14 +80,14 @@ const GaugeContainer = styled(Box)<{ size: string; variant: string }>(({ theme, 
   borderRadius: '50%',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
-  ...getVariantStyles(variant),
+  ...getVariantStyles(variant, colorMode),
   '&:hover': {
     transform: 'scale(1.02)',
     ...(() => {
-      const styles = getVariantStyles(variant);
+      const styles = getVariantStyles(variant, colorMode);
       return {
         ...styles,
-        boxShadow: styles.boxShadow?.replace('0 0', '0 0').replace('30px', '45px').replace('40px', '55px').replace('50px', '65px') || styles.boxShadow,
+        boxShadow: styles.boxShadow?.replace('0 0', '0 0').replace('30px', '45px').replace('40px', '55px').replace('50px', '65px').replace('60px', '75px') || styles.boxShadow,
       };
     })(),
   }
@@ -124,21 +124,29 @@ function LuxuryGauge({
   }, [finalAngle, animationDelay]);
 
   const getColor = () => {
-    if (colorMode === 'primary') return theme.palette.primary.main;
-    if (colorMode === 'gold') return '#FFD700';
-    if (colorMode === 'silver') return '#C0C0C0';
-    
-    // Auto color based on percentage
-    if (percent < 0.4) return '#10b981'; // green
-    if (percent < 0.7) return '#f59e0b'; // yellow/amber
-    return '#ef4444'; // red
+    // Match needle color to variant theme
+    switch (variant) {
+      case 'revenue-gold':
+        return '#FFD700'; // Gold
+      case 'pipeline-plasma':
+        return '#8B7BE8'; // Violet
+      case 'quota-crimson':
+        return '#DC143C'; // Crimson
+      case 'conversion-neon':
+        return '#FF4500'; // Orange red
+      default:
+        // Auto color based on percentage for default variant
+        if (percent < 0.4) return '#10b981'; // green
+        if (percent < 0.7) return '#f59e0b'; // yellow/amber
+        return '#ef4444'; // red
+    }
   };
 
   const needleColor = getColor();
   const scaleFactor = size === 'small' ? 0.8 : size === 'large' ? 1.2 : 1;
 
   return (
-    <GaugeContainer size={size} variant={variant} onClick={onClick}>
+    <GaugeContainer size={size} variant={variant} colorMode={colorMode} onClick={onClick}>
       <svg 
         viewBox="0 0 200 200" 
         style={{ 
@@ -172,15 +180,16 @@ function LuxuryGauge({
           fill="none" 
         />
         
-        {/* Scale marks */}
-        {[...Array(11)].map((_, i) => {
-          const a = (i * 180) / 10 - 90;
+        {/* Scale marks - consistent across all variants */}
+        {[...Array(21)].map((_, i) => {
+          const a = (i * 180) / 20 - 90;
           const rad = (a * Math.PI) / 180;
-          const isMain = i % 2 === 0;
-          const x1 = 100 + (isMain ? 70 : 75) * Math.cos(rad);
-          const y1 = 100 + (isMain ? 70 : 75) * Math.sin(rad);
-          const x2 = 100 + 80 * Math.cos(rad);
-          const y2 = 100 + 80 * Math.sin(rad);
+          const isMain = i % 4 === 0;
+          const isMid = i % 2 === 0;
+          const x1 = 100 + (isMain ? 65 : isMid ? 70 : 73) * Math.cos(rad);
+          const y1 = 100 + (isMain ? 65 : isMid ? 70 : 73) * Math.sin(rad);
+          const x2 = 100 + 78 * Math.cos(rad);
+          const y2 = 100 + 78 * Math.sin(rad);
           
           return (
             <line 
@@ -189,8 +198,9 @@ function LuxuryGauge({
               y1={y1} 
               x2={x2} 
               y2={y2} 
-              stroke="#666"
-              strokeWidth={isMain ? "2" : "1"} 
+              stroke="#888"
+              strokeWidth={isMain ? "2.5" : isMid ? "1.5" : "1"} 
+              opacity={isMain ? 1 : isMid ? 0.7 : 0.5}
             />
           );
         })}
@@ -208,7 +218,7 @@ function LuxuryGauge({
         />
       </svg>
       
-      {/* Needle */}
+      {/* Needle - consistent 3px width across all variants */}
       <Box
         sx={{
           position: 'absolute',
@@ -221,48 +231,35 @@ function LuxuryGauge({
       >
         <Box
           sx={{
-            width: '2px',
-            height: `${95 * scaleFactor}px`,
-            background: `linear-gradient(to bottom, #ffffff 0%, ${needleColor} 50%, ${needleColor === '#ef4444' ? '#7f1d1d' : needleColor === '#10b981' ? '#064e3b' : '#713f12'} 100%)`,
-            borderRadius: '9999px',
-            boxShadow: `0 3px 12px ${needleColor}99`,
-            filter: 'blur(0.5px)',
+            width: '3px',
+            height: `${90 * scaleFactor}px`,
+            background: `linear-gradient(to bottom, ${needleColor} 0%, ${needleColor} 85%, rgba(0,0,0,0.8) 100%)`,
+            borderRadius: '1.5px',
+            boxShadow: `0 2px 8px rgba(0,0,0,0.6), 0 0 20px ${needleColor}66`,
             position: 'relative',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              bottom: 0,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '12px',
-              height: '12px',
-              borderRadius: '50%',
-              background: needleColor,
-              boxShadow: `0 0 15px ${needleColor}`,
-            }
           }}
         />
       </Box>
       
-      {/* Center cap */}
+      {/* Center cap - consistent chrome finish */}
       <Box
         sx={{
           position: 'absolute',
-          width: '24px',
-          height: '24px',
+          width: '20px',
+          height: '20px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle at 30% 30%, #666, #222)',
-          boxShadow: 'inset 0 2px 6px rgba(255,255,255,0.08), 0 1px 2px rgba(255,255,255,0.2)',
-          border: '4px solid #222',
-          outline: '4px solid #222',
-          outlineOffset: '-4px',
+          background: 'radial-gradient(circle at 30% 30%, #c0c0c0 0%, #808080 50%, #404040 100%)',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.5), inset 0 -1px 2px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.6)',
+          border: '2px solid #303030',
           '&::before': {
             content: '""',
             position: 'absolute',
-            inset: 0,
+            top: '20%',
+            left: '20%',
+            width: '30%',
+            height: '30%',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%)',
-            pointerEvents: 'none',
+            background: 'radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, transparent 70%)',
           }
         }}
       />
@@ -280,23 +277,25 @@ function LuxuryGauge({
       >
         <Typography
           sx={{
-            fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+            fontSize: '1.875rem',
             fontWeight: 700,
             fontFamily: '"Orbitron", "Roboto Mono", monospace',
             color: needleColor,
-            textShadow: `0 0 10px ${needleColor}`,
-            letterSpacing: '0.05em',
+            textShadow: `0 0 12px ${needleColor}66`,
+            letterSpacing: '0.02em',
+            lineHeight: 1,
           }}
         >
           {displayValue ?? value}{unit}
         </Typography>
         <Typography
           sx={{
-            fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
-            fontWeight: 500,
-            color: '#888',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            color: '#999',
             textTransform: 'uppercase',
-            letterSpacing: '0.1em',
+            letterSpacing: '0.15em',
+            marginTop: '4px',
           }}
         >
           {label}
@@ -327,18 +326,6 @@ function LuxuryGauge({
         ))}
       </Box>
       
-      {/* Gloss overlay for certain variants */}
-      {(variant === 'crystal' || variant === 'luxury' || variant === 'plasma') && (
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%)',
-            pointerEvents: 'none',
-          }}
-        />
-      )}
     </GaugeContainer>
   );
 }

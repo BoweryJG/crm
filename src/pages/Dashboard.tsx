@@ -105,7 +105,7 @@ const Dashboard: React.FC = () => {
                   onClick={() => navigate('/analytics')}
                   animationDelay={0}
                   colorMode="gold"
-                  variant="luxury"
+                  variant="revenue-gold"
                 />
               </Box>
               <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
@@ -119,7 +119,7 @@ const Dashboard: React.FC = () => {
                   onClick={() => navigate('/analytics')}
                   animationDelay={200}
                   colorMode="primary"
-                  variant="crystal"
+                  variant="pipeline-plasma"
                 />
               </Box>
               <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
@@ -133,7 +133,7 @@ const Dashboard: React.FC = () => {
                   onClick={() => navigate('/analytics')}
                   animationDelay={400}
                   colorMode="auto"
-                  variant="ai"
+                  variant="quota-crimson"
                 />
               </Box>
               <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
@@ -147,7 +147,7 @@ const Dashboard: React.FC = () => {
                   onClick={() => navigate('/analytics')}
                   animationDelay={600}
                   colorMode="auto"
-                  variant="plasma"
+                  variant="conversion-neon"
                 />
               </Box>
             </>
