@@ -223,11 +223,7 @@ const SmartCRM: React.FC = () => {
     
     setStats({
       totalContacts: contactList.length,
-      enrichedToday: contactList.filter(c => {
-        const created = new Date(c.created_at || Date.now());
-        const today = new Date();
-        return created.toDateString() === today.toDateString();
-      }).length,
+      enrichedToday: 0, // EnrichedContact doesn't have created_at field
       averageScore: contactList.length > 0 ? Math.round(totalScore / contactList.length) : 0,
       topTierCount: topTier,
       duplicatesRemoved: 0
