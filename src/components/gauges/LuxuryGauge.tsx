@@ -12,9 +12,61 @@ type GaugeProps = {
   onClick?: () => void;
   animationDelay?: number;
   colorMode?: 'auto' | 'primary' | 'gold' | 'silver';
+  variant?: 'default' | 'crystal' | 'hud' | 'plasma' | 'luxury' | 'ai';
 };
 
-const GaugeContainer = styled(Box)<{ size: string }>(({ theme, size }) => ({
+const getVariantStyles = (variant: string) => {
+  switch (variant) {
+    case 'crystal':
+      return {
+        background: 'conic-gradient(from 180deg, #4e4eff, #000011, #000)',
+        border: '2px solid rgba(78, 78, 255, 0.3)',
+        boxShadow: '0 0 40px rgba(78, 78, 255, 0.4), inset 0 0 20px rgba(78, 78, 255, 0.2)',
+      };
+    case 'hud':
+      return {
+        background: 'rgba(0, 0, 0, 0.5)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid #a78bfa',
+        boxShadow: '0 0 30px rgba(167, 139, 250, 0.3)',
+      };
+    case 'plasma':
+      return {
+        background: '#000000',
+        border: '3px solid transparent',
+        backgroundImage: 'linear-gradient(#000, #000), conic-gradient(from 0deg, #ff0, #f0f, #00f)',
+        backgroundOrigin: 'border-box',
+        backgroundClip: 'padding-box, border-box',
+        boxShadow: '0 0 30px rgba(255, 255, 255, 0.2)',
+      };
+    case 'luxury':
+      return {
+        background: 'url("/carbon-texture.png"), linear-gradient(145deg, #1a1a1a, #0a0a0a)',
+        backgroundSize: 'cover, 100% 100%',
+        backgroundBlendMode: 'overlay',
+        border: '4px solid #374151',
+        boxShadow: '0 0 40px rgba(255, 255, 255, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.8)',
+      };
+    case 'ai':
+      return {
+        background: 'linear-gradient(to bottom, #090909, #1c1c1c)',
+        border: '2px solid #1f2937',
+        boxShadow: '0 0 50px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.1)',
+      };
+    default:
+      return {
+        background: 'linear-gradient(145deg, #0f0f0f, #0a0a0a)',
+        border: '4px solid #222',
+        boxShadow: `
+          0 0 35px rgba(255,255,255,0.15),
+          inset 0 2px 6px rgba(255,255,255,0.08),
+          inset 0 -2px 6px rgba(0,0,0,0.8)
+        `,
+      };
+  }
+};
+
+const GaugeContainer = styled(Box)<{ size: string; variant: string }>(({ theme, size, variant }) => ({
   width: '100%',
   height: '100%',
   maxWidth: size === 'small' ? 200 : size === 'large' ? 320 : 260,
@@ -25,23 +77,19 @@ const GaugeContainer = styled(Box)<{ size: string }>(({ theme, size }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  background: 'linear-gradient(145deg, #0f0f0f, #0a0a0a)',
   borderRadius: '50%',
-  boxShadow: `
-    0 0 35px rgba(255,255,255,0.15),
-    inset 0 2px 6px rgba(255,255,255,0.08),
-    inset 0 -2px 6px rgba(0,0,0,0.8)
-  `,
-  border: '4px solid #222',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
+  ...getVariantStyles(variant),
   '&:hover': {
     transform: 'scale(1.02)',
-    boxShadow: `
-      0 0 45px rgba(255,255,255,0.25),
-      inset 0 2px 6px rgba(255,255,255,0.08),
-      inset 0 -2px 6px rgba(0,0,0,0.8)
-    `,
+    ...(() => {
+      const styles = getVariantStyles(variant);
+      return {
+        ...styles,
+        boxShadow: styles.boxShadow?.replace('0 0', '0 0').replace('30px', '45px').replace('40px', '55px').replace('50px', '65px') || styles.boxShadow,
+      };
+    })(),
   }
 }));
 
@@ -54,7 +102,8 @@ function LuxuryGauge({
   size = 'medium',
   onClick,
   animationDelay = 0,
-  colorMode = 'auto'
+  colorMode = 'auto',
+  variant = 'default'
 }: GaugeProps) {
   const theme = useTheme();
   const [angle, setAngle] = useState(-90);
@@ -89,7 +138,7 @@ function LuxuryGauge({
   const scaleFactor = size === 'small' ? 0.8 : size === 'large' ? 1.2 : 1;
 
   return (
-    <GaugeContainer size={size} onClick={onClick}>
+    <GaugeContainer size={size} variant={variant} onClick={onClick}>
       <svg 
         viewBox="0 0 200 200" 
         style={{ 
@@ -277,6 +326,19 @@ function LuxuryGauge({
           />
         ))}
       </Box>
+      
+      {/* Gloss overlay for certain variants */}
+      {(variant === 'crystal' || variant === 'luxury' || variant === 'plasma') && (
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
     </GaugeContainer>
   );
 }
