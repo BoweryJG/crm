@@ -14,34 +14,28 @@ type GaugeProps = {
   colorMode?: 'auto' | 'primary' | 'gold' | 'silver';
 };
 
-const GaugeContainer = styled(Box)<{ size: string }>(({ size }) => {
-  const dimensions = {
-    small: { width: 200, height: 200 },
-    medium: { width: 260, height: 260 },
-    large: { width: 320, height: 320 }
-  };
-  const dim = dimensions[size as keyof typeof dimensions] || dimensions.medium;
-
-  return {
-    width: { xs: dim.width * 0.8, sm: dim.width * 0.9, md: dim.width },
-    height: { xs: dim.height * 0.8, sm: dim.height * 0.9, md: dim.height },
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'linear-gradient(to bottom, #0a0a0a, #1a1a1a)',
-    borderRadius: '50%',
-    boxShadow: '0 0 35px rgba(255,255,255,0.2)',
-    border: '2px solid #333',
-    cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    '&:hover': {
-      transform: 'scale(1.02)',
-      boxShadow: '0 0 45px rgba(255,255,255,0.3)',
-    }
-  };
-});
+const GaugeContainer = styled(Box)<{ size: string }>(({ theme, size }) => ({
+  width: '100%',
+  height: '100%',
+  maxWidth: size === 'small' ? 200 : size === 'large' ? 320 : 260,
+  maxHeight: size === 'small' ? 200 : size === 'large' ? 320 : 260,
+  aspectRatio: '1 / 1',
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: 'linear-gradient(to bottom, #0a0a0a, #1a1a1a)',
+  borderRadius: '50%',
+  boxShadow: '0 0 35px rgba(255,255,255,0.2)',
+  border: '2px solid #333',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'scale(1.02)',
+    boxShadow: '0 0 45px rgba(255,255,255,0.3)',
+  }
+}));
 
 function LuxuryGauge({ 
   label, 
