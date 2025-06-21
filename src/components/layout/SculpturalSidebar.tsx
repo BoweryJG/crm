@@ -46,8 +46,7 @@ const MonolithTab: React.FC<{
   const theme = useTheme();
   const [isHovered, setIsHovered] = useState(false);
   
-  // Different sounds for variety
-  const hoverSound = useSound(soundVariant % 2 === 0 ? 'ui-hover' : 'gauge-tick');
+  // Different sounds for variety (removed hover sounds)
   const clickSound = useSound(
     isActive ? 'ui-toggle' : 
     soundVariant % 3 === 0 ? 'ui-click-primary' : 
@@ -61,10 +60,7 @@ const MonolithTab: React.FC<{
         clickSound.play();
         onClick();
       }}
-      onMouseEnter={() => {
-        setIsHovered(true);
-        hoverSound.play();
-      }}
+      onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       sx={{
         position: 'relative',
@@ -217,10 +213,10 @@ const SculpturalDivider: React.FC<{ pattern?: 'dots' | 'zigzag' | 'gradient' }> 
   
   if (pattern === 'zigzag') {
     return (
-      <Box sx={{ position: 'relative', height: 20, my: 2, overflow: 'hidden' }}>
-        <svg width="100%" height="20" viewBox="0 0 200 20" preserveAspectRatio="none">
+      <Box sx={{ position: 'relative', height: 12, my: 1, overflow: 'hidden' }}>
+        <svg width="100%" height="12" viewBox="0 0 200 12" preserveAspectRatio="none">
           <path
-            d="M0,10 L10,5 L20,15 L30,5 L40,15 L50,5 L60,15 L70,5 L80,15 L90,5 L100,15 L110,5 L120,15 L130,5 L140,15 L150,5 L160,15 L170,5 L180,15 L190,5 L200,10"
+            d="M0,6 L10,3 L20,9 L30,3 L40,9 L50,3 L60,9 L70,3 L80,9 L90,3 L100,9 L110,3 L120,9 L130,3 L140,9 L150,3 L160,9 L170,3 L180,9 L190,3 L200,6"
             stroke={alpha(theme.palette.primary.main, opacity)}
             strokeWidth="1"
             fill="none"
@@ -234,8 +230,8 @@ const SculpturalDivider: React.FC<{ pattern?: 'dots' | 'zigzag' | 'gradient' }> 
     return (
       <Box
         sx={{
-          height: 30,
-          my: 2,
+          height: 16,
+          my: 0.75,
           backgroundImage: `radial-gradient(circle, ${alpha(theme.palette.primary.main, opacity)} 1px, transparent 1px)`,
           backgroundSize: '10px 10px',
           backgroundPosition: 'center',
