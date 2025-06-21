@@ -63,7 +63,7 @@ const Layout: React.FC = () => {
           ml: { xs: 0, md: `${drawerWidth}px` }, // Proper offset for desktop
           position: 'relative',
           minHeight: '100vh',
-          overflow: 'hidden', // Prevent main content overflow
+          overflow: 'visible', // Allow content to be visible
           display: 'flex',
           flexDirection: 'column'
         }}
@@ -73,8 +73,10 @@ const Layout: React.FC = () => {
           sx={{
             // Scrollable content container
             flex: 1,
-            overflow: 'auto',
+            overflowY: 'auto',
+            overflowX: 'hidden',
             width: '100%',
+            height: 'calc(100vh - 64px)', // Full height minus toolbar
             // Responsive padding that works with both sidebar types
             pt: { xs: 1, sm: 2 },
             px: { 
