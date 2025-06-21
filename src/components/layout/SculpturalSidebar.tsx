@@ -93,8 +93,8 @@ const MonolithTab: React.FC<{
         
         // Padding and spacing
         px: 3,
-        py: 1, // Further reduced
-        mb: 0.25, // Further reduced margin
+        py: 0.75, // Even more reduced
+        mb: 0, // No margin between tabs
         mx: 2,
         
         // Hover effects
@@ -273,7 +273,7 @@ const NavigationSection: React.FC<{
           display: 'flex',
           alignItems: 'center',
           px: 3,
-          py: 0.25, // Further reduced
+          py: 0, // No vertical padding
           cursor: collapsible ? 'pointer' : 'default',
           transition: 'all 0.3s ease',
           '&:hover': collapsible ? {
@@ -475,7 +475,7 @@ const SculpturalSidebar: React.FC<{
         overflowY: 'auto', 
         overflowX: 'hidden', 
         flex: 1, 
-        py: 1,
+        py: 0.5,
         // Custom scrollbar styling
         '&::-webkit-scrollbar': {
           width: '8px',
@@ -492,21 +492,17 @@ const SculpturalSidebar: React.FC<{
         },
       }}>
         {navigationStructure.map((section, index) => (
-          <React.Fragment key={section.title}>
-            {index > 0 && <SculpturalDivider pattern={index === 1 ? 'dots' : 'gradient'} />}
-            <NavigationSection
-              title={section.title}
-              items={section.items}
-              onNavigate={handleNavigation}
-              currentPath={location.pathname}
-              collapsible={section.collapsible}
-              defaultOpen={section.defaultOpen}
-              delayOffset={section.delayOffset}
-            />
-          </React.Fragment>
+          <NavigationSection
+            key={section.title}
+            title={section.title}
+            items={section.items}
+            onNavigate={handleNavigation}
+            currentPath={location.pathname}
+            collapsible={section.collapsible}
+            defaultOpen={section.defaultOpen}
+            delayOffset={section.delayOffset}
+          />
         ))}
-        
-        <SculpturalDivider pattern="zigzag" />
         
         {/* Settings */}
         <NavigationSection
