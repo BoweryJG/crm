@@ -514,7 +514,7 @@ const LayerToggle: React.FC<{
           background: color.bg,
           borderColor: color.border,
           transform: 'translateY(-2px)',
-          boxShadow: `0 4px 20px ${alpha(color.glow, 0.3)}`
+          boxShadow: `0 4px 20px ${color.glow}`
         },
         '& .MuiChip-label': {
           paddingLeft: '12px',
@@ -583,9 +583,10 @@ const ActionCard = styled(Box)<{ priority: string; active?: boolean; themeColors
     border: `1px solid ${color.border}`,
     '&:hover': {
       transform: 'translateY(-2px) scale(1.02)',
-      boxShadow: `0 8px 32px ${alpha(color.glow, 0.3)}`,
+      boxShadow: `0 8px 32px ${color.glow}`,
       borderColor: color.text,
-      background: alpha(color.bg, 0.8),
+      background: color.bg,
+      opacity: 0.9,
       '& .action-button': {
         transform: 'translateX(0)',
         opacity: 1
