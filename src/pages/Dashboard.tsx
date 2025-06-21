@@ -186,7 +186,7 @@ const Dashboard: React.FC = () => {
                 animationDelay={600}
               />
             </>
-          ) : gaugeStyle === 'masterpiece' ? (
+          ) : (
             // Masterpiece style gauges
             <>
               <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
