@@ -225,7 +225,7 @@ export function getStandardAuthConfig() {
       persistSession: true,
       detectSessionInUrl: true,
       storage: window.localStorage,
-      storageKey: 'repspheres-auth',
+      storageKey: 'sb-cbopynuvhcymbumjnvay-auth-token',
       flowType: 'pkce' as const,
       cookies: isProduction ? {
         domain: '.repspheres.com',
