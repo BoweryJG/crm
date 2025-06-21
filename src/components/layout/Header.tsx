@@ -121,15 +121,15 @@ const getThemeColors = (themeMode: string) => {
       buttonHover: 'linear-gradient(135deg, #FFD700, #FFED4B)'
     },
     default: {
-      primary: theme => theme.palette.primary.main,
-      primaryDark: theme => theme.palette.primary.dark,
+      primary: '#1976d2',
+      primaryDark: '#115293',
       surface: 'rgba(255, 255, 255, 0.8)',
       glassMorph: 'rgba(0, 0, 0, 0.02)',
       border: 'rgba(0, 0, 0, 0.06)',
       searchBg: 'rgba(0, 0, 0, 0.04)',
       searchBorder: 'rgba(0, 0, 0, 0.08)',
-      buttonBg: theme => theme.palette.primary.main,
-      buttonHover: theme => theme.palette.primary.dark
+      buttonBg: 'linear-gradient(135deg, #1976d2, #115293)',
+      buttonHover: 'linear-gradient(135deg, #115293, #0d3c6e)'
     }
   };
   
