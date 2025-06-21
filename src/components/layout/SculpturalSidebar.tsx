@@ -542,6 +542,7 @@ const SculpturalSidebar: React.FC<{
             backgroundColor: theme.palette.background.default,
             backgroundImage: 'none',
             border: 'none',
+            zIndex: theme.zIndex.drawer + 1, // Ensure sidebar stays above content
           },
         }}
         open

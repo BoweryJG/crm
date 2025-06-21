@@ -9,6 +9,7 @@ import { AuthProvider, AuthGuard } from './auth';
 import { AppModeProvider } from './contexts/AppModeContext';
 import { DashboardDataProvider } from './contexts/DashboardDataContext';
 import { SUISProvider } from './suis';
+import { SoundProvider } from './contexts/SoundContext';
 import SphereLoadingScreen from './components/common/SphereLoadingScreen';
 import PremiumLoadingScreen from './components/common/PremiumLoadingScreen';
 import StandaloneEliteLoadingScreen from './components/common/StandaloneEliteLoadingScreen';
@@ -89,13 +90,14 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider>
-      <ErrorBoundary>
-        <AuthProvider>
-          <SUISProvider supabaseUrl={supabaseUrl} supabaseAnonKey={supabaseAnonKey}>
-            <AppModeProvider>
-              <DashboardDataProvider>
-                <CssBaseline />
-                <BrowserRouter>
+      <SoundProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <SUISProvider supabaseUrl={supabaseUrl} supabaseAnonKey={supabaseAnonKey}>
+              <AppModeProvider>
+                <DashboardDataProvider>
+                  <CssBaseline />
+                  <BrowserRouter>
               <Routes>
                 {/* Luxury Landing Page - default for non-authenticated users */}
                 <Route path="/welcome" element={
@@ -180,11 +182,12 @@ const App: React.FC = () => {
             <FeatureUpgradeModal />
             <DemoModeIndicator />
           </BrowserRouter>
-              </DashboardDataProvider>
-            </AppModeProvider>
-          </SUISProvider>
-        </AuthProvider>
-      </ErrorBoundary>
+                </DashboardDataProvider>
+              </AppModeProvider>
+            </SUISProvider>
+          </AuthProvider>
+        </ErrorBoundary>
+      </SoundProvider>
     </ThemeProvider>
   );
 };

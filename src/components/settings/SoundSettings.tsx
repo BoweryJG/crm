@@ -33,6 +33,7 @@ import {
 import { soundManager, PerformanceMode, SoundCategory } from '../../services/sound/SoundManager';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useSound } from '../../hooks/useSound';
+import { useSoundContext } from '../../contexts/SoundContext';
 
 interface VolumeControlProps {
   category: SoundCategory;
@@ -56,15 +57,15 @@ const VolumeControl: React.FC<VolumeControlProps> = ({ category, label, icon }) 
     const value = newValue as number;
     setVolume(value);
     soundManager.setCategoryVolume(category, value / 100);
-    // Play test sound
+    localStorage.setItem(`sound-volume-${category}`, String(value / 100));
     play();
   };
   
   return (
-    <Box sx={{ mb: 3 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-        {icon && <Box sx={{ mr: 1 }}>{icon}</Box>}
-        <Typography variant="subtitle2" sx={{ flex: 1 }}>
+    <Box sx={{ mb: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+        <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {icon}
           {label}
         </Typography>
         <Typography variant="caption" sx={{ minWidth: 40, textAlign: 'right' }}>
@@ -99,9 +100,15 @@ const VolumeControl: React.FC<VolumeControlProps> = ({ category, label, icon }) 
 const SoundSettings: React.FC = () => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
-  const [enabled, setEnabled] = useState(true);
-  const [masterVolume, setMasterVolume] = useState(70);
-  const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('office');
+  const { 
+    soundEnabled, 
+    setSoundEnabled, 
+    masterVolume: contextMasterVolume, 
+    setMasterVolume: setContextMasterVolume,
+    performanceMode: contextPerformanceMode,
+    setPerformanceMode: setContextPerformanceMode
+  } = useSoundContext();
+  
   const [testingSound, setTestingSound] = useState<string | null>(null);
   
   // Test sound hooks
@@ -112,32 +119,23 @@ const SoundSettings: React.FC = () => {
   const gaugeTest = useSound('gauge-tick');
   
   useEffect(() => {
-    // Load saved preferences
-    const savedEnabled = localStorage.getItem('sound-enabled');
-    const savedMaster = localStorage.getItem('sound-master-volume');
-    const savedMode = localStorage.getItem('sound-performance-mode');
-    
-    if (savedEnabled !== null) setEnabled(savedEnabled === 'true');
-    if (savedMaster !== null) setMasterVolume(parseFloat(savedMaster) * 100);
-    if (savedMode !== null) setPerformanceMode(savedMode as PerformanceMode);
-  }, []);
+    // Update soundManager when context values change
+    soundManager.setEnabled(soundEnabled);
+    soundManager.setMasterVolume(contextMasterVolume);
+    soundManager.setPerformanceMode(contextPerformanceMode);
+  }, [soundEnabled, contextMasterVolume, contextPerformanceMode]);
   
   const handleEnabledChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.checked;
-    setEnabled(value);
-    soundManager.setEnabled(value);
+    setSoundEnabled(event.target.checked);
   };
   
   const handleMasterVolumeChange = (_: Event, newValue: number | number[]) => {
-    const value = newValue as number;
-    setMasterVolume(value);
-    soundManager.setMasterVolume(value / 100);
+    const value = (newValue as number) / 100;
+    setContextMasterVolume(value);
   };
   
   const handlePerformanceModeChange = (event: any) => {
-    const mode = event.target.value as PerformanceMode;
-    setPerformanceMode(mode);
-    soundManager.setPerformanceMode(mode);
+    setContextPerformanceMode(event.target.value as PerformanceMode);
   };
   
   const testSound = (soundId: string, playFunc: () => void) => {
@@ -156,8 +154,8 @@ const SoundSettings: React.FC = () => {
   };
   
   const getThemeIcon = () => {
-    if (themeMode === 'boeing-747') return <FlightIcon />;
-    if (themeMode === 'f16-viper') return <FireIcon />;
+    if (themeMode.includes('boeing') || themeMode.includes('airbus')) return <FlightIcon />;
+    if (themeMode.includes('f16') || themeMode.includes('viper')) return <FireIcon />;
     return <DiamondIcon />;
   };
   
@@ -180,7 +178,7 @@ const SoundSettings: React.FC = () => {
         <FormControlLabel
           control={
             <Switch
-              checked={enabled}
+              checked={soundEnabled}
               onChange={handleEnabledChange}
               sx={{
                 '& .MuiSwitch-switchBase.Mui-checked': {
@@ -195,16 +193,16 @@ const SoundSettings: React.FC = () => {
           label="Enable Sound Effects"
         />
         
-        <Box sx={{ mt: 3, opacity: enabled ? 1 : 0.5 }}>
+        <Box sx={{ mt: 3, opacity: soundEnabled ? 1 : 0.5 }}>
           <Typography variant="subtitle2" sx={{ mb: 1 }}>
             Master Volume
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <VolumeOffIcon />
             <Slider
-              value={masterVolume}
+              value={contextMasterVolume * 100}
               onChange={handleMasterVolumeChange}
-              disabled={!enabled}
+              disabled={!soundEnabled}
               sx={{
                 '& .MuiSlider-rail': {
                   opacity: 0.3,
@@ -223,7 +221,7 @@ const SoundSettings: React.FC = () => {
             />
             <VolumeUpIcon />
             <Typography variant="caption" sx={{ minWidth: 40 }}>
-              {masterVolume}%
+              {Math.round(contextMasterVolume * 100)}%
             </Typography>
           </Box>
         </Box>
@@ -232,14 +230,14 @@ const SoundSettings: React.FC = () => {
       <Divider sx={{ my: 3 }} />
       
       {/* Performance Mode */}
-      <Box sx={{ mb: 4, opacity: enabled ? 1 : 0.5 }}>
-        <FormControl fullWidth disabled={!enabled}>
+      <Box sx={{ mb: 4, opacity: soundEnabled ? 1 : 0.5 }}>
+        <FormControl fullWidth disabled={!soundEnabled}>
           <InputLabel>Performance Mode</InputLabel>
           <Select
-            value={performanceMode}
+            value={contextPerformanceMode}
             onChange={handlePerformanceModeChange}
             label="Performance Mode"
-            startAdornment={getPerformanceModeIcon(performanceMode)}
+            startAdornment={getPerformanceModeIcon(contextPerformanceMode)}
           >
             <MenuItem value="cinema">
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -291,78 +289,103 @@ const SoundSettings: React.FC = () => {
       
       <Divider sx={{ my: 3 }} />
       
-      {/* Category Volume Controls */}
-      <Box sx={{ mb: 4, opacity: enabled ? 1 : 0.5 }}>
+      {/* Category Volumes */}
+      <Box sx={{ mb: 4, opacity: soundEnabled && contextPerformanceMode !== 'silent' ? 1 : 0.5 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
           Category Volumes
         </Typography>
-        
-        <VolumeControl category="ui-primary" label="Primary Actions" />
-        <VolumeControl category="ui-secondary" label="Secondary Actions" />
-        <VolumeControl category="navigation" label="Navigation" />
-        <VolumeControl category="notification" label="Notifications" />
-        <VolumeControl category="gauge" label="Gauge Sounds" />
-        <VolumeControl category="ambient" label="Ambient Sounds" />
-      </Box>
-      
-      <Divider sx={{ my: 3 }} />
-      
-      {/* Sound Theme */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-          {getThemeIcon()}
-          <Box sx={{ ml: 1 }}>Current Theme: {themeMode}</Box>
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Sound effects automatically match your selected visual theme
-        </Typography>
+        <VolumeControl category="ui-primary" label="UI Primary" icon={<PlayIcon />} />
+        <VolumeControl category="ui-secondary" label="UI Secondary" icon={<PlayIcon />} />
+        <VolumeControl category="navigation" label="Navigation" icon={<PlayIcon />} />
+        <VolumeControl category="notification" label="Notifications" icon={<PlayIcon />} />
+        <VolumeControl category="gauge" label="Gauges" icon={<GraphicEqIcon />} />
       </Box>
       
       <Divider sx={{ my: 3 }} />
       
       {/* Test Sounds */}
-      <Box sx={{ opacity: enabled ? 1 : 0.5 }}>
+      <Box sx={{ opacity: soundEnabled && contextPerformanceMode !== 'silent' ? 1 : 0.5 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
           Test Sounds
         </Typography>
-        
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-          <Chip
-            label="Button Click"
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<PlayIcon />}
             onClick={() => testSound('button', buttonTest.play)}
-            icon={testingSound === 'button' ? <PlayIcon /> : undefined}
-            variant={testingSound === 'button' ? 'filled' : 'outlined'}
-            disabled={!enabled}
-          />
-          <Chip
-            label="Success"
+            disabled={!soundEnabled || contextPerformanceMode === 'silent'}
+            sx={{
+              borderColor: testingSound === 'button' ? '#C9B037' : 'rgba(255,255,255,0.2)',
+              color: testingSound === 'button' ? '#C9B037' : 'inherit'
+            }}
+          >
+            Button Click
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<PlayIcon />}
             onClick={() => testSound('success', notificationTest.play)}
-            icon={testingSound === 'success' ? <PlayIcon /> : undefined}
-            variant={testingSound === 'success' ? 'filled' : 'outlined'}
-            disabled={!enabled}
-          />
-          <Chip
-            label="Error"
+            disabled={!soundEnabled || contextPerformanceMode === 'silent'}
+            sx={{
+              borderColor: testingSound === 'success' ? '#C9B037' : 'rgba(255,255,255,0.2)',
+              color: testingSound === 'success' ? '#C9B037' : 'inherit'
+            }}
+          >
+            Success
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<PlayIcon />}
             onClick={() => testSound('error', errorTest.play)}
-            icon={testingSound === 'error' ? <PlayIcon /> : undefined}
-            variant={testingSound === 'error' ? 'filled' : 'outlined'}
-            disabled={!enabled}
-          />
-          <Chip
-            label="Navigation"
-            onClick={() => testSound('nav', navigationTest.play)}
-            icon={testingSound === 'nav' ? <PlayIcon /> : undefined}
-            variant={testingSound === 'nav' ? 'filled' : 'outlined'}
-            disabled={!enabled}
-          />
-          <Chip
-            label="Gauge Tick"
+            disabled={!soundEnabled || contextPerformanceMode === 'silent'}
+            sx={{
+              borderColor: testingSound === 'error' ? '#C9B037' : 'rgba(255,255,255,0.2)',
+              color: testingSound === 'error' ? '#C9B037' : 'inherit'
+            }}
+          >
+            Error
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<PlayIcon />}
+            onClick={() => testSound('navigation', navigationTest.play)}
+            disabled={!soundEnabled || contextPerformanceMode === 'silent'}
+            sx={{
+              borderColor: testingSound === 'navigation' ? '#C9B037' : 'rgba(255,255,255,0.2)',
+              color: testingSound === 'navigation' ? '#C9B037' : 'inherit'
+            }}
+          >
+            Navigation
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<PlayIcon />}
             onClick={() => testSound('gauge', gaugeTest.play)}
-            icon={testingSound === 'gauge' ? <PlayIcon /> : undefined}
-            variant={testingSound === 'gauge' ? 'filled' : 'outlined'}
-            disabled={!enabled}
-          />
+            disabled={!soundEnabled || contextPerformanceMode === 'silent'}
+            sx={{
+              borderColor: testingSound === 'gauge' ? '#C9B037' : 'rgba(255,255,255,0.2)',
+              color: testingSound === 'gauge' ? '#C9B037' : 'inherit'
+            }}
+          >
+            Gauge Tick
+          </Button>
         </Stack>
+      </Box>
+      
+      {/* Current Theme Info */}
+      <Box sx={{ mt: 3, p: 2, background: 'rgba(201, 176, 55, 0.1)', borderRadius: 1 }}>
+        <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {getThemeIcon()}
+          Current Theme: <strong>{themeMode}</strong>
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          Theme-specific sounds will be loaded automatically
+        </Typography>
       </Box>
     </Paper>
   );

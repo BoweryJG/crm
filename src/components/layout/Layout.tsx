@@ -62,34 +62,41 @@ const Layout: React.FC = () => {
           flexGrow: 1,
           width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
           ml: { xs: 0, md: `${drawerWidth}px` }, // Proper offset for desktop
-          overflow: 'auto',
           position: 'relative',
           minHeight: '100vh',
-          // Responsive padding that works with both sidebar types
-          pt: { xs: 1, sm: 2 },
-          px: { 
-            xs: 2, // Mobile padding
-            sm: 3, // Tablet padding
-            md: 4, // Desktop padding
-            lg: 5  // Large desktop padding
-          },
-          pb: { xs: 3, sm: 4, md: 5 },
-          // Ensure content doesn't get too wide on large screens
-          maxWidth: { xl: 'calc(100% - 80px)' },
-          mx: { xl: 'auto' },
-          transition: 'all 0.3s ease', // Smooth transitions when switching themes
+          overflow: 'hidden', // Prevent main content overflow
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         <Toolbar /> {/* This creates space for the fixed header */}
         <Box
           sx={{
-            // Additional container for better content control
+            // Scrollable content container
+            flex: 1,
+            overflow: 'auto',
             width: '100%',
-            maxWidth: { xs: '100%', xl: '1600px' },
-            mx: 'auto',
+            // Responsive padding that works with both sidebar types
+            pt: { xs: 1, sm: 2 },
+            px: { 
+              xs: 2, // Mobile padding
+              sm: 3, // Tablet padding
+              md: 4, // Desktop padding
+              lg: 5  // Large desktop padding
+            },
+            pb: { xs: 3, sm: 4, md: 5 },
           }}
         >
-          <Outlet /> {/* This renders the current route's element */}
+          <Box
+            sx={{
+              // Additional container for better content control
+              width: '100%',
+              maxWidth: { xs: '100%', xl: '1600px' },
+              mx: 'auto',
+            }}
+          >
+            <Outlet /> {/* This renders the current route's element */}
+          </Box>
         </Box>
       </Box>
     </Box>

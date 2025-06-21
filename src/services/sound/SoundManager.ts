@@ -210,9 +210,48 @@ class SoundManager {
   }
 
   setTheme(themeId: string) {
-    this.currentTheme = themeId;
+    // Map theme IDs to sound pack IDs
+    const soundPackMap: Record<string, string> = {
+      'boeing-cockpit': 'boeing-747',
+      'boeing-cockpit-enhanced': 'boeing-747',
+      'airbus-modern': 'boeing-747',
+      'gulfstream-elite': 'boeing-747',
+      'cessna-classic': 'boeing-747',
+      'f16-viper': 'f16-viper',
+      'cartier-gold': 'luxury-hermes',
+      'cartier-gold-enhanced': 'luxury-hermes',
+      'rolex-platinum': 'rolex-watchmaking',
+      'hermes-orange': 'luxury-hermes',
+      'tiffany-blue': 'luxury-hermes',
+      'chanel-noir': 'luxury-hermes',
+      'chanel-noir-enhanced': 'luxury-hermes',
+      'dior-rouge': 'luxury-hermes',
+      'ysl-purple': 'luxury-hermes',
+      'mac-studio': 'luxury-hermes',
+      'sephora-glow': 'luxury-hermes',
+      'ulta-beauty': 'luxury-hermes',
+      'glossier-pink': 'luxury-hermes',
+      'surgical-precision': 'medical-surgical',
+      'surgical-precision-enhanced': 'medical-surgical',
+      'dental-clean': 'medical-surgical',
+      'aesthetic-spa': 'medical-surgical',
+      'space-exploration': 'space-scifi',
+      'cyber-neon': 'space-scifi',
+      'cyber-neon-enhanced': 'space-scifi',
+      'minimal-zen': 'corporate-professional',
+      'gradient-sunset': 'space-scifi',
+      'corporate-blue': 'corporate-professional',
+      'forest-green': 'space-scifi',
+      'forest-sanctuary': 'space-scifi',
+      'ocean-depths': 'space-scifi',
+      'gallery-dominance': 'luxury-hermes',
+      'gallery-dominance-pro': 'luxury-hermes'
+    };
+
+    const soundPackId = soundPackMap[themeId] || 'boeing-747';
+    this.currentTheme = soundPackId;
     // Preload essential sounds for the new theme
-    this.cache.preloadTheme(themeId);
+    this.cache.preloadTheme(soundPackId);
   }
 
   setMasterVolume(volume: number) {
