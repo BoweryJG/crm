@@ -16,21 +16,38 @@ export class SoundCache {
   }
 
   private async loadCoreSounds() {
-    // Load essential UI sounds that all themes use
-    const coreSounds = [
-      'ui-click-primary',
-      'ui-hover',
-      'ui-toggle',
-      'ui-error',
-      'ui-success',
-      'navigation-forward',
-      'navigation-back',
-    ];
-
-    // These would be bundled with the app (not CDN)
-    coreSounds.forEach(soundId => {
-      this.loadSound(`/sounds/core/${soundId}.opus`, soundId);
-    });
+    try {
+      // Load core sounds manifest
+      const response = await fetch('/sounds/core/manifest.json');
+      if (response.ok) {
+        const manifest = await response.json();
+        
+        // Store all core sound configs
+        Object.entries(manifest.sounds).forEach(([id, config]: [string, any]) => {
+          this.soundConfigs.set(id, config as SoundConfig);
+          // Preload essential sounds
+          if (['ui-click-primary', 'ui-hover', 'navigation-forward'].includes(id)) {
+            this.loadSound(config.url, id);
+          }
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to load core sounds manifest:', error);
+      // Fallback to individual sound loading
+      const coreSounds = [
+        'ui-click-primary',
+        'ui-hover',
+        'ui-toggle',
+        'ui-error',
+        'ui-success',
+        'navigation-forward',
+        'navigation-back',
+      ];
+      
+      coreSounds.forEach(soundId => {
+        this.loadSound(`/sounds/core/${soundId}.opus`, soundId);
+      });
+    }
   }
 
   async getSoundConfig(soundId: string, theme: string): Promise<SoundConfig | null> {

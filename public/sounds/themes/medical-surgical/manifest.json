@@ -1,0 +1,103 @@
+{
+  "id": "medical-surgical",
+  "name": "Surgical Suite Professional",
+  "description": "Clean medical environment with precise surgical instrumentation sounds",
+  "sounds": {
+    "theme-switch": {
+      "id": "theme-switch",
+      "url": "/sounds/themes/medical-surgical/monitor-power.opus",
+      "category": "theme-switch",
+      "volume": 0.6,
+      "description": "Medical monitor power on"
+    },
+    "ui-click-primary": {
+      "id": "ui-click-primary",
+      "url": "/sounds/themes/medical-surgical/instrument-click.opus",
+      "category": "ui-primary",
+      "volume": 0.5,
+      "description": "Surgical instrument click"
+    },
+    "ui-click-secondary": {
+      "id": "ui-click-secondary",
+      "url": "/sounds/themes/medical-surgical/glove-snap.opus",
+      "category": "ui-secondary",
+      "volume": 0.4,
+      "description": "Medical glove snap"
+    },
+    "ui-hover": {
+      "id": "ui-hover",
+      "url": "/sounds/themes/medical-surgical/monitor-beep.opus",
+      "category": "ui-hover",
+      "volume": 0.2,
+      "description": "Soft monitor beep"
+    },
+    "navigation-forward": {
+      "id": "navigation-forward",
+      "url": "/sounds/themes/medical-surgical/chart-flip.opus",
+      "category": "navigation",
+      "volume": 0.4,
+      "description": "Medical chart page flip"
+    },
+    "navigation-back": {
+      "id": "navigation-back",
+      "url": "/sounds/themes/medical-surgical/drawer-close.opus",
+      "category": "navigation",
+      "volume": 0.4,
+      "description": "Medical drawer closing"
+    },
+    "notification-success": {
+      "id": "notification-success",
+      "url": "/sounds/themes/medical-surgical/vitals-normal.opus",
+      "category": "notification",
+      "volume": 0.5,
+      "description": "Vitals normalized tone"
+    },
+    "notification-error": {
+      "id": "notification-error",
+      "url": "/sounds/themes/medical-surgical/alarm-medical.opus",
+      "category": "notification",
+      "volume": 0.7,
+      "description": "Medical alarm warning"
+    },
+    "notification-info": {
+      "id": "notification-info",
+      "url": "/sounds/themes/medical-surgical/nurse-call.opus",
+      "category": "notification",
+      "volume": 0.5,
+      "description": "Nurse call button"
+    },
+    "gauge-tick": {
+      "id": "gauge-tick",
+      "url": "/sounds/themes/medical-surgical/pulse-beep.opus",
+      "category": "gauge",
+      "volume": 0.2,
+      "description": "Heart rate monitor beep"
+    },
+    "gauge-zone": {
+      "id": "gauge-zone",
+      "url": "/sounds/themes/medical-surgical/pressure-change.opus",
+      "category": "gauge",
+      "volume": 0.4,
+      "description": "Blood pressure change"
+    },
+    "gauge-peak": {
+      "id": "gauge-peak",
+      "url": "/sounds/themes/medical-surgical/vitals-optimal.opus",
+      "category": "gauge",
+      "volume": 0.5,
+      "description": "Optimal vitals achieved"
+    },
+    "ambient": {
+      "id": "ambient",
+      "url": "/sounds/themes/medical-surgical/hospital-ambience.opus",
+      "category": "ambient",
+      "volume": 0.05,
+      "description": "Clean hospital ambience"
+    }
+  },
+  "performance": {
+    "preload": ["theme-switch", "ui-click-primary", "gauge-tick"],
+    "lowLatency": true,
+    "cacheStrategy": "moderate"
+  }
+}

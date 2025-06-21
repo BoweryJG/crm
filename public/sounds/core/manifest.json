@@ -1,0 +1,65 @@
+{
+  "id": "core",
+  "name": "Core UI Sounds",
+  "description": "Universal interface sounds used across all themes",
+  "version": "1.0.0",
+  "author": "Omnisensory Experience Engine",
+  "sounds": {
+    "ui-click-primary": {
+      "id": "ui-click-primary",
+      "url": "/sounds/core/ui-click-primary.opus",
+      "category": "ui-primary",
+      "volume": 0.7,
+      "description": "Primary button click"
+    },
+    "ui-click-secondary": {
+      "id": "ui-click-secondary",
+      "url": "/sounds/core/ui-click-secondary.opus",
+      "category": "ui-secondary",
+      "volume": 0.6,
+      "description": "Secondary button click"
+    },
+    "ui-hover": {
+      "id": "ui-hover",
+      "url": "/sounds/core/ui-hover.opus",
+      "category": "ui-secondary",
+      "volume": 0.3,
+      "description": "Hover state feedback"
+    },
+    "ui-toggle": {
+      "id": "ui-toggle",
+      "url": "/sounds/core/ui-toggle.opus",
+      "category": "ui-primary",
+      "volume": 0.7,
+      "description": "Toggle switch actuation"
+    },
+    "ui-error": {
+      "id": "ui-error",
+      "url": "/sounds/core/ui-error.opus",
+      "category": "error",
+      "volume": 0.8,
+      "description": "Error notification"
+    },
+    "ui-success": {
+      "id": "ui-success",
+      "url": "/sounds/core/ui-success.opus",
+      "category": "success",
+      "volume": 0.8,
+      "description": "Success notification"
+    },
+    "navigation-forward": {
+      "id": "navigation-forward",
+      "url": "/sounds/core/navigation-forward.opus",
+      "category": "navigation",
+      "volume": 0.6,
+      "description": "Navigate forward"
+    },
+    "navigation-back": {
+      "id": "navigation-back",
+      "url": "/sounds/core/navigation-back.opus",
+      "category": "navigation",
+      "volume": 0.6,
+      "description": "Navigate back"
+    }
+  }
+}

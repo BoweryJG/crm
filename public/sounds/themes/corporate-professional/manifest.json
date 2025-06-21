@@ -1,0 +1,103 @@
+{
+  "id": "corporate-professional",
+  "name": "Corporate Professional",
+  "description": "Professional business environment with subtle, sophisticated sounds",
+  "sounds": {
+    "theme-switch": {
+      "id": "theme-switch",
+      "url": "/sounds/themes/corporate-professional/briefcase-close.opus",
+      "category": "theme-switch",
+      "volume": 0.5,
+      "description": "Executive briefcase closing"
+    },
+    "ui-click-primary": {
+      "id": "ui-click-primary",
+      "url": "/sounds/themes/corporate-professional/pen-click.opus",
+      "category": "ui-primary",
+      "volume": 0.4,
+      "description": "Premium pen click"
+    },
+    "ui-click-secondary": {
+      "id": "ui-click-secondary",
+      "url": "/sounds/themes/corporate-professional/paper-tap.opus",
+      "category": "ui-secondary",
+      "volume": 0.3,
+      "description": "Paper document tap"
+    },
+    "ui-hover": {
+      "id": "ui-hover",
+      "url": "/sounds/themes/corporate-professional/page-turn.opus",
+      "category": "ui-hover",
+      "volume": 0.2,
+      "description": "Subtle page turn"
+    },
+    "navigation-forward": {
+      "id": "navigation-forward",
+      "url": "/sounds/themes/corporate-professional/folder-open.opus",
+      "category": "navigation",
+      "volume": 0.4,
+      "description": "Folder opening"
+    },
+    "navigation-back": {
+      "id": "navigation-back",
+      "url": "/sounds/themes/corporate-professional/drawer-slide.opus",
+      "category": "navigation",
+      "volume": 0.3,
+      "description": "Filing cabinet drawer slide"
+    },
+    "notification-success": {
+      "id": "notification-success",
+      "url": "/sounds/themes/corporate-professional/stamp-approved.opus",
+      "category": "notification",
+      "volume": 0.5,
+      "description": "Approval stamp sound"
+    },
+    "notification-error": {
+      "id": "notification-error",
+      "url": "/sounds/themes/corporate-professional/alert-subtle.opus",
+      "category": "notification",
+      "volume": 0.5,
+      "description": "Subtle business alert"
+    },
+    "notification-info": {
+      "id": "notification-info",
+      "url": "/sounds/themes/corporate-professional/email-chime.opus",
+      "category": "notification",
+      "volume": 0.4,
+      "description": "Professional email notification"
+    },
+    "gauge-tick": {
+      "id": "gauge-tick",
+      "url": "/sounds/themes/corporate-professional/clock-tick.opus",
+      "category": "gauge",
+      "volume": 0.15,
+      "description": "Office clock tick"
+    },
+    "gauge-zone": {
+      "id": "gauge-zone",
+      "url": "/sounds/themes/corporate-professional/calculator-beep.opus",
+      "category": "gauge",
+      "volume": 0.3,
+      "description": "Calculator button beep"
+    },
+    "gauge-peak": {
+      "id": "gauge-peak",
+      "url": "/sounds/themes/corporate-professional/success-chime.opus",
+      "category": "gauge",
+      "volume": 0.5,
+      "description": "Corporate success chime"
+    },
+    "ambient": {
+      "id": "ambient",
+      "url": "/sounds/themes/corporate-professional/office-ambience.opus",
+      "category": "ambient",
+      "volume": 0.05,
+      "description": "Quiet office ambience"
+    }
+  },
+  "performance": {
+    "preload": ["theme-switch", "ui-click-primary", "notification-info"],
+    "lowLatency": true,
+    "cacheStrategy": "balanced"
+  }
+}

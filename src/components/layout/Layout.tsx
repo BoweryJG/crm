@@ -5,6 +5,7 @@ import Sidebar from './Sidebar';
 import SculpturalSidebar from './SculpturalSidebar';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
+import { useNavigationSound } from '../../hooks/useSound';
 
 const Layout: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -12,6 +13,8 @@ const Layout: React.FC = () => {
   const mainRef = useRef<HTMLDivElement | null>(null);
   const drawerWidth = 280;
   const { themeMode } = useThemeContext();
+  const { forward } = useNavigationSound();
+  const previousPath = useRef(location.pathname);
   
   // Always use SculpturalSidebar for the premium experience
   const usesSculpturalSidebar = true;
@@ -20,14 +23,20 @@ const Layout: React.FC = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  // Reset scroll position when navigating to a new route
+  // Reset scroll position and play navigation sound when navigating to a new route
   useEffect(() => {
+    if (previousPath.current !== location.pathname) {
+      // Play navigation sound
+      forward();
+      previousPath.current = location.pathname;
+    }
+    
     if (mainRef.current) {
       mainRef.current.scrollTop = 0;
     } else {
       window.scrollTo(0, 0);
     }
-  }, [location.pathname]);
+  }, [location.pathname, forward]);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>

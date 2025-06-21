@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -7,6 +7,7 @@ import {
   CircularProgress
 } from '@mui/material';
 import { styled, keyframes } from '@mui/material/styles';
+import { useGaugeSound } from '../../hooks/useSound';
 
 // Aviation-style animations
 const sweep = keyframes`
@@ -163,6 +164,9 @@ const AviationGauge: React.FC<AviationGaugeProps> = ({
   size = 'medium'
 }) => {
   const theme = useTheme();
+  const { tick, zone, peak } = useGaugeSound();
+  const previousZone = useRef<number>(0);
+  const previousValue = useRef<number>(value);
   
   const sizeMap = {
     small: 140,
@@ -182,6 +186,29 @@ const AviationGauge: React.FC<AviationGaugeProps> = ({
     if (percentage >= 40) return theme.palette.info.main;
     return theme.palette.error.main;
   };
+  
+  // Sound effects for gauge movement
+  useEffect(() => {
+    const currentZone = Math.floor(percentage / 20); // 5 zones: 0-20, 20-40, 40-60, 60-80, 80-100
+    
+    // Play zone change sound
+    if (currentZone !== previousZone.current) {
+      zone();
+      previousZone.current = currentZone;
+    }
+    
+    // Play peak sound at 100%
+    if (percentage >= 100 && previousValue.current < 100) {
+      peak();
+    }
+    
+    // Play tick sound for small changes
+    if (Math.abs(value - previousValue.current) > 0 && Math.abs(value - previousValue.current) < 5) {
+      tick();
+    }
+    
+    previousValue.current = value;
+  }, [value, percentage, tick, zone, peak]);
 
   const generateMarkings = () => {
     const markings = [];

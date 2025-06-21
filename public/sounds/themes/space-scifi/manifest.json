@@ -1,0 +1,110 @@
+{
+  "id": "space-scifi",
+  "name": "Space Station Interface",
+  "description": "Futuristic space station computer interface with sci-fi elements",
+  "sounds": {
+    "theme-switch": {
+      "id": "theme-switch",
+      "url": "/sounds/themes/space-scifi/airlock-cycle.opus",
+      "category": "theme-switch",
+      "volume": 0.7,
+      "description": "Airlock pressurization cycle"
+    },
+    "ui-click-primary": {
+      "id": "ui-click-primary",
+      "url": "/sounds/themes/space-scifi/hologram-activate.opus",
+      "category": "ui-primary",
+      "volume": 0.6,
+      "description": "Holographic interface activation"
+    },
+    "ui-click-secondary": {
+      "id": "ui-click-secondary",
+      "url": "/sounds/themes/space-scifi/quantum-beep.opus",
+      "category": "ui-secondary",
+      "volume": 0.5,
+      "description": "Quantum computer beep"
+    },
+    "ui-hover": {
+      "id": "ui-hover",
+      "url": "/sounds/themes/space-scifi/scanner-sweep.opus",
+      "category": "ui-hover",
+      "volume": 0.3,
+      "description": "Scanner sweep sound"
+    },
+    "navigation-forward": {
+      "id": "navigation-forward",
+      "url": "/sounds/themes/space-scifi/warp-engage.opus",
+      "category": "navigation",
+      "volume": 0.5,
+      "description": "Warp drive engagement"
+    },
+    "navigation-back": {
+      "id": "navigation-back",
+      "url": "/sounds/themes/space-scifi/thrusters-reverse.opus",
+      "category": "navigation",
+      "volume": 0.4,
+      "description": "Reverse thrusters engage"
+    },
+    "notification-success": {
+      "id": "notification-success",
+      "url": "/sounds/themes/space-scifi/mission-complete.opus",
+      "category": "notification",
+      "volume": 0.6,
+      "description": "Mission complete confirmation"
+    },
+    "notification-error": {
+      "id": "notification-error",
+      "url": "/sounds/themes/space-scifi/system-alert.opus",
+      "category": "notification",
+      "volume": 0.7,
+      "description": "Critical system alert"
+    },
+    "notification-info": {
+      "id": "notification-info",
+      "url": "/sounds/themes/space-scifi/incoming-transmission.opus",
+      "category": "notification",
+      "volume": 0.5,
+      "description": "Incoming transmission alert"
+    },
+    "gauge-tick": {
+      "id": "gauge-tick",
+      "url": "/sounds/themes/space-scifi/sensor-ping.opus",
+      "category": "gauge",
+      "volume": 0.2,
+      "description": "Sensor array ping"
+    },
+    "gauge-zone": {
+      "id": "gauge-zone",
+      "url": "/sounds/themes/space-scifi/energy-shift.opus",
+      "category": "gauge",
+      "volume": 0.4,
+      "description": "Energy level shift"
+    },
+    "gauge-peak": {
+      "id": "gauge-peak",
+      "url": "/sounds/themes/space-scifi/shields-maximum.opus",
+      "category": "gauge",
+      "volume": 0.6,
+      "description": "Shields at maximum power"
+    },
+    "ambient": {
+      "id": "ambient",
+      "url": "/sounds/themes/space-scifi/station-hum.opus",
+      "category": "ambient",
+      "volume": 0.1,
+      "description": "Space station ambient hum"
+    },
+    "startup": {
+      "id": "startup",
+      "url": "/sounds/themes/space-scifi/systems-online.opus",
+      "category": "startup",
+      "volume": 0.8,
+      "description": "All systems online sequence"
+    }
+  },
+  "performance": {
+    "preload": ["theme-switch", "ui-click-primary", "notification-error"],
+    "lowLatency": true,
+    "cacheStrategy": "aggressive"
+  }
+}

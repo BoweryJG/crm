@@ -1,0 +1,110 @@
+{
+  "id": "formula1-racing",
+  "name": "Formula 1 Racing Team",
+  "description": "High-octane F1 racing sounds from the pit lane and paddock",
+  "sounds": {
+    "theme-switch": {
+      "id": "theme-switch",
+      "url": "/sounds/themes/formula1-racing/ignition-start.opus",
+      "category": "theme-switch",
+      "volume": 0.7,
+      "description": "F1 engine ignition sequence"
+    },
+    "ui-click-primary": {
+      "id": "ui-click-primary",
+      "url": "/sounds/themes/formula1-racing/paddle-shift.opus",
+      "category": "ui-primary",
+      "volume": 0.6,
+      "description": "Carbon fiber paddle shift"
+    },
+    "ui-click-secondary": {
+      "id": "ui-click-secondary",
+      "url": "/sounds/themes/formula1-racing/button-press.opus",
+      "category": "ui-secondary",
+      "volume": 0.5,
+      "description": "Steering wheel button press"
+    },
+    "ui-hover": {
+      "id": "ui-hover",
+      "url": "/sounds/themes/formula1-racing/radio-static.opus",
+      "category": "ui-hover",
+      "volume": 0.2,
+      "description": "Team radio static"
+    },
+    "navigation-forward": {
+      "id": "navigation-forward",
+      "url": "/sounds/themes/formula1-racing/gear-up.opus",
+      "category": "navigation",
+      "volume": 0.5,
+      "description": "Sequential gearbox upshift"
+    },
+    "navigation-back": {
+      "id": "navigation-back",
+      "url": "/sounds/themes/formula1-racing/gear-down.opus",
+      "category": "navigation",
+      "volume": 0.5,
+      "description": "Sequential gearbox downshift"
+    },
+    "notification-success": {
+      "id": "notification-success",
+      "url": "/sounds/themes/formula1-racing/box-confirm.opus",
+      "category": "notification",
+      "volume": 0.6,
+      "description": "Box box confirmation"
+    },
+    "notification-error": {
+      "id": "notification-error",
+      "url": "/sounds/themes/formula1-racing/warning-beep.opus",
+      "category": "notification",
+      "volume": 0.7,
+      "description": "System warning beep"
+    },
+    "notification-info": {
+      "id": "notification-info",
+      "url": "/sounds/themes/formula1-racing/radio-message.opus",
+      "category": "notification",
+      "volume": 0.5,
+      "description": "Race engineer message"
+    },
+    "gauge-tick": {
+      "id": "gauge-tick",
+      "url": "/sounds/themes/formula1-racing/telemetry-tick.opus",
+      "category": "gauge",
+      "volume": 0.2,
+      "description": "Telemetry data tick"
+    },
+    "gauge-zone": {
+      "id": "gauge-zone",
+      "url": "/sounds/themes/formula1-racing/rpm-shift.opus",
+      "category": "gauge",
+      "volume": 0.4,
+      "description": "RPM zone change"
+    },
+    "gauge-peak": {
+      "id": "gauge-peak",
+      "url": "/sounds/themes/formula1-racing/drs-activate.opus",
+      "category": "gauge",
+      "volume": 0.6,
+      "description": "DRS activation sound"
+    },
+    "ambient": {
+      "id": "ambient",
+      "url": "/sounds/themes/formula1-racing/pit-lane.opus",
+      "category": "ambient",
+      "volume": 0.1,
+      "description": "F1 pit lane ambience"
+    },
+    "startup": {
+      "id": "startup",
+      "url": "/sounds/themes/formula1-racing/warm-up.opus",
+      "category": "startup",
+      "volume": 0.8,
+      "description": "Engine warm-up sequence"
+    }
+  },
+  "performance": {
+    "preload": ["theme-switch", "ui-click-primary", "navigation-forward"],
+    "lowLatency": true,
+    "cacheStrategy": "aggressive"
+  }
+}

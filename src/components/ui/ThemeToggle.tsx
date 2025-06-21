@@ -17,10 +17,13 @@ import {
 import { useThemeContext } from '../../themes/ThemeContext';
 import ThemePicker from './ThemePicker';
 import { getThemeById } from '../../themes/themeLibrary';
+import { useThemeSound, useButtonSound } from '../../hooks/useSound';
 
 const ThemeToggle: React.FC = () => {
   const theme = useTheme();
   const { themeMode, toggleTheme, getCurrentTheme } = useThemeContext();
+  const { playThemeSwitch } = useThemeSound();
+  const buttonSound = useButtonSound('secondary');
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const currentThemeData = getCurrentTheme();
@@ -96,7 +99,10 @@ const ThemeToggle: React.FC = () => {
           placement="bottom"
         >
           <IconButton
-            onClick={toggleTheme}
+            onClick={() => {
+              playThemeSwitch();
+              toggleTheme();
+            }}
             sx={{
               color: isLuxuryStyle ? '#C9B037' : theme.palette.primary.main,
               backgroundColor: isLuxuryStyle 
@@ -130,8 +136,9 @@ const ThemeToggle: React.FC = () => {
 
         <Tooltip title="Browse all themes" placement="bottom">
           <IconButton
-            onClick={() => setPickerOpen(true)}
             size="small"
+            {...buttonSound.handlers}
+            onClick={() => setPickerOpen(true)}
             sx={{
               color: isLuxuryStyle ? '#C9B037' : theme.palette.primary.main,
               backgroundColor: isLuxuryStyle 

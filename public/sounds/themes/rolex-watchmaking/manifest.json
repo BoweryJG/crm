@@ -1,0 +1,103 @@
+{
+  "id": "rolex-watchmaking",
+  "name": "Rolex Watchmaking Excellence",
+  "description": "Precision mechanical watch sounds with Swiss craftsmanship",
+  "sounds": {
+    "theme-switch": {
+      "id": "theme-switch",
+      "url": "/sounds/themes/rolex-watchmaking/crown-wind.opus",
+      "category": "theme-switch",
+      "volume": 0.7,
+      "description": "Rolex crown winding mechanism"
+    },
+    "ui-click-primary": {
+      "id": "ui-click-primary",
+      "url": "/sounds/themes/rolex-watchmaking/clasp-close.opus",
+      "category": "ui-primary",
+      "volume": 0.6,
+      "description": "Oyster bracelet clasp closing"
+    },
+    "ui-click-secondary": {
+      "id": "ui-click-secondary",
+      "url": "/sounds/themes/rolex-watchmaking/bezel-click.opus",
+      "category": "ui-secondary",
+      "volume": 0.5,
+      "description": "Rotating bezel click"
+    },
+    "ui-hover": {
+      "id": "ui-hover",
+      "url": "/sounds/themes/rolex-watchmaking/movement-tick.opus",
+      "category": "ui-hover",
+      "volume": 0.2,
+      "description": "Mechanical movement subtle tick"
+    },
+    "navigation-forward": {
+      "id": "navigation-forward",
+      "url": "/sounds/themes/rolex-watchmaking/date-change.opus",
+      "category": "navigation",
+      "volume": 0.5,
+      "description": "Date complication change"
+    },
+    "navigation-back": {
+      "id": "navigation-back",
+      "url": "/sounds/themes/rolex-watchmaking/crown-release.opus",
+      "category": "navigation",
+      "volume": 0.4,
+      "description": "Crown release mechanism"
+    },
+    "notification-success": {
+      "id": "notification-success",
+      "url": "/sounds/themes/rolex-watchmaking/perpetual-chime.opus",
+      "category": "notification",
+      "volume": 0.6,
+      "description": "Perpetual movement success chime"
+    },
+    "notification-error": {
+      "id": "notification-error",
+      "url": "/sounds/themes/rolex-watchmaking/spring-tension.opus",
+      "category": "notification",
+      "volume": 0.5,
+      "description": "Mainspring tension warning"
+    },
+    "notification-info": {
+      "id": "notification-info",
+      "url": "/sounds/themes/rolex-watchmaking/jewel-ping.opus",
+      "category": "notification",
+      "volume": 0.5,
+      "description": "Ruby jewel bearing ping"
+    },
+    "gauge-tick": {
+      "id": "gauge-tick",
+      "url": "/sounds/themes/rolex-watchmaking/escapement-tick.opus",
+      "category": "gauge",
+      "volume": 0.2,
+      "description": "Swiss lever escapement tick"
+    },
+    "gauge-zone": {
+      "id": "gauge-zone",
+      "url": "/sounds/themes/rolex-watchmaking/gear-engage.opus",
+      "category": "gauge",
+      "volume": 0.4,
+      "description": "Precision gear engagement"
+    },
+    "gauge-peak": {
+      "id": "gauge-peak",
+      "url": "/sounds/themes/rolex-watchmaking/chronometer-bell.opus",
+      "category": "gauge",
+      "volume": 0.6,
+      "description": "Chronometer certification bell"
+    },
+    "ambient": {
+      "id": "ambient",
+      "url": "/sounds/themes/rolex-watchmaking/workshop-ambience.opus",
+      "category": "ambient",
+      "volume": 0.1,
+      "description": "Swiss watchmaking workshop"
+    }
+  },
+  "performance": {
+    "preload": ["theme-switch", "ui-click-primary", "gauge-tick"],
+    "lowLatency": true,
+    "cacheStrategy": "aggressive"
+  }
+}

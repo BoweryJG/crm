@@ -28,12 +28,14 @@ import {
   Email as EmailIcon,
   Palette as PaletteIcon,
   Save as SaveIcon,
-  Key as KeyIcon
+  Key as KeyIcon,
+  GraphicEq as GraphicEqIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../themes/ThemeContext';
 import { useAuth } from '../auth';
 import ApiKeyManager from '../components/settings/ApiKeyManager';
 import ThemeSettings from '../components/settings/ThemeSettings';
+import SoundSettings from '../components/settings/SoundSettings';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -185,6 +187,7 @@ const Settings: React.FC = () => {
             <Tab icon={<SecurityIcon />} label="Privacy & Security" />
             <Tab icon={<PhoneIcon />} label="Communication" />
             <Tab icon={<PaletteIcon />} label="Appearance" />
+            <Tab icon={<GraphicEqIcon />} label="Sound" />
             <Tab icon={<KeyIcon />} label="API Keys" />
           </Tabs>
         </Box>
@@ -462,8 +465,15 @@ const Settings: React.FC = () => {
           </Box>
         </TabPanel>
 
-        {/* API Keys */}
+        {/* Sound Settings */}
         <TabPanel value={tabValue} index={5}>
+          <Box sx={{ p: 3 }}>
+            <SoundSettings />
+          </Box>
+        </TabPanel>
+
+        {/* API Keys */}
+        <TabPanel value={tabValue} index={6}>
           <Box sx={{ p: 3 }}>
             <ApiKeyManager />
           </Box>

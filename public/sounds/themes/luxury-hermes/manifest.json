@@ -1,0 +1,96 @@
+{
+  "id": "luxury-hermes",
+  "name": "Hermès Luxury Experience",
+  "description": "Sophisticated sounds inspired by luxury boutiques, fine jewelry, and haute couture",
+  "sounds": {
+    "theme-switch": {
+      "id": "theme-switch",
+      "url": "/sounds/themes/luxury-hermes/boutique-door-chime.opus",
+      "category": "theme-switch",
+      "volume": 0.7,
+      "description": "Elegant boutique door chime"
+    },
+    "ui-click-primary": {
+      "id": "ui-click-primary",
+      "url": "/sounds/themes/luxury-hermes/jewelry-box-open.opus",
+      "category": "ui-primary",
+      "volume": 0.6,
+      "description": "Luxury jewelry box opening"
+    },
+    "ui-click-secondary": {
+      "id": "ui-click-secondary",
+      "url": "/sounds/themes/luxury-hermes/velvet-touch.opus",
+      "category": "ui-secondary",
+      "volume": 0.5,
+      "description": "Soft velvet fabric touch"
+    },
+    "ui-hover": {
+      "id": "ui-hover",
+      "url": "/sounds/themes/luxury-hermes/silk-whisper.opus",
+      "category": "ui-hover",
+      "volume": 0.3,
+      "description": "Delicate silk fabric movement"
+    },
+    "navigation-forward": {
+      "id": "navigation-forward",
+      "url": "/sounds/themes/luxury-hermes/crystal-chime.opus",
+      "category": "navigation",
+      "volume": 0.5,
+      "description": "Crystal glass gentle chime"
+    },
+    "navigation-back": {
+      "id": "navigation-back",
+      "url": "/sounds/themes/luxury-hermes/leather-fold.opus",
+      "category": "navigation",
+      "volume": 0.4,
+      "description": "Fine leather folding sound"
+    },
+    "notification-success": {
+      "id": "notification-success",
+      "url": "/sounds/themes/luxury-hermes/champagne-sparkle.opus",
+      "category": "notification",
+      "volume": 0.6,
+      "description": "Champagne sparkle success sound"
+    },
+    "notification-error": {
+      "id": "notification-error",
+      "url": "/sounds/themes/luxury-hermes/subtle-decline.opus",
+      "category": "notification",
+      "volume": 0.5,
+      "description": "Subtle luxury decline tone"
+    },
+    "notification-info": {
+      "id": "notification-info",
+      "url": "/sounds/themes/luxury-hermes/concierge-bell.opus",
+      "category": "notification",
+      "volume": 0.5,
+      "description": "Luxury hotel concierge bell"
+    },
+    "gauge-tick": {
+      "id": "gauge-tick",
+      "url": "/sounds/themes/luxury-hermes/watch-tick.opus",
+      "category": "gauge",
+      "volume": 0.2,
+      "description": "Luxury watch movement tick"
+    },
+    "gauge-zone": {
+      "id": "gauge-zone",
+      "url": "/sounds/themes/luxury-hermes/bracelet-clink.opus",
+      "category": "gauge",
+      "volume": 0.4,
+      "description": "Gold bracelet gentle clink"
+    },
+    "gauge-peak": {
+      "id": "gauge-peak",
+      "url": "/sounds/themes/luxury-hermes/diamond-sparkle.opus",
+      "category": "gauge",
+      "volume": 0.6,
+      "description": "Diamond sparkle achievement"
+    }
+  },
+  "performance": {
+    "preload": ["theme-switch", "ui-click-primary", "navigation-forward"],
+    "lowLatency": true,
+    "cacheStrategy": "aggressive"
+  }
+}

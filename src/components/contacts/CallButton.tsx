@@ -28,6 +28,7 @@ import {
 import { callContact, updateCallStatus } from '../../services/twilio/twilioService';
 import { useAuth } from '../../auth';
 import { Contact } from '../../types/models';
+import { useButtonSound, useNotificationSound } from '../../hooks/useSound';
 
 interface CallButtonProps {
   contact: Contact;
@@ -36,6 +37,8 @@ interface CallButtonProps {
 const CallButton: React.FC<CallButtonProps> = ({ contact }) => {
   const theme = useTheme();
   const { user } = useAuth();
+  const buttonSound = useButtonSound('primary');
+  const notificationSound = useNotificationSound();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [callState, setCallState] = useState<'idle' | 'connecting' | 'in-progress' | 'completed' | 'failed'>('idle');
   const [callSid, setCallSid] = useState<string | null>(null);
@@ -68,6 +71,7 @@ const CallButton: React.FC<CallButtonProps> = ({ contact }) => {
       if (result.success && result.callSid) {
         setCallSid(result.callSid);
         setCallState('in-progress');
+        notificationSound.success();
         
         // Start tracking call duration
         const interval = setInterval(() => {
@@ -77,6 +81,7 @@ const CallButton: React.FC<CallButtonProps> = ({ contact }) => {
         setDurationInterval(interval);
       } else {
         setCallState('failed');
+        notificationSound.error();
       }
     } catch (error) {
       console.error('Error initiating call:', error);
@@ -149,8 +154,9 @@ const CallButton: React.FC<CallButtonProps> = ({ contact }) => {
     <>
       <IconButton 
         color="primary" 
-        onClick={handleCall}
         aria-label="call contact"
+        {...buttonSound.handlers}
+        onClick={handleCall}
       >
         <PhoneIcon />
       </IconButton>
