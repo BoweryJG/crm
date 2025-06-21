@@ -25,6 +25,7 @@ import {
   AutoAwesome as SparkleIcon,
   Hexagon as HexIcon,
   Architecture as ArchitectureIcon,
+  Psychology as PsychologyIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
