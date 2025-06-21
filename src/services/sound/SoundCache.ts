@@ -33,19 +33,30 @@ export class SoundCache {
       }
     } catch (error) {
       console.warn('Failed to load core sounds manifest:', error);
-      // Fallback to individual sound loading
+      // Fallback to individual sound loading with MP3 format
       const coreSounds = [
         'ui-click-primary',
+        'ui-click-secondary',
         'ui-hover',
         'ui-toggle',
-        'ui-error',
-        'ui-success',
+        'notification-success',
+        'notification-error',
         'navigation-forward',
         'navigation-back',
       ];
       
       coreSounds.forEach(soundId => {
-        this.loadSound(`/sounds/core/${soundId}.opus`, soundId);
+        const config: SoundConfig = {
+          id: soundId,
+          url: `/sounds/core/${soundId}.wav`,
+          category: this.getCategoryForSound(soundId),
+          volume: 0.7
+        };
+        this.soundConfigs.set(soundId, config);
+        // Preload essential sounds
+        if (['ui-click-primary', 'ui-hover', 'navigation-forward'].includes(soundId)) {
+          this.loadSound(config.url, soundId);
+        }
       });
     }
   }
@@ -69,6 +80,7 @@ export class SoundCache {
       return pack.sounds[soundId];
     }
 
+    // Return null if no sound found
     return null;
   }
 
@@ -204,6 +216,20 @@ export class SoundCache {
     // In production, this would return your CDN URL
     // For now, using local fallback
     return process.env.REACT_APP_SOUND_CDN_URL || '';
+  }
+
+  private getCategoryForSound(soundId: string): 'ui-primary' | 'ui-secondary' | 'navigation' | 'notification' | 'gauge' | 'theme-switch' | 'startup' | 'ambient' | 'success' | 'error' {
+    if (soundId.includes('click')) return 'ui-primary';
+    if (soundId.includes('hover')) return 'ui-secondary';
+    if (soundId.includes('navigation')) return 'navigation';
+    if (soundId.includes('notification')) return 'notification';
+    if (soundId.includes('success')) return 'success';
+    if (soundId.includes('error')) return 'error';
+    if (soundId.includes('gauge')) return 'gauge';
+    if (soundId.includes('theme')) return 'theme-switch';
+    if (soundId.includes('startup')) return 'startup';
+    if (soundId.includes('ambient')) return 'ambient';
+    return 'ui-primary';
   }
 
   clearCache() {

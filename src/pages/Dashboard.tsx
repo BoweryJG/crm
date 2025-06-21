@@ -6,7 +6,8 @@ import {
   CardHeader,
   CardContent,
   useTheme,
-  Skeleton
+  Skeleton,
+  Button
 } from '@mui/material';
 import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
@@ -20,6 +21,8 @@ import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '../contexts/DashboardDataContext';
 import { useAuth } from '../auth';
 import { getUserDisplayName } from '../utils/userHelpers';
+import { useSound } from '../hooks/useSound';
+import { useSoundContext } from '../contexts/SoundContext';
 
 // Helper function to generate random integers
 const getRandomInt = (min: number, max: number): number => {
@@ -33,6 +36,10 @@ const Dashboard: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
   const { dashboardData, loading, mockActivities, mockTasks } = useDashboardData();
   const [gaugeStyle, setGaugeStyle] = React.useState<'luxury' | 'quantum'>('luxury');
+  
+  // Sound test
+  const { soundEnabled } = useSoundContext();
+  const testSound = useSound('ui-click-primary');
   
   // Debug auth state
   React.useEffect(() => {
@@ -68,10 +75,26 @@ const Dashboard: React.FC = () => {
         </Typography>
       </Box>
 
-      {/* Gauge Style Selector */}
-      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-        <Box
-          onClick={() => setGaugeStyle('luxury')}
+      {/* Sound Debug Button */}
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Button
+          variant="outlined"
+          onClick={() => {
+            console.log('Sound test - Enabled:', soundEnabled);
+            testSound.play();
+          }}
+          sx={{ 
+            borderColor: soundEnabled ? 'success.main' : 'error.main',
+            color: soundEnabled ? 'success.main' : 'error.main'
+          }}
+        >
+          Test Sound (Sound: {soundEnabled ? 'ON' : 'OFF'})
+        </Button>
+        
+        {/* Gauge Style Selector */}
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box
+            onClick={() => setGaugeStyle('luxury')}
           sx={{
             px: 2,
             py: 0.5,
@@ -109,6 +132,7 @@ const Dashboard: React.FC = () => {
           }}
         >
           Quantum Style
+        </Box>
         </Box>
       </Box>
 

@@ -14,7 +14,7 @@
     },
     "ui-click-primary": {
       "id": "ui-click-primary", 
-      "url": "/sounds/themes/boeing-747/autopilot-engage.opus",
+      "url": "/sounds/themes/boeing-747/boeing-autopilot-engage.mp3",
       "category": "ui-primary",
       "volume": 0.7,
       "variations": [
@@ -60,7 +60,7 @@
     },
     "gauge-zone-change": {
       "id": "gauge-zone-change",
-      "url": "/sounds/themes/boeing-747/altitude-alert.opus", 
+      "url": "/sounds/themes/boeing-747/boeing-altitude-alert.mp3", 
       "category": "gauge",
       "volume": 0.5
     },

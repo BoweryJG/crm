@@ -340,24 +340,29 @@ const SculpturalSidebar: React.FC<{
       title: 'Command Center',
       items: [
         { title: 'Dashboard', path: '/', icon: <DashboardIcon /> },
-        { title: 'Gallery', path: '/command-room', icon: <ArchitectureIcon /> },
+        { title: 'Mission Control', path: '/command-room', icon: <ArchitectureIcon /> },
       ],
       delayOffset: 0,
     },
     {
-      title: 'Operations',
+      title: 'Sales Operations',
       items: [
         { title: 'Smart CRM', path: '/relationships', icon: <PeopleIcon /> },
+        { title: 'Performance', path: '/operations/performance', icon: <TrendingUpIcon /> },
+        { title: 'Analytics', path: '/operations/analytics', icon: <PsychologyIcon /> },
+        { title: 'Call Vault', path: '/operations/call-vault', icon: <PhoneIcon /> },
       ],
+      collapsible: true,
+      defaultOpen: true,
       delayOffset: 100,
     },
     {
-      title: 'Intelligence',
+      title: 'Intelligence Hub',
       items: [
+        { title: 'Canvas AI', path: '/intelligence/canvas', icon: <SparkleIcon /> },
         { title: 'Content', path: '/intelligence/content', icon: <CreateIcon /> },
         { title: 'Research', path: '/intelligence/research', icon: <SearchIcon /> },
-        { title: 'Calls', path: '/intelligence/calls', icon: <PhoneIcon /> },
-        { title: 'Growth', path: '/intelligence/growth', icon: <TrendingUpIcon /> },
+        { title: 'Growth', path: '/intelligence/growth', icon: <HexIcon /> },
       ],
       collapsible: true,
       defaultOpen: true,
@@ -373,6 +378,8 @@ const SculpturalSidebar: React.FC<{
         borderRight: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.1 : 0.05)}`,
         position: 'relative',
         overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
         
         // Subtle background pattern - theme aware
         '&::before': {
@@ -449,7 +456,26 @@ const SculpturalSidebar: React.FC<{
       </Box>
       
       {/* Navigation */}
-      <Box sx={{ overflowY: 'auto', overflowX: 'hidden', flex: 1, py: 2 }}>
+      <Box sx={{ 
+        overflowY: 'auto', 
+        overflowX: 'hidden', 
+        flex: 1, 
+        py: 2,
+        // Custom scrollbar styling
+        '&::-webkit-scrollbar': {
+          width: '8px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: alpha(theme.palette.primary.main, 0.05),
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: alpha(theme.palette.primary.main, 0.2),
+          borderRadius: '4px',
+          '&:hover': {
+            background: alpha(theme.palette.primary.main, 0.3),
+          },
+        },
+      }}>
         {navigationStructure.map((section, index) => (
           <React.Fragment key={section.title}>
             {index > 0 && <SculpturalDivider pattern={index === 1 ? 'dots' : 'gradient'} />}

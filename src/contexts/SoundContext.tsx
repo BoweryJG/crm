@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { SoundCache } from '../services/sound/SoundCache';
 import { useThemeContext } from '../themes/ThemeContext';
+import { soundManager } from '../services/sound/SoundManager';
 
 interface SoundContextValue {
   soundEnabled: boolean;
@@ -45,17 +46,27 @@ export const SoundProvider: React.FC<SoundProviderProps> = ({ children }) => {
 
   const [soundCache] = useState(() => new SoundCache());
 
-  // Save preferences
+  // Initialize soundManager on mount
+  useEffect(() => {
+    soundManager.setEnabled(soundEnabled);
+    soundManager.setMasterVolume(masterVolume);
+    soundManager.setPerformanceMode(performanceMode);
+  }, []);
+
+  // Save preferences and update soundManager
   useEffect(() => {
     localStorage.setItem('crm-sound-enabled', String(soundEnabled));
+    soundManager.setEnabled(soundEnabled);
   }, [soundEnabled]);
 
   useEffect(() => {
     localStorage.setItem('crm-master-volume', String(masterVolume));
+    soundManager.setMasterVolume(masterVolume);
   }, [masterVolume]);
 
   useEffect(() => {
     localStorage.setItem('crm-performance-mode', performanceMode);
+    soundManager.setPerformanceMode(performanceMode);
   }, [performanceMode]);
 
   // Load theme sounds when theme changes
@@ -102,6 +113,7 @@ export const SoundProvider: React.FC<SoundProviderProps> = ({ children }) => {
 
       const soundPackId = soundPackMap[currentTheme.id] || 'boeing-747';
       soundCache.getThemeSoundPack(soundPackId);
+      soundManager.setTheme(currentTheme.id); // Set theme in soundManager
     }
   }, [getCurrentTheme, soundEnabled, performanceMode, soundCache]);
 
