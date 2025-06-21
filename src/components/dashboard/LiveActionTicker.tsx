@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { 
   Box, 
   Typography, 
@@ -12,7 +12,16 @@ import {
   Slider,
   Menu,
   MenuItem,
-  Badge
+  Badge,
+  Popover,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemSecondaryAction,
+  Divider,
+  alpha,
+  useTheme
 } from '@mui/material';
 import { styled, keyframes } from '@mui/material/styles';
 import { 
@@ -30,86 +39,341 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
   Speed as SpeedIcon,
-  Notifications as AlertIcon,
+  Notifications as NotificationsIcon,
   Analytics as AnalyticsIcon,
   Timer as TimerIcon,
   NavigateNext as ActionIcon,
   Warning as WarningIcon,
-  Refresh as RefreshIcon
+  Refresh as RefreshIcon,
+  VolumeUp as VolumeUpIcon,
+  VolumeOff as VolumeOffIcon,
+  MoreVert as MoreVertIcon,
+  FiberManualRecord as LiveIcon,
+  Diamond as DiamondIcon,
+  AutoAwesome as SparkleIcon
 } from '@mui/icons-material';
 import { useSUISOptional } from '../../hooks/useSUIS';
+import { useThemeContext } from '../../themes/ThemeContext';
+import { useSound } from '../../hooks/useSound';
 
-// Import NowCards data
-const nowCardsData = [
-  { 
-    id: '1', 
-    title: '🔥 HOT LEAD: Dr. Sarah Chen - Implant System', 
-    description: 'Dr. Chen from Advanced Dental Care has shown 7 strong purchase signals for the new implant system.', 
-    priority: 'high', 
-    type: 're_engagement', 
-    contactName: 'Dr. Sarah Chen', 
-    companyName: 'Advanced Dental Care',
-    aiInsight: 'AI detected 94% purchase probability. Practice mentioned patient backlog for implant procedures and insurance reimbursement improvements.',
-    confidenceScore: 94,
-    timeframe: 'Next 24-48 hours',
-    actionRequired: 'Schedule in-office demo with clinical specialist'
-  },
-  { 
-    id: '2', 
-    title: '⚡ COMPETITOR THREAT: Dr. Rodriguez - Botox', 
-    description: 'Dr. Rodriguez comparing Botox suppliers - Allergan mentioned multiple times.', 
-    priority: 'high', 
-    type: 'competitor_threat', 
-    contactName: 'Dr. Mike Rodriguez', 
-    companyName: 'Aesthetic Medicine Associates',
-    aiInsight: 'Practice evaluating alternative suppliers. 72% close rate when providing clinical efficacy comparisons within 6 hours.',
-    confidenceScore: 87,
-    timeframe: 'Next 6 hours critical',
-    actionRequired: 'Send competitive analysis immediately'
-  },
-  { 
-    id: '3', 
-    title: '💰 CONTRACT RENEWAL: Valley Ortho - Sutures', 
-    description: 'Annual suture contract renewal worth $240K approaching deadline.', 
-    priority: 'high', 
-    type: 'renewal_risk', 
-    contactName: 'Procurement Dept', 
-    companyName: 'Valley Orthopedics Group',
-    aiInsight: 'Contract expires in 10 days. Competitor (Ethicon) has been visiting frequently. 85% retention rate with proactive renewal.',
-    confidenceScore: 78,
-    timeframe: 'Next 10 days',
-    actionRequired: 'Submit renewal with 5% loyalty discount'
-  },
-  { 
-    id: '4', 
-    title: '🎯 PURCHASE INTENT: Dr. Thompson - Digital Scanner', 
-    description: 'Comparing digital impression scanners - high engagement with iTero content.', 
-    priority: 'medium', 
-    type: 'purchase_intent', 
-    contactName: 'Dr. James Thompson', 
-    companyName: 'Thompson Family Dentistry',
-    aiInsight: 'Downloaded ROI calculator, attended webinar, requested peer references. 68% close rate at this engagement level.',
-    confidenceScore: 68,
-    timeframe: 'Next 2 weeks',
-    actionRequired: 'Arrange peer reference calls'
-  },
-  { 
-    id: '5', 
-    title: '⏰ URGENT REQUEST: Dr. Kim - Surgical Tools', 
-    description: 'Needs specific bone graft instruments for scheduled surgery.', 
-    priority: 'medium', 
-    type: 'urgent_need', 
-    contactName: 'Dr. Jennifer Kim', 
-    companyName: 'Kim Oral Surgery',
-    aiInsight: 'Practice has scheduled complex cases requiring specific instrumentation. 73% close rate with expedited delivery.',
-    confidenceScore: 73,
-    timeframe: 'Next 5 days',
-    actionRequired: 'Offer express delivery + loaner kit'
-  }
-];
+// Interfaces
+interface ActionItem {
+  id: string;
+  priority: 'critical' | 'urgent' | 'opportunity' | 'success';
+  icon: React.ReactNode;
+  title: string;
+  message: string;
+  value?: string;
+  time: string;
+  timestamp: Date;
+  action: {
+    type: 'call' | 'email' | 'meeting' | 'followup';
+    label: string;
+    handler: () => void;
+  };
+  metrics?: {
+    probability?: number;
+    impact?: string;
+    deadline?: string;
+  };
+  category: 'dental' | 'aesthetic' | 'both';
+  aiScore?: number;
+}
+
+interface LayerConfig {
+  critical: boolean;
+  urgent: boolean;
+  opportunity: boolean;
+  success: boolean;
+}
+
+// Theme-aware color mapping
+const getThemeColors = (themeMode: string) => {
+  const colorMap: Record<string, any> = {
+    'gallery-dominance': {
+      critical: { 
+        bg: 'linear-gradient(135deg, rgba(139, 69, 19, 0.15), rgba(255, 215, 0, 0.08))',
+        border: 'rgba(255, 215, 0, 0.5)',
+        text: '#FFD700',
+        glow: 'rgba(255, 215, 0, 0.4)',
+        gradient: 'linear-gradient(90deg, #B8860B, #FFD700, #B8860B)'
+      },
+      urgent: { 
+        bg: 'linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(255, 255, 255, 0.08))',
+        border: 'rgba(192, 192, 192, 0.5)',
+        text: '#E5E5E5',
+        glow: 'rgba(192, 192, 192, 0.4)',
+        gradient: 'linear-gradient(90deg, #C0C0C0, #FFFFFF, #C0C0C0)'
+      },
+      opportunity: { 
+        bg: 'linear-gradient(135deg, rgba(34, 139, 34, 0.15), rgba(50, 205, 50, 0.08))',
+        border: 'rgba(50, 205, 50, 0.5)',
+        text: '#32CD32',
+        glow: 'rgba(50, 205, 50, 0.4)',
+        gradient: 'linear-gradient(90deg, #228B22, #32CD32, #228B22)'
+      },
+      success: { 
+        bg: 'linear-gradient(135deg, rgba(25, 25, 112, 0.15), rgba(65, 105, 225, 0.08))',
+        border: 'rgba(65, 105, 225, 0.5)',
+        text: '#4169E1',
+        glow: 'rgba(65, 105, 225, 0.4)',
+        gradient: 'linear-gradient(90deg, #191970, #4169E1, #191970)'
+      },
+      background: 'linear-gradient(180deg, #000000, #0a0a0a)',
+      surface: 'rgba(20, 20, 20, 0.95)',
+      glassMorph: 'rgba(255, 255, 255, 0.02)'
+    },
+    'boeing-cockpit': {
+      critical: { 
+        bg: 'linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(255, 69, 0, 0.1))',
+        border: 'rgba(255, 69, 0, 0.6)',
+        text: '#FF4500',
+        glow: 'rgba(255, 69, 0, 0.5)',
+        gradient: 'linear-gradient(90deg, #FF0000, #FF4500, #FF0000)'
+      },
+      urgent: { 
+        bg: 'linear-gradient(135deg, rgba(255, 165, 0, 0.2), rgba(255, 215, 0, 0.1))',
+        border: 'rgba(255, 165, 0, 0.6)',
+        text: '#FFA500',
+        glow: 'rgba(255, 165, 0, 0.5)',
+        gradient: 'linear-gradient(90deg, #FF8C00, #FFA500, #FF8C00)'
+      },
+      opportunity: { 
+        bg: 'linear-gradient(135deg, rgba(0, 255, 0, 0.2), rgba(50, 205, 50, 0.1))',
+        border: 'rgba(0, 255, 0, 0.6)',
+        text: '#00FF00',
+        glow: 'rgba(0, 255, 0, 0.5)',
+        gradient: 'linear-gradient(90deg, #00FF00, #32CD32, #00FF00)'
+      },
+      success: { 
+        bg: 'linear-gradient(135deg, rgba(0, 191, 255, 0.2), rgba(30, 144, 255, 0.1))',
+        border: 'rgba(0, 191, 255, 0.6)',
+        text: '#00BFFF',
+        glow: 'rgba(0, 191, 255, 0.5)',
+        gradient: 'linear-gradient(90deg, #00BFFF, #1E90FF, #00BFFF)'
+      },
+      background: 'linear-gradient(180deg, #0a0a0a, #1a1a1a)',
+      surface: 'rgba(10, 15, 20, 0.98)',
+      glassMorph: 'rgba(0, 255, 0, 0.02)'
+    },
+    'cyber-neon': {
+      critical: { 
+        bg: 'linear-gradient(135deg, rgba(255, 0, 128, 0.2), rgba(255, 0, 255, 0.1))',
+        border: 'rgba(255, 0, 128, 0.8)',
+        text: '#FF0080',
+        glow: 'rgba(255, 0, 128, 0.6)',
+        gradient: 'linear-gradient(90deg, #FF0080, #FF00FF, #FF0080)'
+      },
+      urgent: { 
+        bg: 'linear-gradient(135deg, rgba(255, 255, 0, 0.2), rgba(255, 215, 0, 0.1))',
+        border: 'rgba(255, 255, 0, 0.8)',
+        text: '#FFFF00',
+        glow: 'rgba(255, 255, 0, 0.6)',
+        gradient: 'linear-gradient(90deg, #FFFF00, #FFD700, #FFFF00)'
+      },
+      opportunity: { 
+        bg: 'linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 191, 255, 0.1))',
+        border: 'rgba(0, 255, 255, 0.8)',
+        text: '#00FFFF',
+        glow: 'rgba(0, 255, 255, 0.6)',
+        gradient: 'linear-gradient(90deg, #00FFFF, #00BFFF, #00FFFF)'
+      },
+      success: { 
+        bg: 'linear-gradient(135deg, rgba(128, 0, 255, 0.2), rgba(75, 0, 130, 0.1))',
+        border: 'rgba(128, 0, 255, 0.8)',
+        text: '#8000FF',
+        glow: 'rgba(128, 0, 255, 0.6)',
+        gradient: 'linear-gradient(90deg, #8000FF, #4B0082, #8000FF)'
+      },
+      background: 'linear-gradient(180deg, #000000, #0a0014)',
+      surface: 'rgba(10, 0, 20, 0.95)',
+      glassMorph: 'rgba(255, 0, 255, 0.02)'
+    },
+    default: {
+      critical: { 
+        bg: 'rgba(220, 38, 38, 0.08)', 
+        border: 'rgba(220, 38, 38, 0.3)',
+        text: '#EF4444',
+        glow: 'rgba(220, 38, 38, 0.3)',
+        gradient: '#DC2626'
+      },
+      urgent: { 
+        bg: 'rgba(245, 158, 11, 0.08)', 
+        border: 'rgba(245, 158, 11, 0.3)',
+        text: '#F59E0B',
+        glow: 'rgba(245, 158, 11, 0.3)',
+        gradient: '#F59E0B'
+      },
+      opportunity: { 
+        bg: 'rgba(16, 185, 129, 0.08)', 
+        border: 'rgba(16, 185, 129, 0.3)',
+        text: '#10B981',
+        glow: 'rgba(16, 185, 129, 0.3)',
+        gradient: '#10B981'
+      },
+      success: { 
+        bg: 'rgba(59, 130, 246, 0.08)', 
+        border: 'rgba(59, 130, 246, 0.3)',
+        text: '#3B82F6',
+        glow: 'rgba(59, 130, 246, 0.3)',
+        gradient: '#3B82F6'
+      },
+      background: 'rgba(0, 0, 0, 0.3)',
+      surface: 'rgba(20, 20, 20, 0.95)',
+      glassMorph: 'rgba(255, 255, 255, 0.02)'
+    }
+  };
+  
+  return colorMap[themeMode] || colorMap.default;
+};
+
+// Enhanced mock data for dental and aesthetic sales
+const generateEnhancedMockData = (): ActionItem[] => {
+  const dentalScenarios = [
+    {
+      id: 'd1',
+      priority: 'critical' as const,
+      icon: <CriticalIcon />,
+      title: '🦷 IMPLANT SYSTEM INQUIRY',
+      message: 'Dr. Martinez comparing 3i vs Nobel Biocare - 92% close probability',
+      value: '$85K',
+      time: '2 min',
+      timestamp: new Date(Date.now() - 2 * 60 * 1000),
+      action: {
+        type: 'call' as const,
+        label: 'Call Now',
+        handler: () => console.log('Calling Dr. Martinez')
+      },
+      metrics: {
+        probability: 92,
+        impact: 'High',
+        deadline: '2 hours'
+      },
+      category: 'dental' as const,
+      aiScore: 92
+    },
+    {
+      id: 'd2',
+      priority: 'urgent' as const,
+      icon: <UrgentIcon />,
+      title: '⚡ SURGICAL CENTER RUSH',
+      message: 'Valley Surgical needs 50 implant kits by Thursday - $125K order',
+      value: '$125K',
+      time: '15 min',
+      timestamp: new Date(Date.now() - 15 * 60 * 1000),
+      action: {
+        type: 'email' as const,
+        label: 'Send Quote',
+        handler: () => console.log('Sending quote')
+      },
+      metrics: {
+        probability: 85,
+        impact: 'Very High',
+        deadline: 'Thursday'
+      },
+      category: 'dental' as const,
+      aiScore: 85
+    },
+    {
+      id: 'd3',
+      priority: 'critical' as const,
+      icon: <WarningIcon />,
+      title: '⚠️ COMPETITOR ALERT',
+      message: 'Straumann rep spotted at Downtown Dental - Your #1 account',
+      value: '$45K/mo',
+      time: '30 min',
+      timestamp: new Date(Date.now() - 30 * 60 * 1000),
+      action: {
+        type: 'call' as const,
+        label: 'Secure Account',
+        handler: () => console.log('Calling account')
+      },
+      metrics: {
+        probability: 78,
+        impact: 'Critical',
+        deadline: 'Today'
+      },
+      category: 'dental' as const,
+      aiScore: 88
+    }
+  ];
+
+  const aestheticScenarios = [
+    {
+      id: 'a1',
+      priority: 'opportunity' as const,
+      icon: <MoneyIcon />,
+      title: '💉 BOTOX BULK ORDER',
+      message: 'MedSpa chain ready to standardize on Allergan - $200K initial',
+      value: '$200K',
+      time: '5 min',
+      timestamp: new Date(Date.now() - 5 * 60 * 1000),
+      action: {
+        type: 'meeting' as const,
+        label: 'Schedule Demo',
+        handler: () => console.log('Scheduling demo')
+      },
+      metrics: {
+        probability: 88,
+        impact: 'Very High',
+        deadline: 'This week'
+      },
+      category: 'aesthetic' as const,
+      aiScore: 88
+    },
+    {
+      id: 'a2',
+      priority: 'urgent' as const,
+      icon: <TimerIcon />,
+      title: '🚨 FILLER INVENTORY LOW',
+      message: 'Dr. Kim\'s Juvederm stock critical - Usually orders $45K monthly',
+      value: '$45K',
+      time: '1 hour',
+      timestamp: new Date(Date.now() - 60 * 60 * 1000),
+      action: {
+        type: 'call' as const,
+        label: 'Reorder Call',
+        handler: () => console.log('Calling for reorder')
+      },
+      metrics: {
+        probability: 95,
+        impact: 'High',
+        deadline: 'Tomorrow'
+      },
+      category: 'aesthetic' as const,
+      aiScore: 95
+    },
+    {
+      id: 'a3',
+      priority: 'success' as const,
+      icon: <SparkleIcon />,
+      title: '🎉 FDA APPROVAL NEWS',
+      message: 'New dermal filler approved - Be first to offer RHA Collection',
+      value: 'Market Lead',
+      time: '45 min',
+      timestamp: new Date(Date.now() - 45 * 60 * 1000),
+      action: {
+        type: 'email' as const,
+        label: 'Blast Email',
+        handler: () => console.log('Sending announcement')
+      },
+      metrics: {
+        probability: 100,
+        impact: 'Strategic',
+        deadline: 'This week'
+      },
+      category: 'aesthetic' as const,
+      aiScore: 75
+    }
+  ];
+
+  return [...dentalScenarios, ...aestheticScenarios].sort((a, b) => 
+    b.timestamp.getTime() - a.timestamp.getTime()
+  );
+};
 
 // Animation keyframes
-const pulse = keyframes`
+const luxuryPulse = keyframes`
   0%, 100% {
     transform: scale(1);
     opacity: 1;
@@ -120,16 +384,16 @@ const pulse = keyframes`
   }
 `;
 
-const glow = keyframes`
+const luxuryGlow = keyframes`
   0%, 100% {
-    box-shadow: 0 0 5px currentColor;
+    box-shadow: 0 0 10px currentColor, inset 0 0 10px rgba(255, 255, 255, 0.1);
   }
   50% {
-    box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+    box-shadow: 0 0 30px currentColor, 0 0 60px currentColor, inset 0 0 20px rgba(255, 255, 255, 0.2);
   }
 `;
 
-const scroll = keyframes`
+const smoothScroll = keyframes`
   0% {
     transform: translateX(0);
   }
@@ -152,46 +416,37 @@ const snakeBorder = keyframes`
     background-position: 0% 50%;
   }
   100% {
-    background-position: 200% 50%;
+    background-position: 100% 50%;
   }
 `;
 
-// Types
-interface ActionItem {
-  id: string;
-  priority: 'critical' | 'urgent' | 'opportunity' | 'success';
-  icon: React.ReactNode;
-  title: string;
-  message: string;
-  value?: string;
-  time: string;
-  action: {
-    type: 'call' | 'email' | 'schedule' | 'view';
-    label: string;
-    handler: () => void;
-  };
-  metrics?: {
-    probability?: number;
-    impact?: string;
-    deadline?: string;
-  };
-}
+const floatAnimation = keyframes`
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+`;
 
-interface LayerConfig {
-  critical: boolean;
-  urgent: boolean;
-  opportunity: boolean;
-  success: boolean;
-}
-
-// Styled Components
+// Styled components
 const TickerRoot = styled(Box)(({ theme }) => ({
   position: 'relative',
-  background: 'linear-gradient(180deg, #000000 0%, #0a0a0a 100%)',
+  width: '100%',
+  marginBottom: theme.spacing(2),
+}));
+
+const ControlBar = styled(Box)<{ themeColors: any }>(({ theme, themeColors }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing(2),
+  padding: theme.spacing(1.5, 3),
+  background: themeColors.surface,
   backdropFilter: 'blur(20px)',
-  borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+  borderRadius: '12px 12px 0 0',
+  borderBottom: `1px solid ${alpha(themeColors.glassMorph, 0.2)}`,
+  position: 'relative',
   overflow: 'hidden',
-  height: 'auto',
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -199,150 +454,133 @@ const TickerRoot = styled(Box)(({ theme }) => ({
     left: 0,
     right: 0,
     height: '1px',
-    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)',
+    background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.primary.main, 0.5)}, transparent)`,
     animation: `${shimmer} 3s infinite`
   }
 }));
 
-const ControlBar = styled(Box)(({ theme }) => ({
+const LiveIndicator = styled(Box)<{ active: boolean }>(({ active, theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: '6px 16px',
-  background: 'rgba(0, 0, 0, 0.5)',
-  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-  gap: 8,
-  minHeight: 36
-}));
-
-const LiveIndicator = styled(Box)<{ active: boolean }>(({ active }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: 6,
-  padding: '2px 8px',
-  borderRadius: 12,
-  background: active ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-  border: `1px solid ${active ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.1)'}`,
+  gap: theme.spacing(0.5),
+  padding: theme.spacing(0.5, 1),
+  borderRadius: theme.spacing(1),
+  background: active ? alpha(theme.palette.error.main, 0.1) : alpha(theme.palette.grey[500], 0.1),
+  border: `1px solid ${active ? alpha(theme.palette.error.main, 0.3) : alpha(theme.palette.grey[500], 0.3)}`,
   '& .dot': {
-    width: 6,
-    height: 6,
+    width: 8,
+    height: 8,
     borderRadius: '50%',
-    background: active ? '#EF4444' : '#666',
-    animation: active ? `${pulse} 1.5s ease-in-out infinite` : 'none'
+    backgroundColor: active ? theme.palette.error.main : theme.palette.grey[500],
+    animation: active ? `${luxuryPulse} 2s ease-in-out infinite` : 'none',
+    boxShadow: active ? `0 0 10px ${theme.palette.error.main}` : 'none'
   }
 }));
 
 const LayerControls = styled(Box)(({ theme }) => ({
   display: 'flex',
-  gap: 8,
+  gap: theme.spacing(1),
   marginLeft: 'auto'
 }));
 
-const LayerToggle = styled(Chip)<{ active: boolean; priority: string }>(({ active, priority }) => {
-  const colors = {
-    critical: { bg: '#DC2626', light: 'rgba(220, 38, 38, 0.1)' },
-    urgent: { bg: '#F59E0B', light: 'rgba(245, 158, 11, 0.1)' },
-    opportunity: { bg: '#10B981', light: 'rgba(16, 185, 129, 0.1)' },
-    success: { bg: '#3B82F6', light: 'rgba(59, 130, 246, 0.1)' }
-  };
-  
-  const color = colors[priority as keyof typeof colors];
+const LayerToggle = styled(Chip)<{ active: boolean; priority: string; themeColors: any }>(({ active, priority, themeColors }) => {
+  const color = themeColors[priority] || themeColors.success;
   
   return {
     cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    background: active ? color.light : 'transparent',
-    borderColor: active ? color.bg : 'rgba(255, 255, 255, 0.2)',
-    color: active ? color.bg : 'rgba(255, 255, 255, 0.5)',
-    fontSize: '0.7rem',
-    height: 24,
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    background: active ? color.bg : 'transparent',
+    borderColor: active ? color.border : alpha(color.border, 0.3),
+    color: active ? color.text : alpha(color.text, 0.6),
+    fontSize: '0.75rem',
+    height: 28,
+    fontWeight: active ? 600 : 400,
+    backdropFilter: 'blur(10px)',
     '&:hover': {
-      background: color.light,
-      borderColor: color.bg,
-      transform: 'translateY(-1px)'
+      background: color.bg,
+      borderColor: color.border,
+      transform: 'translateY(-2px)',
+      boxShadow: `0 4px 20px ${alpha(color.glow, 0.3)}`
     }
   };
 });
 
-const MainTicker = styled(Box)(({ theme }) => ({
+const MainTicker = styled(Box)<{ themeColors: any }>(({ themeColors }) => ({
   position: 'relative',
-  height: 48,
+  height: 56,
   display: 'flex',
   alignItems: 'center',
   overflow: 'hidden',
-  background: 'rgba(0, 0, 0, 0.3)'
+  background: themeColors.background,
+  borderRadius: '0 0 12px 12px',
+  '&::before, &::after': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 100,
+    zIndex: 2,
+    pointerEvents: 'none'
+  },
+  '&::before': {
+    left: 0,
+    background: `linear-gradient(90deg, ${themeColors.background} 0%, transparent 100%)`
+  },
+  '&::after': {
+    right: 0,
+    background: `linear-gradient(90deg, transparent 0%, ${themeColors.background} 100%)`
+  }
 }));
 
 const TickerContent = styled(Box)<{ paused: boolean }>(({ paused }) => ({
   display: 'flex',
   alignItems: 'center',
-  animation: paused ? 'none' : `${scroll} 60s linear infinite`,
+  animation: paused ? 'none' : `${smoothScroll} 40s linear infinite`,
   whiteSpace: 'nowrap',
-  gap: 24
+  gap: 24,
+  paddingLeft: 24,
+  paddingRight: 24
 }));
 
-const ActionCard = styled(Box)<{ priority: string; active?: boolean }>(({ priority, active = false }) => {
-  const colors = {
-    critical: { 
-      bg: 'rgba(220, 38, 38, 0.08)', 
-      border: 'rgba(220, 38, 38, 0.3)',
-      text: '#EF4444',
-      glow: 'rgba(220, 38, 38, 0.3)',
-      gradient: '#DC2626'
-    },
-    urgent: { 
-      bg: 'rgba(245, 158, 11, 0.08)', 
-      border: 'rgba(245, 158, 11, 0.3)',
-      text: '#F59E0B',
-      glow: 'rgba(245, 158, 11, 0.3)',
-      gradient: '#F59E0B'
-    },
-    opportunity: { 
-      bg: 'rgba(16, 185, 129, 0.08)', 
-      border: 'rgba(16, 185, 129, 0.3)',
-      text: '#10B981',
-      glow: 'rgba(16, 185, 129, 0.3)',
-      gradient: '#10B981'
-    },
-    success: { 
-      bg: 'rgba(59, 130, 246, 0.08)', 
-      border: 'rgba(59, 130, 246, 0.3)',
-      text: '#3B82F6',
-      glow: 'rgba(59, 130, 246, 0.3)',
-      gradient: '#3B82F6'
-    }
-  };
-  
-  const color = colors[priority as keyof typeof colors] || colors.success;
+const ActionCard = styled(Box)<{ priority: string; active?: boolean; themeColors: any }>(({ priority, active = false, themeColors }) => {
+  const color = themeColors[priority] || themeColors.success;
   
   return {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 12,
-    padding: '10px 16px',
-    background: `linear-gradient(135deg, ${color.bg} 0%, rgba(0,0,0,0.05) 100%)`,
-    borderRadius: 10,
+    padding: '12px 20px',
+    background: color.bg,
+    borderRadius: 12,
     cursor: 'pointer',
-    transition: 'all 0.3s ease',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     position: 'relative',
-    minWidth: 350,
-    height: 42,
+    minWidth: 380,
+    height: 48,
     flexShrink: 0,
     overflow: 'hidden',
+    backdropFilter: 'blur(10px)',
+    border: `1px solid ${color.border}`,
     '&:hover': {
-      transform: 'translateY(-1px) scale(1.02)',
-      background: `linear-gradient(135deg, ${color.bg} 0%, rgba(0,0,0,0.08) 100%)`,
+      transform: 'translateY(-2px) scale(1.02)',
+      boxShadow: `0 8px 32px ${alpha(color.glow, 0.3)}`,
+      borderColor: color.text,
+      background: alpha(color.bg, 0.8),
+      '& .action-button': {
+        transform: 'translateX(0)',
+        opacity: 1
+      }
     },
-    // Snake border animation
     '&::before': priority === 'critical' || active ? {
       content: '""',
       position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
+      top: -1,
+      left: -1,
+      right: -1,
+      bottom: -1,
       borderRadius: 'inherit',
-      padding: '2px',
-      background: `linear-gradient(90deg, ${color.gradient}, ${color.text}, ${color.gradient})`,
+      padding: '1px',
+      background: color.gradient,
       backgroundSize: '200% 100%',
       animation: `${snakeBorder} 3s linear infinite`,
       mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
@@ -354,167 +592,62 @@ const ActionCard = styled(Box)<{ priority: string; active?: boolean }>(({ priori
   };
 });
 
-const PriorityIcon = styled(Box)<{ priority: string }>(({ priority }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: 24,
-  height: 24,
-  borderRadius: '50%',
-  background: priority === 'critical' ? 'rgba(220, 38, 38, 0.15)' : 
-              priority === 'urgent' ? 'rgba(245, 158, 11, 0.15)' :
-              priority === 'opportunity' ? 'rgba(16, 185, 129, 0.15)' :
-              'rgba(59, 130, 246, 0.15)',
-  animation: priority === 'critical' ? `${pulse} 2s ease-in-out infinite` : 'none',
-  '& svg': {
-    fontSize: 16
-  }
-}));
+const PriorityIcon = styled(Box)<{ priority: string; themeColors: any }>(({ priority, themeColors }) => {
+  const color = themeColors[priority] || themeColors.success;
+  
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 32,
+    height: 32,
+    borderRadius: '50%',
+    background: alpha(color.text, 0.1),
+    animation: priority === 'critical' ? `${luxuryPulse} 2s ease-in-out infinite` : 
+               priority === 'urgent' ? `${luxuryGlow} 3s ease-in-out infinite` : 'none',
+    '& svg': {
+      fontSize: 18,
+      color: color.text
+    }
+  };
+});
 
 const MetricBadge = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
   alignItems: 'center',
   gap: 4,
-  padding: '2px 8px',
-  borderRadius: 12,
-  background: 'rgba(255, 255, 255, 0.05)',
-  fontSize: '0.75rem',
-  fontWeight: 600
+  padding: '4px 12px',
+  borderRadius: 16,
+  background: alpha(theme.palette.common.white, 0.05),
+  backdropFilter: 'blur(10px)',
+  fontSize: '0.7rem',
+  fontWeight: 600,
+  letterSpacing: '0.5px'
 }));
 
-const ExpandedView = styled(Collapse)(({ theme }) => ({
-  background: 'rgba(0, 0, 0, 0.3)',
-  borderTop: '1px solid rgba(255, 255, 255, 0.05)'
-}));
-
-const CategorySection = styled(Box)(({ theme }) => ({
-  padding: '20px',
-  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-  '&:last-child': {
-    borderBottom: 'none'
+const NotificationCenter = styled(Popover)(({ theme }) => ({
+  '& .MuiPaper-root': {
+    background: alpha(theme.palette.background.paper, 0.95),
+    backdropFilter: 'blur(20px)',
+    borderRadius: 16,
+    border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+    minWidth: 380,
+    maxHeight: 480,
+    overflow: 'hidden'
   }
 }));
 
-// Convert NowCards data to ticker format
-const generateActionItems = (): ActionItem[] => {
-  return nowCardsData.map((card, index) => {
-    // Map priority
-    const getPriority = (priority: string) => {
-      if (priority === 'high') return 'critical';
-      if (priority === 'medium') return 'urgent';
-      return 'opportunity';
-    };
-
-    // Determine action type based on card type
-    const getAction = (type: string) => {
-      switch (type) {
-        case 'competitor_threat':
-        case 'renewal_risk':
-          return { type: 'call' as const, label: 'Call Now', handler: () => console.log('Calling...') };
-        case 're_engagement':
-        case 'purchase_intent':
-          return { type: 'email' as const, label: 'Send Info', handler: () => console.log('Sending...') };
-        case 'urgent_need':
-          return { type: 'schedule' as const, label: 'Schedule', handler: () => console.log('Scheduling...') };
-        default:
-          return { type: 'view' as const, label: 'View', handler: () => console.log('Viewing...') };
-      }
-    };
-
-    // Extract value from title if present
-    const extractValue = (title: string) => {
-      const match = title.match(/\$(\d+)K/);
-      return match ? match[0] : '';
-    };
-
-    return {
-      id: card.id,
-      priority: getPriority(card.priority),
-      icon: card.priority === 'high' ? <CriticalIcon /> : 
-            card.priority === 'medium' ? <UrgentIcon /> : 
-            <OpportunityIcon />,
-      title: card.title.split(':')[0].replace(/[🔥⚡💰🎯⏰🔄📊]/g, '').trim(),
-      message: card.description,
-      value: extractValue(card.title) || `${card.confidenceScore}% AI`,
-      time: '2 min',
-      action: getAction(card.type),
-      metrics: {
-        probability: card.confidenceScore,
-        impact: extractValue(card.title),
-        deadline: card.timeframe
-      }
-    };
-  });
-};
-
 const LiveActionTicker: React.FC = () => {
-  // Use SUIS data for real intelligence - use optional hook
-  const suisContext = useSUISOptional();
-  const state = suisContext?.state || null;
-  const { marketIntelligence, notifications } = state || { marketIntelligence: [], notifications: [] };
+  const theme = useTheme();
+  const { themeMode } = useThemeContext();
+  const themeColors = getThemeColors(themeMode);
   
-  // Transform SUIS data into ticker format
-  const tickerData = useMemo(() => {
-    const items: ActionItem[] = [];
-    
-    // Convert market intelligence to ticker items
-    if (marketIntelligence && marketIntelligence.length > 0) {
-      marketIntelligence.forEach((intel: any) => {
-        if (intel) {
-          items.push({
-            id: intel.id || `intel-${Date.now()}`,
-          priority: intel.data?.impact === 'high' ? 'critical' : 'urgent',
-          icon: intel.intelligenceType === 'competitor_move' ? <UrgentIcon /> : <OpportunityIcon />,
-          title: intel.intelligenceType ? intel.intelligenceType.toUpperCase() : 'MARKET UPDATE',
-          message: intel.data?.trend || intel.data?.action || 'Market Intelligence Update',
-          value: intel.confidenceScore ? `${Math.round(intel.confidenceScore * 100)}% AI` : '',
-          time: '2 min',
-          action: {
-            type: 'view' as const,
-            label: 'View Details',
-            handler: () => console.log('View intelligence:', intel.id)
-          },
-          metrics: {
-            probability: Math.round((intel.confidenceScore || 0.5) * 100),
-            impact: intel.data?.impact || 'medium',
-            deadline: intel.expiresAt ? new Date(intel.expiresAt).toLocaleDateString() : 'N/A'
-          }
-        });
-        }
-      });
-    }
-    
-    // Convert notifications to ticker items
-    if (notifications && notifications.length > 0) {
-      notifications.slice(0, 5).forEach((notif: any) => {
-        if (notif && !notif.readAt) {
-          items.push({
-            id: notif.id || `notif-${Date.now()}`,
-            priority: notif.priority === 'high' ? 'critical' : 'urgent',
-            icon: notif.type === 'alert' ? <AlertIcon /> : <AnalyticsIcon />,
-            title: notif.type ? notif.type.toUpperCase() : 'NOTIFICATION',
-            message: notif.message || 'New notification',
-            time: 'Just now',
-            action: {
-              type: 'view' as const,
-              label: 'Mark Read',
-              handler: () => console.log('Mark read:', notif.id)
-            }
-          });
-        }
-      });
-    }
-    
-    return items;
-  }, [marketIntelligence, notifications]);
-  
-  const loading = false;
-  const error = null;
-  
-  const [items, setItems] = useState<ActionItem[]>([]);
+  // State
+  const [items, setItems] = useState<ActionItem[]>(generateEnhancedMockData());
   const [playing, setPlaying] = useState(true);
   const [expanded, setExpanded] = useState(false);
   const [speed, setSpeed] = useState(1);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const [layers, setLayers] = useState<LayerConfig>({
     critical: true,
     urgent: true,
@@ -522,16 +655,65 @@ const LiveActionTicker: React.FC = () => {
     success: true
   });
   const [settingsAnchor, setSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
+  const [unreadCount, setUnreadCount] = useState(3);
 
-  // Update items when SUIS data changes
+  // Sound hooks
+  const criticalSound = useSound('notification-urgent');
+  const successSound = useSound('notification-success');
+  const clickSound = useSound('ui-click-primary');
+
+  // Request notification permission
   useEffect(() => {
-    if (tickerData && tickerData.length > 0) {
-      setItems(tickerData);
-    } else {
-      // Fallback to generated data if no SUIS data available
-      setItems(generateActionItems());
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
     }
-  }, [tickerData]);
+  }, []);
+
+  // Simulate real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (Math.random() > 0.7) {
+        const mockData = generateEnhancedMockData();
+        const newItem = mockData[Math.floor(Math.random() * mockData.length)];
+        
+        setItems(prev => {
+          const updated = [{ ...newItem, id: Date.now().toString(), time: 'Just now' }, ...prev];
+          return updated.slice(0, 20);
+        });
+        
+        setUnreadCount(prev => prev + 1);
+        
+        // Play sound for critical items
+        if (soundEnabled && newItem.priority === 'critical') {
+          criticalSound.play();
+        }
+        
+        // Browser notification for critical items
+        if ('Notification' in window && 
+            Notification.permission === 'granted' && 
+            newItem.priority === 'critical') {
+          new Notification('Critical Sales Alert', {
+            body: newItem.message,
+            icon: '/favicon.ico',
+            tag: newItem.id
+          });
+        }
+      }
+    }, 15000);
+    
+    return () => clearInterval(interval);
+  }, [soundEnabled, criticalSound]);
+
+  const handleLayerToggle = (layer: keyof LayerConfig) => {
+    setLayers(prev => ({ ...prev, [layer]: !prev[layer] }));
+    clickSound.play();
+  };
+
+  const handleActionClick = (item: ActionItem) => {
+    item.action.handler();
+    successSound.play();
+  };
 
   // Filter items based on active layers
   const visibleItems = items.filter(item => layers[item.priority]);
@@ -544,97 +726,112 @@ const LiveActionTicker: React.FC = () => {
     success: items.filter(i => i.priority === 'success')
   };
 
-  // Simulate real-time updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Add random new critical item occasionally
-      if (Math.random() > 0.95) {
-        const newItem: ActionItem = {
-          id: Date.now().toString(),
-          priority: 'critical',
-          icon: <CriticalIcon />,
-          title: 'NEW URGENT',
-          message: 'New critical action required',
-          value: '$' + Math.floor(Math.random() * 500) + 'K',
-          time: 'Just now',
-          action: {
-            type: 'call',
-            label: 'Action',
-            handler: () => console.log('New action')
-          },
-          metrics: {
-            probability: 90,
-            impact: 'High',
-            deadline: 'ASAP'
-          }
-        };
-        setItems(prev => [newItem, ...prev].slice(0, 20));
-      }
-    }, 10000);
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleLayerToggle = (layer: keyof LayerConfig) => {
-    setLayers(prev => ({ ...prev, [layer]: !prev[layer] }));
-  };
-
-  const handleActionClick = (item: ActionItem) => {
-    // Execute the action
-    item.action.handler();
-    
-    // Could also update the item status, send analytics, etc.
-    console.log('Action clicked:', item);
-  };
-
-
   return (
     <TickerRoot>
       {/* Control Bar */}
-      <ControlBar>
+      <ControlBar themeColors={themeColors}>
         <LiveIndicator active={playing}>
           <Box className="dot" />
-          <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 600 }}>
+          <Typography variant="caption" sx={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em' }}>
             {playing ? 'LIVE' : 'PAUSED'}
           </Typography>
         </LiveIndicator>
 
         <IconButton 
           size="small" 
-          onClick={() => setPlaying(!playing)}
-          sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+          onClick={() => {
+            setPlaying(!playing);
+            clickSound.play();
+          }}
+          sx={{ 
+            color: theme.palette.text.secondary,
+            '&:hover': {
+              color: theme.palette.primary.main,
+              background: alpha(theme.palette.primary.main, 0.1)
+            }
+          }}
         >
           {playing ? <PauseIcon /> : <PlayIcon />}
         </IconButton>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <SpeedIcon sx={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.5)' }} />
+          <SpeedIcon sx={{ fontSize: 16, color: alpha(theme.palette.text.primary, 0.5) }} />
           <Slider
             value={speed}
             onChange={(e, val) => setSpeed(val as number)}
             min={0.5}
             max={2}
             step={0.5}
-            sx={{ width: 60, '& .MuiSlider-thumb': { width: 12, height: 12 } }}
+            sx={{ 
+              width: 80, 
+              '& .MuiSlider-thumb': { 
+                width: 14, 
+                height: 14,
+                '&:hover': {
+                  boxShadow: `0 0 0 8px ${alpha(theme.palette.primary.main, 0.16)}`
+                }
+              },
+              '& .MuiSlider-track': {
+                background: theme.palette.primary.main
+              }
+            }}
             size="small"
           />
-          <Typography variant="caption" sx={{ minWidth: 25, fontSize: '0.65rem' }}>
+          <Typography variant="caption" sx={{ minWidth: 30, fontSize: '0.7rem', fontWeight: 600 }}>
             {speed}x
           </Typography>
         </Box>
 
         <IconButton 
           size="small" 
-          onClick={() => setExpanded(!expanded)}
-          sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+          onClick={() => {
+            setSoundEnabled(!soundEnabled);
+            clickSound.play();
+          }}
+          sx={{ 
+            color: soundEnabled ? theme.palette.primary.main : alpha(theme.palette.text.primary, 0.3),
+            '&:hover': {
+              color: theme.palette.primary.main,
+              background: alpha(theme.palette.primary.main, 0.1)
+            }
+          }}
         >
-          {expanded ? <VisibilityOffIcon /> : <VisibilityIcon />}
+          {soundEnabled ? <VolumeUpIcon /> : <VolumeOffIcon />}
         </IconButton>
 
         <IconButton 
           size="small" 
-          onClick={(e) => setSettingsAnchor(e.currentTarget)}
-          sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+          onClick={(e) => {
+            setNotificationAnchor(e.currentTarget);
+            setUnreadCount(0);
+            clickSound.play();
+          }}
+          sx={{ 
+            color: theme.palette.text.secondary,
+            '&:hover': {
+              color: theme.palette.primary.main,
+              background: alpha(theme.palette.primary.main, 0.1)
+            }
+          }}
+        >
+          <Badge badgeContent={unreadCount} color="error">
+            <NotificationsIcon />
+          </Badge>
+        </IconButton>
+
+        <IconButton 
+          size="small" 
+          onClick={(e) => {
+            setSettingsAnchor(e.currentTarget);
+            clickSound.play();
+          }}
+          sx={{ 
+            color: theme.palette.text.secondary,
+            '&:hover': {
+              color: theme.palette.primary.main,
+              background: alpha(theme.palette.primary.main, 0.1)
+            }
+          }}
         >
           <SettingsIcon />
         </IconButton>
@@ -646,6 +843,7 @@ const LiveActionTicker: React.FC = () => {
             size="small"
             active={layers.critical}
             priority="critical"
+            themeColors={themeColors}
             onClick={() => handleLayerToggle('critical')}
           />
           <LayerToggle
@@ -654,6 +852,7 @@ const LiveActionTicker: React.FC = () => {
             size="small"
             active={layers.urgent}
             priority="urgent"
+            themeColors={themeColors}
             onClick={() => handleLayerToggle('urgent')}
           />
           <LayerToggle
@@ -662,6 +861,7 @@ const LiveActionTicker: React.FC = () => {
             size="small"
             active={layers.opportunity}
             priority="opportunity"
+            themeColors={themeColors}
             onClick={() => handleLayerToggle('opportunity')}
           />
           <LayerToggle
@@ -670,40 +870,37 @@ const LiveActionTicker: React.FC = () => {
             size="small"
             active={layers.success}
             priority="success"
+            themeColors={themeColors}
             onClick={() => handleLayerToggle('success')}
           />
         </LayerControls>
       </ControlBar>
 
       {/* Main Ticker */}
-      <MainTicker>
+      <MainTicker themeColors={themeColors}>
         <TickerContent paused={!playing}>
           {[...visibleItems, ...visibleItems].map((item, index) => (
             <ActionCard 
               key={`${item.id}-${index}`}
               priority={item.priority}
+              themeColors={themeColors}
               onClick={() => handleActionClick(item)}
             >
-              <PriorityIcon priority={item.priority}>
-                {React.cloneElement(item.icon as React.ReactElement, { 
-                  sx: { color: item.priority === 'critical' ? '#DC2626' : 
-                        item.priority === 'urgent' ? '#F59E0B' :
-                        item.priority === 'opportunity' ? '#10B981' : '#3B82F6' }
-                })}
+              <PriorityIcon priority={item.priority} themeColors={themeColors}>
+                {item.icon}
               </PriorityIcon>
               
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography 
                   variant="caption" 
                   sx={{ 
-                    fontWeight: 600,
-                    fontSize: '0.75rem',
-                    color: item.priority === 'critical' ? '#EF4444' : 
-                           item.priority === 'urgent' ? '#F59E0B' :
-                           item.priority === 'opportunity' ? '#10B981' : '#3B82F6',
+                    fontWeight: 700,
+                    fontSize: '0.8rem',
+                    color: themeColors[item.priority]?.text,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
-                    textOverflow: 'ellipsis'
+                    textOverflow: 'ellipsis',
+                    letterSpacing: '0.5px'
                   }}
                 >
                   {item.message}
@@ -711,104 +908,113 @@ const LiveActionTicker: React.FC = () => {
               </Box>
               
               {item.metrics?.probability && (
-                <Box
-                  sx={{
-                    background: `linear-gradient(45deg, ${
-                      item.priority === 'critical' ? '#DC2626' :
-                      item.priority === 'urgent' ? '#F59E0B' :
-                      '#10B981'
-                    }, ${
-                      item.priority === 'critical' ? '#DC262688' :
-                      item.priority === 'urgent' ? '#F59E0B88' :
-                      '#10B98188'
-                    })`,
-                    color: 'white',
-                    px: 1,
-                    py: 0.25,
-                    borderRadius: 1.5,
-                    fontSize: '0.65rem',
-                    fontWeight: 'bold',
-                    boxShadow: 1,
+                <MetricBadge>
+                  <DiamondIcon sx={{ fontSize: 12 }} />
+                  {item.metrics.probability}% AI
+                </MetricBadge>
+              )}
+              
+              {item.value && (
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    color: themeColors[item.priority]?.text,
+                    letterSpacing: '0.5px'
                   }}
                 >
-                  {item.metrics.probability}% AI
-                </Box>
+                  {item.value}
+                </Typography>
               )}
+              
+              <Button
+                size="small"
+                className="action-button"
+                sx={{
+                  textTransform: 'none',
+                  fontSize: '0.7rem',
+                  py: 0.5,
+                  px: 1.5,
+                  minWidth: 'auto',
+                  background: alpha(themeColors[item.priority]?.text || '#fff', 0.1),
+                  color: themeColors[item.priority]?.text,
+                  border: `1px solid ${alpha(themeColors[item.priority]?.text || '#fff', 0.2)}`,
+                  transform: 'translateX(10px)',
+                  opacity: 0,
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: alpha(themeColors[item.priority]?.text || '#fff', 0.2),
+                    borderColor: themeColors[item.priority]?.text
+                  }
+                }}
+              >
+                {item.action.label}
+              </Button>
             </ActionCard>
           ))}
         </TickerContent>
       </MainTicker>
 
-      {/* Expanded View */}
-      <ExpandedView in={expanded}>
-        {layers.critical && groupedItems.critical.length > 0 && (
-          <CategorySection>
-            <Typography 
-              variant="subtitle2" 
-              sx={{ 
-                mb: 2,
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: '#FF6B6B',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1
-              }}
-            >
-              <CriticalIcon /> Critical Actions ({groupedItems.critical.length})
-            </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {groupedItems.critical.map(item => (
-                <ActionCard 
-                  key={item.id}
-                  priority={item.priority}
-                  onClick={() => handleActionClick(item)}
-                  sx={{ width: '100%', minWidth: 'auto' }}
+      {/* Notification Center */}
+      <NotificationCenter
+        open={Boolean(notificationAnchor)}
+        anchorEl={notificationAnchor}
+        onClose={() => setNotificationAnchor(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <Box sx={{ p: 2 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            Notifications
+          </Typography>
+          <List sx={{ width: '100%' }}>
+            {items.slice(0, 5).map((item) => (
+              <React.Fragment key={item.id}>
+                <ListItem 
+                  alignItems="flex-start"
+                  sx={{ 
+                    px: 0,
+                    '&:hover': {
+                      background: alpha(theme.palette.primary.main, 0.05),
+                      borderRadius: 1
+                    }
+                  }}
                 >
-                  <PriorityIcon priority={item.priority}>
-                    {item.icon}
-                  </PriorityIcon>
-                  
-                  <Box sx={{ flex: 1 }}>
-                    <Typography variant="body2" fontWeight={600}>
-                      {item.message}
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
-                      <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                        {item.time} ago
-                      </Typography>
-                      {item.metrics && (
-                        <>
-                          <Typography variant="caption">
-                            Impact: {item.metrics.impact}
-                          </Typography>
-                          <Typography variant="caption">
-                            Deadline: {item.metrics.deadline}
-                          </Typography>
-                        </>
-                      )}
-                    </Box>
-                  </Box>
-                  
-                  <Button
-                    size="small"
-                    sx={{
-                      textTransform: 'none',
-                      fontSize: '0.7rem',
-                      py: 0.5,
-                      px: 1.5,
-                      minWidth: 'auto'
-                    }}
-                  >
-                    {item.action.label}
-                  </Button>
-                </ActionCard>
-              ))}
-            </Box>
-          </CategorySection>
-        )}
-      </ExpandedView>
+                  <ListItemIcon sx={{ minWidth: 40 }}>
+                    <PriorityIcon priority={item.priority} themeColors={themeColors}>
+                      {item.icon}
+                    </PriorityIcon>
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.message}
+                    secondary={
+                      <React.Fragment>
+                        <Typography component="span" variant="body2" color="text.primary">
+                          {item.value}
+                        </Typography>
+                        {" — "}{item.time} ago
+                      </React.Fragment>
+                    }
+                  />
+                  <ListItemSecondaryAction>
+                    <IconButton edge="end" size="small">
+                      <MoreVertIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+                <Divider variant="inset" component="li" />
+              </React.Fragment>
+            ))}
+          </List>
+        </Box>
+      </NotificationCenter>
 
       {/* Settings Menu */}
       <Menu
@@ -817,21 +1023,22 @@ const LiveActionTicker: React.FC = () => {
         onClose={() => setSettingsAnchor(null)}
         PaperProps={{
           sx: {
-            background: 'rgba(20, 20, 20, 0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)'
+            background: alpha(theme.palette.background.paper, 0.95),
+            backdropFilter: 'blur(20px)',
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+            borderRadius: 2
           }
         }}
       >
         <MenuItem>
           <FormControlLabel
-            control={<Switch size="small" defaultChecked />}
+            control={<Switch size="small" checked={true} />}
             label="Auto-refresh data"
           />
         </MenuItem>
         <MenuItem>
           <FormControlLabel
-            control={<Switch size="small" defaultChecked />}
+            control={<Switch size="small" checked={soundEnabled} onChange={(e) => setSoundEnabled(e.target.checked)} />}
             label="Sound notifications"
           />
         </MenuItem>
