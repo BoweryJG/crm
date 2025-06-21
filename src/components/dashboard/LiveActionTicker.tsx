@@ -87,37 +87,37 @@ interface LayerConfig {
   success: boolean;
 }
 
-// Theme-aware color mapping
+// Theme-aware color mapping with stunning vibrant colors
 const getThemeColors = (themeMode: string) => {
   const colorMap: Record<string, any> = {
     'gallery-dominance': {
       critical: { 
-        bg: 'linear-gradient(135deg, rgba(139, 69, 19, 0.15), rgba(255, 215, 0, 0.08))',
-        border: 'rgba(255, 215, 0, 0.5)',
+        bg: 'linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(255, 140, 0, 0.15))',
+        border: 'rgba(255, 215, 0, 0.8)',
         text: '#FFD700',
-        glow: 'rgba(255, 215, 0, 0.4)',
-        gradient: 'linear-gradient(90deg, #B8860B, #FFD700, #B8860B)'
+        glow: 'rgba(255, 215, 0, 0.6)',
+        gradient: 'linear-gradient(90deg, #FFD700, #FFA500, #FFD700)'
       },
       urgent: { 
-        bg: 'linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(255, 255, 255, 0.08))',
-        border: 'rgba(192, 192, 192, 0.5)',
-        text: '#E5E5E5',
-        glow: 'rgba(192, 192, 192, 0.4)',
-        gradient: 'linear-gradient(90deg, #C0C0C0, #FFFFFF, #C0C0C0)'
+        bg: 'linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(220, 220, 220, 0.1))',
+        border: 'rgba(255, 255, 255, 0.6)',
+        text: '#FFFFFF',
+        glow: 'rgba(255, 255, 255, 0.5)',
+        gradient: 'linear-gradient(90deg, #FFFFFF, #F0F0F0, #FFFFFF)'
       },
       opportunity: { 
-        bg: 'linear-gradient(135deg, rgba(34, 139, 34, 0.15), rgba(50, 205, 50, 0.08))',
-        border: 'rgba(50, 205, 50, 0.5)',
-        text: '#32CD32',
-        glow: 'rgba(50, 205, 50, 0.4)',
-        gradient: 'linear-gradient(90deg, #228B22, #32CD32, #228B22)'
+        bg: 'linear-gradient(135deg, rgba(0, 255, 127, 0.25), rgba(50, 205, 50, 0.15))',
+        border: 'rgba(0, 255, 127, 0.8)',
+        text: '#00FF7F',
+        glow: 'rgba(0, 255, 127, 0.6)',
+        gradient: 'linear-gradient(90deg, #00FF7F, #32CD32, #00FF7F)'
       },
       success: { 
-        bg: 'linear-gradient(135deg, rgba(25, 25, 112, 0.15), rgba(65, 105, 225, 0.08))',
-        border: 'rgba(65, 105, 225, 0.5)',
-        text: '#4169E1',
-        glow: 'rgba(65, 105, 225, 0.4)',
-        gradient: 'linear-gradient(90deg, #191970, #4169E1, #191970)'
+        bg: 'linear-gradient(135deg, rgba(138, 43, 226, 0.25), rgba(65, 105, 225, 0.15))',
+        border: 'rgba(138, 43, 226, 0.8)',
+        text: '#8A2BE2',
+        glow: 'rgba(138, 43, 226, 0.6)',
+        gradient: 'linear-gradient(90deg, #8A2BE2, #4169E1, #8A2BE2)'
       },
       background: 'linear-gradient(180deg, #000000, #0a0a0a)',
       surface: 'rgba(20, 20, 20, 0.95)',
@@ -125,18 +125,18 @@ const getThemeColors = (themeMode: string) => {
     },
     'boeing-cockpit': {
       critical: { 
-        bg: 'linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(255, 69, 0, 0.1))',
-        border: 'rgba(255, 69, 0, 0.6)',
-        text: '#FF4500',
-        glow: 'rgba(255, 69, 0, 0.5)',
+        bg: 'linear-gradient(135deg, rgba(255, 0, 0, 0.3), rgba(255, 69, 0, 0.2))',
+        border: 'rgba(255, 0, 0, 0.9)',
+        text: '#FF0000',
+        glow: 'rgba(255, 0, 0, 0.7)',
         gradient: 'linear-gradient(90deg, #FF0000, #FF4500, #FF0000)'
       },
       urgent: { 
-        bg: 'linear-gradient(135deg, rgba(255, 165, 0, 0.2), rgba(255, 215, 0, 0.1))',
-        border: 'rgba(255, 165, 0, 0.6)',
+        bg: 'linear-gradient(135deg, rgba(255, 165, 0, 0.3), rgba(255, 215, 0, 0.2))',
+        border: 'rgba(255, 165, 0, 0.9)',
         text: '#FFA500',
-        glow: 'rgba(255, 165, 0, 0.5)',
-        gradient: 'linear-gradient(90deg, #FF8C00, #FFA500, #FF8C00)'
+        glow: 'rgba(255, 165, 0, 0.7)',
+        gradient: 'linear-gradient(90deg, #FF8C00, #FFD700, #FF8C00)'
       },
       opportunity: { 
         bg: 'linear-gradient(135deg, rgba(0, 255, 0, 0.2), rgba(50, 205, 50, 0.1))',
@@ -372,24 +372,66 @@ const generateEnhancedMockData = (): ActionItem[] => {
   );
 };
 
-// Animation keyframes
+// Animation keyframes - Enhanced with stunning pulsation effects
 const luxuryPulse = keyframes`
   0%, 100% {
-    transform: scale(1);
-    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    opacity: 0.8;
+    filter: brightness(1) saturate(1) hue-rotate(0deg);
+  }
+  25% {
+    transform: scale(1.04) rotate(1deg);
+    opacity: 0.9;
+    filter: brightness(1.2) saturate(1.3) hue-rotate(5deg);
   }
   50% {
-    transform: scale(1.05);
+    transform: scale(1.08) rotate(-1deg);
+    opacity: 1;
+    filter: brightness(1.5) saturate(1.6) hue-rotate(-5deg);
+  }
+  75% {
+    transform: scale(1.04) rotate(1deg);
     opacity: 0.9;
+    filter: brightness(1.2) saturate(1.3) hue-rotate(5deg);
   }
 `;
 
 const luxuryGlow = keyframes`
   0%, 100% {
-    box-shadow: 0 0 10px currentColor, inset 0 0 10px rgba(255, 255, 255, 0.1);
+    box-shadow: 
+      0 0 20px currentColor, 
+      0 0 40px currentColor, 
+      inset 0 0 20px rgba(255, 255, 255, 0.2);
+    filter: brightness(1) saturate(1);
+    transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 30px currentColor, 0 0 60px currentColor, inset 0 0 20px rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      0 0 40px currentColor, 
+      0 0 80px currentColor, 
+      0 0 120px currentColor, 
+      inset 0 0 40px rgba(255, 255, 255, 0.4);
+    filter: brightness(1.4) saturate(1.5);
+    transform: scale(1.02);
+  }
+`;
+
+const colorWave = keyframes`
+  0%, 100% {
+    filter: hue-rotate(0deg) saturate(1) brightness(1);
+    transform: translateY(0);
+  }
+  25% {
+    filter: hue-rotate(15deg) saturate(1.2) brightness(1.1);
+    transform: translateY(-2px);
+  }
+  50% {
+    filter: hue-rotate(-15deg) saturate(1.4) brightness(1.2);
+    transform: translateY(0);
+  }
+  75% {
+    filter: hue-rotate(10deg) saturate(1.2) brightness(1.1);
+    transform: translateY(2px);
   }
 `;
 
@@ -494,6 +536,14 @@ const LayerToggle: React.FC<{
 }> = ({ label, variant = 'outlined', size = 'small', active, priority, themeColors, onClick }) => {
   const color = themeColors[priority] || themeColors.success;
   
+  // Use solid colors for alpha operations
+  const borderColor = typeof color.border === 'string' && !color.border.includes('gradient') 
+    ? color.border 
+    : 'rgba(255, 255, 255, 0.2)';
+  const textColor = typeof color.text === 'string' && !color.text.includes('gradient')
+    ? color.text
+    : '#ffffff';
+  
   return (
     <Chip
       label={label}
@@ -504,15 +554,15 @@ const LayerToggle: React.FC<{
         cursor: 'pointer',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         background: active ? color.bg : 'transparent',
-        borderColor: active ? color.border : alpha(color.border, 0.3),
-        color: active ? color.text : alpha(color.text, 0.6),
+        borderColor: active ? borderColor : alpha(borderColor, 0.3),
+        color: active ? textColor : alpha(textColor, 0.6),
         fontSize: '0.75rem',
         height: 28,
         fontWeight: active ? 600 : 400,
         backdropFilter: 'blur(10px)',
         '&:hover': {
           background: color.bg,
-          borderColor: color.border,
+          borderColor: borderColor,
           transform: 'translateY(-2px)',
           boxShadow: `0 4px 20px ${color.glow}`
         },
@@ -580,13 +630,16 @@ const ActionCard = styled(Box)<{ priority: string; active?: boolean; themeColors
     flexShrink: 0,
     overflow: 'hidden',
     backdropFilter: 'blur(10px)',
-    border: `1px solid ${color.border}`,
+    border: `2px solid ${color.border}`,
+    animation: priority === 'critical' ? `${colorWave} 4s ease-in-out infinite` : 
+               priority === 'urgent' ? `${luxuryPulse} 3s ease-in-out infinite` : 'none',
+    boxShadow: `0 4px 20px ${color.glow}`,
     '&:hover': {
-      transform: 'translateY(-2px) scale(1.02)',
-      boxShadow: `0 8px 32px ${color.glow}`,
+      transform: 'translateY(-4px) scale(1.05)',
+      boxShadow: `0 12px 40px ${color.glow}, 0 0 60px ${color.glow}`,
       borderColor: color.text,
       background: color.bg,
-      opacity: 0.9,
+      filter: 'brightness(1.2) saturate(1.3)',
       '& .action-button': {
         transform: 'translateX(0)',
         opacity: 1
@@ -620,15 +673,20 @@ const PriorityIcon = styled(Box)<{ priority: string; themeColors: any }>(({ prio
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 36,
     borderRadius: '50%',
-    background: alpha(color.text, 0.1),
-    animation: priority === 'critical' ? `${luxuryPulse} 2s ease-in-out infinite` : 
-               priority === 'urgent' ? `${luxuryGlow} 3s ease-in-out infinite` : 'none',
+    background: `radial-gradient(circle, ${alpha(color.text, 0.2)}, ${alpha(color.text, 0.05)})`,
+    border: `2px solid ${alpha(color.text, 0.3)}`,
+    animation: priority === 'critical' ? `${luxuryGlow} 2s ease-in-out infinite` : 
+               priority === 'urgent' ? `${luxuryPulse} 2.5s ease-in-out infinite` : 
+               priority === 'opportunity' ? `${colorWave} 3s ease-in-out infinite` : 'none',
+    boxShadow: `0 0 20px ${color.glow}`,
     '& svg': {
-      fontSize: 18,
-      color: color.text
+      fontSize: 20,
+      color: color.text,
+      filter: 'drop-shadow(0 0 8px currentColor)',
+      animation: priority === 'critical' ? `${luxuryPulse} 1.5s ease-in-out infinite` : 'none'
     }
   };
 });
