@@ -12,8 +12,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const handleGoogleLogin = async () => {
     setIsSigningIn(true);
     try {
-      // The auth context will handle storing the return path
-      await signInWithProvider('google');
+      // Store current location for return after auth
+      sessionStorage.setItem('authReturnPath', window.location.pathname + window.location.search);
+      
+      await signInWithProvider('google', {
+        redirectTo: `${window.location.origin}/auth/callback`
+      });
       // Don't call onSuccess here - let the OAuth callback handle navigation
     } catch (err) {
       console.error('Login failed:', err);
@@ -24,8 +28,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const handleFacebookLogin = async () => {
     setIsSigningIn(true);
     try {
-      // The auth context will handle storing the return path
-      await signInWithProvider('facebook');
+      // Store current location for return after auth
+      sessionStorage.setItem('authReturnPath', window.location.pathname + window.location.search);
+      
+      await signInWithProvider('facebook', {
+        redirectTo: `${window.location.origin}/auth/callback`
+      });
       // Don't call onSuccess here - let the OAuth callback handle navigation
     } catch (err) {
       console.error('Login failed:', err);

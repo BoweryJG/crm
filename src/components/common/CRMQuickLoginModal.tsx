@@ -58,8 +58,11 @@ export const CRMQuickLoginModal: React.FC<CRMQuickLoginModalProps> = ({
     setLocalError(null);
 
     try {
+      // Store current location for return after auth
+      sessionStorage.setItem('authReturnPath', window.location.pathname + window.location.search);
+      
       await signInWithProvider(provider, {
-        redirectTo: window.location.href
+        redirectTo: `${window.location.origin}/auth/callback`
       });
       // OAuth will redirect, so we don't need to handle success here
     } catch (err: any) {

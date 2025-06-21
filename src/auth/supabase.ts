@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { getStandardAuthConfig } from '../utils/crossDomainAuth';
 
 // Get environment variables with fallbacks for development
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://cbopynuvhcymbumjnvay.supabase.co';
@@ -19,7 +18,17 @@ let supabaseInstance: SupabaseClient | null = null;
 
 export const getSupabaseClient = (): SupabaseClient => {
   if (!supabaseInstance) {
-    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, getStandardAuthConfig());
+    // Use standard Supabase auth configuration - no cross-domain needed
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        storageKey: 'sb-cbopynuvhcymbumjnvay-auth-token', // Use Supabase's default key
+        flowType: 'pkce'
+      }
+    });
   }
   return supabaseInstance;
 };

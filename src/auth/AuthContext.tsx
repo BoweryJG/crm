@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase, getRedirectUrl } from './supabase';
-// Cross-domain auth removed - local auth only
 import type { User, AuthSession, AuthState, AuthProvider as AuthProviderType, SignInOptions } from './types';
 import type { Session } from '@supabase/supabase-js';
 

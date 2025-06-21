@@ -24,9 +24,9 @@ const AuthCallback: React.FC = () => {
         if (session) {
           console.log('Auth callback - Session found:', session.user.email);
           
-          // Get the return path from localStorage
-          const returnPath = localStorage.getItem('authReturnPath') || '/';
-          localStorage.removeItem('authReturnPath'); // Clean up
+          // Get the return path from sessionStorage (more secure for redirects)
+          const returnPath = sessionStorage.getItem('authReturnPath') || '/';
+          sessionStorage.removeItem('authReturnPath'); // Clean up
           
           console.log('Auth callback - Returning to:', returnPath);
           
