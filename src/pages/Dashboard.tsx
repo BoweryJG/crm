@@ -15,6 +15,7 @@ import NowCardsStack from '../components/dashboard/NowCardsStack'; // Added impo
 import ClassicRevenueGauge from '../components/gauges/ClassicRevenueGauge';
 import LuxuryGauge from '../components/gauges/LuxuryGauge';
 import QuantumLuxuryGauge from '../components/gauges/QuantumLuxuryGauge';
+import MasterpieceGauge from '../components/gauges/MasterpieceGauge';
 import LiveActionTicker from '../components/dashboard/LiveActionTicker';
 import { useThemeContext } from '../themes/ThemeContext';
 import { useNavigate } from 'react-router-dom';
@@ -35,7 +36,7 @@ const Dashboard: React.FC = () => {
   const { themeMode } = useThemeContext();
   const { user, loading: authLoading } = useAuth();
   const { dashboardData, loading, mockActivities, mockTasks } = useDashboardData();
-  const [gaugeStyle, setGaugeStyle] = React.useState<'luxury' | 'quantum'>('luxury');
+  const [gaugeStyle, setGaugeStyle] = React.useState<'luxury' | 'quantum' | 'masterpiece'>('masterpiece');
   
   // Sound test
   const { soundEnabled } = useSoundContext();
@@ -133,6 +134,26 @@ const Dashboard: React.FC = () => {
         >
           Quantum Style
         </Box>
+        <Box
+          onClick={() => setGaugeStyle('masterpiece')}
+          sx={{
+            px: 2,
+            py: 0.5,
+            borderRadius: 1,
+            cursor: 'pointer',
+            fontSize: '0.875rem',
+            backgroundColor: gaugeStyle === 'masterpiece' ? 'primary.main' : 'transparent',
+            color: gaugeStyle === 'masterpiece' ? 'primary.contrastText' : 'text.secondary',
+            border: '1px solid',
+            borderColor: gaugeStyle === 'masterpiece' ? 'primary.main' : 'divider',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              backgroundColor: gaugeStyle === 'masterpiece' ? 'primary.dark' : 'action.hover',
+            }
+          }}
+        >
+          Masterpiece
+        </Box>
         </Box>
       </Box>
 
@@ -184,6 +205,42 @@ const Dashboard: React.FC = () => {
                 value={dashboardData.conversion_rate}
                 label="CONVERSION"
                 animationDelay={600}
+              />
+            </>
+          ) : gaugeStyle === 'masterpiece' ? (
+            // Masterpiece style gauges
+            <>
+              <MasterpieceGauge 
+                value={Math.round(dashboardData.revenue_generated / 10000)} // Normalize to 0-100
+                label="REVENUE"
+                dataSource="CRM Analytics"
+                size="medium"
+                nightMode={false}
+                soundEnabled={true}
+              />
+              <MasterpieceGauge 
+                value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
+                label="PIPELINE"
+                dataSource="Sales Data"
+                size="medium"
+                nightMode={false}
+                soundEnabled={true}
+              />
+              <MasterpieceGauge 
+                value={dashboardData.quota_percentage}
+                label="QUOTA"
+                dataSource="Performance"
+                size="medium"
+                nightMode={false}
+                soundEnabled={true}
+              />
+              <MasterpieceGauge 
+                value={dashboardData.conversion_rate}
+                label="CONVERSION"
+                dataSource="Metrics"
+                size="medium"
+                nightMode={false}
+                soundEnabled={true}
               />
             </>
           ) : (
