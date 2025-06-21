@@ -483,27 +483,47 @@ const LayerControls = styled(Box)(({ theme }) => ({
   marginLeft: 'auto'
 }));
 
-const LayerToggle = styled(Chip)<{ active: boolean; priority: string; themeColors: any }>(({ active, priority, themeColors }) => {
+const LayerToggle: React.FC<{
+  label: string;
+  variant?: 'filled' | 'outlined';
+  size?: 'small' | 'medium';
+  active: boolean;
+  priority: string;
+  themeColors: any;
+  onClick: () => void;
+}> = ({ label, variant = 'outlined', size = 'small', active, priority, themeColors, onClick }) => {
   const color = themeColors[priority] || themeColors.success;
   
-  return {
-    cursor: 'pointer',
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    background: active ? color.bg : 'transparent',
-    borderColor: active ? color.border : alpha(color.border, 0.3),
-    color: active ? color.text : alpha(color.text, 0.6),
-    fontSize: '0.75rem',
-    height: 28,
-    fontWeight: active ? 600 : 400,
-    backdropFilter: 'blur(10px)',
-    '&:hover': {
-      background: color.bg,
-      borderColor: color.border,
-      transform: 'translateY(-2px)',
-      boxShadow: `0 4px 20px ${alpha(color.glow, 0.3)}`
-    }
-  };
-});
+  return (
+    <Chip
+      label={label}
+      variant={variant}
+      size={size}
+      onClick={onClick}
+      sx={{
+        cursor: 'pointer',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        background: active ? color.bg : 'transparent',
+        borderColor: active ? color.border : alpha(color.border, 0.3),
+        color: active ? color.text : alpha(color.text, 0.6),
+        fontSize: '0.75rem',
+        height: 28,
+        fontWeight: active ? 600 : 400,
+        backdropFilter: 'blur(10px)',
+        '&:hover': {
+          background: color.bg,
+          borderColor: color.border,
+          transform: 'translateY(-2px)',
+          boxShadow: `0 4px 20px ${alpha(color.glow, 0.3)}`
+        },
+        '& .MuiChip-label': {
+          paddingLeft: '12px',
+          paddingRight: '12px'
+        }
+      }}
+    />
+  );
+};
 
 const MainTicker = styled(Box)<{ themeColors: any }>(({ themeColors }) => ({
   position: 'relative',
