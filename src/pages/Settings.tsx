@@ -31,9 +31,9 @@ import {
   Key as KeyIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../themes/ThemeContext';
-import ThemeToggle from '../components/ui/ThemeToggle';
 import { useAuth } from '../auth';
 import ApiKeyManager from '../components/settings/ApiKeyManager';
+import ThemeSettings from '../components/settings/ThemeSettings';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -458,46 +458,7 @@ const Settings: React.FC = () => {
         {/* Appearance */}
         <TabPanel value={tabValue} index={4}>
           <Box sx={{ p: 3 }}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Typography variant="h6" gutterBottom>
-                  Theme Selection
-                </Typography>
-                <Box sx={{ mb: 3 }}>
-                  <ThemeToggle />
-                </Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                  Current theme: <Chip label={themeMode} size="small" />
-                </Typography>
-              </Grid>
-              
-              <Grid item xs={12}>
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Display Options
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={settings.autoPlayVideos}
-                        onChange={(e) => handleSettingChange('autoPlayVideos', e.target.checked)}
-                      />
-                    }
-                    label="Auto-play Videos"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={settings.compactView}
-                        onChange={(e) => handleSettingChange('compactView', e.target.checked)}
-                      />
-                    }
-                    label="Compact View"
-                  />
-                </Box>
-              </Grid>
-            </Grid>
+            <ThemeSettings />
           </Box>
         </TabPanel>
 

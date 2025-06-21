@@ -3,7 +3,6 @@ import { Box, Toolbar } from '@mui/material';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import SculpturalSidebar from './SculpturalSidebar';
-import ThemeSwitcherPanel from '../theme/ThemeSwitcherPanel';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
 
@@ -84,9 +83,6 @@ const Layout: React.FC = () => {
           <Outlet /> {/* This renders the current route's element */}
         </Box>
       </Box>
-      
-      {/* Theme Switcher Panel */}
-      <ThemeSwitcherPanel />
     </Box>
   );
 };

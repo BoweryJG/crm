@@ -1,0 +1,124 @@
+{
+  "id": "boeing-747",
+  "name": "Boeing 747-8 Cockpit",
+  "description": "Authentic 747 flight deck experience with real aviation sounds",
+  "version": "1.0.0",
+  "author": "Omnisensory Experience Engine",
+  "sounds": {
+    "theme-switch": {
+      "id": "theme-switch",
+      "url": "/sounds/themes/boeing-747/master-caution-reset.opus",
+      "category": "theme-switch",
+      "volume": 0.8,
+      "description": "Master caution reset button click"
+    },
+    "ui-click-primary": {
+      "id": "ui-click-primary", 
+      "url": "/sounds/themes/boeing-747/autopilot-engage.opus",
+      "category": "ui-primary",
+      "volume": 0.7,
+      "variations": [
+        "/sounds/themes/boeing-747/autopilot-cmd-a.opus",
+        "/sounds/themes/boeing-747/autopilot-cmd-b.opus"
+      ]
+    },
+    "ui-click-secondary": {
+      "id": "ui-click-secondary",
+      "url": "/sounds/themes/boeing-747/radio-ptt.opus", 
+      "category": "ui-secondary",
+      "volume": 0.6
+    },
+    "ui-hover": {
+      "id": "ui-hover",
+      "url": "/sounds/themes/boeing-747/altitude-selector-tick.opus",
+      "category": "ui-secondary", 
+      "volume": 0.3
+    },
+    "ui-toggle": {
+      "id": "ui-toggle",
+      "url": "/sounds/themes/boeing-747/landing-gear-lever.opus",
+      "category": "ui-primary",
+      "volume": 0.8
+    },
+    "navigation-forward": {
+      "id": "navigation-forward",
+      "url": "/sounds/themes/boeing-747/fms-waypoint-confirm.opus",
+      "category": "navigation",
+      "volume": 0.6
+    },
+    "navigation-back": {
+      "id": "navigation-back", 
+      "url": "/sounds/themes/boeing-747/fms-cancel.opus",
+      "category": "navigation",
+      "volume": 0.6
+    },
+    "gauge-tick": {
+      "id": "gauge-tick",
+      "url": "/sounds/themes/boeing-747/altimeter-tick.opus",
+      "category": "gauge",
+      "volume": 0.2
+    },
+    "gauge-zone-change": {
+      "id": "gauge-zone-change",
+      "url": "/sounds/themes/boeing-747/altitude-alert.opus", 
+      "category": "gauge",
+      "volume": 0.5
+    },
+    "gauge-peak": {
+      "id": "gauge-peak",
+      "url": "/sounds/themes/boeing-747/positive-rate.opus",
+      "category": "gauge", 
+      "volume": 0.7
+    },
+    "notification-success": {
+      "id": "notification-success",
+      "url": "/sounds/themes/boeing-747/seatbelt-chime.opus",
+      "category": "notification",
+      "volume": 0.8
+    },
+    "notification-error": {
+      "id": "notification-error", 
+      "url": "/sounds/themes/boeing-747/stick-shaker.opus",
+      "category": "error",
+      "volume": 1.0
+    },
+    "notification-info": {
+      "id": "notification-info",
+      "url": "/sounds/themes/boeing-747/selcal-chime.opus", 
+      "category": "notification",
+      "volume": 0.7
+    },
+    "startup-1": {
+      "id": "startup-1",
+      "url": "/sounds/themes/boeing-747/apu-start.opus",
+      "category": "startup",
+      "volume": 0.6
+    },
+    "startup-2": {
+      "id": "startup-2", 
+      "url": "/sounds/themes/boeing-747/avionics-power.opus",
+      "category": "startup",
+      "volume": 0.5
+    },
+    "startup-3": {
+      "id": "startup-3",
+      "url": "/sounds/themes/boeing-747/gyro-spinup.opus", 
+      "category": "startup",
+      "volume": 0.4
+    },
+    "startup-4": {
+      "id": "startup-4",
+      "url": "/sounds/themes/boeing-747/cockpit-ready.opus",
+      "category": "startup", 
+      "volume": 0.8
+    }
+  },
+  "startupSequence": ["startup-1", "startup-2", "startup-3", "startup-4"],
+  "ambient": {
+    "id": "ambient",
+    "url": "/sounds/themes/boeing-747/cockpit-ambience.opus",
+    "category": "ambient",
+    "volume": 0.2,
+    "loop": true
+  }
+}
