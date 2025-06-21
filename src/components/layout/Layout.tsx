@@ -23,11 +23,10 @@ const Layout: React.FC = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  // Reset scroll position and play navigation sound when navigating to a new route
+  // Reset scroll position when navigating to a new route
   useEffect(() => {
     if (previousPath.current !== location.pathname) {
-      // Play navigation sound
-      forward();
+      // Navigation sound is now handled in sidebar for variety
       previousPath.current = location.pathname;
     }
     
@@ -36,7 +35,7 @@ const Layout: React.FC = () => {
     } else {
       window.scrollTo(0, 0);
     }
-  }, [location.pathname, forward]);
+  }, [location.pathname]);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>

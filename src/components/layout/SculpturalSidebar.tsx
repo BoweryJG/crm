@@ -31,6 +31,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
 import glassEffects from '../../themes/glassEffects';
 import animations from '../../themes/animations';
+import { useSound } from '../../hooks/useSound';
 
 // Monolithic Tab Component
 const MonolithTab: React.FC<{
@@ -40,14 +41,30 @@ const MonolithTab: React.FC<{
   isActive: boolean;
   onClick: () => void;
   delay?: number;
-}> = ({ title, path, icon, isActive, onClick, delay = 0 }) => {
+  soundVariant?: number;
+}> = ({ title, path, icon, isActive, onClick, delay = 0, soundVariant = 0 }) => {
   const theme = useTheme();
   const [isHovered, setIsHovered] = useState(false);
   
+  // Different sounds for variety
+  const hoverSound = useSound(soundVariant % 2 === 0 ? 'ui-hover' : 'gauge-tick');
+  const clickSound = useSound(
+    isActive ? 'ui-toggle' : 
+    soundVariant % 3 === 0 ? 'ui-click-primary' : 
+    soundVariant % 3 === 1 ? 'ui-click-secondary' : 
+    'navigation-forward'
+  );
+  
   return (
     <Box
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
+      onClick={() => {
+        clickSound.play();
+        onClick();
+      }}
+      onMouseEnter={() => {
+        setIsHovered(true);
+        hoverSound.play();
+      }}
       onMouseLeave={() => setIsHovered(false)}
       sx={{
         position: 'relative',
@@ -80,8 +97,8 @@ const MonolithTab: React.FC<{
         
         // Padding and spacing
         px: 3,
-        py: 2,
-        mb: 1,
+        py: 1.5, // Reduced from 2
+        mb: 0.5, // Reduced from 1
         mx: 2,
         
         // Hover effects
@@ -232,7 +249,7 @@ const SculpturalDivider: React.FC<{ pattern?: 'dots' | 'zigzag' | 'gradient' }> 
     <Box
       sx={{
         height: 1,
-        my: 3,
+        my: 1.5, // Reduced from 3 to 1.5
         mx: 2,
         background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.3 : 0.2)}, transparent)`,
       }}
@@ -260,7 +277,7 @@ const NavigationSection: React.FC<{
           display: 'flex',
           alignItems: 'center',
           px: 3,
-          py: 1,
+          py: 0.5, // Reduced from 1
           cursor: collapsible ? 'pointer' : 'default',
           transition: 'all 0.3s ease',
           '&:hover': collapsible ? {
@@ -297,7 +314,7 @@ const NavigationSection: React.FC<{
       </Box>
       
       <Collapse in={isOpen} timeout={animations.durations.deliberate}>
-        <Box sx={{ pb: 1 }}>
+        <Box sx={{ pb: 0.5 }}> {/* Reduced padding */}
           {items.map((item, index) => (
             <MonolithTab
               key={item.path}
@@ -307,6 +324,7 @@ const NavigationSection: React.FC<{
               isActive={currentPath === item.path || (item.path !== '/' && currentPath.startsWith(item.path))}
               onClick={() => onNavigate(item.path)}
               delay={delayOffset + (index * 50)}
+              soundVariant={index}
             />
           ))}
         </Box>
