@@ -210,38 +210,46 @@ const Dashboard: React.FC = () => {
           ) : gaugeStyle === 'masterpiece' ? (
             // Masterpiece style gauges
             <>
-              <MasterpieceGauge 
-                value={Math.round(dashboardData.revenue_generated / 10000)} // Normalize to 0-100
-                label="REVENUE"
-                dataSource="CRM Analytics"
-                size="medium"
-                nightMode={false}
-                soundEnabled={true}
-              />
-              <MasterpieceGauge 
-                value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
-                label="PIPELINE"
-                dataSource="Sales Data"
-                size="medium"
-                nightMode={false}
-                soundEnabled={true}
-              />
-              <MasterpieceGauge 
-                value={dashboardData.quota_percentage}
-                label="QUOTA"
-                dataSource="Performance"
-                size="medium"
-                nightMode={false}
-                soundEnabled={true}
-              />
-              <MasterpieceGauge 
-                value={dashboardData.conversion_rate}
-                label="CONVERSION"
-                dataSource="Metrics"
-                size="medium"
-                nightMode={false}
-                soundEnabled={true}
-              />
+              <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
+                <MasterpieceGauge 
+                  value={Math.round(dashboardData.revenue_generated / 10000)} // Normalize to 0-100
+                  label="REVENUE"
+                  dataSource="CRM Analytics"
+                  size="medium"
+                  nightMode={false}
+                  soundEnabled={true}
+                />
+              </Box>
+              <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
+                <MasterpieceGauge 
+                  value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
+                  label="PIPELINE"
+                  dataSource="Sales Data"
+                  size="medium"
+                  nightMode={false}
+                  soundEnabled={true}
+                />
+              </Box>
+              <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
+                <MasterpieceGauge 
+                  value={dashboardData.quota_percentage}
+                  label="QUOTA"
+                  dataSource="Performance"
+                  size="medium"
+                  nightMode={false}
+                  soundEnabled={true}
+                />
+              </Box>
+              <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
+                <MasterpieceGauge 
+                  value={dashboardData.conversion_rate}
+                  label="CONVERSION"
+                  dataSource="Metrics"
+                  size="medium"
+                  nightMode={false}
+                  soundEnabled={true}
+                />
+              </Box>
             </>
           ) : (
             // Luxury style gauges

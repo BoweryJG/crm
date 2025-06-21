@@ -93,8 +93,8 @@ const MonolithTab: React.FC<{
         
         // Padding and spacing
         px: 3,
-        py: 1.5, // Reduced from 2
-        mb: 0.5, // Reduced from 1
+        py: 1, // Further reduced
+        mb: 0.25, // Further reduced margin
         mx: 2,
         
         // Hover effects
@@ -273,7 +273,7 @@ const NavigationSection: React.FC<{
           display: 'flex',
           alignItems: 'center',
           px: 3,
-          py: 0.5, // Reduced from 1
+          py: 0.25, // Further reduced
           cursor: collapsible ? 'pointer' : 'default',
           transition: 'all 0.3s ease',
           '&:hover': collapsible ? {
