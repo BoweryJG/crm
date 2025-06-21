@@ -3,6 +3,7 @@ import { Box, Paper, Typography, IconButton, CircularProgress, Alert } from '@mu
 import { ChevronLeft, ChevronRight, Close, Refresh } from '@mui/icons-material';
 import { AIInsightsService, AIInsight } from '../../services/ai/insightsService';
 import { useAppMode } from '../../contexts/AppModeContext';
+import IndustrialAlertCard from './IndustrialAlertCard';
 
 // Map AIInsight to NowCardData for backward compatibility
 interface NowCardData extends AIInsight {
@@ -479,8 +480,17 @@ const NowCardsStack: React.FC = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-        <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-          Right Now Insights
+        <Typography 
+          variant="h5" 
+          sx={{ 
+            fontWeight: 'bold', 
+            color: 'primary.main',
+            fontFamily: '"Orbitron", monospace',
+            textTransform: 'uppercase',
+            letterSpacing: 2,
+          }}
+        >
+          Alert Monitor
         </Typography>
         <IconButton 
           onClick={handleRefresh} 
@@ -570,7 +580,7 @@ const NowCardsStack: React.FC = () => {
                 pointerEvents: index === currentIndex ? 'auto' : 'none', // Ensure only active card's children are interactive
               }}
             >
-              <NowCard card={card} onDismiss={handleDismiss} isActive={index === currentIndex} />
+              <IndustrialAlertCard card={card} isActive={index === currentIndex} index={index} />
             </Box>
           );
         })}

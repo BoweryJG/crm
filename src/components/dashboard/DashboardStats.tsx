@@ -17,112 +17,22 @@ import {
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useDashboardData } from '../../contexts/DashboardDataContext';
-import AnimatedOrbHeroBG from './AnimatedOrbHeroBG'; // Ensure this path is correct
+import IndustrialStatCard from './IndustrialStatCard';
+import TacticalProgressBar from './TacticalProgressBar';
 
-interface StatCardProps {
-  title: string;
-  value: string | number;
-  icon: React.ReactNode;
-  change: {
-    value: number;
-    trend: 'up' | 'down' | 'neutral';
+// Theme-based accent colors for industrial look
+const getAccentColor = (themeMode: string, index: number) => {
+  const themeColors = {
+    default: ['#1976d2', '#42a5f5', '#90caf9', '#bbdefb'],
+    gallery: ['#ffd700', '#ffab00', '#ff6f00', '#ff3d00'],
+    boeing: ['#00e676', '#00c853', '#64dd17', '#aeea00'],
+    quantum: ['#e91e63', '#f06292', '#ce93d8', '#ab47bc'],
+    space: ['#8860D0', '#5CE1E6', '#FFD700', '#00E676'],
+    masterpiece: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4']
   };
-  color?: string;
-  orbIndex?: number;
-}
-
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon, change, color, orbIndex }) => {
-  const theme = useTheme();
-  const { themeMode } = useThemeContext();
   
-  const getTrendColor = (trend: string) => {
-    if (trend === 'up') return theme.palette.success.main;
-    if (trend === 'down') return theme.palette.error.main;
-    return theme.palette.text.secondary;
-  };
-
-  const getTrendIcon = (trend: string) => {
-    if (trend === 'up') return <TrendingUpIcon fontSize="small" />;
-    if (trend === 'down') return <TrendingDownIcon fontSize="small" />;
-    return null;
-  };
-
-  return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: 3,
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: 3,
-        backgroundColor: themeMode === 'space' 
-          ? 'rgba(22, 27, 44, 0.7)' 
-          : theme.palette.background.paper,
-        backdropFilter: 'blur(8px)',
-        border: `1px solid ${
-          themeMode === 'space' 
-            ? 'rgba(255, 255, 255, 0.08)' 
-            : 'rgba(0, 0, 0, 0.06)'
-        }`,
-        transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-        '&:hover': {
-          transform: 'translateY(-5px)',
-          boxShadow: themeMode === 'space'
-            ? '0 10px 30px rgba(0, 0, 0, 0.25)'
-            : '0 10px 30px rgba(0, 0, 0, 0.1)'
-        }
-      }}
-    >
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-        <Box>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            {title}
-          </Typography>
-          <Typography variant="h4" fontWeight={600}>
-            {value}
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: 48,
-            height: 48,
-            borderRadius: 2,
-            overflow: 'hidden',
-            position: 'relative'
-          }}
-        >
-          {/* Replace colored box with animated orb */}
-          <AnimatedOrbHeroBG 
-            style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} 
-            childIndex={orbIndex !== undefined ? orbIndex : 0} 
-          />
-          {icon}
-        </Box>
-      </Box>
-      
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          mt: 'auto',
-          pt: 1,
-          color: getTrendColor(change.trend)
-        }}
-      >
-        {getTrendIcon(change.trend)}
-        <Typography variant="body2" sx={{ ml: 0.5 }}>
-          {change.value}% {change.trend === 'up' ? 'increase' : change.trend === 'down' ? 'decrease' : ''}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>
-          from last month
-        </Typography>
-      </Box>
-    </Paper>
-  );
+  const colors = themeColors[themeMode as keyof typeof themeColors] || themeColors.default;
+  return colors[index % colors.length];
 };
 
 const DashboardStats: React.FC = () => {
@@ -157,109 +67,61 @@ const DashboardStats: React.FC = () => {
   
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 3 }}>
-      <Box>
-        <StatCard
-          title="Total Contacts"
-          value={dashboardData.total_contacts.toLocaleString()}
-          icon={<PersonIcon />}
-          change={{ value: dashboardData.contacts_change, trend: dashboardData.contacts_change >= 0 ? 'up' : 'down' }}
-          color={themeMode === 'space' ? '#8860D0' : '#3D52D5'} // Primary color
-          orbIndex={0}
-        />
-      </Box>
+      <IndustrialStatCard
+        title="Total Contacts"
+        value={dashboardData.total_contacts.toLocaleString()}
+        icon={<PersonIcon />}
+        change={{ 
+          value: Math.abs(dashboardData.contacts_change), 
+          trend: dashboardData.contacts_change >= 0 ? 'up' : 'down' 
+        }}
+        accentColor={getAccentColor(themeMode, 0)}
+        index={0}
+      />
       
-      <Box>
-        <StatCard
-          title="Active Practices"
-          value={dashboardData.active_practices.toLocaleString()}
-          icon={<BusinessIcon />}
-          change={{ value: dashboardData.practices_change, trend: dashboardData.practices_change >= 0 ? 'up' : 'down' }}
-          color={themeMode === 'space' ? '#5CE1E6' : '#44CFCB'} // Secondary color
-          orbIndex={1}
-        />
-      </Box>
+      <IndustrialStatCard
+        title="Active Practices"
+        value={dashboardData.active_practices.toLocaleString()}
+        icon={<BusinessIcon />}
+        change={{ 
+          value: Math.abs(dashboardData.practices_change), 
+          trend: dashboardData.practices_change >= 0 ? 'up' : 'down' 
+        }}
+        accentColor={getAccentColor(themeMode, 1)}
+        index={1}
+      />
       
-      <Box>
-        <StatCard
-          title="Revenue Generated"
-          value={formatCurrency(dashboardData.revenue_generated / 100)} // Convert from cents
-          icon={<RevenueIcon />}
-          change={{ value: dashboardData.revenue_change, trend: dashboardData.revenue_change >= 0 ? 'up' : 'down' }}
-          color={themeMode === 'space' ? '#FFD700' : '#FFAB4C'} // Warning color
-          orbIndex={2}
-        />
-      </Box>
+      <IndustrialStatCard
+        title="Revenue Generated"
+        value={formatCurrency(dashboardData.revenue_generated / 100)}
+        icon={<RevenueIcon />}
+        change={{ 
+          value: Math.abs(dashboardData.revenue_change), 
+          trend: dashboardData.revenue_change >= 0 ? 'up' : 'down' 
+        }}
+        accentColor={getAccentColor(themeMode, 2)}
+        index={2}
+      />
       
-      <Box>
-        <StatCard
-          title="Active Campaigns"
-          value={dashboardData.active_campaigns.toString()}
-          icon={<CampaignIcon />}
-          change={{ value: dashboardData.campaigns_change, trend: dashboardData.campaigns_change >= 0 ? 'up' : 'down' }}
-          color={themeMode === 'space' ? '#00E676' : '#4CAF50'} // Success color
-          orbIndex={3}
-        />
-      </Box>
+      <IndustrialStatCard
+        title="Active Campaigns"
+        value={dashboardData.active_campaigns.toString()}
+        icon={<CampaignIcon />}
+        change={{ 
+          value: Math.abs(dashboardData.campaigns_change), 
+          trend: dashboardData.campaigns_change >= 0 ? 'up' : 'down' 
+        }}
+        accentColor={getAccentColor(themeMode, 3)}
+        index={3}
+      />
       
       <Box sx={{ gridColumn: '1 / -1' }}>
-        <Paper
-          elevation={0}
-          sx={{
-            p: 3,
-            borderRadius: 3,
-            backgroundColor: themeMode === 'space' 
-              ? 'rgba(22, 27, 44, 0.7)' 
-              : theme.palette.background.paper,
-            backdropFilter: 'blur(8px)',
-            border: `1px solid ${
-              themeMode === 'space' 
-                ? 'rgba(255, 255, 255, 0.08)' 
-                : 'rgba(0, 0, 0, 0.06)'
-            }`,
-          }}
-        >
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h6" fontWeight={600}>
-              Sales Goal Progress
-            </Typography>
-            <Typography variant="h6" fontWeight={600} color="primary">
-              {dashboardData.sales_goal_progress}%
-            </Typography>
-          </Box>
-          
-          <LinearProgress
-            variant="determinate"
-            value={dashboardData.sales_goal_progress}
-            sx={{
-              height: 8,
-              borderRadius: 4,
-              backgroundColor: themeMode === 'space' 
-                ? 'rgba(255, 255, 255, 0.08)' 
-                : 'rgba(0, 0, 0, 0.06)',
-              '& .MuiLinearProgress-bar': {
-                borderRadius: 4,
-                backgroundImage: themeMode === 'space'
-                  ? 'linear-gradient(45deg, #8860D0 0%, #5CE1E6 100%)'
-                  : 'linear-gradient(45deg, #3D52D5 0%, #44CFCB 100%)',
-              }
-            }}
-          />
-          
-          <Box 
-            sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              mt: 1.5 
-            }}
-          >
-            <Typography variant="body2" color="text.secondary">
-              Current: {formatCurrency(dashboardData.current_revenue / 100)}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Goal: {formatCurrency(dashboardData.sales_goal / 100)}
-            </Typography>
-          </Box>
-        </Paper>
+        <TacticalProgressBar
+          current={dashboardData.current_revenue / 100}
+          goal={dashboardData.sales_goal / 100}
+          progress={dashboardData.sales_goal_progress}
+          formatValue={formatCurrency}
+        />
       </Box>
     </Box>
   );

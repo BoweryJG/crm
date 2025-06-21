@@ -16,6 +16,8 @@ import ClassicRevenueGauge from '../components/gauges/ClassicRevenueGauge';
 import QuantumLuxuryGauge from '../components/gauges/QuantumLuxuryGauge';
 import MasterpieceGauge from '../components/gauges/MasterpieceGauge';
 import LiveActionTicker from '../components/dashboard/LiveActionTicker';
+import CommandCenterFeed from '../components/dashboard/CommandCenterFeed';
+import MissionBriefingCard from '../components/dashboard/MissionBriefingCard';
 import { useThemeContext } from '../themes/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '../contexts/DashboardDataContext';
@@ -264,176 +266,250 @@ const Dashboard: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Recent Activities and Upcoming Tasks */}
-      <Box sx={{ mb: 4, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
-        <Paper
-          elevation={0}
-          sx={{
-            height: '100%',
-            borderRadius: 3,
-            backgroundColor: themeMode === 'space'
-              ? 'rgba(22, 27, 44, 0.7)'
-              : theme.palette.background.paper,
-            backdropFilter: 'blur(8px)',
-            border: `1px solid ${
-              themeMode === 'space'
-                ? 'rgba(255, 255, 255, 0.08)'
-                : 'rgba(0, 0, 0, 0.06)'
-            }`
-          }}
-        >
-          <CardHeader
-            title="Recent Activities"
-            titleTypographyProps={{ variant: 'h6', fontWeight: 600 }}
-          />
-          <CardContent>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2
-              }}
-            >
-              {!loading && dashboardData ? (
-                // Use activities from context
-                mockActivities.map((activity: any) => (
-                  <Box
-                    key={activity.id}
-                    sx={{
-                      p: 1.5,
-                      borderRadius: 2,
-                      backgroundColor: themeMode === 'space'
-                        ? 'rgba(10, 14, 23, 0.5)'
-                        : 'rgba(245, 247, 250, 0.5)'
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="body2" fontWeight={500}>
-                        {activity.type}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {activity.timeAgo}
-                      </Typography>
-                    </Box>
-                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
-                      {activity.type.includes('added') ? 'Added ' : ''}{activity.description}
-                    </Typography>
-                  </Box>
-                ))
-              ) : (
-                <Typography variant="body2" color="text.secondary" align="center">
-                  Loading activities...
-                </Typography>
-              )}
-            </Box>
-          </CardContent>
-        </Paper>
-
-        <Paper
-          elevation={0}
-          sx={{
-            height: '100%',
-            borderRadius: 3,
-            backgroundColor: themeMode === 'space'
-              ? 'rgba(22, 27, 44, 0.7)'
-              : theme.palette.background.paper,
-            backdropFilter: 'blur(8px)',
-            border: `1px solid ${
-              themeMode === 'space'
-                ? 'rgba(255, 255, 255, 0.08)'
-                : 'rgba(0, 0, 0, 0.06)'
-            }`
-          }}
-        >
-          <CardHeader
-            title="Upcoming Tasks"
-            titleTypographyProps={{ variant: 'h6', fontWeight: 600 }}
-          />
-          <CardContent>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2
-              }}
-            >
-              {!loading && dashboardData ? (
-                // Use tasks from context
-                mockTasks.map((task: any) => (
-                  <Box
-                    key={task.id}
-                    sx={{
-                      p: 1.5,
-                      borderRadius: 2,
-                      backgroundColor: themeMode === 'space'
-                        ? 'rgba(10, 14, 23, 0.5)'
-                        : 'rgba(245, 247, 250, 0.5)',
-                      borderLeft: task.priority === 'High' ? `4px solid ${theme.palette.error.main}` : 
-                                 task.priority === 'Medium' ? `4px solid ${theme.palette.warning.main}` : 
-                                 `4px solid ${theme.palette.success.main}`
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="body2" fontWeight={500}>
-                        {task.type}
-                      </Typography>
-                      <Typography 
-                        variant="caption" 
-                        color={task.dueDate === 'Today' ? "error.main" : 
-                               task.dueDate === 'Tomorrow' ? "warning.main" : 
-                               "text.secondary"}
-                      >
-                        {task.dueDate}
-                      </Typography>
-                    </Box>
-                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
-                      {task.description}
-                    </Typography>
-                  </Box>
-                ))
-              ) : (
-                <Typography variant="body2" color="text.secondary" align="center">
-                  Loading tasks...
-                </Typography>
-              )}
-            </Box>
-          </CardContent>
-        </Paper>
+      {/* Recent Activities and Upcoming Tasks - Industrial Style */}
+      <Box sx={{ mb: 4, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, height: 400 }}>
+        {!loading && dashboardData ? (
+          <>
+            <CommandCenterFeed 
+              activities={mockActivities} 
+              title="Activity Monitor" 
+            />
+            <MissionBriefingCard 
+              tasks={mockTasks} 
+              title="Mission Queue" 
+            />
+          </>
+        ) : (
+          <>
+            <Skeleton variant="rectangular" height="100%" sx={{ borderRadius: 2 }} />
+            <Skeleton variant="rectangular" height="100%" sx={{ borderRadius: 2 }} />
+          </>
+        )}
       </Box>
 
-      {/* Market Intelligence Preview */}
+      {/* Market Intelligence Preview - Tactical Display */}
       <Box sx={{ mb: 4 }}>
-        <Paper
-          elevation={0}
+        <Box
           sx={{
             p: 3,
-            borderRadius: 3,
-            backgroundColor: themeMode === 'space'
-              ? 'rgba(22, 27, 44, 0.7)'
-              : theme.palette.background.paper,
-            backdropFilter: 'blur(8px)',
-            border: `1px solid ${
-              themeMode === 'space'
-                ? 'rgba(255, 255, 255, 0.08)'
-                : 'rgba(0, 0, 0, 0.06)'
-            }`
+            background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: 2,
+            position: 'relative',
+            overflow: 'hidden',
           }}
         >
-          <Typography variant="h6" fontWeight={600} gutterBottom>
-            Market Intelligence
-          </Typography>
-          <Typography variant="body2" paragraph>
-            Recent trends in the dental implant market show a {getRandomInt(12, 18)}% increase in demand for minimally invasive procedures. 
-            Aesthetic procedures, particularly for injectables, have seen a {getRandomInt(20, 25)}% growth in the last quarter.
-          </Typography>
-          <Typography variant="body2" paragraph>
-            Key opportunity: Practices in your region are increasingly interested in combined treatment packages that 
-            integrate both dental and aesthetic procedures for comprehensive patient care.
-          </Typography>
-          <Typography variant="body2" sx={{ fontStyle: 'italic', mt: 2, color: 'text.secondary' }}>
-            Market data refreshed {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </Typography>
-        </Paper>
+          {/* Tactical header */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+            <Typography 
+              variant="h6" 
+              sx={{
+                fontFamily: '"Orbitron", monospace',
+                fontWeight: 700,
+                color: '#00ff41',
+                textTransform: 'uppercase',
+                letterSpacing: 2,
+              }}
+            >
+              Market Intelligence
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box
+                sx={{
+                  px: 2,
+                  py: 0.5,
+                  background: 'rgba(0, 255, 65, 0.1)',
+                  border: '1px solid rgba(0, 255, 65, 0.3)',
+                  borderRadius: 1,
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontFamily: 'monospace',
+                    color: '#00ff41',
+                    fontWeight: 600,
+                  }}
+                >
+                  SIGNAL: STRONG
+                </Typography>
+              </Box>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontFamily: 'monospace',
+                  color: '#666',
+                }}
+              >
+                [{new Date().toLocaleTimeString('en-US', { hour12: false })}]
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Data grid */}
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3, mb: 3 }}>
+            <Box
+              sx={{
+                p: 2,
+                background: 'rgba(0, 0, 0, 0.3)',
+                border: '1px solid rgba(0, 255, 65, 0.1)',
+                borderRadius: 1,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  fontFamily: 'monospace',
+                  color: '#666',
+                  textTransform: 'uppercase',
+                  display: 'block',
+                  mb: 1,
+                }}
+              >
+                Dental Implant Sector
+              </Typography>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontFamily: '"Orbitron", monospace',
+                  fontWeight: 900,
+                  color: '#00ff41',
+                  textShadow: '0 0 20px #00ff41',
+                }}
+              >
+                +{getRandomInt(12, 18)}%
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontFamily: 'monospace',
+                  color: '#999',
+                }}
+              >
+                Minimally invasive demand surge
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                p: 2,
+                background: 'rgba(0, 0, 0, 0.3)',
+                border: '1px solid rgba(255, 170, 0, 0.1)',
+                borderRadius: 1,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  fontFamily: 'monospace',
+                  color: '#666',
+                  textTransform: 'uppercase',
+                  display: 'block',
+                  mb: 1,
+                }}
+              >
+                Aesthetic Procedures
+              </Typography>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontFamily: '"Orbitron", monospace',
+                  fontWeight: 900,
+                  color: '#ffaa00',
+                  textShadow: '0 0 20px #ffaa00',
+                }}
+              >
+                +{getRandomInt(20, 25)}%
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontFamily: 'monospace',
+                  color: '#999',
+                }}
+              >
+                Injectable treatments growth
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Strategic alert */}
+          <Box
+            sx={{
+              p: 2,
+              background: 'rgba(255, 0, 64, 0.05)',
+              border: '1px solid rgba(255, 0, 64, 0.2)',
+              borderRadius: 1,
+              mb: 2,
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                fontFamily: 'monospace',
+                color: '#ff0040',
+                textTransform: 'uppercase',
+                fontWeight: 600,
+                display: 'block',
+                mb: 0.5,
+              }}
+            >
+              Strategic Opportunity Detected:
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                fontFamily: 'monospace',
+                color: '#ccc',
+                fontSize: '0.85rem',
+              }}
+            >
+              Regional practices showing 73% interest in combined dental-aesthetic treatment packages. 
+              Cross-selling opportunity index: HIGH. Recommend bundled solution positioning.
+            </Typography>
+          </Box>
+
+          {/* Status line */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography
+              variant="caption"
+              sx={{
+                fontFamily: 'monospace',
+                color: '#666',
+                fontSize: '0.7rem',
+              }}
+            >
+              DATA SOURCE: MARKET ANALYTICS ENGINE v2.3
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                fontFamily: 'monospace',
+                color: '#666',
+                fontSize: '0.7rem',
+              }}
+            >
+              LAST SYNC: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </Typography>
+          </Box>
+
+          {/* Grid overlay */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              opacity: 0.03,
+              backgroundImage: `
+                repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(0,255,65,0.05) 20px, rgba(0,255,65,0.05) 21px),
+                repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(0,255,65,0.05) 20px, rgba(0,255,65,0.05) 21px)
+              `,
+              pointerEvents: 'none',
+            }}
+          />
+        </Box>
       </Box>
     </Box>
   );
