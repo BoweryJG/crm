@@ -13,7 +13,6 @@ import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
 import NowCardsStack from '../components/dashboard/NowCardsStack'; // Added import
 import ClassicRevenueGauge from '../components/gauges/ClassicRevenueGauge';
-import LuxuryGauge from '../components/gauges/LuxuryGauge';
 import QuantumLuxuryGauge from '../components/gauges/QuantumLuxuryGauge';
 import MasterpieceGauge from '../components/gauges/MasterpieceGauge';
 import LiveActionTicker from '../components/dashboard/LiveActionTicker';
@@ -36,7 +35,7 @@ const Dashboard: React.FC = () => {
   const { themeMode } = useThemeContext();
   const { user, loading: authLoading } = useAuth();
   const { dashboardData, loading, mockActivities, mockTasks } = useDashboardData();
-  const [gaugeStyle, setGaugeStyle] = React.useState<'luxury' | 'quantum' | 'masterpiece'>('masterpiece');
+  const [gaugeStyle, setGaugeStyle] = React.useState<'quantum' | 'masterpiece'>('masterpiece');
   
   // Sound test
   const { soundEnabled } = useSoundContext();
@@ -95,26 +94,6 @@ const Dashboard: React.FC = () => {
         {/* Gauge Style Selector */}
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Box
-            onClick={() => setGaugeStyle('luxury')}
-          sx={{
-            px: 2,
-            py: 0.5,
-            borderRadius: 1,
-            cursor: 'pointer',
-            fontSize: '0.875rem',
-            backgroundColor: gaugeStyle === 'luxury' ? 'primary.main' : 'transparent',
-            color: gaugeStyle === 'luxury' ? 'primary.contrastText' : 'text.secondary',
-            border: '1px solid',
-            borderColor: gaugeStyle === 'luxury' ? 'primary.main' : 'divider',
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              backgroundColor: gaugeStyle === 'luxury' ? 'primary.dark' : 'action.hover',
-            }
-          }}
-        >
-          Luxury Style
-        </Box>
-        <Box
           onClick={() => setGaugeStyle('quantum')}
           sx={{
             px: 2,
@@ -248,66 +227,6 @@ const Dashboard: React.FC = () => {
                   size="medium"
                   nightMode={false}
                   soundEnabled={true}
-                />
-              </Box>
-            </>
-          ) : (
-            // Luxury style gauges
-            <>
-              <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
-                <LuxuryGauge 
-                  value={Math.round(dashboardData.revenue_generated / 100000)} // Value in K
-                  displayValue={Math.round(dashboardData.revenue_generated / 100000)} // Display in K
-                  label="REVENUE"
-                  unit="K"
-                  max={1000} // Max 1M
-                  size="medium"
-                  onClick={() => navigate('/analytics')}
-                  animationDelay={0}
-                  colorMode="gold"
-                  variant="revenue-gold"
-                />
-              </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
-                <LuxuryGauge 
-                  value={Math.round(dashboardData.pipeline_value / 100000)} // Value in K
-                  displayValue={Math.round(dashboardData.pipeline_value / 100000)} // Display in K
-                  label="PIPELINE"
-                  unit="K"
-                  max={2000} // Max 2M
-                  size="medium"
-                  onClick={() => navigate('/analytics')}
-                  animationDelay={200}
-                  colorMode="primary"
-                  variant="pipeline-plasma"
-                />
-              </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
-                <LuxuryGauge 
-                  value={dashboardData.quota_percentage} // Already a percentage
-                  displayValue={dashboardData.quota_percentage}
-                  label="QUOTA"
-                  unit="%"
-                  max={100}
-                  size="medium"
-                  onClick={() => navigate('/analytics')}
-                  animationDelay={400}
-                  colorMode="auto"
-                  variant="quota-crimson"
-                />
-              </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
-                <LuxuryGauge 
-                  value={dashboardData.conversion_rate} // Already a percentage
-                  displayValue={dashboardData.conversion_rate}
-                  label="CONVERSION"
-                  unit="%"
-                  max={100}
-                  size="medium"
-                  onClick={() => navigate('/analytics')}
-                  animationDelay={600}
-                  colorMode="auto"
-                  variant="conversion-neon"
                 />
               </Box>
             </>
