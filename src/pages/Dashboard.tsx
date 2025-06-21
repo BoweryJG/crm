@@ -13,6 +13,7 @@ import QuickCallWidget from '../components/dashboard/QuickCallWidget';
 import NowCardsStack from '../components/dashboard/NowCardsStack'; // Added import
 import ClassicRevenueGauge from '../components/gauges/ClassicRevenueGauge';
 import LuxuryGauge from '../components/gauges/LuxuryGauge';
+import QuantumLuxuryGauge from '../components/gauges/QuantumLuxuryGauge';
 import LiveActionTicker from '../components/dashboard/LiveActionTicker';
 import { useThemeContext } from '../themes/ThemeContext';
 import { useNavigate } from 'react-router-dom';
@@ -31,6 +32,7 @@ const Dashboard: React.FC = () => {
   const { themeMode } = useThemeContext();
   const { user, loading: authLoading } = useAuth();
   const { dashboardData, loading, mockActivities, mockTasks } = useDashboardData();
+  const [gaugeStyle, setGaugeStyle] = React.useState<'luxury' | 'quantum'>('luxury');
   
   // Debug auth state
   React.useEffect(() => {
@@ -66,6 +68,50 @@ const Dashboard: React.FC = () => {
         </Typography>
       </Box>
 
+      {/* Gauge Style Selector */}
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+        <Box
+          onClick={() => setGaugeStyle('luxury')}
+          sx={{
+            px: 2,
+            py: 0.5,
+            borderRadius: 1,
+            cursor: 'pointer',
+            fontSize: '0.875rem',
+            backgroundColor: gaugeStyle === 'luxury' ? 'primary.main' : 'transparent',
+            color: gaugeStyle === 'luxury' ? 'primary.contrastText' : 'text.secondary',
+            border: '1px solid',
+            borderColor: gaugeStyle === 'luxury' ? 'primary.main' : 'divider',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              backgroundColor: gaugeStyle === 'luxury' ? 'primary.dark' : 'action.hover',
+            }
+          }}
+        >
+          Luxury Style
+        </Box>
+        <Box
+          onClick={() => setGaugeStyle('quantum')}
+          sx={{
+            px: 2,
+            py: 0.5,
+            borderRadius: 1,
+            cursor: 'pointer',
+            fontSize: '0.875rem',
+            backgroundColor: gaugeStyle === 'quantum' ? 'primary.main' : 'transparent',
+            color: gaugeStyle === 'quantum' ? 'primary.contrastText' : 'text.secondary',
+            border: '1px solid',
+            borderColor: gaugeStyle === 'quantum' ? 'primary.main' : 'divider',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              backgroundColor: gaugeStyle === 'quantum' ? 'primary.dark' : 'action.hover',
+            }
+          }}
+        >
+          Quantum Style
+        </Box>
+      </Box>
+
       {/* Revenue Gauges Dashboard */}
       <Box sx={{ mb: 4, overflow: 'hidden' }}>
         <Box sx={{ 
@@ -92,7 +138,32 @@ const Dashboard: React.FC = () => {
             [1, 2, 3, 4].map((i) => (
               <Skeleton key={i} variant="circular" width={260} height={260} />
             ))
+          ) : gaugeStyle === 'quantum' ? (
+            // Quantum style gauges
+            <>
+              <QuantumLuxuryGauge 
+                value={Math.round(dashboardData.revenue_generated / 1000)} // Normalize to 0-100
+                label="REVENUE"
+                animationDelay={0}
+              />
+              <QuantumLuxuryGauge 
+                value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
+                label="PIPELINE"
+                animationDelay={200}
+              />
+              <QuantumLuxuryGauge 
+                value={dashboardData.quota_percentage}
+                label="QUOTA"
+                animationDelay={400}
+              />
+              <QuantumLuxuryGauge 
+                value={dashboardData.conversion_rate}
+                label="CONVERSION"
+                animationDelay={600}
+              />
+            </>
           ) : (
+            // Luxury style gauges
             <>
               <Box sx={{ width: '100%', maxWidth: { xs: 200, sm: 220, md: 260 } }}>
                 <LuxuryGauge 
