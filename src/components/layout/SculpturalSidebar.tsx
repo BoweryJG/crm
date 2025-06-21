@@ -213,7 +213,7 @@ const SculpturalDivider: React.FC<{ pattern?: 'dots' | 'zigzag' | 'gradient' }> 
   
   if (pattern === 'zigzag') {
     return (
-      <Box sx={{ position: 'relative', height: 12, my: 1, overflow: 'hidden' }}>
+      <Box sx={{ position: 'relative', height: 12, my: 0.5, overflow: 'hidden' }}>
         <svg width="100%" height="12" viewBox="0 0 200 12" preserveAspectRatio="none">
           <path
             d="M0,6 L10,3 L20,9 L30,3 L40,9 L50,3 L60,9 L70,3 L80,9 L90,3 L100,9 L110,3 L120,9 L130,3 L140,9 L150,3 L160,9 L170,3 L180,9 L190,3 L200,6"
@@ -231,7 +231,7 @@ const SculpturalDivider: React.FC<{ pattern?: 'dots' | 'zigzag' | 'gradient' }> 
       <Box
         sx={{
           height: 16,
-          my: 0.75,
+          my: 0.5,
           backgroundImage: `radial-gradient(circle, ${alpha(theme.palette.primary.main, opacity)} 1px, transparent 1px)`,
           backgroundSize: '10px 10px',
           backgroundPosition: 'center',
@@ -245,7 +245,7 @@ const SculpturalDivider: React.FC<{ pattern?: 'dots' | 'zigzag' | 'gradient' }> 
     <Box
       sx={{
         height: 1,
-        my: 1.5, // Reduced from 3 to 1.5
+        my: 0.75, // Further reduced to minimize space
         mx: 2,
         background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.3 : 0.2)}, transparent)`,
       }}
@@ -310,7 +310,7 @@ const NavigationSection: React.FC<{
       </Box>
       
       <Collapse in={isOpen} timeout={animations.durations.deliberate}>
-        <Box sx={{ pb: 0.5 }}> {/* Reduced padding */}
+        <Box sx={{ pb: 0 }}> {/* Removed padding */}
           {items.map((item, index) => (
             <MonolithTab
               key={item.path}
@@ -475,7 +475,7 @@ const SculpturalSidebar: React.FC<{
         overflowY: 'auto', 
         overflowX: 'hidden', 
         flex: 1, 
-        py: 2,
+        py: 1,
         // Custom scrollbar styling
         '&::-webkit-scrollbar': {
           width: '8px',
