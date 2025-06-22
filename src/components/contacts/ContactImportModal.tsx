@@ -36,6 +36,8 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { supabase } from '../../services/supabase/supabase';
 import { Contact } from '../../types/models';
+import { useAuth } from '../../auth';
+import { useAppMode } from '../../contexts/AppModeContext';
 
 interface ContactImportModalProps {
   open: boolean;
@@ -63,6 +65,8 @@ export const ContactImportModal: React.FC<ContactImportModalProps> = ({
   onImportComplete
 }) => {
   const theme = useTheme();
+  const { user } = useAuth();
+  const { isDemo } = useAppMode();
   const [activeStep, setActiveStep] = useState(0);
   const [file, setFile] = useState<File | null>(null);
   const [parsedData, setParsedData] = useState<ParsedContact[]>([]);
@@ -225,20 +229,33 @@ export const ContactImportModal: React.FC<ContactImportModalProps> = ({
     let errors = 0;
 
     try {
+      // Always use public_contacts table for all imports so admin has access
+      const tableName = 'public_contacts';
+      console.log(`Importing to ${tableName} table (user: ${user?.email}, demo mode: ${isDemo})`);
+
       for (let i = 0; i < totalBatches; i++) {
         const batch = preparedData.slice(i * batchSize, (i + 1) * batchSize);
         
+        // Add session metadata to track imports
+        const batchWithMetadata = batch.map(contact => ({
+          ...contact,
+          import_source: 'web_upload',
+          import_date: new Date().toISOString(),
+          import_user: user?.email || 'anonymous',
+          import_mode: isDemo ? 'demo' : 'authenticated'
+        }));
+        
         // Insert batch - using upsert to avoid duplicates based on email
         const { data, error } = await supabase
-          .from('contacts')
-          .upsert(batch, { 
+          .from(tableName)
+          .upsert(batchWithMetadata, { 
             onConflict: 'email',
             ignoreDuplicates: true 
           })
           .select();
 
         if (error) {
-          console.error('Batch import error:', error);
+          console.error(`Batch import error for ${tableName}:`, error);
           errors += batch.length;
         } else {
           imported += data?.length || 0;
@@ -466,7 +483,8 @@ export const ContactImportModal: React.FC<ContactImportModalProps> = ({
               <Typography variant="body2">
                 • Duplicate emails will be skipped automatically<br />
                 • Missing names will be set to "Unknown Contact"<br />
-                • All contacts will be imported with a default score of 50
+                • All contacts will be imported with a default score of 50<br />
+                • Imported contacts will be accessible across the platform
               </Typography>
             </Alert>
 
