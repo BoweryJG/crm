@@ -128,6 +128,23 @@ const Contacts: React.FC = () => {
         console.log(`Total contacts in ${tableName}: ${count}`);
       }
       
+      // Also check both tables for debugging
+      if (!search.trim()) {
+        const { count: publicCount } = await supabase
+          .from('public_contacts')
+          .select('*', { count: 'exact', head: true });
+        
+        const { count: privateCount } = await supabase
+          .from('contacts')
+          .select('*', { count: 'exact', head: true });
+          
+        console.log('=== Contact Count Debug ===');
+        console.log(`public_contacts table: ${publicCount || 0} contacts`);
+        console.log(`contacts table (private): ${privateCount || 0} contacts`);
+        console.log(`Currently viewing: ${tableName} table`);
+        console.log('==========================');
+      }
+      
       // Fetch contacts with search filter and pagination
       // Use different ordering based on table (overall_score exists only in contacts table)
       const orderColumn = tableName === 'contacts' ? 'overall_score' : 'created_at';
