@@ -35,6 +35,7 @@ import {
 import CallButton from '../components/contacts/CallButton';
 import ContactMetrics from '../components/contacts/ContactMetrics';
 import ContactChatWidget from '../components/contacts/ContactChatWidget';
+import { ContactImportModal } from '../components/contacts/ContactImportModal';
 import { Contact } from '../types/models';
 import { supabase } from '../services/supabase/supabase';
 import mockDataService from '../services/mockData/mockDataService';
@@ -87,6 +88,7 @@ const Contacts: React.FC = () => {
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [totalContacts, setTotalContacts] = useState<number>(0);
   const [searchDebounce, setSearchDebounce] = useState<NodeJS.Timeout | null>(null);
+  const [importModalOpen, setImportModalOpen] = useState<boolean>(false);
   const CONTACTS_PER_PAGE = 100;
 
   const fetchContactsPage = async (page: number, append: boolean = false, search: string = '') => {
@@ -121,7 +123,10 @@ const Contacts: React.FC = () => {
       
       // Get total count with search filter
       const { count } = await countQuery;
-      if (count) setTotalContacts(count);
+      if (count !== null) {
+        setTotalContacts(count);
+        console.log(`Total contacts in ${tableName}: ${count}`);
+      }
       
       // Fetch contacts with search filter and pagination
       // Use different ordering based on table (overall_score exists only in contacts table)
@@ -334,14 +339,20 @@ const Contacts: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" sx={{ color: theme.palette.primary.main }}>
-          Contacts
-        </Typography>
+        <Box>
+          <Typography variant="h4" sx={{ color: theme.palette.primary.main }}>
+            Contacts
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Total: {totalContacts.toLocaleString()} contacts in database
+          </Typography>
+        </Box>
         <Box>
           <Button 
             variant="outlined" 
             startIcon={<ImportExportIcon />}
             sx={{ mr: 1 }}
+            onClick={() => setImportModalOpen(true)}
           >
             Import/Export
           </Button>
@@ -509,6 +520,19 @@ const Contacts: React.FC = () => {
         onContactsUpdate={(newContacts) => {
           setContacts(newContacts);
           setTotalContacts(newContacts.length);
+        }}
+      />
+
+      {/* Contact Import Modal */}
+      <ContactImportModal
+        open={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        onImportComplete={(importedCount) => {
+          setImportModalOpen(false);
+          // Refresh the contacts list
+          fetchContactsPage(0, false, searchTerm);
+          // Show success message (you could add a snackbar here)
+          console.log(`Successfully imported ${importedCount} contacts`);
         }}
       />
     </Box>
