@@ -441,7 +441,12 @@ const SmartCRM: React.FC = () => {
             </Typography>
           </Grid>
         <Grid item xs={12} md={6}>
-          <Stack direction="row" spacing={2} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
+          <Stack 
+            direction={{ xs: 'column', sm: 'row' }} 
+            spacing={2} 
+            justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
+            sx={{ mt: { xs: 2, md: 0 } }}
+          >
             <Button
               variant="contained"
               startIcon={<UploadIcon />}
@@ -450,8 +455,10 @@ const SmartCRM: React.FC = () => {
                 background: 'linear-gradient(135deg, var(--luxury-gold), var(--luxury-gold-light))',
                 color: '#000',
                 fontWeight: 600,
-                px: 3,
-                py: 1.2,
+                px: { xs: 2, sm: 3 },
+                py: { xs: 1, sm: 1.2 },
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                width: { xs: '100%', sm: 'auto' },
                 '&:hover': {
                   background: 'linear-gradient(135deg, var(--luxury-gold-light), var(--luxury-gold))',
                   transform: 'translateY(-1px)',
@@ -566,8 +573,8 @@ const SmartCRM: React.FC = () => {
       </Grid>
 
       {/* Filters and Actions Bar */}
-      <Paper className="filter-bar" elevation={0}>
-        <Grid container spacing={2} alignItems="center">
+      <Paper className="filter-bar" elevation={0} sx={{ mb: 3 }}>
+        <Grid container spacing={{ xs: 1, sm: 2 }} alignItems="center">
           <Grid item xs={12} md={4}>
             <TextField
               fullWidth
@@ -585,7 +592,7 @@ const SmartCRM: React.FC = () => {
             />
           </Grid>
           
-          <Grid item xs={6} md={2}>
+          <Grid item xs={12} sm={6} md={2}>
             <FormControl fullWidth size="small">
               <InputLabel>Industry</InputLabel>
               <Select
@@ -601,7 +608,7 @@ const SmartCRM: React.FC = () => {
             </FormControl>
           </Grid>
 
-          <Grid item xs={6} md={2}>
+          <Grid item xs={12} sm={6} md={2}>
             <FormControl fullWidth size="small">
               <InputLabel>Lead Tier</InputLabel>
               <Select
@@ -618,7 +625,7 @@ const SmartCRM: React.FC = () => {
             </FormControl>
           </Grid>
 
-          <Grid item xs={6} md={2}>
+          <Grid item xs={12} sm={6} md={2}>
             <FormControl fullWidth size="small">
               <InputLabel>Timeline</InputLabel>
               <Select
@@ -635,8 +642,8 @@ const SmartCRM: React.FC = () => {
             </FormControl>
           </Grid>
 
-          <Grid item xs={6} md={2}>
-            <Stack direction="row" spacing={1}>
+          <Grid item xs={12} sm={6} md={2}>
+            <Stack direction="row" spacing={1} justifyContent={{ xs: 'center', sm: 'flex-start' }}>
               <ToggleButtonGroup
                 value={viewMode}
                 exclusive
@@ -662,7 +669,12 @@ const SmartCRM: React.FC = () => {
         </Grid>
 
         {/* Quick Filters */}
-        <Stack direction="row" spacing={1} sx={{ mt: 2 }} flexWrap="wrap">
+        <Stack 
+          direction="row" 
+          spacing={1} 
+          sx={{ mt: 2, gap: { xs: 0.5, sm: 1 } }} 
+          flexWrap="wrap"
+        >
           <Chip 
             label="Has Email" 
             variant={filters.hasEmail ? "filled" : "outlined"}
@@ -756,7 +768,7 @@ const SmartCRM: React.FC = () => {
           {filteredContacts
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             .map((contact, idx) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={idx}>
+              <Grid item xs={12} sm={6} md={6} lg={4} xl={3} key={idx}>
                 <Grow in timeout={100 + idx * 50}>
                   <Card 
                     className="contact-card"

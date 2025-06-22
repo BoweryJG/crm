@@ -314,21 +314,106 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
-/* Responsive Optimizations */
+/* Mobile Optimizations - Comprehensive */
 @media (max-width: 768px) {
+  /* Header adjustments */
+  .smart-crm-header {
+    padding: 1rem 0;
+    margin-bottom: 1rem;
+  }
+  
+  .smart-crm-title {
+    font-size: 2rem !important;
+    line-height: 1.2 !important;
+  }
+  
+  /* Stats cards - reduce blur for performance */
   .stats-card {
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
+    padding: 0.75rem !important;
   }
   
+  .stats-number {
+    font-size: 1.75rem !important;
+  }
+  
+  .stats-icon {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  /* Contact cards - optimize for touch */
   .contact-card {
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
+    min-height: unset;
+    margin-bottom: 0.5rem;
   }
   
+  /* Filter bar - stack on mobile */
   .filter-bar {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    padding: 1rem !important;
+  }
+  
+  /* Filter chips - better touch targets */
+  .filter-chip {
+    min-height: 36px;
+    margin: 2px !important;
+  }
+  
+  /* Table - horizontal scroll */
+  .luxury-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Import zone - full width */
+  .import-dropzone {
+    padding: 3rem 1rem !important;
+  }
+  
+  /* Buttons - stack on very small screens */
+  @media (max-width: 400px) {
+    .filter-bar .MuiStack-root {
+      flex-direction: column !important;
+      width: 100%;
+    }
+    
+    .filter-bar button {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+/* Small mobile optimizations */
+@media (max-width: 480px) {
+  /* Even smaller title */
+  .smart-crm-title {
+    font-size: 1.5rem !important;
+  }
+  
+  /* Single column layout */
+  .contact-card {
+    width: 100%;
+  }
+  
+  /* Reduce animations */
+  * {
+    animation-duration: 0.2s !important;
+  }
+  
+  /* Hide decorative elements */
+  .smart-crm-header::before {
+    display: none;
+  }
+  
+  /* Simplify shadows */
+  .contact-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 }
 
