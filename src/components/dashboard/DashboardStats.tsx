@@ -18,7 +18,6 @@ import {
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useDashboardData } from '../../contexts/DashboardDataContext';
 import IndustrialStatCard from './IndustrialStatCard';
-import PanthereMeridianControlBoard from './PanthereMeridianControlBoard';
 
 // Theme-based accent colors for industrial look
 const getAccentColor = (themeMode: string, index: number) => {
@@ -114,15 +113,6 @@ const DashboardStats: React.FC = () => {
         accentColor={getAccentColor(themeMode, 3)}
         index={3}
       />
-      
-      <Box sx={{ gridColumn: '1 / -1' }}>
-        <PanthereMeridianControlBoard
-          current={dashboardData.current_revenue / 100}
-          goal={dashboardData.sales_goal / 100}
-          progress={dashboardData.sales_goal_progress}
-          formatValue={formatCurrency}
-        />
-      </Box>
     </Box>
   );
 };

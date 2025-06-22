@@ -140,21 +140,52 @@ const Dashboard: React.FC = () => {
       </Box>
 
       {/* Revenue Gauges Dashboard */}
-      <Box sx={{ mb: 4, overflow: 'visible' }}>
+      <Box sx={{ 
+        mb: 4, 
+        overflow: 'visible',
+        // Add subtle background pattern
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: '-5%',
+          right: '-5%',
+          bottom: 0,
+          background: `
+            radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.01) 0%, transparent 50%),
+            radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.01) 0%, transparent 50%),
+            repeating-linear-gradient(
+              45deg,
+              transparent,
+              transparent 10px,
+              rgba(255, 255, 255, 0.005) 10px,
+              rgba(255, 255, 255, 0.005) 20px
+            )
+          `,
+          pointerEvents: 'none',
+          zIndex: 0
+        }
+      }}>
         <Box sx={{ 
           display: 'grid', 
           gridTemplateColumns: { 
             xs: '1fr', 
             sm: 'repeat(2, 1fr)', 
-            md: 'repeat(3, 1fr)', 
-            lg: 'repeat(4, 1fr)' 
+            md: 'repeat(2, 1fr)',
+            lg: 'repeat(3, 1fr)',
+            xl: 'repeat(4, 1fr)' 
           },
-          gap: { xs: 3, sm: 4 },
+          gap: { xs: 4, sm: 5, md: 6 },
           justifyContent: 'center',
           justifyItems: 'center',
           alignItems: 'center',
           width: '100%',
           maxWidth: '100%',
+          px: { xs: 1, sm: 2, md: 3 },
+          py: { xs: 2, sm: 3 },
+          position: 'relative',
+          zIndex: 1,
           '& > *': {
             maxWidth: '100%',
             overflow: 'visible'
@@ -168,28 +199,28 @@ const Dashboard: React.FC = () => {
           ) : gaugeStyle === 'quantum' ? (
             // Quantum style gauges
             <>
-              <Box sx={{ width: '100%', maxWidth: { xs: 300, sm: 300, md: 300 }, padding: 1 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
                 <QuantumLuxuryGauge 
                   value={Math.round(dashboardData.revenue_generated / 1000)} // Normalize to 0-100
                   label="REVENUE"
                   animationDelay={0}
                 />
               </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 300, sm: 300, md: 300 }, padding: 1 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
                 <QuantumLuxuryGauge 
                   value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
                   label="PIPELINE"
                   animationDelay={200}
                 />
               </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 300, sm: 300, md: 300 }, padding: 1 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
                 <QuantumLuxuryGauge 
                   value={dashboardData.quota_percentage}
                   label="QUOTA"
                   animationDelay={400}
                 />
               </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 300, sm: 300, md: 300 }, padding: 1 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
                 <QuantumLuxuryGauge 
                   value={dashboardData.conversion_rate}
                   label="CONVERSION"
@@ -200,7 +231,7 @@ const Dashboard: React.FC = () => {
           ) : (
             // Masterpiece style gauges
             <>
-              <Box sx={{ width: '100%', maxWidth: { xs: 300, sm: 300, md: 300 }, padding: 1 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
                 <MasterpieceGauge 
                   value={Math.round(dashboardData.revenue_generated / 10000)} // Normalize to 0-100
                   label="REVENUE"
@@ -210,7 +241,7 @@ const Dashboard: React.FC = () => {
                   soundEnabled={true}
                 />
               </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 300, sm: 300, md: 300 }, padding: 1 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
                 <MasterpieceGauge 
                   value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
                   label="PIPELINE"
@@ -220,7 +251,7 @@ const Dashboard: React.FC = () => {
                   soundEnabled={true}
                 />
               </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 300, sm: 300, md: 300 }, padding: 1 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
                 <MasterpieceGauge 
                   value={dashboardData.quota_percentage}
                   label="QUOTA"
@@ -230,7 +261,7 @@ const Dashboard: React.FC = () => {
                   soundEnabled={true}
                 />
               </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 300, sm: 300, md: 300 }, padding: 1 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
                 <MasterpieceGauge 
                   value={dashboardData.conversion_rate}
                   label="CONVERSION"

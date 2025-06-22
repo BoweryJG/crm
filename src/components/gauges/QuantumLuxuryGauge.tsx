@@ -11,16 +11,52 @@ interface QuantumLuxuryGaugeProps {
 }
 
 const GaugeWrapper = styled(Box)(({ theme }) => ({
-  background: 'radial-gradient(ellipse at center, #1a1a1a 0%, #0a0a0a 100%)',
+  background: `radial-gradient(ellipse at center, #1a1a1a 0%, #0a0a0a 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(100, 100, 100, 0.02) 3px,
+      rgba(100, 100, 100, 0.02) 6px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 3px,
+      rgba(100, 100, 100, 0.02) 3px,
+      rgba(100, 100, 100, 0.02) 6px
+    ),
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      transparent 0px,
+      transparent 5px,
+      rgba(0, 0, 0, 0.03) 5px,
+      rgba(0, 0, 0, 0.03) 10px
+    )`,
   padding: '30px',
   borderRadius: '25px',
   boxShadow: `
-    inset 0 2px 4px rgba(255,255,255,0.1),
-    inset 0 -2px 4px rgba(0,0,0,0.5),
-    0 10px 40px rgba(0,0,0,0.8)
+    inset 0 2px 4px rgba(255,255,255,0.08),
+    inset 0 -2px 6px rgba(0,0,0,0.6),
+    inset 0 0 30px rgba(0,0,0,0.4),
+    0 10px 40px rgba(0,0,0,0.8),
+    0 20px 60px rgba(0,0,0,0.6),
+    0 0 80px rgba(100,100,100,0.1)
   `,
   position: 'relative',
   display: 'inline-block',
+  border: '1px solid rgba(100, 100, 100, 0.1)',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: '10px',
+    left: '10px',
+    right: '10px',
+    bottom: '10px',
+    borderRadius: '20px',
+    border: '1px solid rgba(100, 100, 100, 0.05)',
+    pointerEvents: 'none'
+  }
 }));
 
 const Gauge = styled(Box)<{ size: number }>(({ size }) => ({
@@ -28,13 +64,22 @@ const Gauge = styled(Box)<{ size: number }>(({ size }) => ({
   width: `${size}px`,
   height: `${size}px`,
   borderRadius: '50%',
-  background: 'radial-gradient(circle at 30% 30%, #2a2a2a 0%, #0f0f0f 100%)',
+  background: `radial-gradient(circle at 30% 30%, #2a2a2a 0%, #1a1a1a 50%, #0f0f0f 100%),
+    repeating-radial-gradient(
+      circle at center,
+      transparent 0px,
+      transparent 2px,
+      rgba(255, 255, 255, 0.01) 2px,
+      rgba(255, 255, 255, 0.01) 4px
+    )`,
   boxShadow: `
-    0 0 40px rgba(0,0,0,0.8),
-    inset 0 0 20px rgba(255,255,255,0.05),
-    inset 0 -5px 10px rgba(0,0,0,0.5)
+    0 0 60px rgba(0,0,0,0.9),
+    inset 0 0 30px rgba(255,255,255,0.03),
+    inset 0 -5px 15px rgba(0,0,0,0.6),
+    inset 0 2px 5px rgba(255,255,255,0.05)
   `,
   border: '2px solid #333',
+  borderImage: 'linear-gradient(135deg, #444 0%, #222 50%, #444 100%) 1',
   overflow: 'visible',
 }));
 

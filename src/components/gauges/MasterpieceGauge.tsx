@@ -30,14 +30,76 @@ const pulseStatus = keyframes`
 const GaugeWrapper = styled(Box)<{ nightMode?: boolean }>(({ nightMode }) => ({
   position: 'relative',
   background: nightMode 
-    ? 'radial-gradient(#001a33, #000)' 
-    : 'radial-gradient(#2a1f16, #0c0c0c)',
-  padding: '20px',
-  borderRadius: '20px',
+    ? `radial-gradient(ellipse at center, #001a33 0%, #000511 50%, #000 100%),
+       repeating-linear-gradient(
+         0deg,
+         transparent,
+         transparent 2px,
+         rgba(0, 233, 255, 0.01) 2px,
+         rgba(0, 233, 255, 0.01) 4px
+       ),
+       repeating-linear-gradient(
+         90deg,
+         transparent,
+         transparent 2px,
+         rgba(0, 233, 255, 0.01) 2px,
+         rgba(0, 233, 255, 0.01) 4px
+       )` 
+    : `radial-gradient(ellipse at center, #3d2f1f 0%, #2a1f16 30%, #1a1410 60%, #0c0c0c 100%),
+       repeating-linear-gradient(
+         0deg,
+         transparent,
+         transparent 2px,
+         rgba(139, 69, 19, 0.03) 2px,
+         rgba(139, 69, 19, 0.03) 4px
+       ),
+       repeating-linear-gradient(
+         90deg,
+         transparent,
+         transparent 2px,
+         rgba(139, 69, 19, 0.02) 2px,
+         rgba(139, 69, 19, 0.02) 4px
+       ),
+       repeating-radial-gradient(
+         circle at 30% 40%,
+         transparent 0px,
+         transparent 3px,
+         rgba(0, 0, 0, 0.02) 3px,
+         rgba(0, 0, 0, 0.02) 6px
+       )`,
+  padding: '25px',
+  borderRadius: '24px',
   boxShadow: nightMode
-    ? 'inset 0 0 30px #00000088, 0 0 45px #00e5ff33, 0 0 80px #00e5ff22'
-    : 'inset 0 0 30px #00000088, 0 0 25px #552d0a33',
+    ? `inset 0 2px 4px rgba(0, 233, 255, 0.1),
+       inset 0 -2px 4px rgba(0, 0, 0, 0.8),
+       inset 0 0 40px rgba(0, 0, 0, 0.6),
+       0 0 60px rgba(0, 233, 255, 0.3),
+       0 0 100px rgba(0, 233, 255, 0.2),
+       0 10px 30px rgba(0, 0, 0, 0.8)`
+    : `inset 0 2px 4px rgba(255, 255, 255, 0.1),
+       inset 0 -2px 8px rgba(0, 0, 0, 0.6),
+       inset 0 0 40px rgba(0, 0, 0, 0.4),
+       0 0 30px rgba(139, 69, 19, 0.2),
+       0 0 60px rgba(139, 69, 19, 0.1),
+       0 10px 30px rgba(0, 0, 0, 0.7),
+       0 20px 60px rgba(0, 0, 0, 0.5)`,
   display: 'inline-block',
+  border: nightMode
+    ? '1px solid rgba(0, 233, 255, 0.1)'
+    : '1px solid rgba(139, 69, 19, 0.2)',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: '8px',
+    left: '8px',
+    right: '8px',
+    bottom: '8px',
+    borderRadius: '16px',
+    border: nightMode
+      ? '1px solid rgba(0, 233, 255, 0.05)'
+      : '1px solid rgba(139, 69, 19, 0.1)',
+    pointerEvents: 'none'
+  }
 }));
 
 const Gauge = styled(Box)({
