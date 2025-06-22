@@ -237,7 +237,7 @@ const Dashboard: React.FC = () => {
                   label="REVENUE"
                   dataSource="CRM Analytics"
                   size="medium"
-                  nightMode={false}
+                  nightMode={themeMode === 'dark' || themeMode === 'space'}
                   soundEnabled={true}
                 />
               </Box>
@@ -247,7 +247,7 @@ const Dashboard: React.FC = () => {
                   label="PIPELINE"
                   dataSource="Sales Data"
                   size="medium"
-                  nightMode={false}
+                  nightMode={themeMode === 'dark' || themeMode === 'space'}
                   soundEnabled={true}
                 />
               </Box>
@@ -257,7 +257,7 @@ const Dashboard: React.FC = () => {
                   label="QUOTA"
                   dataSource="Performance"
                   size="medium"
-                  nightMode={false}
+                  nightMode={themeMode === 'dark' || themeMode === 'space'}
                   soundEnabled={true}
                 />
               </Box>
@@ -267,7 +267,7 @@ const Dashboard: React.FC = () => {
                   label="CONVERSION"
                   dataSource="Metrics"
                   size="medium"
-                  nightMode={false}
+                  nightMode={themeMode === 'dark' || themeMode === 'space'}
                   soundEnabled={true}
                 />
               </Box>

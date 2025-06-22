@@ -174,7 +174,8 @@ const QuickCallWidget: React.FC = () => {
       }
     };
 
-    if (user) {
+    // Fetch contacts in demo mode even without a user, or with a user in any mode
+    if (isDemo || user) {
       fetchRecentContacts();
     }
   }, [user, isDemo]);
