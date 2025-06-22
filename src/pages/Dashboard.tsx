@@ -9,6 +9,13 @@ import {
   Skeleton,
   Button
 } from '@mui/material';
+import { useThemeContext } from '../themes/ThemeContext';
+import { useNavigate } from 'react-router-dom';
+import { useDashboardData } from '../contexts/DashboardDataContext';
+import { useAuth } from '../auth';
+import { getUserDisplayName } from '../utils/userHelpers';
+import { useSound } from '../hooks/useSound';
+import { useSoundContext } from '../contexts/SoundContext';
 import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
 
@@ -21,13 +28,6 @@ const LiveActionTicker = lazy(() => import('../components/dashboard/LiveActionTi
 const CommandCenterFeed = lazy(() => import('../components/dashboard/CommandCenterFeed'));
 const MissionBriefingCard = lazy(() => import('../components/dashboard/MissionBriefingCard'));
 const CartierBlended = lazy(() => import('../components/dashboard/CartierBlended'));
-import { useThemeContext } from '../themes/ThemeContext';
-import { useNavigate } from 'react-router-dom';
-import { useDashboardData } from '../contexts/DashboardDataContext';
-import { useAuth } from '../auth';
-import { getUserDisplayName } from '../utils/userHelpers';
-import { useSound } from '../hooks/useSound';
-import { useSoundContext } from '../contexts/SoundContext';
 
 // Helper function to generate random integers
 const getRandomInt = (min: number, max: number): number => {
