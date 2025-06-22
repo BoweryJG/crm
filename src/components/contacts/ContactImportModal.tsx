@@ -229,33 +229,72 @@ export const ContactImportModal: React.FC<ContactImportModalProps> = ({
     let errors = 0;
 
     try {
-      // Always use public_contacts table for all imports so admin has access
-      const tableName = 'public_contacts';
-      console.log(`Importing to ${tableName} table (user: ${user?.email}, demo mode: ${isDemo})`);
+      // Track all uploads in private admin table (regardless of auth status)
+      const uploadMetadata = {
+        user_email: user?.email || 'anonymous',
+        upload_date: new Date().toISOString(),
+        total_contacts: preparedData.length,
+        file_name: file?.name || 'unknown',
+        is_demo: isDemo,
+        is_authenticated: !!user,
+        ip_address: 'client', // You could get actual IP from request headers
+        user_agent: navigator.userAgent
+      };
+      
+      // Log upload attempt to admin tracking table
+      await supabase
+        .from('contact_upload_logs')
+        .insert(uploadMetadata);
+
+      // If not authenticated, just show preview - don't save contacts
+      if (!user) {
+        // Simulate processing for demo
+        for (let i = 0; i < totalBatches; i++) {
+          setImportProgress(((i + 1) / totalBatches) * 100);
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+        
+        // Show what would happen
+        imported = preparedData.length;
+        
+        // Mark as preview only
+        setImportStats({
+          total: preparedData.length,
+          imported: 0,
+          skipped: 0,
+          errors: 0
+        });
+        
+        setActiveStep(3);
+        setError('Sign up to save your cleaned contacts!');
+        return;
+      }
+
+      // For authenticated users, save to their contacts
+      const tableName = 'contacts';
+      console.log(`Importing to ${tableName} table for user: ${user.email}`);
 
       for (let i = 0; i < totalBatches; i++) {
         const batch = preparedData.slice(i * batchSize, (i + 1) * batchSize);
         
-        // Add session metadata to track imports
-        const batchWithMetadata = batch.map(contact => ({
+        // Add user reference
+        const batchWithUser = batch.map(contact => ({
           ...contact,
-          import_source: 'web_upload',
-          import_date: new Date().toISOString(),
-          import_user: user?.email || 'anonymous',
-          import_mode: isDemo ? 'demo' : 'authenticated'
+          user_id: user.id,
+          import_date: new Date().toISOString()
         }));
         
         // Insert batch - using upsert to avoid duplicates based on email
         const { data, error } = await supabase
           .from(tableName)
-          .upsert(batchWithMetadata, { 
+          .upsert(batchWithUser, { 
             onConflict: 'email',
             ignoreDuplicates: true 
           })
           .select();
 
         if (error) {
-          console.error(`Batch import error for ${tableName}:`, error);
+          console.error(`Batch import error:`, error);
           errors += batch.length;
         } else {
           imported += data?.length || 0;
@@ -484,7 +523,8 @@ export const ContactImportModal: React.FC<ContactImportModalProps> = ({
                 • Duplicate emails will be skipped automatically<br />
                 • Missing names will be set to "Unknown Contact"<br />
                 • All contacts will be imported with a default score of 50<br />
-                • Imported contacts will be accessible across the platform
+                {!user && '• Sign up to save your cleaned contacts permanently'}
+                {user && '• Contacts will be saved to your private CRM'}
               </Typography>
             </Alert>
 
@@ -518,53 +558,90 @@ export const ContactImportModal: React.FC<ContactImportModalProps> = ({
         {/* Step 3: Results */}
         {activeStep === 3 && (
           <Box sx={{ textAlign: 'center', py: 4 }}>
-            <CheckCircleIcon sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
-            <Typography variant="h5" gutterBottom>
-              Import Complete!
-            </Typography>
+            {!user ? (
+              // Non-authenticated preview results
+              <>
+                <WarningIcon sx={{ fontSize: 64, color: 'warning.main', mb: 2 }} />
+                <Typography variant="h5" gutterBottom>
+                  Contact Cleaning Preview
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                  We successfully cleaned and enriched your {importStats.total} contacts!
+                </Typography>
+                
+                <Alert severity="warning" sx={{ mb: 4, maxWidth: 500, mx: 'auto' }}>
+                  <Typography variant="body2">
+                    To save these cleaned contacts to your CRM, please sign up or log in.
+                  </Typography>
+                </Alert>
 
-            <Box sx={{ my: 4 }}>
-              <Grid container spacing={2} justifyContent="center">
-                <Grid item>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h4" color="primary">
-                      {importStats.imported}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Imported
-                    </Typography>
-                  </Box>
-                </Grid>
-                {importStats.skipped > 0 && (
-                  <Grid item>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Typography variant="h4" color="warning.main">
-                        {importStats.skipped}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Skipped (Duplicates)
-                      </Typography>
-                    </Box>
-                  </Grid>
-                )}
-                {importStats.errors > 0 && (
-                  <Grid item>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Typography variant="h4" color="error">
-                        {importStats.errors}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Errors
-                      </Typography>
-                    </Box>
-                  </Grid>
-                )}
-              </Grid>
-            </Box>
+                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                  <Button variant="outlined" onClick={handleClose}>
+                    Cancel
+                  </Button>
+                  <Button 
+                    variant="contained" 
+                    onClick={() => {
+                      handleClose();
+                      // You could trigger the login modal here
+                    }}
+                  >
+                    Sign Up to Save Contacts
+                  </Button>
+                </Box>
+              </>
+            ) : (
+              // Authenticated import results
+              <>
+                <CheckCircleIcon sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
+                <Typography variant="h5" gutterBottom>
+                  Import Complete!
+                </Typography>
 
-            <Button variant="contained" onClick={handleClose} size="large">
-              Done
-            </Button>
+                <Box sx={{ my: 4 }}>
+                  <Grid container spacing={2} justifyContent="center">
+                    <Grid item>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Typography variant="h4" color="primary">
+                          {importStats.imported}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Imported
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    {importStats.skipped > 0 && (
+                      <Grid item>
+                        <Box sx={{ textAlign: 'center' }}>
+                          <Typography variant="h4" color="warning.main">
+                            {importStats.skipped}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Skipped (Duplicates)
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    )}
+                    {importStats.errors > 0 && (
+                      <Grid item>
+                        <Box sx={{ textAlign: 'center' }}>
+                          <Typography variant="h4" color="error">
+                            {importStats.errors}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Errors
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    )}
+                  </Grid>
+                </Box>
+
+                <Button variant="contained" onClick={handleClose} size="large">
+                  Done
+                </Button>
+              </>
+            )}
           </Box>
         )}
       </DialogContent>
