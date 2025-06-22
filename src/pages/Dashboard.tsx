@@ -7,7 +7,8 @@ import {
   CardContent,
   useTheme,
   Skeleton,
-  Button
+  Button,
+  alpha
 } from '@mui/material';
 import { useThemeContext } from '../themes/ThemeContext';
 import { useNavigate } from 'react-router-dom';
