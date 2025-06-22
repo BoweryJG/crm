@@ -10,6 +10,10 @@ RepSpheres CRM is a React-based application that provides comprehensive contact 
 
 ### Core Functionality
 - **Contact Management** - Track doctors, practices, and key decision makers
+  - **Smart Import System**: CSV/Excel upload with automatic field mapping
+  - **Preview Mode**: Non-authenticated users can preview data cleaning
+  - **Bulk Import**: Handle large datasets with progress tracking
+  - **Duplicate Prevention**: Automatic detection and handling
 - **Practice Database** - Comprehensive practice information and interaction history
 - **Sales Analytics** - Track performance metrics and identify opportunities
 - **Call Insights** - AI-powered call analysis and coaching
@@ -23,8 +27,11 @@ RepSpheres CRM is a React-based application that provides comprehensive contact 
 - **Public/Teaser Mode** - Limited access for non-authenticated users
 
 ### User Experience
-- **Multiple Themes** - Space, Corporate, Luxury Aviation, and more
+- **30+ Premium Themes** - Space, Corporate, Luxury Aviation, Cyber, Beauty themes
+  - **Compact Theme Selector**: Scrollable dropdown with color previews
+  - **Favorites System**: Quick access to preferred themes
 - **Responsive Design** - Works on desktop, tablet, and mobile
+- **Performance Optimized** - Lazy loading, mobile optimizations
 - **Real-time Updates** - Live data synchronization
 - **Offline Support** - Continue working without internet connection
 
@@ -187,6 +194,47 @@ This project is proprietary software owned by RepSpheres. All rights reserved.
 - **Documentation**: Coming soon
 - **Support**: support@repspheres.com
 
+## 📊 Contact Import System
+
+### For Non-Authenticated Users
+- Upload CSV/Excel files to preview cleaning capabilities
+- See data enrichment and organization in action
+- Contacts are NOT saved - preview only
+- Clear call-to-action to sign up for full functionality
+
+### For Authenticated Users  
+- Full import with data persistence
+- Contacts saved to private user database
+- Automatic duplicate detection via email
+- Import history and detailed statistics
+- Bulk processing with progress tracking
+
+### Technical Details
+- **File Support**: CSV, Excel (.xlsx, .xls)
+- **Smart Mapping**: Auto-detects common field names
+- **Data Cleaning**: Phone formatting, name standardization
+- **Privacy**: Non-authenticated uploads tracked but not saved
+- **Admin Analytics**: Upload attempts logged for platform insights
+
+## 🎯 Recent Updates
+
+### Contact Import System (Latest)
+- Preview-only mode for non-authenticated users  
+- Fixed "delete 60,000 contacts" issue with proper upsert logic
+- Admin tracking table for upload analytics
+- Clear data privacy boundaries
+
+### Theme System Enhancement  
+- Compact 320px dropdown replaces fullscreen dialog
+- Inline search with instant filtering
+- Visual color previews for each theme
+- Favorites section for quick access
+
+### Performance Optimizations
+- Dashboard components use lazy loading
+- Mobile device detection and reduced animations
+- Throttled updates for better iPhone performance
+
 ## 🎯 Roadmap
 
 - [ ] Mobile app (React Native)
@@ -196,8 +244,8 @@ This project is proprietary software owned by RepSpheres. All rights reserved.
 - [ ] Enhanced offline capabilities
 - [ ] Integration with medical databases
 - [ ] Automated follow-up scheduling
+- [ ] Export functionality for contacts
 
 ---
 
-Built with ❤️ by the RepSpheres team# Deploy trigger Sun Jun 15 20:38:35 EDT 2025
-# Force deployment Sun Jun 15 21:03:57 EDT 2025
+Built with ❤️ by the RepSpheres team

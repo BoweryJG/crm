@@ -98,7 +98,7 @@ const Contacts: React.FC = () => {
       
       // Determine which table to use based on mode and authentication
       const tableName = (!user || isDemo) ? 'public_contacts' : 'contacts';
-      console.log(`Using ${tableName} table (user: ${user?.email}, mode: ${mode})`);
+      console.log(`Using ${tableName} table (user: ${user?.email}, user ID: ${user?.id}, mode: ${mode})`);
       
       // Build query to match actual table structure
       let countQuery = supabase.from(tableName).select('*', { count: 'exact', head: true });
@@ -138,10 +138,22 @@ const Contacts: React.FC = () => {
           .from('contacts')
           .select('*', { count: 'exact', head: true });
           
+        // Check contacts for current user specifically
+        let userContactCount = 0;
+        if (user) {
+          const { count: userCount } = await supabase
+            .from('contacts')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', user.id);
+          userContactCount = userCount || 0;
+        }
+          
         console.log('=== Contact Count Debug ===');
         console.log(`public_contacts table: ${publicCount || 0} contacts`);
         console.log(`contacts table (private): ${privateCount || 0} contacts`);
+        console.log(`Contacts for current user (${user?.id}): ${userContactCount} contacts`);
         console.log(`Currently viewing: ${tableName} table`);
+        console.log(`Authenticated: ${!!user}, Demo mode: ${isDemo}`);
         console.log('==========================');
       }
       
