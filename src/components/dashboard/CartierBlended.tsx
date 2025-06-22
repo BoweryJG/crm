@@ -122,17 +122,22 @@ const EngravedTitle = styled(Typography)(({ theme }) => ({
   userSelect: 'none'
 }));
 
-const SubTitle = styled(Typography)(({ theme }) => ({
+const SubTitle = styled(Typography)(({ theme }) => {
+  const luxuryGreen = theme.palette.mode === 'dark' ? '#8bffa0' : '#6fdd84';
+  return {
   fontFamily: '"Söhne", -apple-system, sans-serif',
   fontSize: '11px',
   fontWeight: 400,
   letterSpacing: '0.05em',
-  color: alpha(theme.palette.success.main, 0.7),
+  color: alpha(luxuryGreen, 0.7),
   marginTop: theme.spacing(0.5),
   userSelect: 'none'
-}));
+};
+});
 
-const GlowingCapsule = styled(Box)(({ theme }) => ({
+const GlowingCapsule = styled(Box)(({ theme }) => {
+  const luxuryGreen = theme.palette.mode === 'dark' ? '#8bffa0' : '#6fdd84';
+  return {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -144,7 +149,7 @@ const GlowingCapsule = styled(Box)(({ theme }) => ({
     : `linear-gradient(135deg, 
         ${alpha(theme.palette.grey[100], 0.8)} 0%, 
         ${alpha(theme.palette.background.paper, 0.6)} 100%)`,
-  border: `2px solid ${alpha(theme.palette.success.main, 0.4)}`,
+  border: `2px solid ${alpha(luxuryGreen, 0.4)}`,
   borderRadius: '50px',
   position: 'relative',
   animation: `${glowPulse} 3s ease-in-out infinite`,
@@ -155,45 +160,56 @@ const GlowingCapsule = styled(Box)(({ theme }) => ({
     borderRadius: '50px',
     padding: 2,
     background: `linear-gradient(45deg, 
-      ${alpha(theme.palette.success.main, 0.8)}, 
-      ${alpha(theme.palette.success.light, 0.6)},
-      ${alpha(theme.palette.success.main, 0.8)})`,
+      ${alpha(luxuryGreen, 0.8)}, 
+      ${alpha(luxuryGreen, 0.6)},
+      ${alpha(luxuryGreen, 0.8)})`,
     WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
     WebkitMaskComposite: 'xor',
     maskComposite: 'exclude',
     opacity: 0.8
   }
-}));
+};
+});
 
-const PercentageDisplay = styled(Typography)(({ theme }) => ({
+const PercentageDisplay = styled(Typography)(({ theme }) => {
+  const luxuryGreen = theme.palette.mode === 'dark' ? '#8bffa0' : '#6fdd84';
+  const luxuryGreenGlow = theme.palette.mode === 'dark' ? 'rgba(139, 255, 160, 0.8)' : 'rgba(111, 221, 132, 0.8)';
+  return {
   fontFamily: '"GT Sectra Display", "Söhne", -apple-system, sans-serif',
   fontSize: '72px',
   fontWeight: 300,
-  color: theme.palette.success.main,
+  color: luxuryGreen,
   letterSpacing: '-0.02em',
   lineHeight: 1,
   textShadow: `
-    0 0 30px ${alpha(theme.palette.success.main, 0.8)},
-    0 0 60px ${alpha(theme.palette.success.main, 0.4)}
+    0 0 30px ${luxuryGreenGlow},
+    0 0 60px ${alpha(luxuryGreen, 0.4)}
   `
-}));
+};
+});
 
-const FilamentProgress = styled(LinearProgress)(({ theme }) => ({
+const FilamentProgress = styled(LinearProgress)(({ theme }) => {
+  const luxuryGreen = theme.palette.mode === 'dark' ? '#8bffa0' : '#6fdd84';
+  const luxuryGreenGlow = theme.palette.mode === 'dark' ? 'rgba(139, 255, 160, 0.8)' : 'rgba(111, 221, 132, 0.8)';
+  return {
   height: 2,
   borderRadius: 1,
   backgroundColor: alpha(theme.palette.common.white, 0.05),
   '& .MuiLinearProgress-bar': {
     borderRadius: 1,
     background: `linear-gradient(90deg, 
-      ${alpha(theme.palette.success.main, 0.8)} 0%, 
-      ${alpha(theme.palette.success.light, 1)} 50%,
-      ${alpha(theme.palette.success.main, 0.8)} 100%)`,
+      ${alpha(luxuryGreen, 0.8)} 0%, 
+      ${luxuryGreen} 50%,
+      ${alpha(luxuryGreen, 0.8)} 100%)`,
     animation: `${filamentGlow} 2s ease-in-out infinite`,
-    boxShadow: `0 0 10px ${alpha(theme.palette.success.main, 0.8)}`
+    boxShadow: `0 0 10px ${luxuryGreenGlow}`
   }
-}));
+};
+});
 
-const MetricCard = styled(Paper)(({ theme }) => ({
+const MetricCard = styled(Paper)(({ theme }) => {
+  const luxuryGreen = theme.palette.mode === 'dark' ? '#8bffa0' : '#6fdd84';
+  return {
   background: theme.palette.mode === 'dark'
     ? `linear-gradient(135deg, 
         ${alpha(theme.palette.background.paper, 0.9)} 0%, 
@@ -215,10 +231,11 @@ const MetricCard = styled(Paper)(({ theme }) => ({
     height: '1px',
     background: `linear-gradient(90deg, 
       transparent, 
-      ${alpha(theme.palette.success.main, 0.4)}, 
+      ${alpha(luxuryGreen, 0.4)}, 
       transparent)`,
   }
-}));
+};
+});
 
 const MomentumChip = styled(Chip)<{ status: string }>(({ theme, status }) => {
   const colors = {
@@ -245,7 +262,9 @@ const MomentumChip = styled(Chip)<{ status: string }>(({ theme, status }) => {
   };
 });
 
-const NeuralBackground = styled(Box)(({ theme }) => ({
+const NeuralBackground = styled(Box)(({ theme }) => {
+  const luxuryGreen = theme.palette.mode === 'dark' ? '#8bffa0' : '#6fdd84';
+  return {
   position: 'absolute',
   top: 0,
   left: 0,
@@ -253,22 +272,23 @@ const NeuralBackground = styled(Box)(({ theme }) => ({
   bottom: 0,
   opacity: 0.03,
   background: `linear-gradient(45deg, 
-    ${theme.palette.success.main} 25%, 
+    ${luxuryGreen} 25%, 
     transparent 25%, 
     transparent 75%, 
-    ${theme.palette.success.main} 75%, 
-    ${theme.palette.success.main}),
+    ${luxuryGreen} 75%, 
+    ${luxuryGreen}),
     linear-gradient(45deg, 
-    ${theme.palette.success.main} 25%, 
+    ${luxuryGreen} 25%, 
     transparent 25%, 
     transparent 75%, 
-    ${theme.palette.success.main} 75%, 
-    ${theme.palette.success.main})`,
+    ${luxuryGreen} 75%, 
+    ${luxuryGreen})`,
   backgroundSize: '60px 60px',
   backgroundPosition: '0 0, 30px 30px',
   animation: `${neuralWave} 20s linear infinite`,
   pointerEvents: 'none'
-}));
+};
+});
 
 interface CartierBlendedProps {
   live?: boolean;
@@ -277,6 +297,10 @@ interface CartierBlendedProps {
 const CartierBlended: React.FC<CartierBlendedProps> = ({ live = true }) => {
   const theme = useTheme();
   const { data } = useMissionStatus(live);
+  
+  // Custom luxury colors that adapt to theme
+  const luxuryGreen = theme.palette.mode === 'dark' ? '#8bffa0' : '#6fdd84';
+  const luxuryGreenGlow = theme.palette.mode === 'dark' ? 'rgba(139, 255, 160, 0.8)' : 'rgba(111, 221, 132, 0.8)';
   
   // Animated percentage
   const springConfig = { stiffness: 50, damping: 20 };
@@ -361,7 +385,7 @@ const CartierBlended: React.FC<CartierBlendedProps> = ({ live = true }) => {
               <Typography 
                 variant="h5" 
                 sx={{ 
-                  color: theme.palette.success.main,
+                  color: luxuryGreen,
                   fontFamily: '"GT Sectra Display", sans-serif',
                   fontWeight: 400,
                   mt: 0.5
