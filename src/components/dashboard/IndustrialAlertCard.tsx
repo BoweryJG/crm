@@ -83,8 +83,9 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
     <Box
       sx={{
         position: 'relative',
-        minWidth: 400,
-        maxWidth: 450,
+        width: '100%',
+        maxWidth: { xs: '100%', sm: '500px', md: '600px' },
+        mx: 'auto',
         background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%)',
         border: '1px solid rgba(255, 255, 255, 0.1)',
         borderLeft: `4px solid ${getPriorityColor(card.priority)}`,
@@ -96,7 +97,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
         cursor: 'pointer',
         animation: card.priority === 'high' ? `${alertPulse} 2s ease-in-out infinite` : 'none',
         '&:hover': {
-          transform: isActive ? 'scale(1.02)' : 'scale(0.97)',
+          transform: isActive ? 'scale(1.01)' : 'scale(0.97)',
           boxShadow: `0 20px 40px rgba(0, 0, 0, 0.8), 0 0 40px ${getPriorityColor(card.priority)}40`,
         },
         '&::before': {

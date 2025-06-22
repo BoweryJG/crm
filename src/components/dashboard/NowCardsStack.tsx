@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Paper, Typography, IconButton, CircularProgress, Alert } from '@mui/material';
+import { Box, Paper, Typography, IconButton, CircularProgress, Alert, Button } from '@mui/material';
 import { ChevronLeft, ChevronRight, Close, Refresh } from '@mui/icons-material';
 import { AIInsightsService, AIInsight } from '../../services/ai/insightsService';
 import { useAppMode } from '../../contexts/AppModeContext';
@@ -156,13 +156,13 @@ const mockCardsData: NowCardData[] = [
 const getPriorityColor = (priority: NowCardData['priority']) => {
   switch (priority) {
     case 'high':
-      return 'error.main';
+      return '#ff0040';
     case 'medium':
-      return 'warning.main';
+      return '#ffaa00';
     case 'low':
-      return 'info.main';
+      return '#00ff41';
     default:
-      return 'grey.500';
+      return '#666666';
   }
 };
 
@@ -478,31 +478,81 @@ const NowCardsStack: React.FC = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-        <Typography 
-          variant="h5" 
-          sx={{ 
-            fontWeight: 'bold', 
-            color: 'primary.main',
-            fontFamily: '"Orbitron", monospace',
-            textTransform: 'uppercase',
-            letterSpacing: 2,
-          }}
-        >
-          Alert Monitor
-        </Typography>
-        <IconButton 
-          onClick={handleRefresh} 
-          size="small"
-          disabled={loading}
-          sx={{ 
-            color: 'primary.main',
-            '&:hover': { backgroundColor: 'primary.main', color: 'white' }
-          }}
-        >
-          <Refresh />
-        </IconButton>
+    <Box sx={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'center', 
+      width: '100%',
+      maxWidth: { xs: '100%', md: '1400px' },
+      mx: 'auto',
+      p: { xs: 2, md: 3 }
+    }}>
+      {/* Header */}
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between',
+        width: '100%',
+        mb: 3,
+        borderBottom: '2px solid',
+        borderColor: 'divider',
+        pb: 2
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography 
+            variant="h5" 
+            sx={{ 
+              fontWeight: 'bold', 
+              color: 'primary.main',
+              fontFamily: '"Orbitron", monospace',
+              textTransform: 'uppercase',
+              letterSpacing: 2,
+            }}
+          >
+            Alert Monitor
+          </Typography>
+          <IconButton 
+            onClick={handleRefresh} 
+            size="small"
+            disabled={loading}
+            sx={{ 
+              color: 'primary.main',
+              '&:hover': { backgroundColor: 'primary.main', color: 'white' }
+            }}
+          >
+            <Refresh />
+          </IconButton>
+        </Box>
+        
+        {/* Alert Stats Summary */}
+        {!loading && cards.length > 0 && (
+          <Box sx={{ display: 'flex', gap: 3 }}>
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography variant="h6" sx={{ color: '#ff0040', fontWeight: 'bold' }}>
+                {cards.filter(c => c.priority === 'high').length}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                HIGH
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography variant="h6" sx={{ color: '#ffaa00', fontWeight: 'bold' }}>
+                {cards.filter(c => c.priority === 'medium').length}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                MEDIUM
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography variant="h6" sx={{ color: '#00ff41', fontWeight: 'bold' }}>
+                {cards.filter(c => c.priority === 'low').length}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                LOW
+              </Typography>
+            </Box>
+          </Box>
+        )}
       </Box>
 
       {error && (
@@ -550,59 +600,262 @@ const NowCardsStack: React.FC = () => {
         </Box>
       ) : (
         <>
+          {/* Main Content Area */}
           <Box sx={{ 
-        position: 'relative', 
-        height: 650, 
-        width: 450, 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        pointerEvents: 'none', // Allow clicks to pass through this container
-      }}>
-        {cards.map((card, index) => {
-          const offset = (index - currentIndex);
-          const absOffset = Math.abs(offset);
-          
-          // Determine visibility and stacking order
-          // Only render a few cards around the current one for performance
-          if (absOffset > 2) return null;
-
-          return (
-            <Box
-              key={card.id}
-              sx={{
-                position: 'absolute',
-                transition: 'all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                transform: `translateX(${offset * 20}px) scale(${1 - absOffset * 0.05}) translateY(${absOffset * 10}px)`,
-                zIndex: cards.length - absOffset,
-                opacity: 1 - absOffset * 0.3,
-                filter: `blur(${absOffset * 1}px)`,
-                pointerEvents: index === currentIndex ? 'auto' : 'none', // Ensure only active card's children are interactive
-              }}
-            >
-              <IndustrialAlertCard card={card} isActive={index === currentIndex} index={index} />
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', lg: '280px 1fr 280px' },
+            gap: 3,
+            width: '100%',
+            alignItems: 'start'
+          }}>
+            {/* Left Panel - Alert Queue */}
+            <Box sx={{ 
+              display: { xs: 'none', lg: 'block' },
+              background: 'rgba(0, 0, 0, 0.3)',
+              borderRadius: 2,
+              p: 2,
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <Typography variant="subtitle2" sx={{ 
+                fontFamily: '"Orbitron", monospace',
+                color: 'text.secondary',
+                mb: 2,
+                textTransform: 'uppercase'
+              }}>
+                Alert Queue
+              </Typography>
+              {cards.map((card, idx) => (
+                <Box
+                  key={card.id}
+                  onClick={() => setCurrentIndex(idx)}
+                  sx={{
+                    p: 1.5,
+                    mb: 1,
+                    borderRadius: 1,
+                    cursor: 'pointer',
+                    background: idx === currentIndex ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                    border: '1px solid',
+                    borderColor: idx === currentIndex ? getPriorityColor(card.priority) : 'transparent',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      borderColor: 'rgba(255, 255, 255, 0.2)'
+                    }
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                    <Box sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: getPriorityColor(card.priority)
+                    }} />
+                    <Typography variant="caption" sx={{ 
+                      fontWeight: 'bold',
+                      color: getPriorityColor(card.priority)
+                    }}>
+                      {card.priority.toUpperCase()}
+                    </Typography>
+                  </Box>
+                  <Typography variant="body2" sx={{ 
+                    fontSize: '0.8rem',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    color: idx === currentIndex ? 'text.primary' : 'text.secondary'
+                  }}>
+                    {card.title.replace(/[🔥⚡💰🎯⏰🔄📊]/g, '').trim()}
+                  </Typography>
+                </Box>
+              ))}
             </Box>
-          );
-        })}
-      </Box>
-      {cards.length > 1 && (
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          mt: 2, 
-          position: 'relative', // Ensure this container can have a zIndex
-          zIndex: 10 // Bring navigation controls to the front
-        }}>
-          <IconButton onClick={handlePrev} aria-label="Previous card">
-            <ChevronLeft />
-          </IconButton>
-          <Typography sx={{ alignSelf: 'center', mx:1 }}>
-            {currentIndex + 1} / {cards.length}
-          </Typography>
-          <IconButton onClick={handleNext} aria-label="Next card">
-            <ChevronRight />
-          </IconButton>
-        </Box>
+
+            {/* Center - Active Card */}
+            <Box sx={{ 
+              position: 'relative',
+              width: '100%',
+              maxWidth: { xs: '100%', md: '600px' },
+              mx: 'auto',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: { xs: 'auto', md: '650px' }
+            }}>
+              <Box
+                sx={{
+                  width: '100%',
+                  opacity: 0,
+                  animation: 'fadeIn 0.5s forwards',
+                  '@keyframes fadeIn': {
+                    from: { opacity: 0, transform: 'translateY(20px)' },
+                    to: { opacity: 1, transform: 'translateY(0)' }
+                  }
+                }}
+              >
+                <IndustrialAlertCard 
+                  card={cards[currentIndex]} 
+                  isActive={true} 
+                  index={currentIndex} 
+                />
+              </Box>
+            </Box>
+
+            {/* Right Panel - Actions & Insights */}
+            <Box sx={{ 
+              display: { xs: 'none', lg: 'block' },
+              background: 'rgba(0, 0, 0, 0.3)',
+              borderRadius: 2,
+              p: 2,
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <Typography variant="subtitle2" sx={{ 
+                fontFamily: '"Orbitron", monospace',
+                color: 'text.secondary',
+                mb: 2,
+                textTransform: 'uppercase'
+              }}>
+                Quick Actions
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  sx={{ 
+                    borderColor: getPriorityColor(cards[currentIndex].priority),
+                    color: getPriorityColor(cards[currentIndex].priority),
+                    '&:hover': {
+                      backgroundColor: `${getPriorityColor(cards[currentIndex].priority)}20`,
+                      borderColor: getPriorityColor(cards[currentIndex].priority)
+                    }
+                  }}
+                >
+                  Contact Now
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  sx={{ 
+                    borderColor: 'text.secondary',
+                    color: 'text.secondary'
+                  }}
+                >
+                  Schedule Follow-up
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  sx={{ 
+                    borderColor: 'text.secondary',
+                    color: 'text.secondary'
+                  }}
+                >
+                  View Full Analysis
+                </Button>
+              </Box>
+              
+              <Typography variant="subtitle2" sx={{ 
+                fontFamily: '"Orbitron", monospace',
+                color: 'text.secondary',
+                mt: 3,
+                mb: 2,
+                textTransform: 'uppercase'
+              }}>
+                AI Confidence
+              </Typography>
+              <Box sx={{ 
+                position: 'relative',
+                height: 8,
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: 4,
+                overflow: 'hidden'
+              }}>
+                <Box sx={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  height: '100%',
+                  width: `${cards[currentIndex].confidenceScore}%`,
+                  background: `linear-gradient(90deg, 
+                    ${getPriorityColor(cards[currentIndex].priority)}80,
+                    ${getPriorityColor(cards[currentIndex].priority)}
+                  )`,
+                  transition: 'width 0.5s ease'
+                }} />
+              </Box>
+              <Typography variant="h4" sx={{ 
+                fontFamily: '"Orbitron", monospace',
+                color: getPriorityColor(cards[currentIndex].priority),
+                mt: 1,
+                textAlign: 'center'
+              }}>
+                {cards[currentIndex].confidenceScore}%
+              </Typography>
+            </Box>
+          </Box>
+          {/* Navigation Controls */}
+          {cards.length > 1 && (
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center',
+              mt: 3,
+              gap: 2
+            }}>
+              <IconButton 
+                onClick={handlePrev} 
+                aria-label="Previous card"
+                sx={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  }
+                }}
+              >
+                <ChevronLeft />
+              </IconButton>
+              
+              {/* Card Indicators */}
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                {cards.map((_, idx) => (
+                  <Box
+                    key={idx}
+                    onClick={() => setCurrentIndex(idx)}
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: idx === currentIndex 
+                        ? getPriorityColor(cards[currentIndex].priority) 
+                        : 'rgba(255, 255, 255, 0.2)',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s',
+                      '&:hover': {
+                        backgroundColor: idx === currentIndex 
+                          ? getPriorityColor(cards[currentIndex].priority)
+                          : 'rgba(255, 255, 255, 0.4)'
+                      }
+                    }}
+                  />
+                ))}
+              </Box>
+              
+              <IconButton 
+                onClick={handleNext} 
+                aria-label="Next card"
+                sx={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  }
+                }}
+              >
+                <ChevronRight />
+              </IconButton>
+            </Box>
           )}
         </>
       )}
