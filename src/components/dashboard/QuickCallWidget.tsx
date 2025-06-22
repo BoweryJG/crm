@@ -44,7 +44,7 @@ import { useAppMode } from '../../contexts/AppModeContext';
 const QuickCallWidget: React.FC = () => {
   const theme = useTheme();
   const { user } = useAuth();
-  const { isDemoMode } = useAppMode();
+  const { isDemo } = useAppMode();
   const [recentContacts, setRecentContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [calling, setCalling] = useState<string | null>(null);
@@ -94,7 +94,7 @@ const QuickCallWidget: React.FC = () => {
         setLoading(true);
         
         // If in demo mode, use mock data
-        if (isDemoMode) {
+        if (isDemo) {
           console.log('QuickCallWidget: Using demo mode mock data');
           const mockContacts = mockDataService.generateRecentCallContacts(5);
           setRecentContacts(mockContacts);
@@ -177,7 +177,7 @@ const QuickCallWidget: React.FC = () => {
     if (user) {
       fetchRecentContacts();
     }
-  }, [user, isDemoMode]);
+  }, [user, isDemo]);
 
   // Try to get personal phone from localStorage
   useEffect(() => {
