@@ -87,144 +87,46 @@ interface LayerConfig {
   success: boolean;
 }
 
-// Theme-aware color mapping with stunning vibrant colors
-const getThemeColors = (themeMode: string) => {
-  const colorMap: Record<string, any> = {
-    'gallery-dominance': {
-      critical: { 
-        bg: 'linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(255, 140, 0, 0.15))',
-        border: 'rgba(255, 215, 0, 0.8)',
-        text: '#FFD700',
-        glow: 'rgba(255, 215, 0, 0.6)',
-        gradient: 'linear-gradient(90deg, #FFD700, #FFA500, #FFD700)'
-      },
-      urgent: { 
-        bg: 'linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(220, 220, 220, 0.1))',
-        border: 'rgba(255, 255, 255, 0.6)',
-        text: '#FFFFFF',
-        glow: 'rgba(255, 255, 255, 0.5)',
-        gradient: 'linear-gradient(90deg, #FFFFFF, #F0F0F0, #FFFFFF)'
-      },
-      opportunity: { 
-        bg: 'linear-gradient(135deg, rgba(0, 255, 127, 0.25), rgba(50, 205, 50, 0.15))',
-        border: 'rgba(0, 255, 127, 0.8)',
-        text: '#00FF7F',
-        glow: 'rgba(0, 255, 127, 0.6)',
-        gradient: 'linear-gradient(90deg, #00FF7F, #32CD32, #00FF7F)'
-      },
-      success: { 
-        bg: 'linear-gradient(135deg, rgba(138, 43, 226, 0.25), rgba(65, 105, 225, 0.15))',
-        border: 'rgba(138, 43, 226, 0.8)',
-        text: '#8A2BE2',
-        glow: 'rgba(138, 43, 226, 0.6)',
-        gradient: 'linear-gradient(90deg, #8A2BE2, #4169E1, #8A2BE2)'
-      },
-      background: 'linear-gradient(180deg, #000000, #0a0a0a)',
-      surface: 'rgba(20, 20, 20, 0.95)',
-      glassMorph: 'rgba(255, 255, 255, 0.02)'
-    },
-    'boeing-cockpit': {
-      critical: { 
-        bg: 'linear-gradient(135deg, rgba(255, 0, 0, 0.3), rgba(255, 69, 0, 0.2))',
-        border: 'rgba(255, 0, 0, 0.9)',
-        text: '#FF0000',
-        glow: 'rgba(255, 0, 0, 0.7)',
-        gradient: 'linear-gradient(90deg, #FF0000, #FF4500, #FF0000)'
-      },
-      urgent: { 
-        bg: 'linear-gradient(135deg, rgba(255, 165, 0, 0.3), rgba(255, 215, 0, 0.2))',
-        border: 'rgba(255, 165, 0, 0.9)',
-        text: '#FFA500',
-        glow: 'rgba(255, 165, 0, 0.7)',
-        gradient: 'linear-gradient(90deg, #FF8C00, #FFD700, #FF8C00)'
-      },
-      opportunity: { 
-        bg: 'linear-gradient(135deg, rgba(0, 255, 0, 0.2), rgba(50, 205, 50, 0.1))',
-        border: 'rgba(0, 255, 0, 0.6)',
-        text: '#00FF00',
-        glow: 'rgba(0, 255, 0, 0.5)',
-        gradient: 'linear-gradient(90deg, #00FF00, #32CD32, #00FF00)'
-      },
-      success: { 
-        bg: 'linear-gradient(135deg, rgba(0, 191, 255, 0.2), rgba(30, 144, 255, 0.1))',
-        border: 'rgba(0, 191, 255, 0.6)',
-        text: '#00BFFF',
-        glow: 'rgba(0, 191, 255, 0.5)',
-        gradient: 'linear-gradient(90deg, #00BFFF, #1E90FF, #00BFFF)'
-      },
-      background: 'linear-gradient(180deg, #0a0a0a, #1a1a1a)',
-      surface: 'rgba(10, 15, 20, 0.98)',
-      glassMorph: 'rgba(0, 255, 0, 0.02)'
-    },
-    'cyber-neon': {
-      critical: { 
-        bg: 'linear-gradient(135deg, rgba(255, 0, 128, 0.2), rgba(255, 0, 255, 0.1))',
-        border: 'rgba(255, 0, 128, 0.8)',
-        text: '#FF0080',
-        glow: 'rgba(255, 0, 128, 0.6)',
-        gradient: 'linear-gradient(90deg, #FF0080, #FF00FF, #FF0080)'
-      },
-      urgent: { 
-        bg: 'linear-gradient(135deg, rgba(255, 255, 0, 0.2), rgba(255, 215, 0, 0.1))',
-        border: 'rgba(255, 255, 0, 0.8)',
-        text: '#FFFF00',
-        glow: 'rgba(255, 255, 0, 0.6)',
-        gradient: 'linear-gradient(90deg, #FFFF00, #FFD700, #FFFF00)'
-      },
-      opportunity: { 
-        bg: 'linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 191, 255, 0.1))',
-        border: 'rgba(0, 255, 255, 0.8)',
-        text: '#00FFFF',
-        glow: 'rgba(0, 255, 255, 0.6)',
-        gradient: 'linear-gradient(90deg, #00FFFF, #00BFFF, #00FFFF)'
-      },
-      success: { 
-        bg: 'linear-gradient(135deg, rgba(128, 0, 255, 0.2), rgba(75, 0, 130, 0.1))',
-        border: 'rgba(128, 0, 255, 0.8)',
-        text: '#8000FF',
-        glow: 'rgba(128, 0, 255, 0.6)',
-        gradient: 'linear-gradient(90deg, #8000FF, #4B0082, #8000FF)'
-      },
-      background: 'linear-gradient(180deg, #000000, #0a0014)',
-      surface: 'rgba(10, 0, 20, 0.95)',
-      glassMorph: 'rgba(255, 0, 255, 0.02)'
-    },
-    default: {
-      critical: { 
-        bg: 'rgba(220, 38, 38, 0.08)', 
-        border: 'rgba(220, 38, 38, 0.3)',
-        text: '#EF4444',
-        glow: 'rgba(220, 38, 38, 0.3)',
-        gradient: '#DC2626'
-      },
-      urgent: { 
-        bg: 'rgba(245, 158, 11, 0.08)', 
-        border: 'rgba(245, 158, 11, 0.3)',
-        text: '#F59E0B',
-        glow: 'rgba(245, 158, 11, 0.3)',
-        gradient: '#F59E0B'
-      },
-      opportunity: { 
-        bg: 'rgba(16, 185, 129, 0.08)', 
-        border: 'rgba(16, 185, 129, 0.3)',
-        text: '#10B981',
-        glow: 'rgba(16, 185, 129, 0.3)',
-        gradient: '#10B981'
-      },
-      success: { 
-        bg: 'rgba(59, 130, 246, 0.08)', 
-        border: 'rgba(59, 130, 246, 0.3)',
-        text: '#3B82F6',
-        glow: 'rgba(59, 130, 246, 0.3)',
-        gradient: '#3B82F6'
-      },
-      background: 'rgba(0, 0, 0, 0.3)',
-      surface: 'rgba(20, 20, 20, 0.95)',
-      glassMorph: 'rgba(255, 255, 255, 0.02)'
-    }
-  };
+// Dynamic theme-aware color mapping that works with any theme
+const getThemeColors = (theme: any) => {
+  // Extract colors dynamically from the current theme
+  const isDark = theme.palette.mode === 'dark';
   
-  return colorMap[themeMode] || colorMap.default;
+  return {
+    critical: { 
+      bg: alpha(theme.palette.error.main, 0.08),
+      border: alpha(theme.palette.error.main, 0.3),
+      text: theme.palette.error.main,
+      glow: alpha(theme.palette.error.main, 0.3),
+      gradient: theme.palette.error.main
+    },
+    urgent: { 
+      bg: alpha(theme.palette.warning.main, 0.08),
+      border: alpha(theme.palette.warning.main, 0.3),
+      text: theme.palette.warning.main,
+      glow: alpha(theme.palette.warning.main, 0.3),
+      gradient: theme.palette.warning.main
+    },
+    opportunity: { 
+      bg: alpha(theme.palette.success.main, 0.08),
+      border: alpha(theme.palette.success.main, 0.3),
+      text: theme.palette.success.main,
+      glow: alpha(theme.palette.success.main, 0.3),
+      gradient: theme.palette.success.main
+    },
+    success: { 
+      bg: alpha(theme.palette.primary.main, 0.08),
+      border: alpha(theme.palette.primary.main, 0.3),
+      text: theme.palette.primary.main,
+      glow: alpha(theme.palette.primary.main, 0.3),
+      gradient: theme.palette.primary.main
+    },
+    background: isDark 
+      ? `linear-gradient(180deg, ${theme.palette.background.default}, ${theme.palette.background.paper})`
+      : theme.palette.background.default,
+    surface: alpha(theme.palette.background.paper, isDark ? 0.95 : 0.98),
+    glassMorph: alpha(theme.palette.common.white, isDark ? 0.02 : 0.05)
+  };
 };
 
 // Enhanced mock data for dental and aesthetic sales
@@ -447,13 +349,13 @@ const TickerRoot = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-const ControlBar = styled(Box)<{ themeColors: any }>(({ theme, themeColors }) => ({
+const ControlBar = styled(Box)<{ themeColors: any; reducedMotion?: boolean }>(({ theme, themeColors, reducedMotion = false }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: theme.spacing(2),
   padding: theme.spacing(1.5, 3),
   background: themeColors.surface,
-  backdropFilter: 'blur(20px)',
+  backdropFilter: reducedMotion ? 'none' : 'blur(20px)',
   borderRadius: '12px 12px 0 0',
   borderBottom: `1px solid ${alpha(themeColors.glassMorph, 0.2)}`,
   position: 'relative',
@@ -466,11 +368,11 @@ const ControlBar = styled(Box)<{ themeColors: any }>(({ theme, themeColors }) =>
     right: 0,
     height: '1px',
     background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.primary.main, 0.5)}, transparent)`,
-    animation: `${shimmer} 3s infinite`
+    animation: reducedMotion ? 'none' : `${shimmer} 3s infinite`
   }
 }));
 
-const LiveIndicator = styled(Box)<{ active: boolean }>(({ active, theme }) => ({
+const LiveIndicator = styled(Box)<{ active: boolean; reducedMotion?: boolean }>(({ active, theme, reducedMotion = false }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: theme.spacing(0.5),
@@ -483,8 +385,8 @@ const LiveIndicator = styled(Box)<{ active: boolean }>(({ active, theme }) => ({
     height: 8,
     borderRadius: '50%',
     backgroundColor: active ? theme.palette.error.main : theme.palette.grey[500],
-    animation: active ? `${luxuryPulse} 2s ease-in-out infinite` : 'none',
-    boxShadow: active ? `0 0 10px ${theme.palette.error.main}` : 'none'
+    animation: active && !reducedMotion ? `${luxuryPulse} 2s ease-in-out infinite` : 'none',
+    boxShadow: active && !reducedMotion ? `0 0 10px ${theme.palette.error.main}` : 'none'
   }
 }));
 
@@ -571,17 +473,22 @@ const MainTicker = styled(Box)<{ themeColors: any }>(({ themeColors }) => ({
   }
 }));
 
-const TickerContent = styled(Box)<{ paused: boolean; speed: number }>(({ paused, speed = 1 }) => ({
+const TickerContent = styled(Box)<{ paused: boolean; speed: number; reducedMotion?: boolean }>(({ paused, speed = 1, reducedMotion = false }) => ({
   display: 'flex',
   alignItems: 'center',
-  animation: paused ? 'none' : `${smoothScroll} ${80 / speed}s linear infinite`,
+  animation: paused || reducedMotion ? 'none' : `${smoothScroll} ${80 / speed}s linear infinite`,
   whiteSpace: 'nowrap',
   gap: 32,
   paddingLeft: 32,
-  paddingRight: 32
+  paddingRight: 32,
+  // Use transform for mobile scrolling (better performance)
+  ...(reducedMotion && !paused ? {
+    transform: 'translateX(-10%)',
+    transition: 'transform 10s linear'
+  } : {})
 }));
 
-const ActionCard = styled(Box)<{ priority: string; active?: boolean; themeColors: any }>(({ priority, active = false, themeColors }) => {
+const ActionCard = styled(Box)<{ priority: string; active?: boolean; themeColors: any; reducedMotion?: boolean }>(({ priority, active = false, themeColors, reducedMotion = false }) => {
   const color = themeColors[priority] || themeColors.success;
   
   return {
@@ -594,18 +501,19 @@ const ActionCard = styled(Box)<{ priority: string; active?: boolean; themeColors
     cursor: 'pointer',
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     position: 'relative',
-    minWidth: 380,
+    minWidth: reducedMotion ? 320 : 380, // Smaller on mobile
     height: 48,
     flexShrink: 0,
     overflow: 'hidden',
-    backdropFilter: 'blur(10px)',
+    backdropFilter: reducedMotion ? 'none' : 'blur(10px)', // Disable blur on mobile
     border: `1px solid ${color.border}`,
-    animation: priority === 'critical' ? `${luxuryPulse} 4s ease-in-out infinite` : 
+    animation: reducedMotion ? 'none' : 
+               priority === 'critical' ? `${luxuryPulse} 4s ease-in-out infinite` : 
                priority === 'urgent' ? `${subtleWave} 3s ease-in-out infinite` : 'none',
-    boxShadow: `0 2px 12px ${alpha(color.glow, 0.2)}`,
+    boxShadow: reducedMotion ? 'none' : `0 2px 12px ${alpha(color.glow, 0.2)}`,
     '&:hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: `0 4px 20px ${alpha(color.glow, 0.3)}`,
+      transform: reducedMotion ? 'none' : 'translateY(-2px)',
+      boxShadow: reducedMotion ? 'none' : `0 4px 20px ${alpha(color.glow, 0.3)}`,
       borderColor: color.text,
       background: color.bg,
       '& .action-button': {
@@ -624,17 +532,17 @@ const ActionCard = styled(Box)<{ priority: string; active?: boolean; themeColors
       padding: '1px',
       background: color.gradient,
       backgroundSize: '200% 100%',
-      animation: `${snakeBorder} 3s linear infinite`,
+      animation: reducedMotion ? 'none' : `${snakeBorder} 3s linear infinite`,
       mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
       maskComposite: 'exclude',
       WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
       WebkitMaskComposite: 'xor',
-      opacity: 0.8,
+      opacity: reducedMotion ? 0 : 0.8, // Hide complex effects on mobile
     } : {}
   };
 });
 
-const PriorityIcon = styled(Box)<{ priority: string; themeColors: any }>(({ priority, themeColors }) => {
+const PriorityIcon = styled(Box)<{ priority: string; themeColors: any; reducedMotion?: boolean }>(({ priority, themeColors, reducedMotion = false }) => {
   const color = themeColors[priority] || themeColors.success;
   
   return {
@@ -646,7 +554,7 @@ const PriorityIcon = styled(Box)<{ priority: string; themeColors: any }>(({ prio
     borderRadius: '50%',
     background: alpha(color.text, 0.1),
     border: `1px solid ${alpha(color.text, 0.2)}`,
-    animation: priority === 'critical' ? `${subtleWave} 3s ease-in-out infinite` : 'none',
+    animation: reducedMotion ? 'none' : priority === 'critical' ? `${subtleWave} 3s ease-in-out infinite` : 'none',
     '& svg': {
       fontSize: 18,
       color: color.text
@@ -682,19 +590,30 @@ const NotificationCenter = styled(Popover)(({ theme }) => ({
 const LiveActionTicker: React.FC = () => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
-  const themeColors = getThemeColors(themeMode);
+  const themeColors = getThemeColors(theme);
+  
+  // Performance optimizations for mobile
+  // - Disables complex animations (pulse, glow, shimmer, border animations)
+  // - Reduces update frequency (60s vs 30s)
+  // - Disables backdrop filters and box shadows
+  // - Limits number of items displayed
+  // - Disables sound by default
+  // - Respects user's reduced motion preference
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const shouldReduceAnimations = isMobile || prefersReducedMotion;
   
   // State
   const [items, setItems] = useState<ActionItem[]>(generateEnhancedMockData());
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(!shouldReduceAnimations); // Pause on mobile by default
   const [expanded, setExpanded] = useState(false);
-  const [speed, setSpeed] = useState(0.5); // Default to half speed for elegance
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [speed, setSpeed] = useState(shouldReduceAnimations ? 0.25 : 0.5); // Slower on mobile
+  const [soundEnabled, setSoundEnabled] = useState(!isMobile); // Disable sound on mobile by default
   const [layers, setLayers] = useState<LayerConfig>({
     critical: true,
     urgent: true,
-    opportunity: true,
-    success: true
+    opportunity: shouldReduceAnimations ? false : true, // Show fewer layers on mobile
+    success: shouldReduceAnimations ? false : true
   });
   const [settingsAnchor, setSettingsAnchor] = useState<null | HTMLElement>(null);
   const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
@@ -714,6 +633,9 @@ const LiveActionTicker: React.FC = () => {
 
   // Simulate real-time updates
   useEffect(() => {
+    // Reduce update frequency on mobile to save battery/CPU
+    const updateInterval = shouldReduceAnimations ? 60000 : 30000; // 60s on mobile, 30s on desktop
+    
     const interval = setInterval(() => {
       if (Math.random() > 0.7) {
         const mockData = generateEnhancedMockData();
@@ -721,18 +643,19 @@ const LiveActionTicker: React.FC = () => {
         
         setItems(prev => {
           const updated = [{ ...newItem, id: Date.now().toString(), time: 'Just now' }, ...prev];
-          return updated.slice(0, 20);
+          return updated.slice(0, shouldReduceAnimations ? 10 : 20); // Fewer items on mobile
         });
         
         setUnreadCount(prev => prev + 1);
         
-        // Play sound for critical items
-        if (soundEnabled && newItem.priority === 'critical') {
+        // Play sound for critical items (if enabled and not on mobile)
+        if (soundEnabled && !shouldReduceAnimations && newItem.priority === 'critical') {
           criticalSound.play();
         }
         
-        // Browser notification for critical items
-        if ('Notification' in window && 
+        // Browser notification for critical items (desktop only)
+        if (!isMobile && 
+            'Notification' in window && 
             Notification.permission === 'granted' && 
             newItem.priority === 'critical') {
           new Notification('Critical Sales Alert', {
@@ -742,10 +665,10 @@ const LiveActionTicker: React.FC = () => {
           });
         }
       }
-    }, 30000); // Update every 30 seconds instead of 15
+    }, updateInterval);
     
     return () => clearInterval(interval);
-  }, [soundEnabled, criticalSound]);
+  }, [soundEnabled, criticalSound, shouldReduceAnimations, isMobile]);
 
   const handleLayerToggle = (layer: keyof LayerConfig) => {
     setLayers(prev => ({ ...prev, [layer]: !prev[layer] }));
@@ -771,8 +694,8 @@ const LiveActionTicker: React.FC = () => {
   return (
     <TickerRoot>
       {/* Control Bar */}
-      <ControlBar themeColors={themeColors}>
-        <LiveIndicator active={playing}>
+      <ControlBar themeColors={themeColors} reducedMotion={shouldReduceAnimations}>
+        <LiveIndicator active={playing} reducedMotion={shouldReduceAnimations}>
           <Box className="dot" />
           <Typography variant="caption" sx={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em' }}>
             {playing ? 'LIVE' : 'PAUSED'}
@@ -920,15 +843,16 @@ const LiveActionTicker: React.FC = () => {
 
       {/* Main Ticker */}
       <MainTicker themeColors={themeColors}>
-        <TickerContent paused={!playing} speed={speed}>
+        <TickerContent paused={!playing} speed={speed} reducedMotion={shouldReduceAnimations}>
           {[...visibleItems, ...visibleItems].map((item, index) => (
             <ActionCard 
               key={`${item.id}-${index}`}
               priority={item.priority}
               themeColors={themeColors}
+              reducedMotion={shouldReduceAnimations}
               onClick={() => handleActionClick(item)}
             >
-              <PriorityIcon priority={item.priority} themeColors={themeColors}>
+              <PriorityIcon priority={item.priority} themeColors={themeColors} reducedMotion={shouldReduceAnimations}>
                 {item.icon}
               </PriorityIcon>
               

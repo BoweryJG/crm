@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { 
   Box, 
   Typography, 
@@ -11,14 +11,16 @@ import {
 } from '@mui/material';
 import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
-import NowCardsStack from '../components/dashboard/NowCardsStack'; // Added import
-import ClassicRevenueGauge from '../components/gauges/ClassicRevenueGauge';
-import QuantumLuxuryGauge from '../components/gauges/QuantumLuxuryGauge';
-import MasterpieceGauge from '../components/gauges/MasterpieceGauge';
-import LiveActionTicker from '../components/dashboard/LiveActionTicker';
-import CommandCenterFeed from '../components/dashboard/CommandCenterFeed';
-import MissionBriefingCard from '../components/dashboard/MissionBriefingCard';
-import CartierBlended from '../components/dashboard/CartierBlended';
+
+// Lazy load heavy components to improve initial load time
+const NowCardsStack = lazy(() => import('../components/dashboard/NowCardsStack'));
+const ClassicRevenueGauge = lazy(() => import('../components/gauges/ClassicRevenueGauge'));
+const QuantumLuxuryGauge = lazy(() => import('../components/gauges/QuantumLuxuryGauge'));
+const MasterpieceGauge = lazy(() => import('../components/gauges/MasterpieceGauge'));
+const LiveActionTicker = lazy(() => import('../components/dashboard/LiveActionTicker'));
+const CommandCenterFeed = lazy(() => import('../components/dashboard/CommandCenterFeed'));
+const MissionBriefingCard = lazy(() => import('../components/dashboard/MissionBriefingCard'));
+const CartierBlended = lazy(() => import('../components/dashboard/CartierBlended'));
 import { useThemeContext } from '../themes/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '../contexts/DashboardDataContext';
@@ -66,7 +68,11 @@ const Dashboard: React.FC = () => {
     <Box>
       {/* Live Action Ticker - Award-Winning Real-Time Insights */}
       <Box sx={{ mb: 3, mx: -3, mt: -3 }}>
-        <LiveActionTicker />
+        <Suspense fallback={
+          <Skeleton variant="rectangular" height={80} sx={{ borderRadius: 2 }} />
+        }>
+          <LiveActionTicker />
+        </Suspense>
       </Box>
 
       <Box sx={{ mb: 4 }}>
@@ -200,76 +206,92 @@ const Dashboard: React.FC = () => {
             // Quantum style gauges
             <>
               <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
-                <QuantumLuxuryGauge 
-                  value={Math.round(dashboardData.revenue_generated / 1000)} // Normalize to 0-100
-                  label="REVENUE"
-                  animationDelay={0}
-                />
+                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                  <QuantumLuxuryGauge 
+                    value={Math.round(dashboardData.revenue_generated / 1000)} // Normalize to 0-100
+                    label="REVENUE"
+                    animationDelay={0}
+                  />
+                </Suspense>
               </Box>
               <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
-                <QuantumLuxuryGauge 
-                  value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
-                  label="PIPELINE"
-                  animationDelay={200}
-                />
+                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                  <QuantumLuxuryGauge 
+                    value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
+                    label="PIPELINE"
+                    animationDelay={200}
+                  />
+                </Suspense>
               </Box>
               <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
-                <QuantumLuxuryGauge 
-                  value={dashboardData.quota_percentage}
-                  label="QUOTA"
-                  animationDelay={400}
-                />
+                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                  <QuantumLuxuryGauge 
+                    value={dashboardData.quota_percentage}
+                    label="QUOTA"
+                    animationDelay={400}
+                  />
+                </Suspense>
               </Box>
               <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
-                <QuantumLuxuryGauge 
-                  value={dashboardData.conversion_rate}
-                  label="CONVERSION"
-                  animationDelay={600}
-                />
+                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                  <QuantumLuxuryGauge 
+                    value={dashboardData.conversion_rate}
+                    label="CONVERSION"
+                    animationDelay={600}
+                  />
+                </Suspense>
               </Box>
             </>
           ) : (
             // Masterpiece style gauges
             <>
               <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
-                <MasterpieceGauge 
-                  value={Math.round(dashboardData.revenue_generated / 10000)} // Normalize to 0-100
-                  label="REVENUE"
-                  dataSource="CRM Analytics"
-                  size="medium"
-                  nightMode={themeMode === 'dark' || themeMode === 'space'}
-                  soundEnabled={true}
-                />
+                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                  <MasterpieceGauge 
+                    value={Math.round(dashboardData.revenue_generated / 10000)} // Normalize to 0-100
+                    label="REVENUE"
+                    dataSource="CRM Analytics"
+                    size="medium"
+                    nightMode={themeMode === 'dark' || themeMode === 'space'}
+                    soundEnabled={true}
+                  />
+                </Suspense>
               </Box>
               <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
-                <MasterpieceGauge 
-                  value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
-                  label="PIPELINE"
-                  dataSource="Sales Data"
-                  size="medium"
-                  nightMode={themeMode === 'dark' || themeMode === 'space'}
-                  soundEnabled={true}
-                />
+                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                  <MasterpieceGauge 
+                    value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
+                    label="PIPELINE"
+                    dataSource="Sales Data"
+                    size="medium"
+                    nightMode={themeMode === 'dark' || themeMode === 'space'}
+                    soundEnabled={true}
+                  />
+                </Suspense>
               </Box>
               <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
-                <MasterpieceGauge 
-                  value={dashboardData.quota_percentage}
-                  label="QUOTA"
-                  dataSource="Performance"
-                  size="medium"
-                  nightMode={themeMode === 'dark' || themeMode === 'space'}
-                  soundEnabled={true}
-                />
+                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                  <MasterpieceGauge 
+                    value={dashboardData.quota_percentage}
+                    label="QUOTA"
+                    dataSource="Performance"
+                    size="medium"
+                    nightMode={themeMode === 'dark' || themeMode === 'space'}
+                    soundEnabled={true}
+                  />
+                </Suspense>
               </Box>
               <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
-                <MasterpieceGauge 
-                  value={dashboardData.conversion_rate}
-                  label="CONVERSION"
-                  dataSource="Metrics"
-                  size="medium"
-                  nightMode={themeMode === 'dark' || themeMode === 'space'}
-                  soundEnabled={true}
-                />
+                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                  <MasterpieceGauge 
+                    value={dashboardData.conversion_rate}
+                    label="CONVERSION"
+                    dataSource="Metrics"
+                    size="medium"
+                    nightMode={themeMode === 'dark' || themeMode === 'space'}
+                    soundEnabled={true}
+                  />
+                </Suspense>
               </Box>
             </>
           )}
@@ -283,12 +305,20 @@ const Dashboard: React.FC = () => {
 
       {/* Mission Progress - Cartier Blended */}
       <Box sx={{ mb: 4 }}>
-        <CartierBlended live={true} />
+        <Suspense fallback={
+          <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
+        }>
+          <CartierBlended live={true} />
+        </Suspense>
       </Box>
 
       {/* Now Cards Stack - Added Section */}
       <Box sx={{ mb: 4 }}>
-        <NowCardsStack />
+        <Suspense fallback={
+          <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />
+        }>
+          <NowCardsStack />
+        </Suspense>
       </Box>
 
       {/* Quick Actions and Communications */}
