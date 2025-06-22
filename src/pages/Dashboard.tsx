@@ -334,13 +334,9 @@ const Dashboard: React.FC = () => {
           right: '-3%',
           bottom: 0,
           background: `
-            repeating-linear-gradient(
-              135deg,
-              transparent,
-              transparent 15px,
-              ${alpha(theme.palette.primary.main, 0.02)} 15px,
-              ${alpha(theme.palette.primary.main, 0.02)} 30px
-            )
+            radial-gradient(circle at 20% 50%, ${alpha(theme.palette.primary.main, 0.03)} 0%, transparent 40%),
+            radial-gradient(circle at 80% 50%, ${alpha(theme.palette.primary.main, 0.03)} 0%, transparent 40%),
+            radial-gradient(circle at 50% 50%, ${alpha(theme.palette.background.paper, 0.5)} 0%, transparent 70%)
           `,
           pointerEvents: 'none',
           zIndex: 0,
