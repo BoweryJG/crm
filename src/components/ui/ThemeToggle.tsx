@@ -5,15 +5,10 @@ import {
   Box,
   Typography,
   useTheme,
-  Button,
-  ButtonGroup,
   Menu,
   MenuItem,
-  ListItemIcon,
-  ListItemText,
   Divider,
   alpha,
-  Chip,
   InputBase,
   InputAdornment
 } from '@mui/material';
@@ -96,7 +91,7 @@ const ThemeToggle: React.FC = () => {
 
   return (
     <>
-      <ButtonGroup variant="outlined" size="small">
+      <Box sx={{ display: 'flex', alignItems: 'center', height: 32 }}>
         <Tooltip 
           title={
             <Box>
@@ -114,11 +109,15 @@ const ThemeToggle: React.FC = () => {
           placement="bottom"
         >
           <IconButton
+            size="small"
             onClick={() => {
               playThemeSwitch();
               toggleTheme();
             }}
             sx={{
+              height: 32,
+              width: 32,
+              padding: 0,
               color: isLuxuryStyle ? '#C9B037' : theme.palette.primary.main,
               backgroundColor: isLuxuryStyle 
                 ? 'rgba(201, 176, 55, 0.1)' 
@@ -126,6 +125,7 @@ const ThemeToggle: React.FC = () => {
               border: isLuxuryStyle 
                 ? '1px solid rgba(201, 176, 55, 0.3)'
                 : '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '4px 0 0 4px',
               backdropFilter: 'blur(10px)',
               '&:hover': {
                 backgroundColor: isLuxuryStyle 
@@ -145,7 +145,7 @@ const ThemeToggle: React.FC = () => {
               })
             }}
           >
-            {getThemeIcon()}
+            {React.cloneElement(getThemeIcon(), { sx: { fontSize: 18 } })}
           </IconButton>
         </Tooltip>
 
@@ -158,6 +158,9 @@ const ThemeToggle: React.FC = () => {
               setTimeout(() => searchInputRef.current?.focus(), 100);
             }}
             sx={{
+              height: 32,
+              width: 28,
+              padding: 0,
               color: isLuxuryStyle ? '#C9B037' : theme.palette.primary.main,
               backgroundColor: isLuxuryStyle 
                 ? 'rgba(201, 176, 55, 0.1)' 
@@ -165,8 +168,9 @@ const ThemeToggle: React.FC = () => {
               border: isLuxuryStyle 
                 ? '1px solid rgba(201, 176, 55, 0.3)'
                 : '1px solid rgba(255, 255, 255, 0.2)',
-              backdropFilter: 'blur(10px)',
+              borderRadius: '0 4px 4px 0',
               borderLeft: 'none',
+              backdropFilter: 'blur(10px)',
               '&:hover': {
                 backgroundColor: isLuxuryStyle 
                   ? 'rgba(201, 176, 55, 0.2)' 
@@ -178,10 +182,10 @@ const ThemeToggle: React.FC = () => {
               transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
             }}
           >
-            <ExpandIcon sx={{ fontSize: 16 }} />
+            <ExpandIcon sx={{ fontSize: 14 }} />
           </IconButton>
         </Tooltip>
-      </ButtonGroup>
+      </Box>
 
       {/* Compact Theme Menu */}
       <Menu
