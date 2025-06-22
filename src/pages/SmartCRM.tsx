@@ -99,6 +99,7 @@ import {
 } from '../services/contactEnrichmentService';
 import { Contact } from '../types/models';
 import { supabase } from '../services/supabase/supabase';
+import '../styles/smartCRM.css';
 
 interface SmartCRMStats {
   totalContacts: number;
@@ -426,26 +427,19 @@ const SmartCRM: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Grid container spacing={3} alignItems="center" sx={{ mb: 4 }}>
-        <Grid item xs={12} md={6}>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 700,
-              mb: 1,
-              background: isSpaceTheme
-                ? 'linear-gradient(45deg, #8860D0 0%, #5CE1E6 100%)'
-                : 'linear-gradient(45deg, #3D52D5 0%, #44CFCB 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
-          >
-            Smart CRM
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            AI-powered contact cleaning, enrichment, and intelligent segmentation
-          </Typography>
-        </Grid>
+      <Box className="smart-crm-header">
+        <Grid container spacing={3} alignItems="center">
+          <Grid item xs={12} md={6}>
+            <Typography
+              variant="h3"
+              className="smart-crm-title"
+            >
+              Smart CRM
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+              AI-powered contact cleaning, enrichment, and intelligent segmentation
+            </Typography>
+          </Grid>
         <Grid item xs={12} md={6}>
           <Stack direction="row" spacing={2} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
             <Button
@@ -453,9 +447,17 @@ const SmartCRM: React.FC = () => {
               startIcon={<UploadIcon />}
               onClick={() => document.getElementById('file-input')?.click()}
               sx={{
-                background: isSpaceTheme
-                  ? 'linear-gradient(45deg, #8860D0 30%, #5CE1E6 90%)'
-                  : theme.palette.primary.main
+                background: 'linear-gradient(135deg, var(--luxury-gold), var(--luxury-gold-light))',
+                color: '#000',
+                fontWeight: 600,
+                px: 3,
+                py: 1.2,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, var(--luxury-gold-light), var(--luxury-gold))',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 4px 20px rgba(201, 176, 55, 0.3)'
+                },
+                transition: 'all 0.2s ease'
               }}
             >
               Import Contacts
@@ -465,6 +467,14 @@ const SmartCRM: React.FC = () => {
               startIcon={<DownloadIcon />}
               onClick={exportContacts}
               disabled={filteredContacts.length === 0}
+              sx={{
+                borderColor: 'var(--glass-border)',
+                color: 'var(--luxury-silver)',
+                '&:hover': {
+                  borderColor: 'var(--luxury-gold)',
+                  background: 'var(--glass-bg)'
+                }
+              }}
             >
               Export
             </Button>
@@ -475,22 +485,18 @@ const SmartCRM: React.FC = () => {
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ 
-            background: isSpaceTheme 
-              ? 'linear-gradient(135deg, rgba(136, 96, 208, 0.1) 0%, rgba(136, 96, 208, 0.2) 100%)'
-              : 'linear-gradient(135deg, rgba(61, 82, 213, 0.05) 0%, rgba(61, 82, 213, 0.1) 100%)'
-          }}>
+          <Card className="stats-card" elevation={0}>
             <CardContent>
               <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Box>
-                  <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                    {stats.totalContacts}
+                  <Typography className="stats-number">
+                    {stats.totalContacts.toLocaleString()}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Total Contacts
                   </Typography>
                 </Box>
-                <Avatar sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main' }}>
+                <Avatar className="stats-icon">
                   <GroupsIcon />
                 </Avatar>
               </Stack>
@@ -499,20 +505,18 @@ const SmartCRM: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ 
-            background: alpha(theme.palette.success.main, 0.05)
-          }}>
+          <Card className="stats-card" elevation={0}>
             <CardContent>
               <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Box>
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: 'success.main' }}>
-                    {stats.topTierCount}
+                  <Typography className="stats-number" sx={{ color: 'success.main' }}>
+                    {stats.topTierCount.toLocaleString()}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     A-Tier Leads
                   </Typography>
                 </Box>
-                <Avatar sx={{ bgcolor: alpha(theme.palette.success.main, 0.1), color: 'success.main' }}>
+                <Avatar className="stats-icon" sx={{ background: 'linear-gradient(135deg, #06D6A0, #40E0D0)' }}>
                   <StarIcon />
                 </Avatar>
               </Stack>
@@ -521,20 +525,18 @@ const SmartCRM: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ 
-            background: alpha(theme.palette.info.main, 0.05)
-          }}>
+          <Card className="stats-card" elevation={0}>
             <CardContent>
               <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Box>
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: 'info.main' }}>
+                  <Typography className="stats-number" sx={{ color: 'info.main' }}>
                     {stats.averageScore}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Avg. Score
                   </Typography>
                 </Box>
-                <Avatar sx={{ bgcolor: alpha(theme.palette.info.main, 0.1), color: 'info.main' }}>
+                <Avatar className="stats-icon" sx={{ background: 'linear-gradient(135deg, #00B4D8, #48CAE4)' }}>
                   <TrendingUpIcon />
                 </Avatar>
               </Stack>
@@ -543,20 +545,18 @@ const SmartCRM: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ 
-            background: alpha(theme.palette.warning.main, 0.05)
-          }}>
+          <Card className="stats-card" elevation={0}>
             <CardContent>
               <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Box>
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: 'warning.main' }}>
-                    {stats.enrichedToday}
+                  <Typography className="stats-number" sx={{ color: 'warning.main' }}>
+                    {stats.enrichedToday.toLocaleString()}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Added Today
                   </Typography>
                 </Box>
-                <Avatar sx={{ bgcolor: alpha(theme.palette.warning.main, 0.1), color: 'warning.main' }}>
+                <Avatar className="stats-icon" sx={{ background: 'linear-gradient(135deg, #FFB000, #FFC947)' }}>
                   <AIIcon />
                 </Avatar>
               </Stack>
@@ -566,7 +566,7 @@ const SmartCRM: React.FC = () => {
       </Grid>
 
       {/* Filters and Actions Bar */}
-      <Paper sx={{ p: 2, mb: 3 }}>
+      <Paper className="filter-bar" elevation={0}>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} md={4}>
             <TextField
@@ -669,6 +669,7 @@ const SmartCRM: React.FC = () => {
             onClick={() => setFilters({ ...filters, hasEmail: !filters.hasEmail })}
             icon={<EmailIcon />}
             size="small"
+            className={filters.hasEmail ? "filter-chip selected" : "filter-chip"}
           />
           <Chip 
             label="Has Phone" 
@@ -676,6 +677,7 @@ const SmartCRM: React.FC = () => {
             onClick={() => setFilters({ ...filters, hasPhone: !filters.hasPhone })}
             icon={<PhoneIcon />}
             size="small"
+            className={filters.hasPhone ? "filter-chip selected" : "filter-chip"}
           />
           <Chip 
             label="Top 20%" 
@@ -685,7 +687,14 @@ const SmartCRM: React.FC = () => {
             }}
             icon={<StarIcon />}
             size="small"
-            color="primary"
+            className="filter-chip"
+            sx={{ 
+              borderColor: 'var(--luxury-gold)',
+              color: 'var(--luxury-gold)',
+              '&:hover': {
+                background: 'rgba(201, 176, 55, 0.1)'
+              }
+            }}
           />
           <Chip 
             label="High Value" 
@@ -707,29 +716,38 @@ const SmartCRM: React.FC = () => {
       {/* Contacts Display */}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
+          <CircularProgress sx={{ color: 'var(--luxury-gold)' }} />
         </Box>
       ) : filteredContacts.length === 0 ? (
         <Paper
           {...getRootProps()}
+          className={`import-dropzone ${isDragActive ? 'drag-active' : ''}`}
           sx={{
             p: 8,
             textAlign: 'center',
-            border: '2px dashed',
-            borderColor: isDragActive ? 'primary.main' : 'divider',
-            backgroundColor: isDragActive ? alpha(theme.palette.primary.main, 0.05) : 'background.paper',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            borderRadius: '16px'
           }}
         >
           <input {...getInputProps()} id="file-input" hidden />
-          <UploadIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
+          <UploadIcon sx={{ fontSize: 64, color: 'var(--luxury-gold)', mb: 2, opacity: 0.8 }} />
           <Typography variant="h5" gutterBottom>
             {isDragActive ? 'Drop your contacts file here' : 'Import Your Contacts'}
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
             Drag & drop a CSV or Excel file, or click to browse
           </Typography>
-          <Button variant="contained" size="large">
+          <Button 
+            variant="contained" 
+            size="large"
+            sx={{
+              background: 'linear-gradient(135deg, var(--luxury-gold), var(--luxury-gold-light))',
+              color: '#000',
+              fontWeight: 600,
+              px: 4,
+              py: 1.5
+            }}
+          >
             Select File
           </Button>
         </Paper>
@@ -741,14 +759,11 @@ const SmartCRM: React.FC = () => {
               <Grid item xs={12} sm={6} md={4} lg={3} key={idx}>
                 <Grow in timeout={100 + idx * 50}>
                   <Card 
+                    className="contact-card"
+                    elevation={0}
                     sx={{ 
                       height: '100%',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: 4
-                      }
+                      borderRadius: '12px'
                     }}
                     onClick={() => {
                       setSelectedContact(contact);
@@ -771,11 +786,7 @@ const SmartCRM: React.FC = () => {
                             <Chip 
                               label={contact.lead_tier} 
                               size="small"
-                              sx={{ 
-                                bgcolor: alpha(getTierColor(contact.lead_tier), 0.1),
-                                color: getTierColor(contact.lead_tier),
-                                fontWeight: 700
-                              }}
+                              className={`tier-badge-${contact.lead_tier.toLowerCase()}`}
                             />
                           </Stack>
                         </Stack>
@@ -790,25 +801,21 @@ const SmartCRM: React.FC = () => {
                               {contact.overall_score}/100
                             </Typography>
                           </Stack>
-                          <LinearProgress 
-                            variant="determinate" 
-                            value={contact.overall_score}
-                            sx={{ 
-                              height: 6,
-                              borderRadius: 3,
-                              bgcolor: alpha(theme.palette.primary.main, 0.1),
-                              '& .MuiLinearProgress-bar': {
-                                borderRadius: 3,
-                                bgcolor: contact.overall_score >= 80 
-                                  ? theme.palette.success.main 
+                          <Box className="score-progress">
+                            <Box 
+                              className="score-progress-bar"
+                              sx={{ 
+                                width: `${contact.overall_score}%`,
+                                background: contact.overall_score >= 80 
+                                  ? 'linear-gradient(90deg, #06D6A0, #40E0D0)'
                                   : contact.overall_score >= 60 
-                                  ? theme.palette.info.main
+                                  ? 'linear-gradient(90deg, #00B4D8, #48CAE4)'
                                   : contact.overall_score >= 40
-                                  ? theme.palette.warning.main
-                                  : theme.palette.grey[500]
-                              }
-                            }}
-                          />
+                                  ? 'linear-gradient(90deg, #FFB000, #FFC947)'
+                                  : 'linear-gradient(90deg, #666, #999)'
+                              }}
+                            />
+                          </Box>
                         </Box>
 
                         {/* Info */}
@@ -889,7 +896,7 @@ const SmartCRM: React.FC = () => {
             ))}
         </Grid>
       ) : (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} className="luxury-table" elevation={0}>
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -926,7 +933,7 @@ const SmartCRM: React.FC = () => {
                   return (
                     <TableRow 
                       key={idx}
-                      hover
+                      className="luxury-table-row"
                       selected={isSelected}
                       sx={{ cursor: 'pointer' }}
                       onClick={() => {
@@ -979,11 +986,7 @@ const SmartCRM: React.FC = () => {
                         <Chip 
                           label={contact.lead_tier}
                           size="small"
-                          sx={{ 
-                            bgcolor: alpha(getTierColor(contact.lead_tier), 0.1),
-                            color: getTierColor(contact.lead_tier),
-                            fontWeight: 700
-                          }}
+                          className={`tier-badge-${contact.lead_tier.toLowerCase()}`}
                         />
                       </TableCell>
                       <TableCell align="right">
@@ -1032,6 +1035,15 @@ const SmartCRM: React.FC = () => {
         onClose={() => setImportDialogOpen(false)}
         maxWidth="md"
         fullWidth
+        PaperProps={{ 
+          className: 'luxury-dialog',
+          elevation: 0,
+          sx: { 
+            background: 'var(--glass-bg)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid var(--glass-border)'
+          }
+        }}
       >
         <DialogTitle>
           <Stack direction="row" alignItems="center" spacing={2}>
@@ -1170,6 +1182,15 @@ const SmartCRM: React.FC = () => {
         onClose={() => setDetailDialogOpen(false)}
         maxWidth="sm"
         fullWidth
+        PaperProps={{ 
+          className: 'luxury-dialog',
+          elevation: 0,
+          sx: { 
+            background: 'var(--glass-bg)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid var(--glass-border)'
+          }
+        }}
       >
         {selectedContact && (
           <>
