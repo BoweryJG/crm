@@ -58,21 +58,26 @@ const sapphireSheen = keyframes`
 
 // Styled components
 const LuxuryContainer = styled(Paper)(({ theme }) => ({
-  background: `linear-gradient(135deg, 
-    ${alpha('#0a0a0a', 0.98)} 0%, 
-    ${alpha('#1a1a1a', 0.95)} 50%,
-    ${alpha('#0f0f0f', 0.98)} 100%)`,
+  background: theme.palette.mode === 'dark' 
+    ? `linear-gradient(135deg, 
+        ${alpha(theme.palette.background.default, 0.98)} 0%, 
+        ${alpha(theme.palette.background.paper, 0.95)} 50%,
+        ${alpha(theme.palette.background.default, 0.98)} 100%)`
+    : `linear-gradient(135deg, 
+        ${alpha(theme.palette.grey[100], 0.98)} 0%, 
+        ${alpha(theme.palette.background.paper, 0.95)} 50%,
+        ${alpha(theme.palette.grey[50], 0.98)} 100%)`,
   backdropFilter: 'blur(20px)',
-  border: `1px solid ${alpha('#ffffff', 0.1)}`,
+  border: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
   borderRadius: '20px',
   position: 'relative',
   overflow: 'hidden',
   padding: theme.spacing(4),
   boxShadow: `
-    inset 0 2px 4px ${alpha('#ffffff', 0.1)},
-    inset 0 -2px 4px ${alpha('#000000', 0.5)},
-    0 10px 40px ${alpha('#000000', 0.5)},
-    0 2px 10px ${alpha('#8bffa0', 0.2)}
+    inset 0 2px 4px ${alpha(theme.palette.common.white, 0.1)},
+    inset 0 -2px 4px ${alpha(theme.palette.common.black, 0.5)},
+    0 10px 40px ${alpha(theme.palette.common.black, 0.5)},
+    0 2px 10px ${alpha(theme.palette.success.main, 0.2)}
   `,
   '&::before': {
     content: '""',
@@ -83,7 +88,7 @@ const LuxuryContainer = styled(Paper)(({ theme }) => ({
     bottom: 0,
     background: `linear-gradient(45deg, 
       transparent 30%, 
-      ${alpha('#ffffff', 0.05)} 50%, 
+      ${alpha(theme.palette.common.white, 0.05)} 50%, 
       transparent 70%)`,
     backgroundSize: '200% 200%',
     animation: `${sapphireSheen} 8s ease-in-out infinite`,
@@ -97,7 +102,7 @@ const LuxuryContainer = styled(Paper)(({ theme }) => ({
     right: 0,
     bottom: 0,
     background: `radial-gradient(circle at 30% 80%, 
-      ${alpha('#8bffa0', 0.05)} 0%, 
+      ${alpha(theme.palette.success.main, 0.05)} 0%, 
       transparent 50%)`,
     pointerEvents: 'none'
   }
@@ -109,9 +114,9 @@ const EngravedTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
   letterSpacing: '0.2em',
   textTransform: 'uppercase',
-  color: alpha('#ffffff', 0.9),
+  color: alpha(theme.palette.text.primary, 0.9),
   textShadow: `
-    0 1px 2px ${alpha('#000000', 0.8)},
+    0 1px 2px ${alpha(theme.palette.common.black, 0.8)},
     inset 0 -1px 1px ${alpha('#ffffff', 0.1)}
   `,
   userSelect: 'none'
@@ -122,7 +127,7 @@ const SubTitle = styled(Typography)(({ theme }) => ({
   fontSize: '11px',
   fontWeight: 400,
   letterSpacing: '0.05em',
-  color: alpha('#8bffa0', 0.7),
+  color: alpha(theme.palette.success.main, 0.7),
   marginTop: theme.spacing(0.5),
   userSelect: 'none'
 }));
@@ -132,10 +137,14 @@ const GlowingCapsule = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   padding: theme.spacing(2, 4),
-  background: `linear-gradient(135deg, 
-    ${alpha('#0a0a0a', 0.8)} 0%, 
-    ${alpha('#1a1a1a', 0.6)} 100%)`,
-  border: `2px solid ${alpha('#8bffa0', 0.4)}`,
+  background: theme.palette.mode === 'dark'
+    ? `linear-gradient(135deg, 
+        ${alpha(theme.palette.background.default, 0.8)} 0%, 
+        ${alpha(theme.palette.background.paper, 0.6)} 100%)`
+    : `linear-gradient(135deg, 
+        ${alpha(theme.palette.grey[100], 0.8)} 0%, 
+        ${alpha(theme.palette.background.paper, 0.6)} 100%)`,
+  border: `2px solid ${alpha(theme.palette.success.main, 0.4)}`,
   borderRadius: '50px',
   position: 'relative',
   animation: `${glowPulse} 3s ease-in-out infinite`,
@@ -146,9 +155,9 @@ const GlowingCapsule = styled(Box)(({ theme }) => ({
     borderRadius: '50px',
     padding: 2,
     background: `linear-gradient(45deg, 
-      ${alpha('#8bffa0', 0.8)}, 
-      ${alpha('#4ade80', 0.6)},
-      ${alpha('#8bffa0', 0.8)})`,
+      ${alpha(theme.palette.success.main, 0.8)}, 
+      ${alpha(theme.palette.success.light, 0.6)},
+      ${alpha(theme.palette.success.main, 0.8)})`,
     WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
     WebkitMaskComposite: 'xor',
     maskComposite: 'exclude',
@@ -160,35 +169,39 @@ const PercentageDisplay = styled(Typography)(({ theme }) => ({
   fontFamily: '"GT Sectra Display", "Söhne", -apple-system, sans-serif',
   fontSize: '72px',
   fontWeight: 300,
-  color: '#8bffa0',
+  color: theme.palette.success.main,
   letterSpacing: '-0.02em',
   lineHeight: 1,
   textShadow: `
-    0 0 30px ${alpha('#8bffa0', 0.8)},
-    0 0 60px ${alpha('#8bffa0', 0.4)}
+    0 0 30px ${alpha(theme.palette.success.main, 0.8)},
+    0 0 60px ${alpha(theme.palette.success.main, 0.4)}
   `
 }));
 
 const FilamentProgress = styled(LinearProgress)(({ theme }) => ({
   height: 2,
   borderRadius: 1,
-  backgroundColor: alpha('#ffffff', 0.05),
+  backgroundColor: alpha(theme.palette.common.white, 0.05),
   '& .MuiLinearProgress-bar': {
     borderRadius: 1,
     background: `linear-gradient(90deg, 
-      ${alpha('#8bffa0', 0.8)} 0%, 
-      ${alpha('#4ade80', 1)} 50%,
-      ${alpha('#8bffa0', 0.8)} 100%)`,
+      ${alpha(theme.palette.success.main, 0.8)} 0%, 
+      ${alpha(theme.palette.success.light, 1)} 50%,
+      ${alpha(theme.palette.success.main, 0.8)} 100%)`,
     animation: `${filamentGlow} 2s ease-in-out infinite`,
-    boxShadow: `0 0 10px ${alpha('#8bffa0', 0.8)}`
+    boxShadow: `0 0 10px ${alpha(theme.palette.success.main, 0.8)}`
   }
 }));
 
 const MetricCard = styled(Paper)(({ theme }) => ({
-  background: `linear-gradient(135deg, 
-    ${alpha('#0f0f0f', 0.9)} 0%, 
-    ${alpha('#1a1a1a', 0.8)} 100%)`,
-  border: `1px solid ${alpha('#ffffff', 0.1)}`,
+  background: theme.palette.mode === 'dark'
+    ? `linear-gradient(135deg, 
+        ${alpha(theme.palette.background.paper, 0.9)} 0%, 
+        ${alpha(theme.palette.background.default, 0.8)} 100%)`
+    : `linear-gradient(135deg, 
+        ${alpha(theme.palette.grey[50], 0.9)} 0%, 
+        ${alpha(theme.palette.background.paper, 0.8)} 100%)`,
+  border: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
   borderRadius: '12px',
   padding: theme.spacing(2),
   position: 'relative',
@@ -202,16 +215,16 @@ const MetricCard = styled(Paper)(({ theme }) => ({
     height: '1px',
     background: `linear-gradient(90deg, 
       transparent, 
-      ${alpha('#8bffa0', 0.4)}, 
+      ${alpha(theme.palette.success.main, 0.4)}, 
       transparent)`,
   }
 }));
 
 const MomentumChip = styled(Chip)<{ status: string }>(({ theme, status }) => {
   const colors = {
-    stable: { primary: '#8bffa0', secondary: '#4ade80' },
-    accelerating: { primary: '#fbbf24', secondary: '#f59e0b' },
-    at_risk: { primary: '#ef4444', secondary: '#dc2626' }
+    stable: { primary: theme.palette.success.main, secondary: theme.palette.success.light },
+    accelerating: { primary: theme.palette.warning.main, secondary: theme.palette.warning.light },
+    at_risk: { primary: theme.palette.error.main, secondary: theme.palette.error.light }
   };
   
   const color = colors[status as keyof typeof colors] || colors.stable;
@@ -232,7 +245,7 @@ const MomentumChip = styled(Chip)<{ status: string }>(({ theme, status }) => {
   };
 });
 
-const NeuralBackground = styled(Box)({
+const NeuralBackground = styled(Box)(({ theme }) => ({
   position: 'absolute',
   top: 0,
   left: 0,
@@ -240,28 +253,29 @@ const NeuralBackground = styled(Box)({
   bottom: 0,
   opacity: 0.03,
   background: `linear-gradient(45deg, 
-    #8bffa0 25%, 
+    ${theme.palette.success.main} 25%, 
     transparent 25%, 
     transparent 75%, 
-    #8bffa0 75%, 
-    #8bffa0),
+    ${theme.palette.success.main} 75%, 
+    ${theme.palette.success.main}),
     linear-gradient(45deg, 
-    #8bffa0 25%, 
+    ${theme.palette.success.main} 25%, 
     transparent 25%, 
     transparent 75%, 
-    #8bffa0 75%, 
-    #8bffa0)`,
+    ${theme.palette.success.main} 75%, 
+    ${theme.palette.success.main})`,
   backgroundSize: '60px 60px',
   backgroundPosition: '0 0, 30px 30px',
   animation: `${neuralWave} 20s linear infinite`,
   pointerEvents: 'none'
-});
+}));
 
 interface CartierBlendedProps {
   live?: boolean;
 }
 
 const CartierBlended: React.FC<CartierBlendedProps> = ({ live = true }) => {
+  const theme = useTheme();
   const { data } = useMissionStatus(live);
   
   // Animated percentage
@@ -336,7 +350,7 @@ const CartierBlended: React.FC<CartierBlendedProps> = ({ live = true }) => {
               <Typography 
                 variant="caption" 
                 sx={{ 
-                  color: alpha('#ffffff', 0.5),
+                  color: alpha(theme.palette.text.primary, 0.5),
                   fontSize: '10px',
                   letterSpacing: '0.1em',
                   textTransform: 'uppercase'
@@ -347,7 +361,7 @@ const CartierBlended: React.FC<CartierBlendedProps> = ({ live = true }) => {
               <Typography 
                 variant="h5" 
                 sx={{ 
-                  color: '#8bffa0',
+                  color: theme.palette.success.main,
                   fontFamily: '"GT Sectra Display", sans-serif',
                   fontWeight: 400,
                   mt: 0.5
@@ -363,7 +377,7 @@ const CartierBlended: React.FC<CartierBlendedProps> = ({ live = true }) => {
               <Typography 
                 variant="caption" 
                 sx={{ 
-                  color: alpha('#ffffff', 0.5),
+                  color: alpha(theme.palette.text.primary, 0.5),
                   fontSize: '10px',
                   letterSpacing: '0.1em',
                   textTransform: 'uppercase'
@@ -374,7 +388,7 @@ const CartierBlended: React.FC<CartierBlendedProps> = ({ live = true }) => {
               <Typography 
                 variant="h5" 
                 sx={{ 
-                  color: '#fbbf24',
+                  color: theme.palette.warning.main,
                   fontFamily: '"GT Sectra Display", sans-serif',
                   fontWeight: 400,
                   mt: 0.5
@@ -418,7 +432,7 @@ const CartierBlended: React.FC<CartierBlendedProps> = ({ live = true }) => {
               <Typography 
                 variant="caption" 
                 sx={{ 
-                  color: alpha('#ffffff', 0.5),
+                  color: alpha(theme.palette.text.primary, 0.5),
                   fontSize: '10px',
                   letterSpacing: '0.1em',
                   textTransform: 'uppercase'
@@ -429,7 +443,7 @@ const CartierBlended: React.FC<CartierBlendedProps> = ({ live = true }) => {
               <Typography 
                 variant="body2" 
                 sx={{ 
-                  color: alpha('#ffffff', 0.8),
+                  color: alpha(theme.palette.text.primary, 0.8),
                   fontFamily: '"Söhne", sans-serif'
                 }}
               >

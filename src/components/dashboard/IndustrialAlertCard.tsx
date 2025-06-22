@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, IconButton, keyframes, Collapse } from '@mui/material';
+import { Box, Typography, IconButton, keyframes, Collapse, useTheme, alpha } from '@mui/material';
 import { 
   Warning, 
   ExpandMore, 
@@ -60,14 +60,15 @@ interface IndustrialAlertCardProps {
 }
 
 const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActive, index }) => {
+  const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
   
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return '#ff0040';
-      case 'medium': return '#ffaa00';
-      case 'low': return '#00ff41';
-      default: return '#666';
+      case 'high': return theme.palette.error.main;
+      case 'medium': return theme.palette.warning.main;
+      case 'low': return theme.palette.success.main;
+      default: return theme.palette.text.secondary;
     }
   };
 
@@ -86,8 +87,10 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
         width: '100%',
         maxWidth: { xs: '100%', sm: '500px', md: '600px' },
         mx: 'auto',
-        background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        background: theme.palette.mode === 'dark'
+          ? `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${theme.palette.background.paper} 50%, ${theme.palette.background.default} 100%)`
+          : `linear-gradient(135deg, ${theme.palette.grey[100]} 0%, ${theme.palette.background.paper} 50%, ${theme.palette.grey[100]} 100%)`,
+        border: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
         borderLeft: `4px solid ${getPriorityColor(card.priority)}`,
         borderRadius: 2,
         overflow: 'hidden',
@@ -98,7 +101,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
         animation: card.priority === 'high' ? `${alertPulse} 2s ease-in-out infinite` : 'none',
         '&:hover': {
           transform: isActive ? 'scale(1.01)' : 'scale(0.97)',
-          boxShadow: `0 20px 40px rgba(0, 0, 0, 0.8), 0 0 40px ${getPriorityColor(card.priority)}40`,
+          boxShadow: `0 20px 40px ${alpha(theme.palette.common.black, 0.8)}, 0 0 40px ${alpha(getPriorityColor(card.priority), 0.25)}`,
         },
         '&::before': {
           content: '""',
@@ -137,8 +140,8 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
         sx={{
           p: 2,
           pb: 1,
-          background: 'rgba(0, 0, 0, 0.3)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+          background: alpha(theme.palette.common.black, 0.3),
+          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -177,7 +180,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
             variant="caption"
             sx={{
               fontFamily: 'monospace',
-              color: '#666',
+              color: theme.palette.text.disabled,
               letterSpacing: 1,
             }}
           >
@@ -218,7 +221,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
             fontFamily: '"Orbitron", monospace',
             fontWeight: 700,
             fontSize: '1rem',
-            color: '#fff',
+            color: theme.palette.text.primary,
             mb: 1,
             textTransform: 'uppercase',
             letterSpacing: 1,
@@ -234,7 +237,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
               variant="caption"
               sx={{
                 fontFamily: 'monospace',
-                color: '#999',
+                color: theme.palette.text.secondary,
                 textTransform: 'uppercase',
               }}
             >
@@ -256,7 +259,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
         <Typography
           variant="body2"
           sx={{
-            color: '#ccc',
+            color: theme.palette.text.secondary,
             mb: 2,
             lineHeight: 1.5,
           }}
@@ -268,8 +271,8 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
         <Box
           sx={{
             p: 1.5,
-            background: 'rgba(0, 255, 65, 0.05)',
-            border: '1px solid rgba(0, 255, 65, 0.2)',
+            background: alpha(theme.palette.success.main, 0.05),
+            border: `1px solid ${alpha(theme.palette.success.main, 0.2)}`,
             borderRadius: 1,
             mb: 2,
             position: 'relative',
@@ -280,7 +283,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
             variant="caption"
             sx={{
               fontFamily: 'monospace',
-              color: '#00ff41',
+              color: theme.palette.success.main,
               display: 'block',
               mb: 0.5,
               textTransform: 'uppercase',
@@ -292,7 +295,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
             variant="body2"
             sx={{
               fontFamily: 'monospace',
-              color: '#00ff41',
+              color: theme.palette.success.main,
               fontSize: '0.85rem',
             }}
           >
@@ -305,8 +308,8 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
           <Box
             sx={{
               p: 1,
-              background: 'rgba(255, 0, 64, 0.05)',
-              border: '1px solid rgba(255, 0, 64, 0.2)',
+              background: alpha(theme.palette.error.main, 0.05),
+              border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
               borderRadius: 1,
             }}
           >
@@ -314,7 +317,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
               variant="caption"
               sx={{
                 fontFamily: 'monospace',
-                color: '#666',
+                color: theme.palette.text.disabled,
                 display: 'block',
                 textTransform: 'uppercase',
                 fontSize: '0.7rem',
@@ -326,7 +329,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
               variant="caption"
               sx={{
                 fontFamily: 'monospace',
-                color: '#ff0040',
+                color: theme.palette.error.main,
                 fontWeight: 600,
               }}
             >
@@ -337,8 +340,8 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
           <Box
             sx={{
               p: 1,
-              background: 'rgba(255, 170, 0, 0.05)',
-              border: '1px solid rgba(255, 170, 0, 0.2)',
+              background: alpha(theme.palette.warning.main, 0.05),
+              border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`,
               borderRadius: 1,
             }}
           >
@@ -346,7 +349,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
               variant="caption"
               sx={{
                 fontFamily: 'monospace',
-                color: '#666',
+                color: theme.palette.text.disabled,
                 display: 'block',
                 textTransform: 'uppercase',
                 fontSize: '0.7rem',
@@ -358,7 +361,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
               variant="caption"
               sx={{
                 fontFamily: 'monospace',
-                color: '#ffaa00',
+                color: theme.palette.warning.main,
                 fontWeight: 600,
                 textTransform: 'uppercase',
               }}
@@ -377,9 +380,9 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
               setExpanded(!expanded);
             }}
             sx={{
-              color: '#666',
+              color: theme.palette.text.disabled,
               '&:hover': {
-                color: '#999',
+                color: theme.palette.text.secondary,
               }
             }}
           >
@@ -389,13 +392,13 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
 
         {/* Expanded content */}
         <Collapse in={expanded}>
-          <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
+          <Box sx={{ mt: 2, pt: 2, borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}` }}>
             {/* Leading indicators */}
             <Typography
               variant="caption"
               sx={{
                 fontFamily: 'monospace',
-                color: '#999',
+                color: theme.palette.text.secondary,
                 textTransform: 'uppercase',
                 display: 'block',
                 mb: 1,
@@ -418,7 +421,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
                     sx={{
                       width: 4,
                       height: 4,
-                      backgroundColor: '#00ff41',
+                      backgroundColor: theme.palette.success.main,
                       borderRadius: '50%',
                     }}
                   />
@@ -426,7 +429,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
                     variant="caption"
                     sx={{
                       fontFamily: 'monospace',
-                      color: '#999',
+                      color: theme.palette.text.secondary,
                       fontSize: '0.8rem',
                     }}
                   >
@@ -440,8 +443,8 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
             <Box
               sx={{
                 p: 1.5,
-                background: 'rgba(255, 0, 64, 0.1)',
-                border: '1px solid rgba(255, 0, 64, 0.3)',
+                background: alpha(theme.palette.error.main, 0.1),
+                border: `1px solid ${alpha(theme.palette.error.main, 0.3)}`,
                 borderRadius: 1,
               }}
             >
@@ -449,7 +452,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
                 variant="caption"
                 sx={{
                   fontFamily: 'monospace',
-                  color: '#ff0040',
+                  color: theme.palette.error.main,
                   textTransform: 'uppercase',
                   display: 'block',
                   mb: 0.5,
@@ -462,7 +465,7 @@ const IndustrialAlertCard: React.FC<IndustrialAlertCardProps> = ({ card, isActiv
                 variant="body2"
                 sx={{
                   fontFamily: 'monospace',
-                  color: '#ff0040',
+                  color: theme.palette.error.main,
                   fontSize: '0.85rem',
                 }}
               >
