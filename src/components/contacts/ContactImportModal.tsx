@@ -22,7 +22,8 @@ import {
   Step,
   StepLabel,
   useTheme,
-  alpha
+  alpha,
+  Grid
 } from '@mui/material';
 import {
   CloudUpload as CloudUploadIcon,
@@ -111,8 +112,8 @@ export const ContactImportModal: React.FC<ContactImportModalProps> = ({
         complete: (results) => {
           if (results.data.length > 0) {
             setParsedData(results.data as ParsedContact[]);
-            setHeaders(Object.keys(results.data[0]));
-            autoMapFields(Object.keys(results.data[0]));
+            setHeaders(Object.keys(results.data[0] as Record<string, any>));
+            autoMapFields(Object.keys(results.data[0] as Record<string, any>));
             setActiveStep(1);
           } else {
             setError('No data found in CSV file');
@@ -134,8 +135,8 @@ export const ContactImportModal: React.FC<ContactImportModalProps> = ({
           
           if (jsonData.length > 0) {
             setParsedData(jsonData as ParsedContact[]);
-            setHeaders(Object.keys(jsonData[0]));
-            autoMapFields(Object.keys(jsonData[0]));
+            setHeaders(Object.keys(jsonData[0] as Record<string, any>));
+            autoMapFields(Object.keys(jsonData[0] as Record<string, any>));
             setActiveStep(1);
           } else {
             setError('No data found in Excel file');
@@ -649,5 +650,3 @@ export const ContactImportModal: React.FC<ContactImportModalProps> = ({
   );
 };
 
-// Add missing Grid import
-import { Grid } from '@mui/material';

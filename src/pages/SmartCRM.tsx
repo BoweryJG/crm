@@ -487,7 +487,8 @@ const SmartCRM: React.FC = () => {
             </Button>
           </Stack>
         </Grid>
-      </Grid>
+        </Grid>
+      </Box>
 
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
