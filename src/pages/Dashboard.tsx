@@ -18,6 +18,7 @@ import MasterpieceGauge from '../components/gauges/MasterpieceGauge';
 import LiveActionTicker from '../components/dashboard/LiveActionTicker';
 import CommandCenterFeed from '../components/dashboard/CommandCenterFeed';
 import MissionBriefingCard from '../components/dashboard/MissionBriefingCard';
+import CartierBlended from '../components/dashboard/CartierBlended';
 import { useThemeContext } from '../themes/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '../contexts/DashboardDataContext';
@@ -247,6 +248,11 @@ const Dashboard: React.FC = () => {
       {/* Stats Cards */}
       <Box sx={{ mb: 4 }}>
         <DashboardStats />
+      </Box>
+
+      {/* Mission Progress - Cartier Blended */}
+      <Box sx={{ mb: 4 }}>
+        <CartierBlended live={true} />
       </Box>
 
       {/* Now Cards Stack - Added Section */}

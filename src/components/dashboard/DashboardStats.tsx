@@ -18,7 +18,7 @@ import {
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useDashboardData } from '../../contexts/DashboardDataContext';
 import IndustrialStatCard from './IndustrialStatCard';
-import TacticalProgressBar from './TacticalProgressBar';
+import PanthereMeridianControlBoard from './PanthereMeridianControlBoard';
 
 // Theme-based accent colors for industrial look
 const getAccentColor = (themeMode: string, index: number) => {
@@ -116,7 +116,7 @@ const DashboardStats: React.FC = () => {
       />
       
       <Box sx={{ gridColumn: '1 / -1' }}>
-        <TacticalProgressBar
+        <PanthereMeridianControlBoard
           current={dashboardData.current_revenue / 100}
           goal={dashboardData.sales_goal / 100}
           progress={dashboardData.sales_goal_progress}
