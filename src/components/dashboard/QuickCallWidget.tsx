@@ -39,10 +39,12 @@ import { callContact, disconnectCall, initializeTwilioDevice, initiateServerCall
 import { useAuth } from '../../auth';
 import { Contact } from '../../types/models';
 import mockDataService from '../../services/mockData/mockDataService';
+import { useAppMode } from '../../contexts/AppModeContext';
 
 const QuickCallWidget: React.FC = () => {
   const theme = useTheme();
   const { user } = useAuth();
+  const { isDemoMode } = useAppMode();
   const [recentContacts, setRecentContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [calling, setCalling] = useState<string | null>(null);
@@ -91,6 +93,15 @@ const QuickCallWidget: React.FC = () => {
       try {
         setLoading(true);
         
+        // If in demo mode, use mock data
+        if (isDemoMode) {
+          console.log('QuickCallWidget: Using demo mode mock data');
+          const mockContacts = mockDataService.generateRecentCallContacts(5);
+          setRecentContacts(mockContacts);
+          setLoading(false);
+          return;
+        }
+        
         // STEP 1: First, get recent call activities
         const { data: activityData, error: activityError } = await supabase
           .from('sales_activities')
@@ -105,14 +116,14 @@ const QuickCallWidget: React.FC = () => {
         if (activityError) {
           console.error('Error fetching sales activities:', activityError.message, activityError);
           console.log('Falling back to mock contacts data for QuickCallWidget due to activityError.');
-          const mockContacts = mockDataService.generateMockContacts(5);
+          const mockContacts = mockDataService.generateRecentCallContacts(5);
           setRecentContacts(mockContacts);
           return;
         }
         
         if (!activityData || activityData.length === 0) {
           console.log('No call activities found (activityData is null or empty), using mock data. ActivityData:', activityData);
-          const mockContacts = mockDataService.generateMockContacts(5);
+          const mockContacts = mockDataService.generateRecentCallContacts(5);
           setRecentContacts(mockContacts);
           return;
         }
@@ -126,7 +137,7 @@ const QuickCallWidget: React.FC = () => {
         
         if (uniqueContactIds.length === 0) {
           console.log('No valid contact IDs found, using mock data');
-          const mockContacts = mockDataService.generateMockContacts(5);
+          const mockContacts = mockDataService.generateRecentCallContacts(5);
           setRecentContacts(mockContacts);
           return;
         }
@@ -140,7 +151,7 @@ const QuickCallWidget: React.FC = () => {
         if (contactsError) {
           console.error('Error fetching contacts:', contactsError);
           console.log('Falling back to mock contacts data for QuickCallWidget');
-          const mockContacts = mockDataService.generateMockContacts(5);
+          const mockContacts = mockDataService.generateRecentCallContacts(5);
           setRecentContacts(mockContacts);
           return;
         }
@@ -149,14 +160,14 @@ const QuickCallWidget: React.FC = () => {
           setRecentContacts(contactsData as Contact[]);
         } else {
           console.log('No contacts found for the given IDs, using mock data');
-          const mockContacts = mockDataService.generateMockContacts(5);
+          const mockContacts = mockDataService.generateRecentCallContacts(5);
           setRecentContacts(mockContacts);
         }
       } catch (error) {
         console.error('Error fetching recent contacts:', error);
         console.log('Falling back to mock contacts data for QuickCallWidget');
         // Use mock data if there's an exception
-        const mockContacts = mockDataService.generateMockContacts(5);
+        const mockContacts = mockDataService.generateRecentCallContacts(5);
         setRecentContacts(mockContacts);
       } finally {
         setLoading(false);
@@ -166,7 +177,7 @@ const QuickCallWidget: React.FC = () => {
     if (user) {
       fetchRecentContacts();
     }
-  }, [user]);
+  }, [user, isDemoMode]);
 
   // Try to get personal phone from localStorage
   useEffect(() => {

@@ -279,6 +279,106 @@ export const generateMockContacts = (count: number = 20): Contact[] => {
   });
 };
 
+// Generate recent contacts specifically for Quick Call widget
+export const generateRecentCallContacts = (count: number = 5): Contact[] => {
+  // High-priority contacts with recent interactions
+  const recentContacts = [
+    {
+      id: 'quick-call-1',
+      first_name: 'Dr. Sarah',
+      last_name: 'Chen',
+      email: 'sarah.chen@brightsmiledental.com',
+      phone: '(212) 555-0142',
+      title: 'Practice Owner',
+      practice_id: 'practice-1',
+      practice_name: 'Bright Smile Dental NYC',
+      specialization: 'dental' as const,
+      tags: ['VIP', 'Key Decision Maker', 'High Volume'],
+      is_starred: true,
+      last_contacted: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+      notes: 'Interested in bulk order of implant systems. Follow up on pricing discussion.',
+      created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+      updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      status: 'customer' as const
+    },
+    {
+      id: 'quick-call-2',
+      first_name: 'Dr. Michael',
+      last_name: 'Rodriguez',
+      email: 'michael.rodriguez@radianceaesthetics.com',
+      phone: '(310) 555-0198',
+      title: 'Medical Director',
+      practice_id: 'practice-2',
+      practice_name: 'Radiance Aesthetic Clinic',
+      specialization: 'aesthetic' as const,
+      tags: ['Hot Lead', 'Expansion Plans', 'Decision This Week'],
+      is_starred: true,
+      last_contacted: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Yesterday
+      notes: 'Demo scheduled for new laser system. Budget approved. Decision by Friday.',
+      created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+      updated_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+      status: 'lead' as const
+    },
+    {
+      id: 'quick-call-3',
+      first_name: 'Jennifer',
+      last_name: 'Thompson',
+      email: 'jennifer.thompson@elitecosmeticcenter.com',
+      phone: '(469) 555-0177',
+      title: 'Clinic Manager',
+      practice_id: 'practice-3',
+      practice_name: 'Elite Cosmetic Center Dallas',
+      specialization: 'aesthetic' as const,
+      tags: ['Follow-up Required', 'Contract Renewal'],
+      is_starred: false,
+      last_contacted: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
+      notes: 'Contract renewal discussion. Wants better pricing on dermal fillers.',
+      created_at: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString(),
+      updated_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      status: 'customer' as const
+    },
+    {
+      id: 'quick-call-4',
+      first_name: 'Dr. James',
+      last_name: 'Patel',
+      email: 'james.patel@moderndentalcare.com',
+      phone: '(415) 555-0156',
+      title: 'Lead Orthodontist',
+      practice_id: 'practice-4',
+      practice_name: 'Modern Dental Care SF',
+      specialization: 'dental' as const,
+      tags: ['New Contact', 'Referral', 'High Potential'],
+      is_starred: false,
+      last_contacted: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
+      notes: 'Referred by Dr. Chen. Looking for Invisalign supplies. Very interested.',
+      created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      updated_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+      status: 'prospect' as const
+    },
+    {
+      id: 'quick-call-5',
+      first_name: 'Lisa',
+      last_name: 'Anderson',
+      email: 'lisa.anderson@glowmedspa.com',
+      phone: '(713) 555-0189',
+      title: 'Spa Director',
+      practice_id: 'practice-5',
+      practice_name: 'Glow Med Spa Houston',
+      specialization: 'aesthetic' as const,
+      tags: ['Support Call', 'Training Request'],
+      is_starred: false,
+      last_contacted: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 hours ago
+      notes: 'Needs training on new microneedling device. Schedule for next week.',
+      created_at: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(),
+      updated_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+      status: 'customer' as const
+    }
+  ];
+
+  // Return only the requested number of contacts
+  return recentContacts.slice(0, count);
+};
+
 // Generate a list of random practices across the country for dental and aesthetic industries
 export const generateMockPractices = (count: number = 20): Practice[] => {
   // Expanded practice names for both industries
@@ -1007,6 +1107,7 @@ const mockDataService = {
   getCallAnalyses, // Add this
   getData, // Add this
   generateMockContacts,
+  generateRecentCallContacts, // New function for Quick Call widget
   generateMockPractices,
   generateDashboardStats,
   generateRecentActivities,
