@@ -175,17 +175,11 @@ const Dashboard: React.FC = () => {
         }
       }}>
         <Box sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: { 
-            xs: '1fr', 
-            sm: 'repeat(2, 1fr)', 
-            md: 'repeat(2, 1fr)',
-            lg: 'repeat(3, 1fr)',
-            xl: 'repeat(4, 1fr)' 
-          },
-          gap: { xs: 4, sm: 5, md: 6 },
+          display: 'flex', 
+          flexDirection: 'row',
+          flexWrap: 'nowrap',
+          gap: { xs: 2, sm: 3, md: 4 },
           justifyContent: 'center',
-          justifyItems: 'center',
           alignItems: 'center',
           width: '100%',
           maxWidth: '100%',
@@ -193,8 +187,18 @@ const Dashboard: React.FC = () => {
           py: { xs: 2, sm: 3 },
           position: 'relative',
           zIndex: 1,
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          // Hide scrollbar but keep functionality
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          },
+          msOverflowStyle: 'none',
+          scrollbarWidth: 'none',
+          // Ensure single row
           '& > *': {
-            maxWidth: '100%',
+            flex: '0 0 auto',
+            maxWidth: { xs: 280, sm: 320 },
             overflow: 'visible'
           }
         }}>
@@ -206,7 +210,7 @@ const Dashboard: React.FC = () => {
           ) : gaugeStyle === 'quantum' ? (
             // Quantum style gauges
             <>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'block', sm: 'block' } }}>
                 <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
                   <QuantumLuxuryGauge 
                     value={Math.round(dashboardData.revenue_generated / 1000)} // Normalize to 0-100
@@ -215,7 +219,7 @@ const Dashboard: React.FC = () => {
                   />
                 </Suspense>
               </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'none', sm: 'block' } }}>
                 <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
                   <QuantumLuxuryGauge 
                     value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
@@ -224,7 +228,7 @@ const Dashboard: React.FC = () => {
                   />
                 </Suspense>
               </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'none', sm: 'none', md: 'block' } }}>
                 <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
                   <QuantumLuxuryGauge 
                     value={dashboardData.quota_percentage}
@@ -233,7 +237,7 @@ const Dashboard: React.FC = () => {
                   />
                 </Suspense>
               </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}>
                 <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
                   <QuantumLuxuryGauge 
                     value={dashboardData.conversion_rate}
@@ -246,7 +250,7 @@ const Dashboard: React.FC = () => {
           ) : (
             // Masterpiece style gauges
             <>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'block', sm: 'block' } }}>
                 <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
                   <MasterpieceGauge 
                     value={Math.round(dashboardData.revenue_generated / 10000)} // Normalize to 0-100
@@ -258,7 +262,7 @@ const Dashboard: React.FC = () => {
                   />
                 </Suspense>
               </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'none', sm: 'block' } }}>
                 <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
                   <MasterpieceGauge 
                     value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
@@ -270,7 +274,7 @@ const Dashboard: React.FC = () => {
                   />
                 </Suspense>
               </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'none', sm: 'none', md: 'block' } }}>
                 <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
                   <MasterpieceGauge 
                     value={dashboardData.quota_percentage}
@@ -282,7 +286,7 @@ const Dashboard: React.FC = () => {
                   />
                 </Suspense>
               </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2 }}>
+              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}>
                 <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
                   <MasterpieceGauge 
                     value={dashboardData.conversion_rate}

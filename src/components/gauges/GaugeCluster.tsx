@@ -46,14 +46,23 @@ const GaugeCluster: React.FC<GaugeClusterProps> = ({
       <GaugeTitle>REPSPHERES COMMAND CENTER</GaugeTitle>
       
       <Box sx={{ 
-        display: 'grid', 
-        gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'nowrap',
         gap: 3,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        overflowX: 'auto',
+        overflowY: 'hidden',
+        // Hide scrollbar but keep functionality
+        '&::-webkit-scrollbar': {
+          display: 'none'
+        },
+        msOverflowStyle: 'none',
+        scrollbarWidth: 'none'
       }}>
-        {/* Target Alignment Gauge */}
-        <Box sx={{ cursor: 'pointer' }} onClick={() => onGaugeClick?.('quota')}>
+        {/* Target Alignment Gauge - Always visible */}
+        <Box sx={{ cursor: 'pointer', flex: '0 0 auto', display: { xs: 'block', sm: 'block' } }} onClick={() => onGaugeClick?.('quota')}>
           <AviationDashboard
             metrics={{
               winProbability: targetAlignment
@@ -74,8 +83,8 @@ const GaugeCluster: React.FC<GaugeClusterProps> = ({
           </Typography>
         </Box>
 
-        {/* Performance Index Gauge */}
-        <Box sx={{ cursor: 'pointer' }} onClick={() => onGaugeClick?.('performance')}>
+        {/* Performance Index Gauge - Hidden on mobile */}
+        <Box sx={{ cursor: 'pointer', flex: '0 0 auto', display: { xs: 'none', sm: 'block' } }} onClick={() => onGaugeClick?.('performance')}>
           <AviationDashboard
             metrics={{
               winProbability: performanceIndex
@@ -96,8 +105,8 @@ const GaugeCluster: React.FC<GaugeClusterProps> = ({
           </Typography>
         </Box>
 
-        {/* Confidence Assured Gauge */}
-        <Box sx={{ cursor: 'pointer' }} onClick={() => onGaugeClick?.('confidence')}>
+        {/* Confidence Assured Gauge - Hidden on mobile and small screens */}
+        <Box sx={{ cursor: 'pointer', flex: '0 0 auto', display: { xs: 'none', sm: 'none', md: 'block' } }} onClick={() => onGaugeClick?.('confidence')}>
           <AviationDashboard
             metrics={{
               confidence: confidenceAssured
