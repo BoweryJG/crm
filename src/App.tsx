@@ -48,8 +48,6 @@ const KnowledgeAesthetic = lazy(() => import('./pages/KnowledgeAesthetic'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Profile = lazy(() => import('./pages/Profile'));
 const RipplePage = lazy(() => import('./pages/RipplePage'));
-const GaugePreview = lazy(() => import('./pages/GaugePreview'));
-const TestGauge = lazy(() => import('./pages/TestGauge'));
 const CommandRoom = lazy(() => import('./pages/CommandRoom'));
 
 // SUIS Components
@@ -159,8 +157,6 @@ const App: React.FC = () => {
                 <Route path="subscribe/cancel" element={<Suspense fallback={<div>Loading...</div>}><SubscribeCancel /></Suspense>} />
                 <Route path="settings" element={<Suspense fallback={<StandaloneEliteLoadingScreen loadingText="Loading Settings" message="Preparing your preferences..." />}><Settings /></Suspense>} />
                 <Route path="profile" element={<Suspense fallback={<StandaloneEliteLoadingScreen loadingText="Loading Profile" message="Retrieving your profile..." />}><Profile /></Suspense>} />
-                <Route path="gauge-preview" element={<Suspense fallback={<PremiumLoadingScreen loadingText="GT500 GAUGE" message="Initializing performance metrics..." />}><GaugePreview /></Suspense>} />
-                <Route path="test-gauge" element={<TestGauge />} />
                 
                 {/* SUIS Intelligence Routes */}
                 <Route path="intelligence" element={<Suspense fallback={<SphereLoadingScreen loadingText="INTELLIGENCE" message="INITIALIZING UNIFIED SYSTEM" />}><IntelligenceDashboard /></Suspense>} />
