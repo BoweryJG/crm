@@ -181,10 +181,11 @@ const SearchBar = styled(Box)<{ themeColors: any }>(({ theme, themeColors }) => 
   backgroundColor: themeColors.searchBg,
   backdropFilter: 'blur(10px)',
   border: `1px solid ${themeColors.searchBorder}`,
-  borderRadius: 24,
-  padding: theme.spacing(0.75, 2),
+  borderRadius: 20,
+  padding: theme.spacing(0.5, 1.5),
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  minWidth: 240,
+  minWidth: 220,
+  height: 36,
   '&:hover': {
     borderColor: alpha(themeColors.primary, 0.3),
     backgroundColor: alpha(themeColors.searchBg, 2),
@@ -214,18 +215,18 @@ const LoginButton = styled(Button)<{ themeColors: any }>(({ theme, themeColors }
   border: `1px solid ${alpha(themeColors.primary, 0.3)}`,
   color: themeColors.primary,
   backdropFilter: 'blur(10px)',
-  borderRadius: 20,
-  padding: '4px 18px',
-  height: '36px',
-  fontSize: '0.875rem',
+  borderRadius: 18,
+  padding: '3px 16px',
+  height: '32px',
+  fontSize: '0.825rem',
   fontWeight: 600,
   letterSpacing: '0.5px',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
     background: alpha(themeColors.primary, 0.1),
     borderColor: themeColors.primary,
-    transform: 'translateY(-2px)',
-    boxShadow: `0 8px 24px ${alpha(themeColors.primary, 0.2)}`
+    transform: 'translateY(-1px)',
+    boxShadow: `0 4px 16px ${alpha(themeColors.primary, 0.2)}`
   }
 }));
 
@@ -233,18 +234,18 @@ const SignUpButton = styled(Button)<{ themeColors: any }>(({ theme, themeColors 
   background: typeof themeColors.buttonBg === 'string' ? themeColors.buttonBg : themeColors.primary,
   color: theme.palette.getContrastText(themeColors.primary),
   backdropFilter: 'blur(10px)',
-  borderRadius: 20,
-  padding: '4px 20px',
-  height: '36px',
-  fontSize: '0.875rem',
+  borderRadius: 18,
+  padding: '3px 18px',
+  height: '32px',
+  fontSize: '0.825rem',
   fontWeight: 700,
   letterSpacing: '0.5px',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   border: `1px solid ${alpha(themeColors.primary, 0.2)}`,
   '&:hover': {
     background: typeof themeColors.buttonHover === 'string' ? themeColors.buttonHover : themeColors.primaryDark,
-    transform: 'translateY(-2px)',
-    boxShadow: `0 8px 24px ${alpha(themeColors.primary, 0.3)}`
+    transform: 'translateY(-1px)',
+    boxShadow: `0 4px 16px ${alpha(themeColors.primary, 0.3)}`
   }
 }));
 
@@ -266,6 +267,33 @@ const NotificationItem = styled(ListItem)(({ theme }) => ({
   transition: 'all 0.2s ease',
   '&:hover': {
     backgroundColor: alpha(theme.palette.primary.main, 0.05)
+  }
+}));
+
+const NotificationBadge = styled(Box)<{ count: number; themeColors: any }>(({ theme, count, themeColors }) => ({
+  position: 'absolute',
+  top: -6,
+  right: -6,
+  width: 20,
+  height: 20,
+  borderRadius: '50%',
+  background: `linear-gradient(135deg, #FF4444 0%, #FF6666 100%)`,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '0.65rem',
+  fontWeight: 700,
+  color: '#fff',
+  border: `2px solid ${themeColors.surface}`,
+  boxShadow: `
+    0 2px 8px rgba(255, 68, 68, 0.4),
+    0 0 0 1px rgba(255, 68, 68, 0.2)
+  `,
+  animation: count > 0 ? `${pulse} 2s ease-in-out infinite` : 'none',
+  transform: 'scale(0.9)',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'scale(1)'
   }
 }));
 
@@ -391,14 +419,18 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
         zIndex: theme.zIndex.drawer + 1,
       }}
     >
-      <Toolbar sx={{ gap: 2 }}>
+      <Toolbar sx={{ 
+        gap: 2, 
+        minHeight: { xs: 56, sm: 60 },
+        padding: theme.spacing(0, 2)
+      }}>
         {/* Mobile Menu Toggle */}
         {usesSculpturalDesign ? (
           <Box sx={{ mr: 1, display: { md: 'none' } }}>
             <SculpturalMenuToggle 
               open={mobileOpen} 
               onClick={onSidebarToggle}
-              size="medium"
+              size="small"
             />
           </Box>
         ) : (
@@ -407,7 +439,12 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
             aria-label="open drawer"
             edge="start"
             onClick={onSidebarToggle}
-            sx={{ mr: 1, display: { md: 'none' } }}
+            sx={{ 
+              mr: 1, 
+              display: { md: 'none' },
+              padding: 0.5
+            }}
+            size="small"
           >
             <MenuIcon />
           </IconButton>
@@ -424,7 +461,8 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
           <SearchIcon 
             sx={{ 
               color: searchFocused ? themeColors.primary : theme.palette.text.secondary,
-              transition: 'color 0.3s ease'
+              transition: 'color 0.3s ease',
+              fontSize: 20
             }} 
           />
           <SearchInput
@@ -491,28 +529,19 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
             onClick={handleNotificationOpen}
             sx={{ 
               color: theme.palette.text.primary,
+              position: 'relative',
+              padding: 1,
               '&:hover': {
                 backgroundColor: alpha(themeColors.primary, 0.1)
               }
             }}
           >
-            <Badge 
-              badgeContent={unreadCount} 
-              color="error"
-              sx={{
-                '& .MuiBadge-badge': {
-                  backgroundColor: '#FF4444',
-                  color: '#fff',
-                  fontWeight: 700,
-                  fontSize: '0.7rem',
-                  minWidth: 18,
-                  height: 18,
-                  animation: unreadCount > 0 ? `${pulse} 2s ease-in-out infinite` : 'none'
-                }
-              }}
-            >
-              <NotificationsIcon />
-            </Badge>
+            <NotificationsIcon sx={{ fontSize: 22 }} />
+            {unreadCount > 0 && (
+              <NotificationBadge count={unreadCount} themeColors={themeColors}>
+                {unreadCount}
+              </NotificationBadge>
+            )}
           </IconButton>
         </Tooltip>
 
@@ -535,9 +564,9 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
                 sx={{ 
                   bgcolor: themeColors.primary,
                   color: theme.palette.getContrastText(themeColors.primary),
-                  width: 36,
-                  height: 36,
-                  fontSize: '0.875rem',
+                  width: 32,
+                  height: 32,
+                  fontSize: '0.8rem',
                   fontWeight: 700
                 }}
               >

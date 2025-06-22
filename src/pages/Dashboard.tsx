@@ -322,8 +322,31 @@ const Dashboard: React.FC = () => {
       </Box>
 
       {/* Quick Actions and Communications */}
-      <Box sx={{ mb: 4 }}>
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' }, gap: 3 }}>
+      <Box sx={{ 
+        mb: 4,
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: '-3%',
+          right: '-3%',
+          bottom: 0,
+          background: `
+            repeating-linear-gradient(
+              135deg,
+              transparent,
+              transparent 15px,
+              ${alpha(theme.palette.primary.main, 0.02)} 15px,
+              ${alpha(theme.palette.primary.main, 0.02)} 30px
+            )
+          `,
+          pointerEvents: 'none',
+          zIndex: 0,
+          borderRadius: 2
+        }
+      }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' }, gap: 3, position: 'relative', zIndex: 1 }}>
           <Box>
             <QuickCallWidget />
           </Box>
@@ -334,24 +357,51 @@ const Dashboard: React.FC = () => {
       </Box>
 
       {/* Recent Activities and Upcoming Tasks - Industrial Style */}
-      <Box sx={{ mb: 4, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, height: 400 }}>
-        {!loading && dashboardData ? (
-          <>
-            <CommandCenterFeed 
-              activities={mockActivities} 
-              title="Activity Monitor" 
-            />
-            <MissionBriefingCard 
-              tasks={mockTasks} 
-              title="Mission Queue" 
-            />
-          </>
-        ) : (
-          <>
-            <Skeleton variant="rectangular" height="100%" sx={{ borderRadius: 2 }} />
-            <Skeleton variant="rectangular" height="100%" sx={{ borderRadius: 2 }} />
-          </>
-        )}
+      <Box sx={{ 
+        mb: 4, 
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: '-2%',
+          right: '-2%',
+          bottom: 0,
+          background: `
+            repeating-linear-gradient(
+              -45deg,
+              transparent,
+              transparent 20px,
+              ${alpha(theme.palette.text.primary, 0.01)} 20px,
+              ${alpha(theme.palette.text.primary, 0.01)} 40px
+            ),
+            radial-gradient(ellipse at top left, ${alpha(theme.palette.background.paper, 0.3)} 0%, transparent 50%),
+            radial-gradient(ellipse at bottom right, ${alpha(theme.palette.background.paper, 0.3)} 0%, transparent 50%)
+          `,
+          pointerEvents: 'none',
+          zIndex: 0,
+          borderRadius: 2
+        }
+      }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, height: 400, position: 'relative', zIndex: 1 }}>
+          {!loading && dashboardData ? (
+            <>
+              <CommandCenterFeed 
+                activities={mockActivities} 
+                title="Activity Monitor" 
+              />
+              <MissionBriefingCard 
+                tasks={mockTasks} 
+                title="Mission Queue" 
+              />
+            </>
+          ) : (
+            <>
+              <Skeleton variant="rectangular" height="100%" sx={{ borderRadius: 2 }} />
+              <Skeleton variant="rectangular" height="100%" sx={{ borderRadius: 2 }} />
+            </>
+          )}
+        </Box>
       </Box>
 
       {/* Market Intelligence Preview - Tactical Display */}
