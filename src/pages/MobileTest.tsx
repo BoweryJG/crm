@@ -14,7 +14,7 @@ const MobileTest: React.FC = () => {
       <Paper sx={{ p: 2, mb: 2 }}>
         <Typography variant="h6">Mobile Detection Test</Typography>
         <Typography>Screen Width: {screenWidth}px</Typography>
-        <Typography>Is Mobile (< 600px): {isMobile ? 'YES ✅' : 'NO ❌'}</Typography>
+        <Typography>Is Mobile (&lt; 600px): {isMobile ? 'YES ✅' : 'NO ❌'}</Typography>
         <Typography>Theme Breakpoint sm: {theme.breakpoints.values.sm}px</Typography>
       </Paper>
       
