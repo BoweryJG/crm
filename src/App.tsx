@@ -50,6 +50,7 @@ const Settings = lazy(() => import('./pages/Settings'));
 const Profile = lazy(() => import('./pages/Profile'));
 const RipplePage = lazy(() => import('./pages/RipplePage'));
 const CommandRoom = lazy(() => import('./pages/CommandRoom'));
+const CallVaultPage = lazy(() => import('./pages/CallVaultPage'));
 
 // SUIS Components
 const SUISDemo = lazy(() => import('./components/demo/SUISDemo'));
@@ -176,6 +177,9 @@ const App: React.FC = () => {
                 <Route path="intelligence/learning" element={<Suspense fallback={<SphereLoadingScreen loadingText="LEARNING PATHWAY" message="PERSONALIZING CURRICULUM" />}><LearningPathway /></Suspense>} />
                 <Route path="intelligence/calls" element={<Suspense fallback={<SphereLoadingScreen loadingText="CALL COACH" message="PREPARING CALL ANALYSIS" />}><CallAnalysis /></Suspense>} />
                 <Route path="intelligence/growth" element={<Suspense fallback={<SphereLoadingScreen loadingText="GROWTH TRACKER" message="ANALYZING PROGRESS" />}><GrowthTracker /></Suspense>} />
+                
+                {/* Operations Routes */}
+                <Route path="operations/call-vault" element={<Suspense fallback={<SphereLoadingScreen loadingText="CALL VAULT" message="LOADING ARCHIVE SYSTEM" />}><CallVaultPage /></Suspense>} />
                 
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
