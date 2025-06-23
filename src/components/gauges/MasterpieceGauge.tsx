@@ -590,21 +590,6 @@ export const MasterpieceGauge: React.FC<MasterpieceGaugeProps> = ({
   soundEnabled: propSoundEnabled = true,
   showControls = false,
 }) => {
-  // Disable on low performance devices
-  if (isLowPerformanceDevice()) {
-    return (
-      <Box sx={{ 
-        p: 3, 
-        textAlign: 'center',
-        backgroundColor: 'rgba(0,0,0,0.1)',
-        borderRadius: 2
-      }}>
-        <Box sx={{ fontSize: '2rem', fontWeight: 'bold' }}>{value}%</Box>
-        <Box sx={{ fontSize: '0.875rem', opacity: 0.7 }}>{label}</Box>
-      </Box>
-    );
-  }
-  
   const [currentValue, setCurrentValue] = useState(0);
   const [displayValue, setDisplayValue] = useState(0);
   const [nightMode, setNightMode] = useState(propNightMode ?? false);
@@ -618,6 +603,23 @@ export const MasterpieceGauge: React.FC<MasterpieceGaugeProps> = ({
   const audioContext = useRef<AudioContext | null>(null);
   const devModeTimer = useRef<NodeJS.Timeout | null>(null);
   const needleRef = useRef<HTMLDivElement>(null);
+  
+  // Performance mode check - AFTER hooks
+  const isLowPerf = isLowPerformanceDevice();
+  
+  if (isLowPerf) {
+    return (
+      <Box sx={{ 
+        p: 3, 
+        textAlign: 'center',
+        backgroundColor: 'rgba(0,0,0,0.1)',
+        borderRadius: 2
+      }}>
+        <Box sx={{ fontSize: '2rem', fontWeight: 'bold' }}>{value}%</Box>
+        <Box sx={{ fontSize: '0.875rem', opacity: 0.7 }}>{label}</Box>
+      </Box>
+    );
+  }
 
   useEffect(() => {
     audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)();
