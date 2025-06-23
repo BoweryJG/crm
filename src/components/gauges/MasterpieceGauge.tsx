@@ -603,17 +603,33 @@ export const MasterpieceGauge: React.FC<MasterpieceGaugeProps> = ({
   const audioContext = useRef<AudioContext | null>(null);
   const devModeTimer = useRef<NodeJS.Timeout | null>(null);
   const needleRef = useRef<HTMLDivElement>(null);
+  const [audioInitialized, setAudioInitialized] = useState(false);
   
-  // Initialize audio context
+  // Initialize audio context only after user interaction
+  const initAudio = useCallback(() => {
+    if (!audioContext.current && soundEnabled) {
+      try {
+        audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        // Resume if suspended
+        if (audioContext.current.state === 'suspended') {
+          audioContext.current.resume();
+        }
+        setAudioInitialized(true);
+      } catch (e) {
+        console.error('Failed to init audio:', e);
+      }
+    }
+  }, [soundEnabled]);
+  
+  // Cleanup
   useEffect(() => {
-    audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     return () => {
       audioContext.current?.close();
     };
   }, []);
 
   const playTickSound = useCallback(() => {
-    if (!soundEnabled || !audioContext.current) return;
+    if (!soundEnabled || !audioContext.current || audioContext.current.state === 'suspended') return;
     
     const oscillator = audioContext.current.createOscillator();
     const gainNode = audioContext.current.createGain();
@@ -632,7 +648,7 @@ export const MasterpieceGauge: React.FC<MasterpieceGaugeProps> = ({
   }, [soundEnabled]);
 
   const playMechanicalSound = useCallback((freq = 2000, vol = 0.02, duration = 0.03) => {
-    if (!soundEnabled || !audioContext.current) return;
+    if (!soundEnabled || !audioContext.current || audioContext.current.state === 'suspended') return;
     
     const oscillator = audioContext.current.createOscillator();
     const gainNode = audioContext.current.createGain();
@@ -763,7 +779,7 @@ export const MasterpieceGauge: React.FC<MasterpieceGaugeProps> = ({
   const angle = (currentValue / 100) * 180 - 90;
 
   return (
-    <GaugeWrapper nightMode={nightMode}>
+    <GaugeWrapper nightMode={nightMode} onClick={initAudio}>
       <Signature nightMode={nightMode}>JG</Signature>
       <Gauge sx={{ width: gaugeSize, height: gaugeSize }}>
         <Bezel nightMode={nightMode}>
