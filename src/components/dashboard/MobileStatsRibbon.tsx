@@ -155,31 +155,31 @@ const MobileStatsRibbon: React.FC<MobileStatsRibbonProps> = ({ data, themeAccent
       icon: <PersonIcon />,
       label: 'Contacts',
       value: data.total_contacts.toLocaleString(),
-      change: { value: Math.abs(data.contacts_change), trend: data.contacts_change >= 0 ? 'up' : 'down' },
+      change: { value: Math.abs(data.contacts_change), trend: data.contacts_change >= 0 ? 'up' : 'down' } as { value: number; trend: 'up' | 'down' },
     },
     {
       icon: <BusinessIcon />,
       label: 'Practices',
       value: data.active_practices.toLocaleString(),
-      change: { value: Math.abs(data.practices_change), trend: data.practices_change >= 0 ? 'up' : 'down' },
+      change: { value: Math.abs(data.practices_change), trend: data.practices_change >= 0 ? 'up' : 'down' } as { value: number; trend: 'up' | 'down' },
     },
     {
       icon: <RevenueIcon />,
       label: 'Revenue',
       value: formatCurrency(data.revenue_generated / 100),
-      change: { value: Math.abs(data.revenue_change), trend: data.revenue_change >= 0 ? 'up' : 'down' },
+      change: { value: Math.abs(data.revenue_change), trend: data.revenue_change >= 0 ? 'up' : 'down' } as { value: number; trend: 'up' | 'down' },
     },
     {
       icon: <PipelineIcon />,
       label: 'Pipeline',
       value: formatCurrency(data.pipeline_value / 100),
-      change: { value: Math.abs(data.pipeline_change), trend: data.pipeline_change >= 0 ? 'up' : 'down' },
+      change: { value: Math.abs(data.pipeline_change), trend: data.pipeline_change >= 0 ? 'up' : 'down' } as { value: number; trend: 'up' | 'down' },
     },
     {
       icon: <ConversionIcon />,
       label: 'Conversion',
       value: `${data.conversion_rate}%`,
-      change: { value: Math.abs(data.conversion_change), trend: data.conversion_change >= 0 ? 'up' : 'down' },
+      change: { value: Math.abs(data.conversion_change), trend: data.conversion_change >= 0 ? 'up' : 'down' } as { value: number; trend: 'up' | 'down' },
     },
   ];
   
