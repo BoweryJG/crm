@@ -61,17 +61,18 @@ const MonolithTab: React.FC<{
         clickSound.play();
         onClick();
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={React.useCallback(() => setIsHovered(true), [])}
+      onMouseLeave={React.useCallback(() => setIsHovered(false), [])}
       sx={{
         position: 'relative',
         cursor: 'pointer',
         overflow: 'hidden',
+        willChange: isHovered ? 'transform, background-color, box-shadow' : 'auto',
         transition: animations.utils.createTransition(
-          animations.durations.deliberate,
-          animations.easings.monolith
+          isHovered ? animations.durations.quick : animations.durations.normal,
+          animations.easings.metal
         ).transition,
-        transitionDelay: `${delay}ms`,
+        transitionDelay: isHovered ? '0ms' : `${delay}ms`,
         
         // Base shape with skew
         transform: isActive ? 'skewX(-5deg) translateX(5px)' : 'skewX(-3deg)',
