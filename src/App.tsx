@@ -8,6 +8,7 @@ import { ThemeProvider } from './themes/ThemeContext';
 import { AuthProvider, AuthGuard } from './auth';
 import { AppModeProvider } from './contexts/AppModeContext';
 import { DashboardDataProvider } from './contexts/DashboardDataContext';
+import { cleanupPerformance, isLowPerformanceDevice } from './utils/performance';
 import { SUISProvider } from './suis';
 import { SoundProvider } from './contexts/SoundContext';
 import SphereLoadingScreen from './components/common/SphereLoadingScreen';
@@ -70,10 +71,16 @@ const App: React.FC = () => {
   const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNib3B5bnV2aGN5bWJ1bWpudmF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5OTUxNzMsImV4cCI6MjA1OTU3MTE3M30.UZElMkoHugIt984RtYWyfrRuv2rB67opQdCrFVPCfzU';
 
   useEffect(() => {
+    // Check for performance issues
+    if (isLowPerformanceDevice()) {
+      cleanupPerformance();
+      console.log('Performance mode activated - animations disabled');
+    }
+    
     // Premium loading experience with minimum duration
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 3500); // Increased for premium experience
+    }, isLowPerformanceDevice() ? 1500 : 3500); // Reduced for low performance devices
     
     return () => clearTimeout(timer);
   }, []);
