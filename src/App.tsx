@@ -53,8 +53,9 @@ const CommandRoom = lazy(() => import('./pages/CommandRoom'));
 const CallVaultPage = lazy(() => import('./pages/CallVaultPage'));
 
 // Intelligence Hub Modules
-const StrategicCanvas = lazy(() => import('./modules/intelligence/components/StrategicCanvas'));
+const StrategicCanvas = lazy(() => import('./modules/intelligence/components/StrategicCanvasMobile'));
 const ContentForge = lazy(() => import('./modules/intelligence/components/ContentForge'));
+const ResearchLab = lazy(() => import('./modules/intelligence/components/ResearchLab'));
 const GrowthForge = lazy(() => import('./modules/intelligence/components/GrowthForge'));
 const KnowledgeAcademyHub = lazy(() => import('./modules/intelligence/components/KnowledgeAcademy'));
 
@@ -65,7 +66,6 @@ const IntelligenceProfileSetup = lazy(() => import('./suis/components/Intelligen
 const ContactUniverse = lazy(() => import('./suis/components/ContactUniverse'));
 const ContentGenerator = lazy(() => import('./suis/components/ContentGenerator'));
 const ResearchAssistant = lazy(() => import('./suis/components/ResearchAssistant'));
-const ResearchLab = lazy(() => import('./suis/components/ResearchLab'));
 const MarketIntelligenceFeed = lazy(() => import('./suis/components/MarketIntelligenceFeed'));
 const LearningPathway = lazy(() => import('./suis/components/LearningPathway'));
 
