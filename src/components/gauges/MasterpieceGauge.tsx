@@ -604,23 +604,7 @@ export const MasterpieceGauge: React.FC<MasterpieceGaugeProps> = ({
   const devModeTimer = useRef<NodeJS.Timeout | null>(null);
   const needleRef = useRef<HTMLDivElement>(null);
   
-  // Performance mode check - AFTER hooks
-  const isLowPerf = isLowPerformanceDevice();
-  
-  if (isLowPerf) {
-    return (
-      <Box sx={{ 
-        p: 3, 
-        textAlign: 'center',
-        backgroundColor: 'rgba(0,0,0,0.1)',
-        borderRadius: 2
-      }}>
-        <Box sx={{ fontSize: '2rem', fontWeight: 'bold' }}>{value}%</Box>
-        <Box sx={{ fontSize: '0.875rem', opacity: 0.7 }}>{label}</Box>
-      </Box>
-    );
-  }
-
+  // Initialize audio context
   useEffect(() => {
     audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     return () => {
@@ -715,6 +699,23 @@ export const MasterpieceGauge: React.FC<MasterpieceGaugeProps> = ({
       updateGauge(value);
     }
   }, [value, repMode, updateGauge]);
+  
+  // Performance mode check - AFTER all hooks
+  const isLowPerf = isLowPerformanceDevice();
+  
+  if (isLowPerf) {
+    return (
+      <Box sx={{ 
+        p: 3, 
+        textAlign: 'center',
+        backgroundColor: 'rgba(0,0,0,0.1)',
+        borderRadius: 2
+      }}>
+        <Box sx={{ fontSize: '2rem', fontWeight: 'bold' }}>{value}%</Box>
+        <Box sx={{ fontSize: '0.875rem', opacity: 0.7 }}>{label}</Box>
+      </Box>
+    );
+  }
 
   const handleCalibrate = () => {
     setDisplayValue(0);
