@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Box, Button, Typography, Paper, List, ListItem, ListItemText, Chip, Alert } from '@mui/material';
 import { useSound } from '../../hooks/useSound';
 import { useSoundContext } from '../../contexts/SoundContext';
@@ -19,8 +19,27 @@ const AudioDebugger: React.FC = () => {
     'gauge-tick',
   ];
   
-  const testSound = (soundName: string) => {
-    const sound = useSound(soundName);
+  // Pre-load all sounds at component level
+  const sounds = {
+    'ui-click-primary': useSound('ui-click-primary'),
+    'ui-click-secondary': useSound('ui-click-secondary'),
+    'ui-hover': useSound('ui-hover'),
+    'ui-toggle': useSound('ui-toggle'),
+    'notification-success': useSound('notification-success'),
+    'notification-error': useSound('notification-error'),
+    'navigation-forward': useSound('navigation-forward'),
+    'navigation-back': useSound('navigation-back'),
+    'gauge-tick': useSound('gauge-tick'),
+  };
+  
+  const testSound = useCallback((soundName: string) => {
+    const sound = sounds[soundName as keyof typeof sounds];
+    if (!sound) {
+      console.error(`Sound ${soundName} not found`);
+      setTestResults(prev => ({ ...prev, [soundName]: 'error' }));
+      return;
+    }
+    
     setTestResults(prev => ({ ...prev, [soundName]: 'pending' }));
     
     try {
@@ -36,14 +55,14 @@ const AudioDebugger: React.FC = () => {
       console.error(`Error with ${soundName}:`, error);
       setTestResults(prev => ({ ...prev, [soundName]: 'error' }));
     }
-  };
+  }, [sounds]);
   
-  const testAllSounds = async () => {
+  const testAllSounds = useCallback(async () => {
     for (const soundName of soundsToTest) {
       await new Promise(resolve => setTimeout(resolve, 500)); // Small delay between sounds
       testSound(soundName);
     }
-  };
+  }, [testSound]);
   
   return (
     <Paper sx={{ p: 3, m: 2 }}>
