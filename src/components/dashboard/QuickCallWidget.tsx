@@ -47,6 +47,7 @@ const QuickCallWidget: React.FC = () => {
   const { isDemo } = useAppMode();
   const [recentContacts, setRecentContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
+  const hasFetchedRef = useRef(false);
   const [calling, setCalling] = useState<string | null>(null);
   const [personalNumberDialogOpen, setPersonalNumberDialogOpen] = useState(false);
   const [personalNumber, setPersonalNumber] = useState<string>('');
@@ -90,6 +91,12 @@ const QuickCallWidget: React.FC = () => {
 
   useEffect(() => {
     const fetchRecentContacts = async () => {
+      // Prevent multiple fetches
+      if (hasFetchedRef.current) {
+        return;
+      }
+      hasFetchedRef.current = true;
+
       try {
         setLoading(true);
         

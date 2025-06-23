@@ -292,7 +292,7 @@ const Dashboard: React.FC = () => {
             <Suspense fallback={
               <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
             }>
-              <CartierBlended live={true} />
+              <CartierBlended live={false} />
             </Suspense>
           </Box>
 
