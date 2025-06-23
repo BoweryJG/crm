@@ -19,6 +19,7 @@ import { Gallery, GalleryContainer, Monolith } from '../../../components/gallery
 import glassEffects from '../../../themes/glassEffects';
 import animations from '../../../themes/animations';
 import { useAuth } from '../../../auth';
+import { getMobileStyles } from './MobileStyles';
 import { useAppMode } from '../../../contexts/AppModeContext';
 
 interface CanvasBaseProps {
@@ -47,6 +48,7 @@ export const CanvasBase: React.FC<CanvasBaseProps> = ({
   const theme = useTheme();
   const { user } = useAuth();
   const { isDemo } = useAppMode();
+  const mobileStyles = getMobileStyles(theme);
 
   return (
     <Gallery.Container maxWidth="lg">
@@ -68,9 +70,8 @@ export const CanvasBase: React.FC<CanvasBaseProps> = ({
             <Typography
               variant="h2"
               sx={{
-                fontWeight: 200,
-                letterSpacing: '0.15em',
-                mb: 3,
+                ...mobileStyles.mobileHeading,
+                mb: { xs: 2, sm: 3 },
               }}
             >
               {title}
@@ -78,10 +79,10 @@ export const CanvasBase: React.FC<CanvasBaseProps> = ({
             <Typography
               variant="body1"
               sx={{
+                ...mobileStyles.mobileText,
                 color: theme.palette.text.secondary,
                 maxWidth: 600,
                 mx: 'auto',
-                letterSpacing: '0.05em',
               }}
             >
               {subtitle}
@@ -98,13 +99,18 @@ export const CanvasBase: React.FC<CanvasBaseProps> = ({
                   <Button
                     size="small"
                     onClick={onSignInClick}
-                    sx={{ letterSpacing: '0.05em' }}
+                    sx={{
+                      ...mobileStyles.mobileButton,
+                      fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                      padding: { xs: '4px 8px', sm: '6px 12px' },
+                    }}
                   >
                     Sign In
                   </Button>
                 )
               }
               sx={{
+                ...mobileStyles.mobileAlert,
                 mb: 4,
                 ...glassEffects.effects.museum,
                 borderRadius: 0,
@@ -113,7 +119,7 @@ export const CanvasBase: React.FC<CanvasBaseProps> = ({
                 },
               }}
             >
-              <Typography variant="body2" sx={{ letterSpacing: '0.05em' }}>
+              <Typography variant="body2" sx={{ ...mobileStyles.mobileText }}>
                 {isDemo
                   ? 'Demo Mode: Generate and preview content. Sign in to save, send, and track.'
                   : 'Public Access: Explore all features. Sign in to save and automate your workflow.'}
@@ -171,6 +177,7 @@ export const AIGenerateButton: React.FC<{
   fullWidth?: boolean;
 }> = ({ onClick, disabled, loading, label = 'GENERATE', fullWidth }) => {
   const theme = useTheme();
+  const mobileStyles = getMobileStyles(theme);
 
   return (
     <Button
@@ -181,9 +188,11 @@ export const AIGenerateButton: React.FC<{
       startIcon={<AIIcon />}
       fullWidth={fullWidth}
       sx={{
-        px: 6,
-        py: 1.5,
-        letterSpacing: '0.15em',
+        ...mobileStyles.mobileButton,
+        px: { xs: 3, sm: 4, md: 6 },
+        py: { xs: 1, sm: 1.25, md: 1.5 },
+        fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' },
+        letterSpacing: { xs: '0.1em', sm: '0.15em' },
         background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.8)})`,
         '&:hover': {
           background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.8)}, ${theme.palette.primary.main})`,

@@ -48,6 +48,7 @@ import { CanvasBase, AIGenerateButton } from './CanvasBase';
 import { useAuth } from '../../../auth';
 import { useNavigate } from 'react-router-dom';
 import { useThemeContext } from '../../../themes/ThemeContext';
+import { getMobileStyles } from './MobileStyles';
 
 interface Skill {
   id: string;

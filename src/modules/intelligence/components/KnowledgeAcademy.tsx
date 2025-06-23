@@ -58,6 +58,7 @@ import { CanvasBase, AIGenerateButton } from './CanvasBase';
 import { useAuth } from '../../../auth';
 import { useNavigate } from 'react-router-dom';
 import { useThemeContext } from '../../../themes/ThemeContext';
+import { getMobileStyles } from './MobileStyles';
 
 interface Lesson {
   id: string;
@@ -90,6 +91,7 @@ const KnowledgeAcademy: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { themeMode } = useThemeContext();
+  const mobileStyles = getMobileStyles(theme);
   const [activeMode, setActiveMode] = useState<'learn' | 'create'>('learn');
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
@@ -459,7 +461,7 @@ const KnowledgeAcademy: React.FC = () => {
                       <Button
                         variant="contained"
                         startIcon={<CheckCircleIcon />}
-                        sx={{ letterSpacing: '0.1em' }}
+                        sx={{ ...mobileStyles.mobileButton }}
                       >
                         SUBMIT ANSWER
                       </Button>
