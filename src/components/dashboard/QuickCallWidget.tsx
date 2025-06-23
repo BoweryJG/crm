@@ -102,7 +102,7 @@ const QuickCallWidget: React.FC = () => {
         
         // If in demo mode, use mock data
         if (isDemo) {
-          console.log('QuickCallWidget: Using demo mode mock data');
+          // Using demo mode mock data
           const mockContacts = mockDataService.generateRecentCallContacts(5);
           setRecentContacts(mockContacts);
           setLoading(false);

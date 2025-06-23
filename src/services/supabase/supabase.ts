@@ -411,7 +411,9 @@ try {
     }
   } else {
     // Use real client with valid credentials
-    supabase = createClient(supabaseUrl, supabaseAnonKey);
+    // Import from the singleton auth instance instead of creating new client
+    const { getSupabaseClient } = require('../../auth/supabase');
+    supabase = getSupabaseClient();
   }
 } catch (error) {
   console.error('Supabase client error:', error);

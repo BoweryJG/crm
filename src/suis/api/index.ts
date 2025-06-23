@@ -557,7 +557,9 @@ export class SUISAPIManager {
     this.sphere1a = new Sphere1AClient(config.sphere1a);
     this.openRouter = new OpenRouterClient(config.openRouter);
     this.twilio = new TwilioClient(config.twilio);
-    this.supabase = createClient(config.supabase.url, config.supabase.anonKey);
+    // Use singleton from auth instead of creating new client
+    const { getSupabaseClient } = require('../../auth/supabase');
+    this.supabase = getSupabaseClient();
   }
 
   // Market Intelligence Methods

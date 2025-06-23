@@ -57,15 +57,7 @@ const Dashboard: React.FC = () => {
   const { soundEnabled } = useSoundContext();
   const testSound = useSound('ui-click-primary');
   
-  // Debug auth state
-  React.useEffect(() => {
-    console.log('Dashboard - Auth state:', { 
-      user: user?.email, 
-      authLoading,
-      fullName: user?.user_metadata?.full_name,
-      displayName: getUserDisplayName(user)
-    });
-  }, [user, authLoading]);
+  // Remove debug logging to reduce console noise
 
   if (authLoading) {
     return (
