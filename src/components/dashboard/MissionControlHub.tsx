@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
-  Activity as ActivityIcon,
+  Timeline as ActivityIcon,
   Assignment as TaskIcon,
   AutoAwesome as InsightIcon,
   ExpandMore as ExpandIcon,
