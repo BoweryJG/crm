@@ -57,9 +57,19 @@ const MonolithTab: React.FC<{
   
   return (
     <Box
-      onClick={() => {
+      onClick={(e) => {
+        // Add mechanical click effect
+        const rect = e.currentTarget.getBoundingClientRect();
+        e.currentTarget.style.transform = 'skewX(-5deg) translateX(3px) scale(0.98)';
+        
+        // Play sound and navigate
         clickSound.play();
         onClick();
+        
+        // Spring back animation
+        setTimeout(() => {
+          e.currentTarget.style.transform = isActive ? 'skewX(-5deg) translateX(5px)' : 'skewX(-3deg)';
+        }, 100);
       }}
       onMouseEnter={React.useCallback(() => setIsHovered(true), [])}
       onMouseLeave={React.useCallback(() => setIsHovered(false), [])}
@@ -67,12 +77,12 @@ const MonolithTab: React.FC<{
         position: 'relative',
         cursor: 'pointer',
         overflow: 'hidden',
-        willChange: isHovered ? 'transform, background-color, box-shadow' : 'auto',
-        transition: animations.utils.createTransition(
-          isHovered ? animations.durations.quick : animations.durations.normal,
-          animations.easings.metal
-        ).transition,
-        transitionDelay: isHovered ? '0ms' : `${delay}ms`,
+        willChange: 'transform, background-color, box-shadow, border-left',
+        // Single, smooth mechanical transition
+        transition: `all ${animations.durations.instant}ms ${animations.easings.metal}`,
+        transitionDelay: '0ms',
+        // Add transform-origin for weighted feel
+        transformOrigin: 'left center',
         
         // Base shape with skew
         transform: isActive ? 'skewX(-5deg) translateX(5px)' : 'skewX(-3deg)',
@@ -99,13 +109,19 @@ const MonolithTab: React.FC<{
         mb: 0, // No margin between tabs
         mx: 2,
         
-        // Hover effects
+        // Hover effects - mechanical precision
         '&:hover': {
-          transform: 'skewX(-5deg) translateX(8px) translateY(-2px)',
-          backgroundColor: alpha(theme.palette.primary.main, 0.1),
-          borderLeftWidth: '4px',
-          borderLeftColor: alpha(theme.palette.primary.main, 0.5),
-          boxShadow: `0 15px 50px ${alpha(theme.palette.primary.main, 0.2)}, inset 0 0 20px ${alpha(theme.palette.primary.main, 0.1)}`,
+          transform: isActive 
+            ? 'skewX(-5deg) translateX(5px) scale(1.02)' 
+            : 'skewX(-4deg) translateX(12px) scale(1.05)',
+          backgroundColor: alpha(theme.palette.primary.main, 0.12),
+          borderLeftWidth: '5px',
+          borderLeftColor: theme.palette.primary.main,
+          boxShadow: `
+            0 20px 60px ${alpha(theme.palette.primary.main, 0.3)}, 
+            inset 0 0 30px ${alpha(theme.palette.primary.main, 0.15)},
+            inset -2px 0 10px ${alpha(theme.palette.primary.main, 0.2)}
+          `,
         },
         
         // Gold accent line
@@ -118,7 +134,7 @@ const MonolithTab: React.FC<{
           height: '1px',
           background: `linear-gradient(90deg, ${theme.palette.primary.main}, transparent)`,
           opacity: isActive ? 1 : 0,
-          transition: 'opacity 0.6s ease',
+          transition: `opacity ${animations.durations.instant}ms ease`,
         },
         
         // Hover glow effect
@@ -132,7 +148,7 @@ const MonolithTab: React.FC<{
           background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.1)} 0%, transparent 70%)`,
           transform: 'translateY(-50%)',
           opacity: isHovered ? 1 : 0,
-          transition: 'opacity 0.6s ease',
+          transition: `opacity ${animations.durations.instant}ms ease`,
           pointerEvents: 'none',
         },
       }}
@@ -144,7 +160,7 @@ const MonolithTab: React.FC<{
             position: 'relative',
             mr: 2,
             color: isActive ? theme.palette.primary.main : theme.palette.text.secondary,
-            transition: 'all 0.6s ease',
+            transition: `all ${animations.durations.instant}ms ${animations.easings.metal}`,
             transform: isActive ? 'scale(1.2)' : 'scale(1)',
             filter: isActive ? `drop-shadow(0 0 8px ${theme.palette.primary.main})` : 'none',
             
@@ -158,7 +174,7 @@ const MonolithTab: React.FC<{
               bottom: '-4px',
               border: `1px solid ${alpha(theme.palette.primary.main, isActive ? 0.3 : 0.1)}`,
               transform: 'rotate(45deg)',
-              transition: 'all 0.6s ease',
+              transition: `all ${animations.durations.instant}ms ${animations.easings.metal}`,
             },
           }}
         >
@@ -173,7 +189,7 @@ const MonolithTab: React.FC<{
             letterSpacing: isActive ? '0.2em' : '0.1em',
             textTransform: 'uppercase',
             color: isActive ? theme.palette.text.primary : theme.palette.text.secondary,
-            transition: 'all 0.6s ease',
+            transition: `all ${animations.durations.instant}ms ${animations.easings.metal}`,
             textShadow: isActive ? `0 0 20px ${alpha(theme.palette.primary.main, 0.5)}` : 'none',
           }}
         >
@@ -341,6 +357,15 @@ const SculpturalSidebar: React.FC<{
   const navigate = useNavigate();
   const location = useLocation();
   const { themeMode, setThemeMode } = useThemeContext();
+  
+  // Preload mechanical sounds for instant feedback
+  React.useEffect(() => {
+    const sounds = ['ui-click-primary', 'ui-click-secondary', 'ui-toggle', 'navigation-forward'];
+    sounds.forEach(soundId => {
+      const audio = new Audio(`/sounds/${soundId}.mp3`);
+      audio.load();
+    });
+  }, []);
   
   const handleNavigation = (path: string) => {
     navigate(path);
