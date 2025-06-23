@@ -265,6 +265,24 @@ const QuickActionsView: React.FC<{
   
   const actions: ActionType[] = ['call', 'email', 'meeting', 'message'];
   
+  const getActionIcon = (type: ActionType) => {
+    switch (type) {
+      case 'call': return <PhoneIcon />;
+      case 'email': return <EmailIcon />;
+      case 'meeting': return <MeetingIcon />;
+      case 'message': return <ChatIcon />;
+    }
+  };
+  
+  const getActionColor = (type: ActionType) => {
+    switch (type) {
+      case 'call': return themeAccents.primary;
+      case 'email': return themeAccents.secondary;
+      case 'meeting': return themeAccents.glow;
+      case 'message': return themeAccents.success || '#00ff41';
+    }
+  };
+  
   return (
     <Box>
       {/* Action Selector */}
@@ -427,6 +445,24 @@ const LiveFeed: React.FC<{
 }> = ({ themeAccents, liveActions }) => {
   const theme = useTheme();
   
+  const getActionIcon = (type: ActionType) => {
+    switch (type) {
+      case 'call': return <PhoneIcon />;
+      case 'email': return <EmailIcon />;
+      case 'meeting': return <MeetingIcon />;
+      case 'message': return <ChatIcon />;
+    }
+  };
+  
+  const getActionColor = (type: ActionType) => {
+    switch (type) {
+      case 'call': return themeAccents.primary;
+      case 'email': return themeAccents.secondary;
+      case 'meeting': return themeAccents.glow;
+      case 'message': return themeAccents.success || '#00ff41';
+    }
+  };
+  
   return (
     <Box>
       <Typography variant="subtitle2" sx={{ mb: 2, color: theme.palette.text.secondary }}>
@@ -497,6 +533,24 @@ const ActionDrawer: React.FC<{
   const theme = useTheme();
   
   if (!contact) return null;
+  
+  const getActionIcon = (type: ActionType) => {
+    switch (type) {
+      case 'call': return <PhoneIcon />;
+      case 'email': return <EmailIcon />;
+      case 'meeting': return <MeetingIcon />;
+      case 'message': return <ChatIcon />;
+    }
+  };
+  
+  const getActionColor = (type: ActionType) => {
+    switch (type) {
+      case 'call': return themeAccents.primary;
+      case 'email': return themeAccents.secondary;
+      case 'meeting': return themeAccents.glow;
+      case 'message': return themeAccents.success || '#00ff41';
+    }
+  };
   
   return (
     <SwipeableDrawer
