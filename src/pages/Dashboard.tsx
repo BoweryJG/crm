@@ -8,7 +8,8 @@ import {
   useTheme,
   Skeleton,
   Button,
-  alpha
+  alpha,
+  useMediaQuery
 } from '@mui/material';
 import { useThemeContext } from '../themes/ThemeContext';
 import { useNavigate } from 'react-router-dom';
@@ -31,6 +32,10 @@ const CommandCenterFeed = lazy(() => import('../components/dashboard/CommandCent
 const MissionBriefingCard = lazy(() => import('../components/dashboard/MissionBriefingCard'));
 const CartierBlended = lazy(() => import('../components/dashboard/CartierBlended'));
 
+// Mobile-optimized components
+const MissionControlHub = lazy(() => import('../components/dashboard/MissionControlHub'));
+const OperationsCenter = lazy(() => import('../components/dashboard/OperationsCenter'));
+
 // Helper function to generate random integers
 const getRandomInt = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -43,6 +48,10 @@ const Dashboard: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
   const { dashboardData, loading, mockActivities, mockTasks } = useDashboardData();
   const [gaugeStyle, setGaugeStyle] = React.useState<'quantum' | 'masterpiece'>('masterpiece');
+  
+  // Responsive breakpoints
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   
   // Sound test
   const { soundEnabled } = useSoundContext();
@@ -266,102 +275,130 @@ const Dashboard: React.FC = () => {
         <DashboardStats />
       </Box>
 
-      {/* Mission Progress - Cartier Blended */}
-      <Box sx={{ mb: 4 }}>
-        <Suspense fallback={
-          <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
-        }>
-          <CartierBlended live={true} />
-        </Suspense>
-      </Box>
-
-      {/* Now Cards Stack - Added Section */}
-      <Box sx={{ mb: 4 }}>
-        <Suspense fallback={
-          <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />
-        }>
-          <NowCardsStack />
-        </Suspense>
-      </Box>
-
-      {/* Quick Actions and Communications */}
-      <Box sx={{ 
-        mb: 4,
-        position: 'relative',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: '-3%',
-          right: '-3%',
-          bottom: 0,
-          background: `
-            radial-gradient(circle at 20% 50%, ${alpha(theme.palette.primary.main, 0.03)} 0%, transparent 40%),
-            radial-gradient(circle at 80% 50%, ${alpha(theme.palette.primary.main, 0.03)} 0%, transparent 40%),
-            radial-gradient(circle at 50% 50%, ${alpha(theme.palette.background.paper, 0.5)} 0%, transparent 70%)
-          `,
-          pointerEvents: 'none',
-          zIndex: 0,
-          borderRadius: 2
-        }
-      }}>
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' }, gap: 3, position: 'relative', zIndex: 1 }}>
-          <Box>
-            <QuickCallWidget />
+      {/* Mobile: Mission Control Hub - Consolidated view */}
+      {/* Desktop: Original separate components */}
+      {isMobile ? (
+        <Box sx={{ mb: 4 }}>
+          <Suspense fallback={
+            <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />
+          }>
+            <MissionControlHub />
+          </Suspense>
+        </Box>
+      ) : (
+        <>
+          {/* Mission Progress - Cartier Blended */}
+          <Box sx={{ mb: 4 }}>
+            <Suspense fallback={
+              <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
+            }>
+              <CartierBlended live={true} />
+            </Suspense>
           </Box>
-          <Box>
-            {/* Additional widgets can go here */}
+
+          {/* Now Cards Stack - Added Section */}
+          <Box sx={{ mb: 4 }}>
+            <Suspense fallback={
+              <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />
+            }>
+              <NowCardsStack />
+            </Suspense>
+          </Box>
+        </>
+      )}
+
+      {/* Mobile: Operations Center - Consolidated communications */}
+      {/* Desktop: Original QuickCallWidget */}
+      {isMobile ? (
+        <Box sx={{ mb: 4 }}>
+          <Suspense fallback={
+            <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
+          }>
+            <OperationsCenter />
+          </Suspense>
+        </Box>
+      ) : (
+        <Box sx={{ 
+          mb: 4,
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: '-3%',
+            right: '-3%',
+            bottom: 0,
+            background: `
+              radial-gradient(circle at 20% 50%, ${alpha(theme.palette.primary.main, 0.03)} 0%, transparent 40%),
+              radial-gradient(circle at 80% 50%, ${alpha(theme.palette.primary.main, 0.03)} 0%, transparent 40%),
+              radial-gradient(circle at 50% 50%, ${alpha(theme.palette.background.paper, 0.5)} 0%, transparent 70%)
+            `,
+            pointerEvents: 'none',
+            zIndex: 0,
+            borderRadius: 2
+          }
+        }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' }, gap: 3, position: 'relative', zIndex: 1 }}>
+            <Box>
+              <QuickCallWidget />
+            </Box>
+            <Box>
+              {/* Additional widgets can go here */}
+            </Box>
           </Box>
         </Box>
-      </Box>
+      )}
 
       {/* Recent Activities and Upcoming Tasks - Industrial Style */}
-      <Box sx={{ 
-        mb: 4, 
-        position: 'relative',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: '-2%',
-          right: '-2%',
-          bottom: 0,
-          background: `
-            repeating-linear-gradient(
-              -45deg,
-              transparent,
-              transparent 20px,
-              ${alpha(theme.palette.text.primary, 0.01)} 20px,
-              ${alpha(theme.palette.text.primary, 0.01)} 40px
-            ),
-            radial-gradient(ellipse at top left, ${alpha(theme.palette.background.paper, 0.3)} 0%, transparent 50%),
-            radial-gradient(ellipse at bottom right, ${alpha(theme.palette.background.paper, 0.3)} 0%, transparent 50%)
-          `,
-          pointerEvents: 'none',
-          zIndex: 0,
-          borderRadius: 2
-        }
-      }}>
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, height: 400, position: 'relative', zIndex: 1 }}>
-          {!loading && dashboardData ? (
-            <>
-              <CommandCenterFeed 
-                activities={mockActivities} 
-                title="Activity Monitor" 
-              />
-              <MissionBriefingCard 
-                tasks={mockTasks} 
-                title="Mission Queue" 
-              />
-            </>
-          ) : (
-            <>
-              <Skeleton variant="rectangular" height="100%" sx={{ borderRadius: 2 }} />
-              <Skeleton variant="rectangular" height="100%" sx={{ borderRadius: 2 }} />
-            </>
-          )}
+      {/* On mobile, these are integrated into MissionControlHub above */}
+      {!isMobile && (
+        <Box sx={{ 
+          mb: 4, 
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: '-2%',
+            right: '-2%',
+            bottom: 0,
+            background: `
+              repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 20px,
+                ${alpha(theme.palette.text.primary, 0.01)} 20px,
+                ${alpha(theme.palette.text.primary, 0.01)} 40px
+              ),
+              radial-gradient(ellipse at top left, ${alpha(theme.palette.background.paper, 0.3)} 0%, transparent 50%),
+              radial-gradient(ellipse at bottom right, ${alpha(theme.palette.background.paper, 0.3)} 0%, transparent 50%)
+            `,
+            pointerEvents: 'none',
+            zIndex: 0,
+            borderRadius: 2
+          }
+        }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, height: 400, position: 'relative', zIndex: 1 }}>
+            {!loading && dashboardData ? (
+              <>
+                <CommandCenterFeed 
+                  activities={mockActivities} 
+                  title="Activity Monitor" 
+                />
+                <MissionBriefingCard 
+                  tasks={mockTasks} 
+                  title="Mission Queue" 
+                />
+              </>
+            ) : (
+              <>
+                <Skeleton variant="rectangular" height="100%" sx={{ borderRadius: 2 }} />
+                <Skeleton variant="rectangular" height="100%" sx={{ borderRadius: 2 }} />
+              </>
+            )}
+          </Box>
         </Box>
-      </Box>
+      )}
 
       {/* Market Intelligence Preview - Tactical Display */}
       <Box sx={{ mb: 4 }}>
