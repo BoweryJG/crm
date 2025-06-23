@@ -12,6 +12,7 @@ import {
   useTheme,
   alpha,
   Fab,
+  Button,
 } from '@mui/material';
 import {
   Psychology as StrategyIcon,
@@ -227,14 +228,23 @@ const StrategicCanvasMobile: React.FC = () => {
               placeholder="Search products..."
               sx={{ flex: 1 }}
             />
-            <AIGenerateButton
+            <Button
+              variant="contained"
               onClick={handleAnalyze}
-              disabled={!doctor || !product}
-              loading={loading}
-              label="ANALYZE"
+              disabled={!doctor || !product || loading}
               startIcon={<AnalyzeIcon />}
-              sx={{ height: 36, alignSelf: 'flex-end' }}
-            />
+              sx={{ 
+                height: 36, 
+                alignSelf: 'flex-end',
+                px: 3,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                '&:hover': {
+                  background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+                },
+              }}
+            >
+              ANALYZE
+            </Button>
           </Stack>
         )}
 
