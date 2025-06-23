@@ -55,6 +55,8 @@ const CallVaultPage = lazy(() => import('./pages/CallVaultPage'));
 // Intelligence Hub Modules
 const StrategicCanvas = lazy(() => import('./modules/intelligence/components/StrategicCanvas'));
 const ContentForge = lazy(() => import('./modules/intelligence/components/ContentForge'));
+const GrowthForge = lazy(() => import('./modules/intelligence/components/GrowthForge'));
+const KnowledgeAcademyHub = lazy(() => import('./modules/intelligence/components/KnowledgeAcademy'));
 
 // SUIS Components
 const SUISDemo = lazy(() => import('./components/demo/SUISDemo'));
@@ -64,7 +66,6 @@ const ContactUniverse = lazy(() => import('./suis/components/ContactUniverse'));
 const ContentGenerator = lazy(() => import('./suis/components/ContentGenerator'));
 const ResearchAssistant = lazy(() => import('./suis/components/ResearchAssistant'));
 const ResearchLab = lazy(() => import('./suis/components/ResearchLab'));
-const GrowthTracker = lazy(() => import('./suis/components/GrowthTracker'));
 const MarketIntelligenceFeed = lazy(() => import('./suis/components/MarketIntelligenceFeed'));
 const LearningPathway = lazy(() => import('./suis/components/LearningPathway'));
 
@@ -177,11 +178,12 @@ const App: React.FC = () => {
                 <Route path="intelligence/canvas" element={<Suspense fallback={<SphereLoadingScreen loadingText="STRATEGIC CANVAS" message="INITIALIZING STRATEGY ENGINE" />}><StrategicCanvas /></Suspense>} />
                 <Route path="intelligence/content" element={<Suspense fallback={<SphereLoadingScreen loadingText="CONTENT FORGE" message="PREPARING WORKSHOP" />}><ContentForge /></Suspense>} />
                 <Route path="intelligence/research" element={<Suspense fallback={<SphereLoadingScreen loadingText="RESEARCH LAB" message="INITIALIZING AI RESEARCH" />}><ResearchLab /></Suspense>} />
+                <Route path="intelligence/growth" element={<Suspense fallback={<SphereLoadingScreen loadingText="GROWTH FORGE" message="POWERING UP FITNESS TRACKER" />}><GrowthForge /></Suspense>} />
+                <Route path="intelligence/academy" element={<Suspense fallback={<SphereLoadingScreen loadingText="KNOWLEDGE ACADEMY" message="PREPARING LEARNING LAB" />}><KnowledgeAcademyHub /></Suspense>} />
                 <Route path="intelligence/contacts" element={<Suspense fallback={<SphereLoadingScreen loadingText="CONTACT UNIVERSE" message="MAPPING NEURAL CONNECTIONS" />}><ContactUniverse /></Suspense>} />
                 <Route path="intelligence/market" element={<Suspense fallback={<SphereLoadingScreen loadingText="MARKET INTELLIGENCE" message="ANALYZING MARKET SIGNALS" />}><MarketIntelligenceFeed /></Suspense>} />
                 <Route path="intelligence/learning" element={<Suspense fallback={<SphereLoadingScreen loadingText="LEARNING PATHWAY" message="PERSONALIZING CURRICULUM" />}><LearningPathway /></Suspense>} />
                 <Route path="intelligence/calls" element={<Suspense fallback={<SphereLoadingScreen loadingText="CALL COACH" message="PREPARING CALL ANALYSIS" />}><CallAnalysis /></Suspense>} />
-                <Route path="intelligence/growth" element={<Suspense fallback={<SphereLoadingScreen loadingText="GROWTH TRACKER" message="ANALYZING PROGRESS" />}><GrowthTracker /></Suspense>} />
                 
                 {/* Operations Routes */}
                 <Route path="operations/call-vault" element={<Suspense fallback={<SphereLoadingScreen loadingText="CALL VAULT" message="LOADING ARCHIVE SYSTEM" />}><CallVaultPage /></Suspense>} />

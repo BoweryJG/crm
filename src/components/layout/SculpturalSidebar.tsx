@@ -26,6 +26,7 @@ import {
   Hexagon as HexIcon,
   Architecture as ArchitectureIcon,
   Psychology as PsychologyIcon,
+  School as SchoolIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
@@ -378,6 +379,7 @@ const SculpturalSidebar: React.FC<{
         { title: 'Forge', path: '/intelligence/content', icon: <CreateIcon /> },
         { title: 'Lab', path: '/intelligence/research', icon: <SearchIcon /> },
         { title: 'Growth', path: '/intelligence/growth', icon: <HexIcon /> },
+        { title: 'Academy', path: '/intelligence/academy', icon: <SchoolIcon /> },
       ],
       collapsible: true,
       defaultOpen: true,
