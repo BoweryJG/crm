@@ -223,7 +223,7 @@ export const getThemeGlass = (themeMode: string) => {
   }
   
   if (cleanThemes.includes(themeMode)) {
-    return glassEffects.effects.frostedPearl;
+    return glassEffects.effects.frostedSteel;
   }
   
   // Default

@@ -63,7 +63,7 @@ const PriorityTaskList: React.FC<PriorityTaskListProps> = ({ tasks, themeAccents
       case 'Low':
         return <LowPriorityIcon sx={{ fontSize: 16 }} />;
       default:
-        return null;
+        return undefined;
     }
   };
   
