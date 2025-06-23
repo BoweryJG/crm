@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Box, styled } from '@mui/material';
 import { keyframes } from '@emotion/react';
+import { isLowPerformanceDevice } from '../../utils/performance';
 
 const pulseGlow = keyframes`
   0%, 100% { box-shadow: 0 0 12px rgba(0,255,255,0.05); }
@@ -589,6 +590,21 @@ export const MasterpieceGauge: React.FC<MasterpieceGaugeProps> = ({
   soundEnabled: propSoundEnabled = true,
   showControls = false,
 }) => {
+  // Disable on low performance devices
+  if (isLowPerformanceDevice()) {
+    return (
+      <Box sx={{ 
+        p: 3, 
+        textAlign: 'center',
+        backgroundColor: 'rgba(0,0,0,0.1)',
+        borderRadius: 2
+      }}>
+        <Box sx={{ fontSize: '2rem', fontWeight: 'bold' }}>{value}%</Box>
+        <Box sx={{ fontSize: '0.875rem', opacity: 0.7 }}>{label}</Box>
+      </Box>
+    );
+  }
+  
   const [currentValue, setCurrentValue] = useState(0);
   const [displayValue, setDisplayValue] = useState(0);
   const [nightMode, setNightMode] = useState(propNightMode ?? false);
@@ -641,10 +657,10 @@ export const MasterpieceGauge: React.FC<MasterpieceGaugeProps> = ({
     gainNode.connect(audioContext.current.destination);
     
     filter.type = 'bandpass';
-    filter.frequency.value = freq;
+    filter.frequency.value = Math.min(freq, 20000); // Clamp to valid range
     filter.Q.value = 10;
     
-    oscillator.frequency.value = freq;
+    oscillator.frequency.value = Math.min(freq, 20000); // Clamp to valid range
     oscillator.type = 'sawtooth';
     
     gainNode.gain.setValueAtTime(vol, audioContext.current.currentTime);
@@ -671,8 +687,8 @@ export const MasterpieceGauge: React.FC<MasterpieceGaugeProps> = ({
       setStatusRing('red');
     }
     
-    // Play sounds
-    const baseFreq = 1000 + (newValue * 20);
+    // Play sounds - FIXED: Clamp frequency to valid range
+    const baseFreq = Math.min(1000 + (newValue * 20), 20000); // Max 20kHz
     playMechanicalSound(baseFreq, 0.03, 0.1);
     playTickSound();
     
