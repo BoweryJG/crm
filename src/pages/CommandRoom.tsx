@@ -538,6 +538,12 @@ const CommandRoom: React.FC = () => {
         </Fade>
       </GalleryContainer>
       )}
+
+      {/* Render Active Module */}
+      {activeModule === 'canvas' && <Canvas />}
+      {activeModule === 'quotacore' && <QuotaCore />}
+      {activeModule === 'linguistiq' && <LinguistIQ />}
+      {activeModule === 'callvault' && <CallVault />}
     </Box>
   );
 };

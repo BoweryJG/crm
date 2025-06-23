@@ -425,7 +425,12 @@ const SmartCRM: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ 
+      p: 3,
+      height: '100vh',
+      overflow: 'auto',
+      position: 'relative'
+    }}>
       {/* Header */}
       <Box className="smart-crm-header">
         <Grid container spacing={3} alignItems="center">
