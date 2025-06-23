@@ -34,24 +34,64 @@ export const ResponsiveGaugeLayout: React.FC<ResponsiveGaugeLayoutProps> = ({
   sidebarWidth = 280,
 }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // < 600px
-  const isTablet = useMediaQuery(theme.breakpoints.down('md')); // < 900px
-  const isDesktop = useMediaQuery(theme.breakpoints.down('lg')); // < 1200px
-  const isLargeDesktop = useMediaQuery(theme.breakpoints.up('lg')); // >= 1200px
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [visibleCount, setVisibleCount] = React.useState(children.length);
 
-  // Determine how many gauges to show based on screen size
-  const getVisibleGauges = () => {
-    if (isMobile) return 1; // Only show 1 gauge on mobile
-    if (isTablet) return 2; // Show 2 gauges on tablet
-    if (isDesktop) return 3; // Show 3 gauges on desktop
-    return children.length; // Show all gauges on large desktop
-  };
+  // Calculate how many gauges can fit without cutoff
+  React.useEffect(() => {
+    const calculateVisibleGauges = () => {
+      if (!containerRef.current) return;
+      
+      const containerWidth = containerRef.current.offsetWidth;
+      const gaugeMinWidth = 250; // Minimum width for a gauge
+      const gaugeMaxWidth = 280; // Maximum width for a gauge
+      const gap = 32; // Gap between gauges (2rem)
+      
+      // Account for padding
+      const padding = window.innerWidth < 600 ? 16 : window.innerWidth < 900 ? 32 : 48;
+      const availableWidth = containerWidth - (padding * 2);
+      
+      // Calculate how many gauges can fit
+      let gaugesPerRow = 1;
+      
+      // Try to fit as many gauges as possible
+      for (let i = children.length; i >= 1; i--) {
+        const totalGaugeWidth = i * gaugeMinWidth;
+        const totalGapWidth = (i - 1) * gap;
+        const totalWidth = totalGaugeWidth + totalGapWidth;
+        
+        if (totalWidth <= availableWidth) {
+          gaugesPerRow = i;
+          break;
+        }
+      }
+      
+      // Only show complete rows
+      setVisibleCount(gaugesPerRow);
+    };
 
-  const visibleCount = getVisibleGauges();
+    // Initial calculation
+    calculateVisibleGauges();
+    
+    // Recalculate on resize with debounce
+    let resizeTimeout: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(calculateVisibleGauges, 100);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimeout);
+    };
+  }, [children.length]);
+
   const visibleChildren = children.slice(0, visibleCount);
 
   return (
     <Box
+      ref={containerRef}
       sx={{
         width: '100%',
         overflow: 'hidden',
@@ -66,37 +106,21 @@ export const ResponsiveGaugeLayout: React.FC<ResponsiveGaugeLayoutProps> = ({
       
       <Box
         sx={{
-          display: 'grid',
-          gridTemplateColumns: {
-            xs: '1fr', // 1 column on mobile
-            sm: 'repeat(2, 1fr)', // 2 columns on tablet
-            md: 'repeat(3, 1fr)', // 3 columns on desktop
-            lg: `repeat(${children.length}, 1fr)`, // All columns on large desktop
-          },
-          gap: { xs: 2, sm: 3, md: 4 },
-          justifyItems: 'center',
-          alignItems: 'center',
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: '2rem',
           width: '100%',
-          maxWidth: {
-            xs: '100%',
-            sm: '640px',
-            md: '960px',
-            lg: '1200px',
-            xl: '1400px',
-          },
-          mx: 'auto',
+          overflow: 'hidden',
         }}
       >
         {visibleChildren.map((child, index) => (
           <Box
             key={index}
             sx={{
-              width: '100%',
-              maxWidth: {
-                xs: '280px', // Smaller on mobile
-                sm: '300px', // Medium on tablet
-                md: '320px', // Larger on desktop
-              },
+              flex: '1 0 22%', // Allow 4 per row max, can wrap
+              minWidth: '250px', // Minimum size before wrapping
+              maxWidth: '280px',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',

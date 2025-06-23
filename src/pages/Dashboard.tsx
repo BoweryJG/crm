@@ -19,6 +19,7 @@ import { useSound } from '../hooks/useSound';
 import { useSoundContext } from '../contexts/SoundContext';
 import DashboardStats from '../components/dashboard/DashboardStats';
 import QuickCallWidget from '../components/dashboard/QuickCallWidget';
+import { ResponsiveGaugeLayout } from '../components/gauges/ResponsiveGaugeLayout';
 
 // Lazy load heavy components to improve initial load time
 const NowCardsStack = lazy(() => import('../components/dashboard/NowCardsStack'));
@@ -174,34 +175,7 @@ const Dashboard: React.FC = () => {
           zIndex: 0
         }
       }}>
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: 'row',
-          flexWrap: 'nowrap',
-          gap: { xs: 2, sm: 3, md: 4 },
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-          maxWidth: '100%',
-          px: { xs: 1, sm: 2, md: 3 },
-          py: { xs: 2, sm: 3 },
-          position: 'relative',
-          zIndex: 1,
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          // Hide scrollbar but keep functionality
-          '&::-webkit-scrollbar': {
-            display: 'none'
-          },
-          msOverflowStyle: 'none',
-          scrollbarWidth: 'none',
-          // Ensure single row
-          '& > *': {
-            flex: '0 0 auto',
-            maxWidth: { xs: 280, sm: 320 },
-            overflow: 'visible'
-          }
-        }}>
+        <ResponsiveGaugeLayout sidebarWidth={0}>
           {loading || !dashboardData ? (
             // Show loading skeletons
             [1, 2, 3, 4].map((i) => (
@@ -209,98 +183,82 @@ const Dashboard: React.FC = () => {
             ))
           ) : gaugeStyle === 'quantum' ? (
             // Quantum style gauges
-            <>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'block', sm: 'block' } }}>
-                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
-                  <QuantumLuxuryGauge 
-                    value={Math.round(dashboardData.revenue_generated / 1000)} // Normalize to 0-100
-                    label="REVENUE"
-                    animationDelay={0}
-                  />
-                </Suspense>
-              </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'none', sm: 'block' } }}>
-                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
-                  <QuantumLuxuryGauge 
-                    value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
-                    label="PIPELINE"
-                    animationDelay={200}
-                  />
-                </Suspense>
-              </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'none', sm: 'none', md: 'block' } }}>
-                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
-                  <QuantumLuxuryGauge 
-                    value={dashboardData.quota_percentage}
-                    label="QUOTA"
-                    animationDelay={400}
-                  />
-                </Suspense>
-              </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}>
-                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
-                  <QuantumLuxuryGauge 
-                    value={dashboardData.conversion_rate}
-                    label="CONVERSION"
-                    animationDelay={600}
-                  />
-                </Suspense>
-              </Box>
-            </>
+            [
+              <Suspense key="revenue-q" fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                <QuantumLuxuryGauge 
+                  value={Math.round(dashboardData.revenue_generated / 1000)} // Normalize to 0-100
+                  label="REVENUE"
+                  animationDelay={0}
+                />
+              </Suspense>,
+              <Suspense key="pipeline-q" fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                <QuantumLuxuryGauge 
+                  value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
+                  label="PIPELINE"
+                  animationDelay={200}
+                />
+              </Suspense>,
+              <Suspense key="quota-q" fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                <QuantumLuxuryGauge 
+                  value={dashboardData.quota_percentage}
+                  label="QUOTA"
+                  animationDelay={400}
+                />
+              </Suspense>,
+              <Suspense key="conversion-q" fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                <QuantumLuxuryGauge 
+                  value={dashboardData.conversion_rate}
+                  label="CONVERSION"
+                  animationDelay={600}
+                />
+              </Suspense>
+            ]
           ) : (
             // Masterpiece style gauges
-            <>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'block', sm: 'block' } }}>
-                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
-                  <MasterpieceGauge 
-                    value={Math.round(dashboardData.revenue_generated / 10000)} // Normalize to 0-100
-                    label="REVENUE"
-                    dataSource="CRM Analytics"
-                    size="medium"
-                    nightMode={themeMode === 'dark' || themeMode === 'space'}
-                    soundEnabled={true}
-                  />
-                </Suspense>
-              </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'none', sm: 'block' } }}>
-                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
-                  <MasterpieceGauge 
-                    value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
-                    label="PIPELINE"
-                    dataSource="Sales Data"
-                    size="medium"
-                    nightMode={themeMode === 'dark' || themeMode === 'space'}
-                    soundEnabled={true}
-                  />
-                </Suspense>
-              </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'none', sm: 'none', md: 'block' } }}>
-                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
-                  <MasterpieceGauge 
-                    value={dashboardData.quota_percentage}
-                    label="QUOTA"
-                    dataSource="Performance"
-                    size="medium"
-                    nightMode={themeMode === 'dark' || themeMode === 'space'}
-                    soundEnabled={true}
-                  />
-                </Suspense>
-              </Box>
-              <Box sx={{ width: '100%', maxWidth: { xs: 320, sm: 320, md: 320 }, p: 2, display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' } }}>
-                <Suspense fallback={<Skeleton variant="circular" width={260} height={260} />}>
-                  <MasterpieceGauge 
-                    value={dashboardData.conversion_rate}
-                    label="CONVERSION"
-                    dataSource="Metrics"
-                    size="medium"
-                    nightMode={themeMode === 'dark' || themeMode === 'space'}
-                    soundEnabled={true}
-                  />
-                </Suspense>
-              </Box>
-            </>
+            [
+              <Suspense key="revenue-m" fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                <MasterpieceGauge 
+                  value={Math.round(dashboardData.revenue_generated / 10000)} // Normalize to 0-100
+                  label="REVENUE"
+                  dataSource="CRM Analytics"
+                  size="medium"
+                  nightMode={themeMode === 'dark' || themeMode === 'space'}
+                  soundEnabled={true}
+                />
+              </Suspense>,
+              <Suspense key="pipeline-m" fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                <MasterpieceGauge 
+                  value={Math.round((dashboardData.pipeline_value / 2000000) * 100)} // Normalize to 0-100
+                  label="PIPELINE"
+                  dataSource="Sales Data"
+                  size="medium"
+                  nightMode={themeMode === 'dark' || themeMode === 'space'}
+                  soundEnabled={true}
+                />
+              </Suspense>,
+              <Suspense key="quota-m" fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                <MasterpieceGauge 
+                  value={dashboardData.quota_percentage}
+                  label="QUOTA"
+                  dataSource="Performance"
+                  size="medium"
+                  nightMode={themeMode === 'dark' || themeMode === 'space'}
+                  soundEnabled={true}
+                />
+              </Suspense>,
+              <Suspense key="conversion-m" fallback={<Skeleton variant="circular" width={260} height={260} />}>
+                <MasterpieceGauge 
+                  value={dashboardData.conversion_rate}
+                  label="CONVERSION"
+                  dataSource="Metrics"
+                  size="medium"
+                  nightMode={themeMode === 'dark' || themeMode === 'space'}
+                  soundEnabled={true}
+                />
+              </Suspense>
+            ]
           )}
-        </Box>
+        </ResponsiveGaugeLayout>
       </Box>
 
       {/* Stats Cards */}
