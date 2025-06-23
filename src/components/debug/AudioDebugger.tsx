@@ -4,7 +4,7 @@ import { useSound } from '../../hooks/useSound';
 import { useSoundContext } from '../../contexts/SoundContext';
 
 const AudioDebugger: React.FC = () => {
-  const { soundEnabled, toggleSound } = useSoundContext();
+  const { soundEnabled, setSoundEnabled } = useSoundContext();
   const [testResults, setTestResults] = useState<Record<string, 'success' | 'error' | 'pending'>>({});
   
   const soundsToTest = [
@@ -75,7 +75,7 @@ const AudioDebugger: React.FC = () => {
       <Box sx={{ mb: 3 }}>
         <Button 
           variant="contained" 
-          onClick={toggleSound}
+          onClick={() => setSoundEnabled(!soundEnabled)}
           sx={{ mr: 2 }}
         >
           {soundEnabled ? 'Disable' : 'Enable'} Sounds
