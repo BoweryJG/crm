@@ -51,6 +51,7 @@ const Profile = lazy(() => import('./pages/Profile'));
 const RipplePage = lazy(() => import('./pages/RipplePage'));
 const CommandRoom = lazy(() => import('./pages/CommandRoom'));
 const CallVaultPage = lazy(() => import('./pages/CallVaultPage'));
+const MobileTest = lazy(() => import('./pages/MobileTest'));
 
 // Intelligence Hub Modules
 const StrategicCanvas = lazy(() => import('./modules/intelligence/components/StrategicCanvasMobile'));
@@ -187,6 +188,9 @@ const App: React.FC = () => {
                 
                 {/* Operations Routes */}
                 <Route path="operations/call-vault" element={<Suspense fallback={<SphereLoadingScreen loadingText="CALL VAULT" message="LOADING ARCHIVE SYSTEM" />}><CallVaultPage /></Suspense>} />
+                
+                {/* Mobile Test Route */}
+                <Route path="mobile-test" element={<Suspense fallback={<div>Loading Mobile Test...</div>}><MobileTest /></Suspense>} />
                 
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
