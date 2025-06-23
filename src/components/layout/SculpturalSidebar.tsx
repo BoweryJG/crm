@@ -374,9 +374,9 @@ const SculpturalSidebar: React.FC<{
     {
       title: 'Intelligence Hub',
       items: [
-        { title: 'Canvas AI', path: '/intelligence/canvas', icon: <SparkleIcon /> },
-        { title: 'Content', path: '/intelligence/content', icon: <CreateIcon /> },
-        { title: 'Research', path: '/intelligence/research', icon: <SearchIcon /> },
+        { title: 'Strategy', path: '/intelligence/canvas', icon: <SparkleIcon /> },
+        { title: 'Forge', path: '/intelligence/content', icon: <CreateIcon /> },
+        { title: 'Lab', path: '/intelligence/research', icon: <SearchIcon /> },
         { title: 'Growth', path: '/intelligence/growth', icon: <HexIcon /> },
       ],
       collapsible: true,

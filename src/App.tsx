@@ -52,6 +52,10 @@ const RipplePage = lazy(() => import('./pages/RipplePage'));
 const CommandRoom = lazy(() => import('./pages/CommandRoom'));
 const CallVaultPage = lazy(() => import('./pages/CallVaultPage'));
 
+// Intelligence Hub Modules
+const StrategicCanvas = lazy(() => import('./modules/intelligence/components/StrategicCanvas'));
+const ContentForge = lazy(() => import('./modules/intelligence/components/ContentForge'));
+
 // SUIS Components
 const SUISDemo = lazy(() => import('./components/demo/SUISDemo'));
 const IntelligenceDashboard = lazy(() => import('./suis/components/IntelligenceDashboard'));
@@ -170,9 +174,10 @@ const App: React.FC = () => {
                 <Route path="intelligence" element={<Suspense fallback={<SphereLoadingScreen loadingText="INTELLIGENCE" message="INITIALIZING UNIFIED SYSTEM" />}><IntelligenceDashboard /></Suspense>} />
                 <Route path="intelligence/setup" element={<Suspense fallback={<SphereLoadingScreen loadingText="PROFILE SETUP" message="PREPARING INTELLIGENCE PROFILE" />}><IntelligenceProfileSetup /></Suspense>} />
                 <Route path="intelligence/demo" element={<Suspense fallback={<SphereLoadingScreen loadingText="SUIS DEMO" message="LOADING DEMONSTRATION" />}><SUISDemo /></Suspense>} />
-                <Route path="intelligence/contacts" element={<Suspense fallback={<SphereLoadingScreen loadingText="CONTACT UNIVERSE" message="MAPPING NEURAL CONNECTIONS" />}><ContactUniverse /></Suspense>} />
-                <Route path="intelligence/content" element={<Suspense fallback={<SphereLoadingScreen loadingText="CONTENT GENERATOR" message="ACTIVATING AI ENGINE" />}><ContentGenerator /></Suspense>} />
+                <Route path="intelligence/canvas" element={<Suspense fallback={<SphereLoadingScreen loadingText="STRATEGIC CANVAS" message="INITIALIZING STRATEGY ENGINE" />}><StrategicCanvas /></Suspense>} />
+                <Route path="intelligence/content" element={<Suspense fallback={<SphereLoadingScreen loadingText="CONTENT FORGE" message="PREPARING WORKSHOP" />}><ContentForge /></Suspense>} />
                 <Route path="intelligence/research" element={<Suspense fallback={<SphereLoadingScreen loadingText="RESEARCH LAB" message="INITIALIZING AI RESEARCH" />}><ResearchLab /></Suspense>} />
+                <Route path="intelligence/contacts" element={<Suspense fallback={<SphereLoadingScreen loadingText="CONTACT UNIVERSE" message="MAPPING NEURAL CONNECTIONS" />}><ContactUniverse /></Suspense>} />
                 <Route path="intelligence/market" element={<Suspense fallback={<SphereLoadingScreen loadingText="MARKET INTELLIGENCE" message="ANALYZING MARKET SIGNALS" />}><MarketIntelligenceFeed /></Suspense>} />
                 <Route path="intelligence/learning" element={<Suspense fallback={<SphereLoadingScreen loadingText="LEARNING PATHWAY" message="PERSONALIZING CURRICULUM" />}><LearningPathway /></Suspense>} />
                 <Route path="intelligence/calls" element={<Suspense fallback={<SphereLoadingScreen loadingText="CALL COACH" message="PREPARING CALL ANALYSIS" />}><CallAnalysis /></Suspense>} />
