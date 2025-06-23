@@ -33,7 +33,8 @@ import {
   CheckCircle as SuccessIcon,
   Schedule as FollowUpIcon,
   Block as ObjectionIcon,
-  Star as StarIcon
+  Star as StarIcon,
+  Refresh as RefreshIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import ConferencePhone from '../components/callVault/ConferencePhone';
@@ -45,6 +46,8 @@ import {
   generateWaveformData,
   type DemoCall 
 } from '../mock/callVault';
+import { Gallery, GalleryContainer, Monolith } from '../components/gallery';
+import glassEffects from '../themes/glassEffects';
 
 const DemoCallVault: React.FC = () => {
   const theme = useTheme();
@@ -173,70 +176,194 @@ const DemoCallVault: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      {/* Demo Mode Badge */}
-      <Box className="demo-badge">DEMO MODE</Box>
-      
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Button
-          onClick={() => navigate('/command-room')}
-          sx={{ mb: 2, color: theme.palette.text.secondary }}
-        >
-          ← Back to Command Room
-        </Button>
-        
-        <Typography variant="h3" sx={{ fontWeight: 200, mb: 1 }}>
-          CallVault Conference System
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Experience realistic sales conversations from top-performing reps
-        </Typography>
-      </Box>
-
-      <Grid container spacing={3}>
-        {/* Left Column - Call List */}
-        <Grid item xs={12} md={4}>
-          <Paper 
-            sx={{ 
-              p: 2, 
-              backgroundColor: alpha(theme.palette.background.paper, 0.5),
-              backdropFilter: 'blur(10px)'
+    <GalleryContainer>
+      <Fade in timeout={800}>
+        <Box>
+          {/* Demo Mode Badge */}
+          <Box 
+            sx={{
+              position: 'fixed',
+              top: 20,
+              right: 20,
+              backgroundColor: alpha(theme.palette.warning.main, 0.9),
+              color: theme.palette.background.default,
+              px: 2,
+              py: 0.5,
+              borderRadius: 0,
+              letterSpacing: '0.1em',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              zIndex: 1200,
+              boxShadow: `0 2px 8px ${alpha(theme.palette.warning.main, 0.3)}`
             }}
           >
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Demo Recordings
+            DEMO MODE
+          </Box>
+          
+          {/* Header */}
+          <Box sx={{ mb: 4 }}>
+            <Button
+              onClick={() => navigate('/command-room')}
+              sx={{ 
+                mb: 2, 
+                color: theme.palette.text.secondary,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                fontSize: '0.875rem',
+                '&:hover': {
+                  color: theme.palette.primary.main,
+                }
+              }}
+            >
+              ← Back to Command Room
+            </Button>
+            
+            <Typography 
+              variant="h2" 
+              sx={{ 
+                fontWeight: 100, 
+                mb: 1,
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                fontSize: { xs: '2rem', md: '3rem' }
+              }}
+            >
+              CALLVAULT DEMO
             </Typography>
+            <Typography 
+              variant="body1" 
+              sx={{
+                color: theme.palette.text.secondary,
+                letterSpacing: '0.05em',
+                opacity: 0.8
+              }}
+            >
+              Experience realistic sales conversations from top-performing reps
+            </Typography>
+          </Box>
+
+          <Gallery.Space height={40} />
+
+          <Grid container spacing={3}>
+            {/* Left Column - Call List */}
+            <Grid item xs={12} md={4}>
+              <Monolith
+                variant="museum"
+                elevation="elevated"
+                hover="subtle"
+                fullHeight
+                sx={{
+                  maxHeight: '70vh',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  overflow: 'hidden'
+                }}
+              >
+                <Box sx={{ p: 3, pb: 2 }}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      fontWeight: 300
+                    }}
+                  >
+                    Demo Recordings
+                  </Typography>
+                </Box>
+                
+                <Divider sx={{ opacity: 0.1 }} />
+                
+                <Box sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
             
             <List>
               {allDemoCalls.map((call) => (
                 <ListItem
                   key={call.id}
-                  className={`call-list-item ${selectedCall?.id === call.id ? 'active' : ''}`}
                   onClick={() => handlePlayCall(call)}
-                  sx={{ mb: 1, borderRadius: 2 }}
+                  sx={{ 
+                    mb: 1.5, 
+                    borderRadius: 1,
+                    backgroundColor: selectedCall?.id === call.id 
+                      ? alpha(theme.palette.primary.main, 0.08)
+                      : alpha(theme.palette.background.paper, 0.4),
+                    border: `1px solid ${selectedCall?.id === call.id 
+                      ? alpha(theme.palette.primary.main, 0.2)
+                      : alpha(theme.palette.divider, 0.1)}`,
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                      borderColor: alpha(theme.palette.primary.main, 0.15),
+                      transform: 'translateX(4px)',
+                    }
+                  }}
                 >
                   <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: getOutcomeColor(call.outcome) }}>
+                    <Avatar 
+                      sx={{ 
+                        bgcolor: selectedCall?.id === call.id 
+                          ? getOutcomeColor(call.outcome)
+                          : alpha(getOutcomeColor(call.outcome), 0.2),
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
                       {getOutcomeIcon(call.outcome)}
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText
-                    primary={call.title}
+                    primary={
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          fontWeight: selectedCall?.id === call.id ? 600 : 400,
+                          letterSpacing: '0.02em'
+                        }}
+                      >
+                        {call.title}
+                      </Typography>
+                    }
                     secondary={
                       <Stack spacing={0.5}>
-                        <Typography variant="caption">
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            opacity: 0.7,
+                            letterSpacing: '0.03em'
+                          }}
+                        >
                           {call.contact.practice} • {formatDuration(call.duration)}
                         </Typography>
-                        <Stack direction="row" spacing={0.5}>
+                        <Stack direction="row" spacing={0.5} flexWrap="wrap">
                           {call.tags.slice(0, 2).map((tag) => (
                             <Chip
                               key={tag}
-                              label={tag}
+                              label={tag.toUpperCase()}
                               size="small"
-                              sx={{ height: 20, fontSize: '0.7rem' }}
+                              sx={{ 
+                                height: 18, 
+                                fontSize: '0.65rem',
+                                letterSpacing: '0.05em',
+                                backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                                color: theme.palette.primary.main,
+                                border: 'none'
+                              }}
                             />
                           ))}
+                          {call.outcome && (
+                            <Chip
+                              label={call.outcome.toUpperCase()}
+                              size="small"
+                              sx={{ 
+                                height: 18, 
+                                fontSize: '0.65rem',
+                                letterSpacing: '0.05em',
+                                backgroundColor: alpha(getOutcomeColor(call.outcome), 0.1),
+                                color: getOutcomeColor(call.outcome),
+                                border: 'none'
+                              }}
+                            />
+                          )}
                         </Stack>
                       </Stack>
                     }
@@ -244,18 +371,18 @@ const DemoCallVault: React.FC = () => {
                 </ListItem>
               ))}
             </List>
-          </Paper>
-        </Grid>
+                </Box>
+              </Monolith>
+            </Grid>
 
-        {/* Center Column - Conference Phone */}
-        <Grid item xs={12} md={8}>
-          <Paper 
-            sx={{ 
-              p: 3,
-              backgroundColor: alpha(theme.palette.background.paper, 0.5),
-              backdropFilter: 'blur(10px)'
-            }}
-          >
+            {/* Center Column - Conference Phone */}
+            <Grid item xs={12} md={8}>
+              <Monolith
+                variant="obsidian"
+                elevation="elevated"
+                hover="none"
+                fullHeight
+              >
             <ConferencePhone
               isConnected={isPlaying}
               isMuted={isMuted}
@@ -279,7 +406,16 @@ const DemoCallVault: React.FC = () => {
             {/* Current Transcript */}
             {selectedCall && currentTranscriptIndex < selectedCall.transcript.length && (
               <Box sx={{ mt: 3 }}>
-                <Typography variant="h6" sx={{ mb: 2 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    mb: 2,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    fontWeight: 300,
+                    fontSize: '0.875rem'
+                  }}
+                >
                   Live Transcription
                 </Typography>
                 <Box
@@ -343,24 +479,40 @@ const DemoCallVault: React.FC = () => {
                 </Grid>
               </Grid>
             )}
-          </Paper>
-        </Grid>
-      </Grid>
+              </Monolith>
+            </Grid>
+          </Grid>
 
-      {/* Demo Mode Info */}
-      <Box sx={{ mt: 4, textAlign: 'center' }}>
-        <Typography variant="body2" color="text.secondary">
-          This is a demo mode showcasing realistic sales conversations. 
-          <Button
-            size="small"
-            sx={{ ml: 1 }}
-            onClick={() => navigate('/auth')}
-          >
-            Sign in for live calling
-          </Button>
-        </Typography>
-      </Box>
-    </Container>
+          <Gallery.Space height={60} />
+
+          {/* Demo Mode Info */}
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography 
+              variant="body2" 
+              sx={{
+                color: theme.palette.text.secondary,
+                letterSpacing: '0.05em'
+              }}
+            >
+              This is a demo mode showcasing realistic sales conversations. 
+              <Button
+                size="small"
+                sx={{ 
+                  ml: 1,
+                  letterSpacing: '0.05em',
+                  '&:hover': {
+                    color: theme.palette.primary.main,
+                  }
+                }}
+                onClick={() => navigate('/login')}
+              >
+                Sign in for live calling
+              </Button>
+            </Typography>
+          </Box>
+        </Box>
+      </Fade>
+    </GalleryContainer>
   );
 };
 

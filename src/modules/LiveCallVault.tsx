@@ -27,7 +27,8 @@ import {
   DialogTitle,
   DialogContent,
   TextField,
-  DialogActions
+  DialogActions,
+  Fade
 } from '@mui/material';
 import {
   Phone as PhoneIcon,
@@ -42,7 +43,10 @@ import {
   Transcribe as TranscribeIcon,
   CallEnd as CallEndIcon,
   Add as AddIcon,
-  Refresh as RefreshIcon
+  Refresh as RefreshIcon,
+  CheckCircle as SuccessIcon,
+  Schedule as FollowUpIcon,
+  Block as ObjectionIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
@@ -54,6 +58,8 @@ import {
   initializeTwilioDevice 
 } from '../services/twilio/twilioService';
 import { formatDuration } from '../mock/callVault';
+import { Gallery, GalleryContainer, Monolith } from '../components/gallery';
+import glassEffects from '../themes/glassEffects';
 
 interface TwilioCall {
   id: string;
@@ -243,66 +249,123 @@ const LiveCallVault: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Button
-          onClick={() => navigate('/command-room')}
-          sx={{ mb: 2, color: theme.palette.text.secondary }}
-        >
-          ← Back to Command Room
-        </Button>
-        
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Box>
-            <Typography variant="h3" sx={{ fontWeight: 200, mb: 1 }}>
-              CallVault Conference System
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Your Twilio-powered call recording and analytics center
-            </Typography>
-          </Box>
-          
-          <Stack direction="row" spacing={2}>
+    <GalleryContainer>
+      <Fade in timeout={800}>
+        <Box>
+          {/* Header */}
+          <Box sx={{ mb: 4 }}>
             <Button
-              variant="outlined"
-              startIcon={<RefreshIcon />}
-              onClick={fetchCallsAndRecordings}
-            >
-              Refresh
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setNewCallDialogOpen(true)}
-              sx={{
-                background: 'linear-gradient(135deg, var(--phone-amber), var(--phone-amber-glow))',
+              onClick={() => navigate('/command-room')}
+              sx={{ 
+                mb: 2, 
+                color: theme.palette.text.secondary,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                fontSize: '0.875rem',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, var(--phone-amber-glow), var(--phone-amber))'
+                  color: theme.palette.primary.main,
                 }
               }}
             >
-              New Call
+              ← Back to Command Room
             </Button>
-          </Stack>
-        </Stack>
-      </Box>
+            
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Box>
+                <Typography 
+                  variant="h2" 
+                  sx={{ 
+                    fontWeight: 100, 
+                    mb: 1,
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    fontSize: { xs: '2rem', md: '3rem' }
+                  }}
+                >
+                  CALLVAULT ARCHIVE
+                </Typography>
+                <Typography 
+                  variant="body1" 
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    letterSpacing: '0.05em',
+                    opacity: 0.8
+                  }}
+                >
+                  Twilio-powered call recording and analytics center
+                </Typography>
+              </Box>
+              
+              <Stack direction="row" spacing={2}>
+                <Button
+                  variant="outlined"
+                  startIcon={<RefreshIcon />}
+                  onClick={fetchCallsAndRecordings}
+                  sx={{
+                    borderColor: alpha(theme.palette.primary.main, 0.3),
+                    color: theme.palette.text.primary,
+                    letterSpacing: '0.1em',
+                    '&:hover': {
+                      borderColor: theme.palette.primary.main,
+                      backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                    }
+                  }}
+                >
+                  Refresh
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => setNewCallDialogOpen(true)}
+                  sx={{
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.8)})`,
+                    letterSpacing: '0.1em',
+                    '&:hover': {
+                      background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.8)}, ${theme.palette.primary.main})`,
+                      transform: 'translateY(-1px)',
+                      boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.3)}`
+                    }
+                  }}
+                >
+                  New Call
+                </Button>
+              </Stack>
+            </Stack>
+          </Box>
 
-      <Grid container spacing={3}>
-        {/* Left Column - Call List */}
-        <Grid item xs={12} md={4}>
-          <Paper 
-            sx={{ 
-              p: 2, 
-              backgroundColor: alpha(theme.palette.background.paper, 0.5),
-              backdropFilter: 'blur(10px)',
-              maxHeight: '70vh',
-              overflowY: 'auto'
-            }}
-          >
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Recent Calls
-            </Typography>
+          <Gallery.Space height={40} />
+
+          <Grid container spacing={3}>
+            {/* Left Column - Call List */}
+            <Grid item xs={12} md={4}>
+              <Monolith
+                variant="museum"
+                elevation="elevated"
+                hover="subtle"
+                fullHeight
+                sx={{
+                  maxHeight: '70vh',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  overflow: 'hidden'
+                }}
+              >
+                <Box sx={{ p: 3, pb: 2 }}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      fontWeight: 300
+                    }}
+                  >
+                    Recent Calls
+                  </Typography>
+                </Box>
+                
+                <Divider sx={{ opacity: 0.1 }} />
+                
+                <Box sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
             
             {loading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
@@ -321,42 +384,101 @@ const LiveCallVault: React.FC = () => {
                   return (
                     <ListItem
                       key={call.id}
-                      className={`call-list-item ${selectedCall?.id === call.id ? 'active' : ''}`}
                       onClick={() => setSelectedCall(call)}
-                      sx={{ mb: 1, borderRadius: 2 }}
+                      sx={{ 
+                        mb: 1.5, 
+                        borderRadius: 1,
+                        backgroundColor: selectedCall?.id === call.id 
+                          ? alpha(theme.palette.primary.main, 0.08)
+                          : alpha(theme.palette.background.paper, 0.4),
+                        border: `1px solid ${selectedCall?.id === call.id 
+                          ? alpha(theme.palette.primary.main, 0.2)
+                          : alpha(theme.palette.divider, 0.1)}`,
+                        transition: 'all 0.3s ease',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                          borderColor: alpha(theme.palette.primary.main, 0.15),
+                          transform: 'translateX(4px)',
+                        }
+                      }}
                     >
                       <ListItemAvatar>
-                        <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
+                        <Avatar 
+                          sx={{ 
+                            bgcolor: selectedCall?.id === call.id 
+                              ? theme.palette.primary.main
+                              : alpha(theme.palette.primary.main, 0.2),
+                            transition: 'all 0.3s ease'
+                          }}
+                        >
                           <PhoneIcon />
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText
-                        primary={contactInfo.name}
+                        primary={
+                          <Typography 
+                            variant="body2" 
+                            sx={{ 
+                              fontWeight: selectedCall?.id === call.id ? 600 : 400,
+                              letterSpacing: '0.02em'
+                            }}
+                          >
+                            {contactInfo.name}
+                          </Typography>
+                        }
                         secondary={
                           <Stack spacing={0.5}>
-                            <Typography variant="caption">
+                            <Typography 
+                              variant="caption" 
+                              sx={{ 
+                                opacity: 0.7,
+                                letterSpacing: '0.03em'
+                              }}
+                            >
                               {contactInfo.number} • {formatDuration(call.duration)}
                             </Typography>
-                            <Stack direction="row" spacing={0.5}>
+                            <Stack direction="row" spacing={0.5} flexWrap="wrap">
                               <Chip
-                                label={call.direction}
+                                label={call.direction.toUpperCase()}
                                 size="small"
-                                sx={{ height: 20, fontSize: '0.7rem' }}
+                                sx={{ 
+                                  height: 18, 
+                                  fontSize: '0.65rem',
+                                  letterSpacing: '0.05em',
+                                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                                  color: theme.palette.primary.main,
+                                  border: 'none'
+                                }}
                               />
                               {recording && (
                                 <Chip
-                                  label="Recording"
+                                  label="RECORDING"
                                   size="small"
-                                  icon={<PlayIcon sx={{ fontSize: 12 }} />}
-                                  sx={{ height: 20, fontSize: '0.7rem' }}
+                                  icon={<PlayIcon sx={{ fontSize: 10 }} />}
+                                  sx={{ 
+                                    height: 18, 
+                                    fontSize: '0.65rem',
+                                    letterSpacing: '0.05em',
+                                    backgroundColor: alpha(theme.palette.success.main, 0.1),
+                                    color: theme.palette.success.main,
+                                    border: 'none'
+                                  }}
                                 />
                               )}
                               {recording?.transcription_text && (
                                 <Chip
-                                  label="Transcript"
+                                  label="TRANSCRIPT"
                                   size="small"
-                                  icon={<TranscribeIcon sx={{ fontSize: 12 }} />}
-                                  sx={{ height: 20, fontSize: '0.7rem' }}
+                                  icon={<TranscribeIcon sx={{ fontSize: 10 }} />}
+                                  sx={{ 
+                                    height: 18, 
+                                    fontSize: '0.65rem',
+                                    letterSpacing: '0.05em',
+                                    backgroundColor: alpha(theme.palette.info.main, 0.1),
+                                    color: theme.palette.info.main,
+                                    border: 'none'
+                                  }}
                                 />
                               )}
                             </Stack>
@@ -368,18 +490,18 @@ const LiveCallVault: React.FC = () => {
                 })}
               </List>
             )}
-          </Paper>
-        </Grid>
+                </Box>
+              </Monolith>
+            </Grid>
 
-        {/* Center Column - Conference Phone */}
-        <Grid item xs={12} md={8}>
-          <Paper 
-            sx={{ 
-              p: 3,
-              backgroundColor: alpha(theme.palette.background.paper, 0.5),
-              backdropFilter: 'blur(10px)'
-            }}
-          >
+            {/* Center Column - Conference Phone */}
+            <Grid item xs={12} md={8}>
+              <Monolith
+                variant="obsidian"
+                elevation="elevated"
+                hover="none"
+                fullHeight
+              >
             <ConferencePhone
               isConnected={isCallActive}
               isMuted={isMuted}
@@ -448,49 +570,101 @@ const LiveCallVault: React.FC = () => {
                 )}
               </Box>
             )}
-          </Paper>
-        </Grid>
-      </Grid>
+              </Monolith>
+            </Grid>
+          </Grid>
 
-      {/* New Call Dialog */}
-      <Dialog
-        open={newCallDialogOpen}
-        onClose={() => setNewCallDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Make a New Call</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Phone Number"
-            type="tel"
+          {/* New Call Dialog */}
+          <Dialog
+            open={newCallDialogOpen}
+            onClose={() => setNewCallDialogOpen(false)}
+            maxWidth="sm"
             fullWidth
-            variant="outlined"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            placeholder="+1 (555) 123-4567"
-            sx={{ mt: 2 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setNewCallDialogOpen(false)}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleMakeCall}
-            variant="contained"
-            disabled={!phoneNumber}
-            sx={{
-              background: 'linear-gradient(135deg, var(--phone-amber), var(--phone-amber-glow))'
+            PaperProps={{
+              sx: {
+                ...glassEffects.effects.obsidian,
+                borderRadius: 1,
+              }
             }}
           >
-            Call
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+            <DialogTitle 
+              sx={{ 
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                fontWeight: 300,
+                borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`
+              }}
+            >
+              Make a New Call
+            </DialogTitle>
+            <DialogContent sx={{ mt: 3 }}>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Phone Number"
+                type="tel"
+                fullWidth
+                variant="outlined"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="+1 (555) 123-4567"
+                sx={{ 
+                  mt: 2,
+                  '& .MuiOutlinedInput-root': {
+                    letterSpacing: '0.05em',
+                    '& fieldset': {
+                      borderColor: alpha(theme.palette.primary.main, 0.2),
+                    },
+                    '&:hover fieldset': {
+                      borderColor: alpha(theme.palette.primary.main, 0.3),
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme.palette.primary.main,
+                    },
+                  },
+                  '& .MuiInputLabel-root': {
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    fontSize: '0.875rem',
+                  }
+                }}
+              />
+            </DialogContent>
+            <DialogActions sx={{ p: 3, pt: 0 }}>
+              <Button 
+                onClick={() => setNewCallDialogOpen(false)}
+                sx={{
+                  letterSpacing: '0.1em',
+                  color: theme.palette.text.secondary,
+                  '&:hover': {
+                    color: theme.palette.text.primary,
+                  }
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleMakeCall}
+                variant="contained"
+                disabled={!phoneNumber}
+                sx={{
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.8)})`,
+                  letterSpacing: '0.1em',
+                  px: 3,
+                  '&:hover': {
+                    background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.8)}, ${theme.palette.primary.main})`,
+                    transform: 'translateY(-1px)',
+                    boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.3)}`
+                  }
+                }}
+              >
+                Call
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Box>
+      </Fade>
+    </GalleryContainer>
   );
 };
 
