@@ -338,11 +338,7 @@ const LiveCallVault: React.FC = () => {
           <Grid container spacing={3}>
             {/* Left Column - Call List */}
             <Grid item xs={12} md={4}>
-              <Monolith
-                variant="museum"
-                elevation="elevated"
-                hover="subtle"
-                fullHeight
+              <Box
                 sx={{
                   maxHeight: '70vh',
                   display: 'flex',
@@ -350,6 +346,12 @@ const LiveCallVault: React.FC = () => {
                   overflow: 'hidden'
                 }}
               >
+                <Monolith
+                  variant="museum"
+                  elevation="elevated"
+                  hover="subtle"
+                  fullHeight
+                >
                 <Box sx={{ p: 3, pb: 2 }}>
                   <Typography 
                     variant="h6" 
@@ -491,7 +493,8 @@ const LiveCallVault: React.FC = () => {
               </List>
             )}
                 </Box>
-              </Monolith>
+                </Monolith>
+              </Box>
             </Grid>
 
             {/* Center Column - Conference Phone */}
