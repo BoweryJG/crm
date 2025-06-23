@@ -86,6 +86,12 @@ export class AIInsightsService {
    * Analyze a single call for insights
    */
   private static analyzeCallForInsights(call: CallAnalysis, linguistics: LinguisticsAnalysis): AIInsight | null {
+    // Early return if linguistics data is invalid
+    if (!linguistics || typeof linguistics !== 'object') {
+      console.warn('Invalid linguistics data provided to analyzeCallForInsights');
+      return null;
+    }
+
     const indicators: string[] = [];
     let type: AIInsight['type'] = 'sentiment_shift';
     let priority: AIInsight['priority'] = 'low';
