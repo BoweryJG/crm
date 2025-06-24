@@ -242,6 +242,13 @@ const SignUpButton = styled(Button)<{ themeColors: any }>(({ theme, themeColors 
   letterSpacing: '0.5px',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   border: `1px solid ${alpha(themeColors.primary, 0.2)}`,
+  flexShrink: 0, // Prevent button from shrinking
+  minWidth: 'fit-content', // Ensure button fits its content
+  whiteSpace: 'nowrap', // Prevent text wrapping
+  [theme.breakpoints.down('sm')]: {
+    padding: '3px 12px', // Slightly less padding on mobile
+    fontSize: '0.75rem', // Slightly smaller font on mobile
+  },
   '&:hover': {
     background: typeof themeColors.buttonHover === 'string' ? themeColors.buttonHover : themeColors.primaryDark,
     transform: 'translateY(-1px)',
@@ -454,8 +461,9 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
         <SearchBar 
           themeColors={themeColors}
           sx={{ 
-            flex: { xs: 1, md: 'unset' },
-            maxWidth: { md: 400 } 
+            flex: { xs: '1 1 auto', md: 'unset' },
+            maxWidth: { xs: 'calc(100% - 120px)', md: 400 }, // Leave space for sign up button on mobile
+            minWidth: { xs: 0, sm: 200 } // Allow shrinking on mobile
           }}
         >
           <SearchIcon 
