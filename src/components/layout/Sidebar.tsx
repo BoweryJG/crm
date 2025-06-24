@@ -64,7 +64,8 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
       title: 'Command Center',
       items: [
         { title: 'Dashboard', path: '/', icon: <DashboardIcon /> },
-        { title: 'Command Room', path: '/command-room', icon: <MuseumIcon /> }
+        { title: 'Command Room', path: '/command-room', icon: <MuseumIcon /> },
+        { title: 'Command Center', path: '/command-center', icon: <DashboardIcon /> }
       ]
     },
     {

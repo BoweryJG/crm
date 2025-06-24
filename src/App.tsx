@@ -50,6 +50,7 @@ const Settings = lazy(() => import('./pages/Settings'));
 const Profile = lazy(() => import('./pages/Profile'));
 const RipplePage = lazy(() => import('./pages/RipplePage'));
 const CommandRoom = lazy(() => import('./pages/CommandRoom'));
+const CommandCenter = lazy(() => import('./pages/CommandCenter'));
 const CallVaultPage = lazy(() => import('./pages/CallVaultPage'));
 const MobileTest = lazy(() => import('./pages/MobileTest'));
 
@@ -146,6 +147,7 @@ const App: React.FC = () => {
                 }>
                 <Route index element={<Dashboard />} />
                 <Route path="command-room" element={<Suspense fallback={<PremiumLoadingScreen loadingText="GALLERY" message="Curating your dominance" minimumDuration={2500} />}><CommandRoom /></Suspense>} />
+                <Route path="command-center" element={<Suspense fallback={<PremiumLoadingScreen loadingText="COMMAND CENTER" message="Initializing control systems" minimumDuration={2500} />}><CommandCenter /></Suspense>} />
                 <Route path="relationships" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="SMART CRM" message="INITIALIZING AI INTELLIGENCE" />}><SmartCRM /></React.Suspense>} />
                 <Route path="contacts" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="CONTACTS" message="NEURAL DATABASE SYNC" />}><Contacts /></React.Suspense>} />
                 <Route path="contacts/:id" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="PROFILE" message="EXTRACTING DATA MATRIX" />}><ContactDetail /></React.Suspense>} />
