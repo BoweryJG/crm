@@ -37,7 +37,8 @@ import { useAuth } from '../auth';
 import { useThemeContext } from '../themes/ThemeContext';
 import MissionControlHub from '../components/dashboard/MissionControlHub';
 import OperationsCenter from '../components/dashboard/OperationsCenter';
-import ContentForge from '../modules/intelligence/components/ContentForge';
+import AutomationHub from '../components/automation/AutomationHub';
+import ContentForgeHub from '../components/content/ContentForgeHub';
 import glassEffects from '../themes/glassEffects';
 import animations from '../themes/animations';
 
@@ -325,144 +326,11 @@ const CommandCenter: React.FC = () => {
         </TabPanel>
 
         <TabPanel value={activeTab} index={2}>
-          <Box sx={{ mb: 4 }}>
-            <Typography
-              variant="overline"
-              sx={{
-                color: theme.palette.primary.main,
-                letterSpacing: '0.3em',
-                display: 'block',
-                mb: 1,
-              }}
-            >
-              PROCESS AUTOMATION
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 200, letterSpacing: '0.05em', mb: 2 }}>
-              Automation Hub
-            </Typography>
-            <Typography variant="body1" sx={{ color: theme.palette.text.secondary, mb: 4 }}>
-              Manage automated workflows and scheduled activities
-            </Typography>
-          </Box>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <Paper
-                elevation={0}
-                sx={{
-                  ...glassEffects.effects.obsidian,
-                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                  borderRadius: 0,
-                  p: 3,
-                }}
-              >
-                <Typography variant="h6" sx={{ mb: 2, letterSpacing: '0.05em' }}>
-                  Research Automation
-                </Typography>
-                <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 3 }}>
-                  Automate research workflows including data collection, analysis, and report generation.
-                </Typography>
-                <Button
-                  variant="outlined"
-                  startIcon={<AutomationIcon />}
-                  onClick={() => navigate('/research')}
-                  sx={{ borderRadius: 0 }}
-                >
-                  Go to Research
-                </Button>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Paper
-                elevation={0}
-                sx={{
-                  ...glassEffects.effects.obsidian,
-                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                  borderRadius: 0,
-                  p: 3,
-                }}
-              >
-                <Typography variant="h6" sx={{ mb: 2, letterSpacing: '0.05em' }}>
-                  Content Generation
-                </Typography>
-                <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 3 }}>
-                  Automated content creation for emails, proposals, and marketing materials.
-                </Typography>
-                <Button
-                  variant="outlined"
-                  startIcon={<ContentForgeIcon />}
-                  onClick={() => setActiveTab(3)}
-                  sx={{ borderRadius: 0 }}
-                >
-                  Open Content Forge
-                </Button>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Paper
-                elevation={0}
-                sx={{
-                  ...glassEffects.effects.obsidian,
-                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                  borderRadius: 0,
-                  p: 3,
-                }}
-              >
-                <Typography variant="h6" sx={{ mb: 2, letterSpacing: '0.05em' }}>
-                  Scheduled Activities
-                </Typography>
-                <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 3 }}>
-                  Set up recurring tasks, follow-ups, and automated outreach campaigns.
-                </Typography>
-                <Chip label="Coming Soon" size="small" sx={{ mt: 1 }} />
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Paper
-                elevation={0}
-                sx={{
-                  ...glassEffects.effects.obsidian,
-                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                  borderRadius: 0,
-                  p: 3,
-                }}
-              >
-                <Typography variant="h6" sx={{ mb: 2, letterSpacing: '0.05em' }}>
-                  Workflow Builder
-                </Typography>
-                <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 3 }}>
-                  Create custom automation workflows with triggers, conditions, and actions.
-                </Typography>
-                <Chip label="Coming Soon" size="small" sx={{ mt: 1 }} />
-              </Paper>
-            </Grid>
-          </Grid>
+          <AutomationHub />
         </TabPanel>
 
         <TabPanel value={activeTab} index={3}>
-          <Box sx={{ mb: 4 }}>
-            <Typography
-              variant="overline"
-              sx={{
-                color: theme.palette.primary.main,
-                letterSpacing: '0.3em',
-                display: 'block',
-                mb: 1,
-              }}
-            >
-              CONTENT CREATION
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 200, letterSpacing: '0.05em', mb: 2 }}>
-              Content Forge
-            </Typography>
-            <Typography variant="body1" sx={{ color: theme.palette.text.secondary, mb: 4 }}>
-              AI-powered content generation for all communication needs
-            </Typography>
-          </Box>
-          <ContentForge />
+          <ContentForgeHub />
         </TabPanel>
       </Box>
     </Box>
