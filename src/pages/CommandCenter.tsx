@@ -7,6 +7,9 @@ import {
   Stack,
   Fade,
   Paper,
+  Grid,
+  Button,
+  Chip,
   useTheme,
   useMediaQuery,
   IconButton,
@@ -34,7 +37,6 @@ import { useAuth } from '../auth';
 import { useThemeContext } from '../themes/ThemeContext';
 import MissionControlHub from '../components/dashboard/MissionControlHub';
 import OperationsCenter from '../components/dashboard/OperationsCenter';
-import AutomationButton from '../components/research/AutomationButton';
 import ContentForge from '../modules/intelligence/components/ContentForge';
 import glassEffects from '../themes/glassEffects';
 import animations from '../themes/animations';
@@ -342,31 +344,102 @@ const CommandCenter: React.FC = () => {
               Manage automated workflows and scheduled activities
             </Typography>
           </Box>
-          <Paper
-            elevation={0}
-            sx={{
-              ...glassEffects.effects.obsidian,
-              backgroundColor: alpha(theme.palette.background.paper, 0.5),
-              border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-              borderRadius: 0,
-              p: 4,
-              textAlign: 'center',
-            }}
-          >
-            <Typography variant="h6" sx={{ mb: 3, letterSpacing: '0.05em' }}>
-              Automation Workflows
-            </Typography>
-            <AutomationButton
-              documentId="demo"
-              isEditing={false}
-              onWorkflowComplete={(workflowId) => {
-                console.log('Workflow completed:', workflowId);
-              }}
-            />
-            <Typography variant="body2" sx={{ mt: 4, color: theme.palette.text.secondary }}>
-              Configure and manage automated research, content generation, and outreach workflows
-            </Typography>
-          </Paper>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Paper
+                elevation={0}
+                sx={{
+                  ...glassEffects.effects.obsidian,
+                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                  borderRadius: 0,
+                  p: 3,
+                }}
+              >
+                <Typography variant="h6" sx={{ mb: 2, letterSpacing: '0.05em' }}>
+                  Research Automation
+                </Typography>
+                <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 3 }}>
+                  Automate research workflows including data collection, analysis, and report generation.
+                </Typography>
+                <Button
+                  variant="outlined"
+                  startIcon={<AutomationIcon />}
+                  onClick={() => navigate('/research')}
+                  sx={{ borderRadius: 0 }}
+                >
+                  Go to Research
+                </Button>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Paper
+                elevation={0}
+                sx={{
+                  ...glassEffects.effects.obsidian,
+                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                  borderRadius: 0,
+                  p: 3,
+                }}
+              >
+                <Typography variant="h6" sx={{ mb: 2, letterSpacing: '0.05em' }}>
+                  Content Generation
+                </Typography>
+                <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 3 }}>
+                  Automated content creation for emails, proposals, and marketing materials.
+                </Typography>
+                <Button
+                  variant="outlined"
+                  startIcon={<ContentForgeIcon />}
+                  onClick={() => setActiveTab(3)}
+                  sx={{ borderRadius: 0 }}
+                >
+                  Open Content Forge
+                </Button>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Paper
+                elevation={0}
+                sx={{
+                  ...glassEffects.effects.obsidian,
+                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                  borderRadius: 0,
+                  p: 3,
+                }}
+              >
+                <Typography variant="h6" sx={{ mb: 2, letterSpacing: '0.05em' }}>
+                  Scheduled Activities
+                </Typography>
+                <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 3 }}>
+                  Set up recurring tasks, follow-ups, and automated outreach campaigns.
+                </Typography>
+                <Chip label="Coming Soon" size="small" sx={{ mt: 1 }} />
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Paper
+                elevation={0}
+                sx={{
+                  ...glassEffects.effects.obsidian,
+                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                  borderRadius: 0,
+                  p: 3,
+                }}
+              >
+                <Typography variant="h6" sx={{ mb: 2, letterSpacing: '0.05em' }}>
+                  Workflow Builder
+                </Typography>
+                <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 3 }}>
+                  Create custom automation workflows with triggers, conditions, and actions.
+                </Typography>
+                <Chip label="Coming Soon" size="small" sx={{ mt: 1 }} />
+              </Paper>
+            </Grid>
+          </Grid>
         </TabPanel>
 
         <TabPanel value={activeTab} index={3}>
