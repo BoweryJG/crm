@@ -250,7 +250,7 @@ const BrandEmboss = styled(Box)<{ nightMode?: boolean }>(({ nightMode }) => ({
   position: 'absolute',
   top: '50px',
   left: '50%',
-  transform: 'translateX(-50%)',
+  transform: 'translateX(-50%) translateZ(0)', // Hardware acceleration
   fontFamily: '"Cinzel", serif',
   textTransform: 'uppercase',
   fontSize: '10px',
@@ -277,7 +277,6 @@ const BrandEmboss = styled(Box)<{ nightMode?: boolean }>(({ nightMode }) => ({
   opacity: nightMode ? 0.8 : 0.65,
   animation: `${sweep} 8s linear infinite`,
   willChange: 'background-position',
-  transform: 'translateX(-50%) translateZ(0)', // Hardware acceleration
   zIndex: 2,
   pointerEvents: 'none',
 }));
