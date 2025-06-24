@@ -121,7 +121,9 @@ class ComprehensiveAutomationService {
 
       const activeWorkflows = workflowStats.data?.filter(w => w.status === WorkflowStatus.ACTIVE).length || 0;
       const scheduledTasks = workflowStats.data?.filter(w => w.status === WorkflowStatus.SCHEDULED).length || 0;
-      const avgSuccessRate = workflowStats.data?.reduce((acc, w) => acc + (w.success_rate || 0), 0) / (workflowStats.data?.length || 1);
+      const successRateSum = workflowStats.data?.reduce((acc, w) => acc + (w.success_rate || 0), 0) || 0;
+      const workflowCount = workflowStats.data?.length || 1;
+      const avgSuccessRate = successRateSum / workflowCount;
       
       // Calculate time saved (mock calculation - would need real metrics)
       const tasksCreated = taskStats.data?.length || 0;
