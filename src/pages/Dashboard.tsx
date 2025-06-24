@@ -87,12 +87,12 @@ const Dashboard: React.FC = () => {
         </Typography>
       </Box>
 
-      {/* Mission Control - MOVED TO TOP POSITION */}
+      {/* Mission Control Hub - 4 SWIPABLE CARDS - MOVED TO TOP */}
       <Box sx={{ mb: 4 }}>
         <Suspense fallback={
-          <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
+          <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />
         }>
-          <CartierBlended live={false} />
+          <MissionControlHub />
         </Suspense>
       </Box>
 
@@ -261,28 +261,23 @@ const Dashboard: React.FC = () => {
         <DashboardStats />
       </Box>
 
-      {/* Mobile: Mission Control Hub - Consolidated view */}
-      {/* Desktop: Original separate components */}
-      {isMobile ? (
-        <Box sx={{ mb: 4 }}>
-          <Suspense fallback={
-            <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />
-          }>
-            <MissionControlHub />
-          </Suspense>
-        </Box>
-      ) : (
-        <>
-          {/* Now Cards Stack - Mission Control moved to top */}
-          <Box sx={{ mb: 4 }}>
-            <Suspense fallback={
-              <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />
-            }>
-              <NowCardsStack />
-            </Suspense>
-          </Box>
-        </>
-      )}
+      {/* Now Cards Stack */}
+      <Box sx={{ mb: 4 }}>
+        <Suspense fallback={
+          <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />
+        }>
+          <NowCardsStack />
+        </Suspense>
+      </Box>
+      
+      {/* Mission Progress - Cartier Blended */}
+      <Box sx={{ mb: 4 }}>
+        <Suspense fallback={
+          <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
+        }>
+          <CartierBlended live={false} />
+        </Suspense>
+      </Box>
 
       {/* Mobile: Operations Center - Consolidated communications */}
       {/* Desktop: Original QuickCallWidget */}
