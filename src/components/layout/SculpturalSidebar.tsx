@@ -7,26 +7,17 @@ import {
   Box,
   Drawer,
   Typography,
-  IconButton,
-  Collapse,
   useTheme,
   alpha,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
-  Museum as MuseumIcon,
   People as PeopleIcon,
-  Create as CreateIcon,
-  Search as SearchIcon,
   Phone as PhoneIcon,
   TrendingUp as TrendingUpIcon,
   Settings as SettingsIcon,
-  ChevronRight as ChevronIcon,
-  AutoAwesome as SparkleIcon,
-  Hexagon as HexIcon,
   Architecture as ArchitectureIcon,
   Psychology as PsychologyIcon,
-  School as SchoolIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
@@ -57,21 +48,10 @@ const MonolithTab: React.FC<{
   
   return (
     <Box
-      onClick={(e) => {
-        // Add mechanical click effect
-        const element = e.currentTarget;
-        element.style.transform = 'skewX(-5deg) translateX(3px) scale(0.98)';
-        
-        // Play sound and navigate
+      onClick={() => {
+        // Instant click feedback
         clickSound.play();
         onClick();
-        
-        // Spring back animation
-        setTimeout(() => {
-          if (element) {
-            element.style.transform = isActive ? 'skewX(-5deg) translateX(5px)' : 'skewX(-3deg)';
-          }
-        }, 100);
       }}
       onMouseEnter={React.useCallback(() => setIsHovered(true), [])}
       onMouseLeave={React.useCallback(() => setIsHovered(false), [])}
@@ -79,148 +59,74 @@ const MonolithTab: React.FC<{
         position: 'relative',
         cursor: 'pointer',
         overflow: 'hidden',
-        willChange: 'transform, background-color, box-shadow, border-left',
-        // Single, smooth mechanical transition
-        transition: `all ${animations.durations.instant}ms ${animations.easings.metal}`,
-        transitionDelay: '0ms',
-        // Add transform-origin for weighted feel
+        willChange: 'transform',
+        // Ultra-fast transitions for instant feedback
+        transition: 'transform 100ms cubic-bezier(0.4, 0, 0.2, 1), background-color 150ms ease-out',
         transformOrigin: 'left center',
         
-        // Base shape with skew
-        transform: isActive ? 'skewX(-5deg) translateX(5px)' : 'skewX(-3deg)',
+        // Simplified transform for performance
+        transform: isActive ? 'translateX(5px)' : 'translateX(0)',
         
-        // Glass effect base
+        // Simplified background
         backgroundColor: isActive 
-          ? alpha(theme.palette.primary.main, 0.15)
+          ? alpha(theme.palette.primary.main, 0.12)
+          : isHovered 
+          ? alpha(theme.palette.primary.main, 0.08)
           : alpha(theme.palette.background.paper, 0.03),
-        backdropFilter: 'blur(10px)',
         
-        // Borders and shadows for depth
+        // Simple border
         borderLeft: isActive 
-          ? `6px solid ${theme.palette.primary.main}`
-          : `2px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+          ? `4px solid ${theme.palette.primary.main}`
+          : `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+        
+        // Reduced shadows for performance
         boxShadow: isActive
-          ? `0 10px 40px ${alpha(theme.palette.primary.main, 0.3)}, inset 0 0 0 1px ${alpha(theme.palette.primary.main, 0.2)}`
-          : theme.palette.mode === 'dark'
-          ? `0 4px 20px ${alpha('#000', 0.4)}`
-          : `0 4px 20px ${alpha('#000', 0.1)}`,
+          ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
+          : 'none',
         
         // Padding and spacing
         px: 3,
-        py: 0.75, // Even more reduced
-        mb: 0, // No margin between tabs
+        py: 1,
+        mb: 0.5,
         mx: 2,
         
-        // Hover effects - mechanical precision
+        // Instant hover feedback
         '&:hover': {
           transform: isActive 
-            ? 'skewX(-5deg) translateX(5px) scale(1.02)' 
-            : 'skewX(-4deg) translateX(12px) scale(1.05)',
+            ? 'translateX(5px)' 
+            : 'translateX(3px)',
           backgroundColor: alpha(theme.palette.primary.main, 0.12),
-          borderLeftWidth: '5px',
           borderLeftColor: theme.palette.primary.main,
-          boxShadow: `
-            0 20px 60px ${alpha(theme.palette.primary.main, 0.3)}, 
-            inset 0 0 30px ${alpha(theme.palette.primary.main, 0.15)},
-            inset -2px 0 10px ${alpha(theme.palette.primary.main, 0.2)}
-          `,
         },
         
-        // Gold accent line
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '1px',
-          background: `linear-gradient(90deg, ${theme.palette.primary.main}, transparent)`,
-          opacity: isActive ? 1 : 0,
-          transition: `opacity ${animations.durations.instant}ms ease`,
-        },
-        
-        // Hover glow effect
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          top: '50%',
-          left: '-50%',
-          width: '200%',
-          height: '200%',
-          background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.1)} 0%, transparent 70%)`,
-          transform: 'translateY(-50%)',
-          opacity: isHovered ? 1 : 0,
-          transition: `opacity ${animations.durations.instant}ms ease`,
-          pointerEvents: 'none',
-        },
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', transform: 'skewX(3deg)' }}>
-        {/* Icon with geometric enhancement */}
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        {/* Simplified icon */}
         <Box
           sx={{
-            position: 'relative',
             mr: 2,
             color: isActive ? theme.palette.primary.main : theme.palette.text.secondary,
-            transition: `all ${animations.durations.instant}ms ${animations.easings.metal}`,
-            transform: isActive ? 'scale(1.2)' : 'scale(1)',
-            filter: isActive ? `drop-shadow(0 0 8px ${theme.palette.primary.main})` : 'none',
-            
-            // Icon container shape
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: '-4px',
-              left: '-4px',
-              right: '-4px',
-              bottom: '-4px',
-              border: `1px solid ${alpha(theme.palette.primary.main, isActive ? 0.3 : 0.1)}`,
-              transform: 'rotate(45deg)',
-              transition: `all ${animations.durations.instant}ms ${animations.easings.metal}`,
-            },
+            transition: 'color 150ms ease-out',
           }}
         >
           {icon}
         </Box>
         
-        {/* Text with artistic treatment */}
+        {/* Simplified text */}
         <Typography
           variant="body2"
           sx={{
-            fontWeight: isActive ? 800 : 100,
-            letterSpacing: isActive ? '0.2em' : '0.1em',
+            fontWeight: isActive ? 600 : 400,
+            letterSpacing: '0.05em',
             textTransform: 'uppercase',
             color: isActive ? theme.palette.text.primary : theme.palette.text.secondary,
-            transition: `all ${animations.durations.instant}ms ${animations.easings.metal}`,
-            textShadow: isActive ? `0 0 20px ${alpha(theme.palette.primary.main, 0.5)}` : 'none',
+            transition: 'all 150ms ease-out',
           }}
         >
           {title}
         </Typography>
         
-        {/* Active indicator */}
-        {isActive && (
-          <Box
-            sx={{
-              ml: 'auto',
-              width: 8,
-              height: 8,
-              backgroundColor: theme.palette.primary.main,
-              boxShadow: `0 0 10px ${theme.palette.primary.main}`,
-              animation: `pulse 2s ease-in-out infinite`,
-              '@keyframes pulse': {
-                '0%, 100%': {
-                  opacity: 1,
-                  transform: 'scale(1)',
-                },
-                '50%': {
-                  opacity: 0.8,
-                  transform: 'scale(1.2)',
-                },
-              },
-            }}
-          />
-        )}
       </Box>
     </Box>
   );
@@ -279,72 +185,42 @@ const NavigationSection: React.FC<{
   items: Array<{ title: string; path: string; icon: React.ReactNode }>;
   onNavigate: (path: string) => void;
   currentPath: string;
-  collapsible?: boolean;
-  defaultOpen?: boolean;
   delayOffset?: number;
-}> = ({ title, items, onNavigate, currentPath, collapsible = false, defaultOpen = true, delayOffset = 0 }) => {
+}> = ({ title, items, onNavigate, currentPath, delayOffset = 0 }) => {
   const theme = useTheme();
-  const [isOpen, setIsOpen] = useState(defaultOpen);
   
   return (
     <Box>
-      <Box
+      <Typography
+        variant="overline"
         sx={{
-          display: 'flex',
-          alignItems: 'center',
           px: 3,
-          py: 0, // No vertical padding
-          cursor: collapsible ? 'pointer' : 'default',
-          transition: 'all 0.3s ease',
-          '&:hover': collapsible ? {
-            backgroundColor: alpha(theme.palette.primary.main, 0.05),
-          } : {},
+          pt: 1,
+          pb: 0.5,
+          letterSpacing: '0.2em',
+          fontWeight: 300,
+          fontSize: '0.6rem',
+          color: alpha(theme.palette.text.secondary, 0.5),
+          textTransform: 'uppercase',
         }}
-        onClick={() => collapsible && setIsOpen(!isOpen)}
       >
-        <Typography
-          variant="overline"
-          sx={{
-            flex: 1,
-            letterSpacing: '0.3em',
-            fontWeight: 300,
-            fontSize: '0.625rem',
-            color: alpha(theme.palette.text.secondary, 0.7),
-            textTransform: 'uppercase',
-          }}
-        >
-          {title}
-        </Typography>
-        {collapsible && (
-          <IconButton
-            size="small"
-            sx={{
-              color: theme.palette.text.secondary,
-              transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-              transition: 'transform 0.3s ease',
-            }}
-          >
-            <ChevronIcon fontSize="small" />
-          </IconButton>
-        )}
-      </Box>
+        {title}
+      </Typography>
       
-      <Collapse in={isOpen} timeout={animations.durations.deliberate}>
-        <Box sx={{ pb: 0 }}> {/* Removed padding */}
-          {items.map((item, index) => (
-            <MonolithTab
-              key={item.path}
-              title={item.title}
-              path={item.path}
-              icon={item.icon}
-              isActive={currentPath === item.path || (item.path !== '/' && currentPath.startsWith(item.path))}
-              onClick={() => onNavigate(item.path)}
-              delay={delayOffset + (index * 50)}
-              soundVariant={index}
-            />
-          ))}
-        </Box>
-      </Collapse>
+      <Box sx={{ pb: 0 }}>
+        {items.map((item, index) => (
+          <MonolithTab
+            key={item.path}
+            title={item.title}
+            path={item.path}
+            icon={item.icon}
+            isActive={currentPath === item.path || (item.path !== '/' && currentPath.startsWith(item.path))}
+            onClick={() => onNavigate(item.path)}
+            delay={delayOffset + (index * 50)}
+            soundVariant={index}
+          />
+        ))}
+      </Box>
     </Box>
   );
 };
@@ -360,14 +236,6 @@ const SculpturalSidebar: React.FC<{
   const location = useLocation();
   const { themeMode, setThemeMode } = useThemeContext();
   
-  // Preload mechanical sounds for instant feedback
-  React.useEffect(() => {
-    const sounds = ['ui-click-primary', 'ui-click-secondary', 'ui-toggle', 'navigation-forward'];
-    sounds.forEach(soundId => {
-      const audio = new Audio(`/sounds/${soundId}.mp3`);
-      audio.load();
-    });
-  }, []);
   
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -379,39 +247,50 @@ const SculpturalSidebar: React.FC<{
     }
   };
   
+  // Simplified navigation - theme-aware labels
+  const getThemeAwareLabel = (key: string) => {
+    const labels: Record<string, Record<string, string>> = {
+      dashboard: {
+        default: 'Dashboard',
+        'boeing-cockpit': 'Flight Deck',
+        'cartier-gold': 'Executive Suite',
+        'gallery-dominance': 'Command Center',
+      },
+      relationships: {
+        default: 'Relationships',
+        'boeing-cockpit': 'Fleet Registry',
+        'cartier-gold': 'Clientele',
+        'gallery-dominance': 'Network',
+      },
+      analytics: {
+        default: 'Analytics',
+        'boeing-cockpit': 'Instruments',
+        'cartier-gold': 'Performance',
+        'gallery-dominance': 'Metrics',
+      },
+      intelligence: {
+        default: 'Intelligence',
+        'boeing-cockpit': 'AI Copilot',
+        'cartier-gold': 'Concierge AI',
+        'gallery-dominance': 'Neural Core',
+      },
+    };
+    
+    return labels[key]?.[themeMode] || labels[key]?.default || key;
+  };
+
   const navigationStructure = [
     {
-      title: 'Command Center',
+      title: 'Core',
       items: [
-        { title: 'Dashboard', path: '/', icon: <DashboardIcon /> },
-        { title: 'Mission Control', path: '/command-room', icon: <ArchitectureIcon /> },
+        { title: getThemeAwareLabel('dashboard'), path: '/', icon: <DashboardIcon /> },
+        { title: getThemeAwareLabel('relationships'), path: '/relationships', icon: <PeopleIcon /> },
+        { title: getThemeAwareLabel('analytics'), path: '/analytics', icon: <TrendingUpIcon /> },
+        { title: getThemeAwareLabel('intelligence'), path: '/intelligence', icon: <PsychologyIcon /> },
+        { title: 'Call Vault', path: '/operations/call-vault', icon: <PhoneIcon /> },
+        { title: 'Command Room', path: '/command-room', icon: <ArchitectureIcon /> },
       ],
       delayOffset: 0,
-    },
-    {
-      title: 'Sales Operations',
-      items: [
-        { title: 'Smart CRM', path: '/relationships', icon: <PeopleIcon /> },
-        { title: 'Performance', path: '/operations/performance', icon: <TrendingUpIcon /> },
-        { title: 'Analytics', path: '/operations/analytics', icon: <PsychologyIcon /> },
-        { title: 'Call Vault', path: '/operations/call-vault', icon: <PhoneIcon /> },
-      ],
-      collapsible: true,
-      defaultOpen: true,
-      delayOffset: 100,
-    },
-    {
-      title: 'Intelligence Hub',
-      items: [
-        { title: 'Strategy', path: '/intelligence/canvas', icon: <SparkleIcon /> },
-        { title: 'Forge', path: '/intelligence/content', icon: <CreateIcon /> },
-        { title: 'Lab', path: '/intelligence/research', icon: <SearchIcon /> },
-        { title: 'Growth', path: '/intelligence/growth', icon: <HexIcon /> },
-        { title: 'Academy', path: '/intelligence/academy', icon: <SchoolIcon /> },
-      ],
-      collapsible: true,
-      defaultOpen: true,
-      delayOffset: 200,
     },
   ];
   
@@ -528,22 +407,20 @@ const SculpturalSidebar: React.FC<{
             items={section.items}
             onNavigate={handleNavigation}
             currentPath={location.pathname}
-            collapsible={section.collapsible}
-            defaultOpen={section.defaultOpen}
             delayOffset={section.delayOffset}
           />
         ))}
         
-        {/* Settings */}
-        <NavigationSection
-          title="Configuration"
-          items={[
-            { title: 'Settings', path: '/settings', icon: <SettingsIcon /> },
-          ]}
-          onNavigate={handleNavigation}
-          currentPath={location.pathname}
-          delayOffset={400}
-        />
+        {/* Simplified Settings */}
+        <Box sx={{ mt: 'auto', pt: 2 }}>
+          <MonolithTab
+            title="Settings"
+            path="/settings"
+            icon={<SettingsIcon />}
+            isActive={location.pathname === '/settings'}
+            onClick={() => handleNavigation('/settings')}
+          />
+        </Box>
       </Box>
       
       {/* Footer */}

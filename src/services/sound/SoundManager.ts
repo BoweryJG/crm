@@ -70,12 +70,15 @@ class SoundManager {
     return SoundManager.instance;
   }
 
-  private initializeAudioContext() {
+  private async initializeAudioContext() {
     try {
       this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       
+      // Initialize cache after audio context
+      await this.cache.initialize();
+      
       // Resume context on user interaction (required for some browsers)
-      const resumeContext = () => {
+      const resumeContext = async () => {
         if (this.audioContext?.state === 'suspended') {
           this.audioContext.resume();
         }
@@ -136,15 +139,16 @@ class SoundManager {
     this.lastPlayedTimes.set(soundId, now);
 
     try {
-      const config = await this.cache.getSoundConfig(soundId, this.currentTheme);
-      if (!config) {
-        console.warn(`Sound not found: ${soundId}`);
+      // Get sound buffer with fallback support
+      const buffer = await this.cache.getSoundBuffer(soundId, this.currentTheme);
+      if (!buffer) {
+        // Silently fail - fallbacks have already been tried
         return;
       }
-
-      // Load audio buffer
-      const buffer = await this.cache.getSound(config.url);
-      if (!buffer) {
+      
+      // Get config for volume settings
+      const config = await this.cache.getSoundConfig(soundId, this.currentTheme);
+      if (!config) {
         return;
       }
 

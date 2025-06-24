@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sound Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .sound-test {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sound-test.success {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+        .sound-test.error {
+            border-color: #f44336;
+            background: rgba(244, 67, 54, 0.1);
+        }
+        button {
+            padding: 5px 15px;
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1976d2;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sound File Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        const soundFiles = [
+            // Test sounds
+            '/sounds/test-click.mp3',
+            
+            // Core sounds - MP3
+            '/sounds/core/ui-click-primary.mp3',
+            '/sounds/core/ui-click-secondary.mp3',
+            '/sounds/core/ui-hover.mp3',
+            '/sounds/core/ui-toggle.mp3',
+            '/sounds/core/navigation-forward.mp3',
+            '/sounds/core/navigation-back.mp3',
+            '/sounds/core/notification-success.mp3',
+            '/sounds/core/notification-error.mp3',
+            '/sounds/core/gauge-tick.mp3',
+            
+            // Core sounds - WAV
+            '/sounds/core/ui-click-primary.wav',
+            '/sounds/core/ui-click-secondary.wav',
+            '/sounds/core/ui-hover.wav',
+            '/sounds/core/ui-toggle.wav',
+            '/sounds/core/navigation-forward.wav',
+            '/sounds/core/navigation-back.wav',
+            '/sounds/core/notification-success.wav',
+            '/sounds/core/notification-error.wav',
+            '/sounds/core/gauge-tick.wav',
+            
+            // Direct references
+            '/sounds/ui-click-primary.mp3',
+            '/sounds/ui-click-secondary.mp3',
+            '/sounds/ui-toggle.mp3',
+            '/sounds/navigation-forward.mp3',
+            
+            // Theme specific
+            '/sounds/themes/boeing-747/switch-click.wav',
+            '/sounds/themes/boeing-747/switch-toggle.wav',
+            '/sounds/themes/boeing-747/chime-success.wav',
+            '/sounds/themes/luxury-hermes/crystal-tap.wav',
+            '/sounds/themes/luxury-hermes/bell-chime.wav',
+            '/sounds/themes/f16-viper/tactical-click.wav',
+            '/sounds/themes/f16-viper/weapon-select.wav',
+        ];
+        
+        const resultsDiv = document.getElementById('results');
+        
+        async function testSound(url) {
+            const div = document.createElement('div');
+            div.className = 'sound-test';
+            
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                if (response.ok) {
+                    div.className += ' success';
+                    div.innerHTML = `
+                        <span style="flex: 1;">✓ ${url}</span>
+                        <button onclick="playSound('${url}')">Play</button>
+                    `;
+                } else {
+                    div.className += ' error';
+                    div.innerHTML = `✗ ${url} (${response.status})`;
+                }
+            } catch (error) {
+                div.className += ' error';
+                div.innerHTML = `✗ ${url} (Network error)`;
+            }
+            
+            resultsDiv.appendChild(div);
+        }
+        
+        function playSound(url) {
+            const audio = new Audio(url);
+            audio.volume = 0.5;
+            audio.play().catch(err => {
+                alert(`Error playing ${url}: ${err.message}`);
+            });
+        }
+        
+        // Test all sounds
+        soundFiles.forEach(testSound);
+    </script>
+</body>
+</html>

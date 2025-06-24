@@ -195,7 +195,8 @@ const DigitalCabochon = styled(Box)({
   `,
   cursor: 'pointer',
   transition: 'all 0.3s ease',
-  animation: 'pulse 3s ease-in-out infinite',
+  // Disabled infinite animation for performance
+  // animation: 'pulse 3s ease-in-out infinite',
   '@keyframes pulse': {
     '0%, 100%': { 
       boxShadow: `
@@ -312,7 +313,8 @@ const QuantumDot = styled(Box)<{ delay: number }>(({ delay }) => ({
   background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%)',
   borderRadius: '50%',
   opacity: 0,
-  animation: `quantumFade 4s ease-in-out infinite`,
+  // Disabled infinite animation for performance
+  // animation: `quantumFade 4s ease-in-out infinite`,
   animationDelay: `${delay}s`,
   '@keyframes quantumFade': {
     '0%, 100%': { opacity: 0 },

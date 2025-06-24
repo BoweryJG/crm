@@ -1,5 +1,6 @@
-// Smart Sound Caching System with Progressive Download
+// Smart Sound Caching System with Fallback Support
 import { SoundConfig, ThemeSoundPack } from './SoundManager';
+import { getSoundUrl, getFirstAvailableSound, CORE_SOUNDS } from './soundMappings';
 
 export class SoundCache {
   private cache: Map<string, AudioBuffer> = new Map();
@@ -7,241 +8,215 @@ export class SoundCache {
   private soundConfigs: Map<string, SoundConfig> = new Map();
   private themePacks: Map<string, ThemeSoundPack> = new Map();
   private audioContext: AudioContext;
-  private maxCacheSize: number = 100 * 1024 * 1024; // 100MB
+  private maxCacheSize: number = 50 * 1024 * 1024; // 50MB reduced for performance
   private currentCacheSize: number = 0;
+  private failedSounds: Set<string> = new Set(); // Track failed sounds to avoid retrying
 
   constructor() {
     this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    this.loadCoreSounds();
+    // Don't preload sounds on construction - wait for user interaction
   }
 
-  private async loadCoreSounds() {
-    try {
-      // Load core sounds manifest
-      const response = await fetch('/sounds/core/manifest.json');
-      if (response.ok) {
-        const manifest = await response.json();
-        
-        // Store all core sound configs
-        Object.entries(manifest.sounds).forEach(([id, config]: [string, any]) => {
-          this.soundConfigs.set(id, config as SoundConfig);
-          // Preload essential sounds
-          if (['ui-click-primary', 'ui-hover', 'navigation-forward'].includes(id)) {
-            this.loadSound(config.url, id);
-          }
-        });
+  // Initialize sounds after user interaction (for Chrome autoplay policy)
+  async initialize() {
+    if (this.audioContext.state === 'suspended') {
+      await this.audioContext.resume();
+    }
+    // Only preload the most essential sounds
+    await this.preloadEssentialSounds();
+  }
+
+  private async preloadEssentialSounds() {
+    const essentialSounds = ['ui-click-primary', 'ui-click-secondary', 'ui-toggle'];
+    
+    for (const soundId of essentialSounds) {
+      try {
+        await this.getSoundBuffer(soundId);
+      } catch (error) {
+        console.warn(`Failed to preload ${soundId}:`, error);
       }
-    } catch (error) {
-      console.warn('Failed to load core sounds manifest:', error);
-      // Fallback to individual sound loading with MP3 format
-      const coreSounds = [
-        'ui-click-primary',
-        'ui-click-secondary',
-        'ui-hover',
-        'ui-toggle',
-        'notification-success',
-        'notification-error',
-        'navigation-forward',
-        'navigation-back',
-      ];
-      
-      coreSounds.forEach(soundId => {
-        const config: SoundConfig = {
-          id: soundId,
-          url: `/sounds/core/${soundId}.wav`,
-          category: this.getCategoryForSound(soundId),
-          volume: 0.7
-        };
-        this.soundConfigs.set(soundId, config);
-        // Preload essential sounds
-        if (['ui-click-primary', 'ui-hover', 'navigation-forward'].includes(soundId)) {
-          this.loadSound(config.url, soundId);
-        }
-      });
     }
   }
 
-  async getSoundConfig(soundId: string, theme: string): Promise<SoundConfig | null> {
-    // First check if we have a theme-specific version
-    const themeKey = `${theme}:${soundId}`;
-    if (this.soundConfigs.has(themeKey)) {
-      return this.soundConfigs.get(themeKey)!;
+  async getSoundBuffer(soundId: string, themeId?: string): Promise<AudioBuffer | null> {
+    const cacheKey = themeId ? `${themeId}-${soundId}` : soundId;
+    
+    // Return cached version if available
+    if (this.cache.has(cacheKey)) {
+      return this.cache.get(cacheKey)!;
     }
 
-    // Fall back to core sound
-    if (this.soundConfigs.has(soundId)) {
-      return this.soundConfigs.get(soundId)!;
+    // Return existing loading promise if already loading
+    if (this.loading.has(cacheKey)) {
+      return this.loading.get(cacheKey)!;
     }
 
-    // Try to load from theme pack
-    const pack = await this.getThemeSoundPack(theme);
-    if (pack?.sounds[soundId]) {
-      this.soundConfigs.set(themeKey, pack.sounds[soundId]);
-      return pack.sounds[soundId];
+    // Skip if we've already tried and failed
+    if (this.failedSounds.has(cacheKey)) {
+      return null;
     }
 
-    // Return null if no sound found
-    return null;
-  }
-
-  async getSound(url: string): Promise<AudioBuffer | null> {
-    // Check cache first
-    if (this.cache.has(url)) {
-      return this.cache.get(url)!;
-    }
-
-    // Check if already loading
-    if (this.loading.has(url)) {
-      return this.loading.get(url)!;
-    }
-
-    // Start loading
-    const loadPromise = this.loadSound(url);
-    this.loading.set(url, loadPromise);
+    // Start loading with fallback support
+    const loadPromise = this.loadSoundWithFallback(soundId, themeId);
+    this.loading.set(cacheKey, loadPromise);
 
     try {
       const buffer = await loadPromise;
-      this.loading.delete(url);
+      this.loading.delete(cacheKey);
+      
+      if (buffer) {
+        this.addToCache(cacheKey, buffer);
+      } else {
+        this.failedSounds.add(cacheKey);
+      }
+      
       return buffer;
     } catch (error) {
-      this.loading.delete(url);
-      throw error;
+      this.loading.delete(cacheKey);
+      this.failedSounds.add(cacheKey);
+      return null;
     }
   }
 
-  private async loadSound(url: string, id?: string): Promise<AudioBuffer | null> {
-    try {
-      // Determine if local or CDN
-      const isLocal = url.startsWith('/sounds/');
-      const finalUrl = isLocal ? url : `${this.getCDNUrl()}${url}`;
+  private async loadSoundWithFallback(soundId: string, themeId?: string): Promise<AudioBuffer | null> {
+    const urls = getSoundUrl(soundId, themeId);
+    
+    for (const url of urls) {
+      try {
+        const buffer = await this.loadSound(url);
+        if (buffer) {
+          return buffer;
+        }
+      } catch (error) {
+        console.warn(`Failed to load sound from ${url}:`, error);
+      }
+    }
+    
+    console.warn(`All fallbacks failed for sound: ${soundId}`);
+    return null;
+  }
 
-      const response = await fetch(finalUrl);
+  private async loadSound(url: string): Promise<AudioBuffer | null> {
+    try {
+      const response = await fetch(url);
       if (!response.ok) {
-        throw new Error(`Failed to load sound: ${response.statusText}`);
+        throw new Error(`HTTP ${response.status}`);
       }
 
       const arrayBuffer = await response.arrayBuffer();
       const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
-
-      // Cache management
-      const bufferSize = arrayBuffer.byteLength;
-      if (this.currentCacheSize + bufferSize > this.maxCacheSize) {
-        this.evictOldestSounds(bufferSize);
-      }
-
-      this.cache.set(url, audioBuffer);
-      this.currentCacheSize += bufferSize;
-
-      // Store config if ID provided
-      if (id) {
-        this.soundConfigs.set(id, {
-          id,
-          url,
-          category: 'ui-primary', // Default, would be set properly in real implementation
-        });
-      }
-
+      
       return audioBuffer;
     } catch (error) {
-      console.error('Error loading sound:', error);
+      // Don't log encoding errors - they're too noisy
+      if (error instanceof Error && !error.message.includes('Unable to decode')) {
+        console.warn(`Error loading sound ${url}:`, error.message);
+      }
       return null;
     }
+  }
+
+  private addToCache(key: string, buffer: AudioBuffer) {
+    const bufferSize = buffer.length * buffer.numberOfChannels * 4; // 32-bit float
+    
+    // Check cache size and evict if necessary
+    if (this.currentCacheSize + bufferSize > this.maxCacheSize) {
+      this.evictOldestEntries(bufferSize);
+    }
+
+    this.cache.set(key, buffer);
+    this.currentCacheSize += bufferSize;
+  }
+
+  private evictOldestEntries(requiredSpace: number) {
+    const entries = Array.from(this.cache.entries());
+    let freedSpace = 0;
+    let i = 0;
+
+    while (freedSpace < requiredSpace && i < entries.length) {
+      const [key, buffer] = entries[i];
+      const bufferSize = buffer.length * buffer.numberOfChannels * 4;
+      
+      this.cache.delete(key);
+      this.currentCacheSize -= bufferSize;
+      freedSpace += bufferSize;
+      i++;
+    }
+  }
+
+  async getSoundConfig(soundId: string, themeId?: string): Promise<SoundConfig | null> {
+    // Check if we have a stored config
+    if (this.soundConfigs.has(soundId)) {
+      return this.soundConfigs.get(soundId)!;
+    }
+
+    // Generate config from our mappings
+    const mapping = CORE_SOUNDS[soundId];
+    if (mapping) {
+      const config: SoundConfig = {
+        id: soundId,
+        url: mapping.primary,
+        category: mapping.category as any,
+        volume: 0.5,
+      };
+      this.soundConfigs.set(soundId, config);
+      return config;
+    }
+
+    return null;
   }
 
   async getThemeSoundPack(themeId: string): Promise<ThemeSoundPack | null> {
-    if (this.themePacks.has(themeId)) {
-      return this.themePacks.get(themeId)!;
-    }
-
-    try {
-      // Load theme manifest
-      const response = await fetch(`/sounds/themes/${themeId}/manifest.json`);
-      if (!response.ok) {
-        // Try CDN
-        const cdnResponse = await fetch(`${this.getCDNUrl()}/themes/${themeId}/manifest.json`);
-        if (!cdnResponse.ok) {
-          return null;
-        }
-        const pack = await cdnResponse.json();
-        this.themePacks.set(themeId, pack);
-        return pack;
-      }
-
-      const pack = await response.json();
-      this.themePacks.set(themeId, pack);
-      return pack;
-    } catch (error) {
-      console.error('Error loading theme sound pack:', error);
-      return null;
-    }
+    // For now, return null - theme packs are optional
+    return null;
   }
 
   async preloadTheme(themeId: string): Promise<void> {
-    const pack = await this.getThemeSoundPack(themeId);
-    if (!pack) return;
-
-    // Preload essential sounds for this theme
-    const essentialSounds = [
-      'theme-switch',
-      'ui-click-primary',
-      'ui-hover',
-      'navigation-forward',
-      'gauge-tick',
-    ];
-
+    // Theme preloading is now optional and lightweight
+    const essentialSounds = ['ui-click-primary', 'ui-toggle'];
+    
     for (const soundId of essentialSounds) {
-      if (pack.sounds[soundId]) {
-        this.getSound(pack.sounds[soundId].url);
+      try {
+        await this.getSoundBuffer(soundId, themeId);
+      } catch (error) {
+        // Silently fail - theme sounds are optional
       }
     }
-  }
-
-  private evictOldestSounds(requiredSpace: number) {
-    // Simple LRU eviction - in production would track access times
-    let freedSpace = 0;
-    const entries = Array.from(this.cache.entries());
-    
-    for (const [url, buffer] of entries) {
-      if (freedSpace >= requiredSpace) break;
-      
-      // Estimate buffer size (channels * length * bytes per sample)
-      const bufferSize = buffer.numberOfChannels * buffer.length * 4;
-      this.cache.delete(url);
-      freedSpace += bufferSize;
-      this.currentCacheSize -= bufferSize;
-    }
-  }
-
-  private getCDNUrl(): string {
-    // In production, this would return your CDN URL
-    // For now, using local fallback
-    return process.env.REACT_APP_SOUND_CDN_URL || '';
-  }
-
-  private getCategoryForSound(soundId: string): 'ui-primary' | 'ui-secondary' | 'navigation' | 'notification' | 'gauge' | 'theme-switch' | 'startup' | 'ambient' | 'success' | 'error' {
-    if (soundId.includes('click')) return 'ui-primary';
-    if (soundId.includes('hover')) return 'ui-secondary';
-    if (soundId.includes('navigation')) return 'navigation';
-    if (soundId.includes('notification')) return 'notification';
-    if (soundId.includes('success')) return 'success';
-    if (soundId.includes('error')) return 'error';
-    if (soundId.includes('gauge')) return 'gauge';
-    if (soundId.includes('theme')) return 'theme-switch';
-    if (soundId.includes('startup')) return 'startup';
-    if (soundId.includes('ambient')) return 'ambient';
-    return 'ui-primary';
   }
 
   clearCache() {
     this.cache.clear();
+    this.loading.clear();
+    this.failedSounds.clear();
     this.currentCacheSize = 0;
   }
 
-  getCacheSize(): number {
-    return this.currentCacheSize;
+  clearTheme(themeId: string) {
+    // Clear theme-specific sounds from cache
+    const keysToDelete: string[] = [];
+    
+    Array.from(this.cache.keys()).forEach(key => {
+      if (key.startsWith(`${themeId}-`)) {
+        keysToDelete.push(key);
+      }
+    });
+    
+    keysToDelete.forEach(key => {
+      const buffer = this.cache.get(key);
+      if (buffer) {
+        const bufferSize = buffer.length * buffer.numberOfChannels * 4;
+        this.currentCacheSize -= bufferSize;
+        this.cache.delete(key);
+      }
+    });
   }
 
-  getCachedSounds(): string[] {
-    return Array.from(this.cache.keys());
+  getCacheInfo() {
+    return {
+      entries: this.cache.size,
+      sizeInMB: (this.currentCacheSize / (1024 * 1024)).toFixed(2),
+      maxSizeInMB: (this.maxCacheSize / (1024 * 1024)).toFixed(2),
+      failedSounds: Array.from(this.failedSounds),
+    };
   }
 }

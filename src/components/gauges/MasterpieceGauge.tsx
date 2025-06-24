@@ -238,7 +238,7 @@ const InnerGauge = styled(Box)<{ nightMode?: boolean }>(({ nightMode }) => ({
     inset: 0,
     borderRadius: '50%',
     boxShadow: nightMode ? '0 0 40px rgba(0, 255, 255, 0.3)' : '0 0 20px rgba(0, 255, 255, 0.08)',
-    animation: `${nightMode ? pulseGlowNight : pulseGlow} 2s infinite ease-in-out`,
+    // Removed infinite animation for performance
     pointerEvents: 'none',
   },
 }));
@@ -275,8 +275,8 @@ const BrandEmboss = styled(Box)<{ nightMode?: boolean }>(({ nightMode }) => ({
     : '0 1px 1px rgba(255,255,255,0.15), 0 -1px 1px rgba(0,0,0,0.5)',
   WebkitTextStroke: nightMode ? '0.5px rgba(0,233,255,0.3)' : '0.4px rgba(0,0,0,0.4)',
   opacity: nightMode ? 0.8 : 0.65,
-  animation: `${sweep} 8s linear infinite`,
-  willChange: 'background-position',
+  animation: `${sweep} 12s linear infinite`, // Slowed down for performance
+  willChange: 'auto', // Reduced GPU usage
   zIndex: 2,
   pointerEvents: 'none',
 }));
@@ -450,7 +450,7 @@ const StatusRing = styled(Box)<{ status: 'green' | 'orange' | 'red' }>(({ status
     : status === 'orange'
     ? 'radial-gradient(circle, transparent 45%, rgba(255,165,0,0.3) 50%, transparent 55%)'
     : 'radial-gradient(circle, transparent 45%, rgba(255,0,0,0.3) 50%, transparent 55%)',
-  animation: `${pulseStatus} ${status === 'green' ? '2s' : status === 'orange' ? '1.5s' : '1s'} infinite`,
+  // Removed infinite animation for performance
 }));
 
 const GoalLabel = styled(Box)<{ devMode?: boolean; nightMode?: boolean }>(({ devMode, nightMode }) => ({
@@ -529,7 +529,7 @@ const Gear = styled(Box)<{ size: number; duration: number; reverse?: boolean }>(
                 conic-gradient(from 0deg, #444 0deg, #333 20deg, #444 40deg, #333 60deg, #444 80deg, #333 100deg, #444 120deg, #333 140deg, #444 160deg, #333 180deg, #444 200deg, #333 220deg, #444 240deg, #333 260deg, #444 280deg, #333 300deg, #444 320deg, #333 340deg, #444 360deg)`,
   borderRadius: '50%',
   opacity: 0.3,
-  animation: `${rotateGear} ${duration}s linear infinite ${reverse ? 'reverse' : ''}`,
+  animation: isLowPerformanceDevice() ? 'none' : `${rotateGear} ${duration}s linear infinite ${reverse ? 'reverse' : ''}`,
   transition: 'animation-duration 1s ease',
 }));
 
