@@ -87,23 +87,8 @@ const Dashboard: React.FC = () => {
         </Typography>
       </Box>
 
-      {/* Sound Debug Button */}
-      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Button
-          variant="outlined"
-          onClick={() => {
-            console.log('Sound test - Enabled:', soundEnabled);
-            testSound.play();
-          }}
-          sx={{ 
-            borderColor: soundEnabled ? 'success.main' : 'error.main',
-            color: soundEnabled ? 'success.main' : 'error.main'
-          }}
-        >
-          Test Sound (Sound: {soundEnabled ? 'ON' : 'OFF'})
-        </Button>
-        
-        {/* Gauge Style Selector */}
+      {/* Gauge Style Selector */}
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Box
           onClick={() => setGaugeStyle('quantum')}

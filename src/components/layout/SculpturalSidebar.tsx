@@ -59,8 +59,8 @@ const MonolithTab: React.FC<{
     <Box
       onClick={(e) => {
         // Add mechanical click effect
-        const rect = e.currentTarget.getBoundingClientRect();
-        e.currentTarget.style.transform = 'skewX(-5deg) translateX(3px) scale(0.98)';
+        const element = e.currentTarget;
+        element.style.transform = 'skewX(-5deg) translateX(3px) scale(0.98)';
         
         // Play sound and navigate
         clickSound.play();
@@ -68,7 +68,9 @@ const MonolithTab: React.FC<{
         
         // Spring back animation
         setTimeout(() => {
-          e.currentTarget.style.transform = isActive ? 'skewX(-5deg) translateX(5px)' : 'skewX(-3deg)';
+          if (element) {
+            element.style.transform = isActive ? 'skewX(-5deg) translateX(5px)' : 'skewX(-3deg)';
+          }
         }, 100);
       }}
       onMouseEnter={React.useCallback(() => setIsHovered(true), [])}
