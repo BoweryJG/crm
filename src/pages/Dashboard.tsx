@@ -87,6 +87,15 @@ const Dashboard: React.FC = () => {
         </Typography>
       </Box>
 
+      {/* Mission Control - MOVED TO TOP POSITION */}
+      <Box sx={{ mb: 4 }}>
+        <Suspense fallback={
+          <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
+        }>
+          <CartierBlended live={false} />
+        </Suspense>
+      </Box>
+
       {/* Gauge Style Selector */}
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -264,16 +273,7 @@ const Dashboard: React.FC = () => {
         </Box>
       ) : (
         <>
-          {/* Mission Progress - Cartier Blended */}
-          <Box sx={{ mb: 4 }}>
-            <Suspense fallback={
-              <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
-            }>
-              <CartierBlended live={false} />
-            </Suspense>
-          </Box>
-
-          {/* Now Cards Stack - Added Section */}
+          {/* Now Cards Stack - Mission Control moved to top */}
           <Box sx={{ mb: 4 }}>
             <Suspense fallback={
               <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />

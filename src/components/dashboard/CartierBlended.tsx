@@ -91,7 +91,7 @@ const LuxuryContainer = styled(Paper)(({ theme }) => ({
       ${alpha(theme.palette.common.white, 0.05)} 50%, 
       transparent 70%)`,
     backgroundSize: '200% 200%',
-    animation: `${sapphireSheen} 8s ease-in-out infinite`,
+    // animation: `${sapphireSheen} 8s ease-in-out infinite`, // Disabled for performance
     pointerEvents: 'none'
   },
   '&::after': {
@@ -152,7 +152,7 @@ const GlowingCapsule = styled(Box)(({ theme }) => {
   border: `2px solid ${alpha(luxuryGreen, 0.4)}`,
   borderRadius: '50px',
   position: 'relative',
-  animation: `${glowPulse} 3s ease-in-out infinite`,
+  // animation: `${glowPulse} 3s ease-in-out infinite`, // Disabled for performance
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -201,7 +201,7 @@ const FilamentProgress = styled(LinearProgress)(({ theme }) => {
       ${alpha(luxuryGreen, 0.8)} 0%, 
       ${luxuryGreen} 50%,
       ${alpha(luxuryGreen, 0.8)} 100%)`,
-    animation: `${filamentGlow} 2s ease-in-out infinite`,
+    // animation: `${filamentGlow} 2s ease-in-out infinite`, // Disabled for performance
     boxShadow: `0 0 10px ${luxuryGreenGlow}`
   }
 };
@@ -285,7 +285,7 @@ const NeuralBackground = styled(Box)(({ theme }) => {
     ${luxuryGreen})`,
   backgroundSize: '60px 60px',
   backgroundPosition: '0 0, 30px 30px',
-  animation: `${neuralWave} 20s linear infinite`,
+  // animation: `${neuralWave} 20s linear infinite`, // Disabled for performance
   pointerEvents: 'none'
 };
 });
