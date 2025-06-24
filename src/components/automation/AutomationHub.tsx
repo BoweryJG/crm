@@ -297,7 +297,7 @@ const AutomationHub: React.FC = () => {
                     <Grid item xs={12} md={2} sx={{ textAlign: 'right' }}>
                       <Stack direction="row" spacing={1} justifyContent={isMobile ? 'center' : 'flex-end'}>
                         <IconButton size="small">
-                          {workflow.status === 'active' ? <PauseIcon /> : <PlayArrow />}
+                          {workflow.status === 'active' ? <PauseIcon /> : <StartIcon />}
                         </IconButton>
                         <IconButton size="small">
                           <ConfigIcon />
