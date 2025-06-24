@@ -14,8 +14,8 @@ const pulseGlowNight = keyframes`
 `;
 
 const sweep = keyframes`
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% { background-position: -100% 0; }
+  100% { background-position: 100% 0; }
 `;
 
 const rotateGear = keyframes`
@@ -244,6 +244,9 @@ const InnerGauge = styled(Box)<{ nightMode?: boolean }>(({ nightMode }) => ({
 }));
 
 const BrandEmboss = styled(Box)<{ nightMode?: boolean }>(({ nightMode }) => ({
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none !important',
+  },
   position: 'absolute',
   top: '50px',
   left: '50%',
@@ -272,7 +275,9 @@ const BrandEmboss = styled(Box)<{ nightMode?: boolean }>(({ nightMode }) => ({
     : '0 1px 1px rgba(255,255,255,0.15), 0 -1px 1px rgba(0,0,0,0.5)',
   WebkitTextStroke: nightMode ? '0.5px rgba(0,233,255,0.3)' : '0.4px rgba(0,0,0,0.4)',
   opacity: nightMode ? 0.8 : 0.65,
-  animation: `${sweep} 6s linear infinite`,
+  animation: `${sweep} 8s linear infinite`,
+  willChange: 'background-position',
+  transform: 'translateX(-50%) translateZ(0)', // Hardware acceleration
   zIndex: 2,
   pointerEvents: 'none',
 }));
