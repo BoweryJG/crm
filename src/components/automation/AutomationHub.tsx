@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -16,6 +16,13 @@ import {
   alpha,
   Fade,
   LinearProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Link as MuiLink,
+  CircularProgress,
 } from '@mui/material';
 import {
   AutoMode as AutomationIcon,
@@ -30,109 +37,129 @@ import {
   TrendingUp as AnalyticsIcon,
   CheckCircle as ActiveIcon,
   Cancel as InactiveIcon,
+  Link as LinkIcon,
+  Mic as RecordingIcon,
+  Article as PRIcon,
+  ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
 import glassEffects from '../../themes/glassEffects';
 import { getThemeAccents, getThemeGlass } from '../dashboard/ThemeAwareComponents';
+import automationService, { 
+  WorkflowType, 
+  WorkflowStatus, 
+  AutomationWorkflow,
+  AutomationStats,
+  MagicLinkAutomation
+} from '../../services/automation/comprehensiveAutomationService';
 
-type AutomationMode = 'overview' | 'workflows' | 'scheduled' | 'history';
-
-interface WorkflowItem {
-  id: string;
-  name: string;
-  type: 'email' | 'report' | 'outreach' | 'content';
-  status: 'active' | 'paused' | 'scheduled';
-  lastRun: string;
-  nextRun?: string;
-  successRate: number;
-  description: string;
-}
-
-const mockWorkflows: WorkflowItem[] = [
-  {
-    id: '1',
-    name: 'Weekly Performance Reports',
-    type: 'report',
-    status: 'active',
-    lastRun: '2 hours ago',
-    nextRun: 'Tomorrow at 9:00 AM',
-    successRate: 98,
-    description: 'Automated weekly sales performance reports sent to team',
-  },
-  {
-    id: '2',
-    name: 'Follow-up Email Sequence',
-    type: 'email',
-    status: 'active',
-    lastRun: '30 minutes ago',
-    successRate: 94,
-    description: '3-step follow-up sequence for new contacts',
-  },
-  {
-    id: '3',
-    name: 'Content Generation Pipeline',
-    type: 'content',
-    status: 'paused',
-    lastRun: 'Yesterday',
-    successRate: 87,
-    description: 'AI-powered content creation for social media and blog',
-  },
-  {
-    id: '4',
-    name: 'Quarterly Outreach Campaign',
-    type: 'outreach',
-    status: 'scheduled',
-    lastRun: '3 months ago',
-    nextRun: 'Jan 1, 2025',
-    successRate: 91,
-    description: 'Automated outreach to inactive contacts',
-  },
-];
+type AutomationMode = 'overview' | 'workflows' | 'scheduled' | 'magiclinks';
 
 const AutomationHub: React.FC = () => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [viewMode, setViewMode] = useState<AutomationMode>('overview');
+  const [workflows, setWorkflows] = useState<AutomationWorkflow[]>([]);
+  const [stats, setStats] = useState<AutomationStats | null>(null);
+  const [magicLinks, setMagicLinks] = useState<MagicLinkAutomation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [magicLinkDialog, setMagicLinkDialog] = useState(false);
+  const [generatedLink, setGeneratedLink] = useState<string>('');
   
   const themeAccents = getThemeAccents(themeMode);
   const themeGlass = getThemeGlass(themeMode);
 
-  const getWorkflowIcon = (type: string) => {
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [workflowsResult, statsResult, magicLinksResult] = await Promise.all([
+        automationService.getWorkflows(),
+        automationService.getStats(),
+        automationService.getMagicLinks({ used: false, expired: false }),
+      ]);
+
+      if (workflowsResult.data) setWorkflows(workflowsResult.data);
+      if (statsResult.data) setStats(statsResult.data);
+      if (magicLinksResult.data) setMagicLinks(magicLinksResult.data);
+    } catch (error) {
+      console.error('Error loading automation data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getWorkflowIcon = (type: WorkflowType) => {
     switch (type) {
-      case 'email': return <EmailIcon />;
-      case 'report': return <ReportIcon />;
-      case 'outreach': return <CampaignIcon />;
-      case 'content': return <AutomationIcon />;
+      case WorkflowType.EMAIL_SEQUENCE: return <EmailIcon />;
+      case WorkflowType.REPORT_GENERATION: return <ReportIcon />;
+      case WorkflowType.OUTREACH_CAMPAIGN: return <CampaignIcon />;
+      case WorkflowType.CONTENT_GENERATION: return <AutomationIcon />;
+      case WorkflowType.PLAUD_RECORDING: return <RecordingIcon />;
+      case WorkflowType.PR_DISTRIBUTION: return <PRIcon />;
+      case WorkflowType.MAGIC_LINK: return <LinkIcon />;
       default: return <AutomationIcon />;
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: WorkflowStatus) => {
     switch (status) {
-      case 'active': return theme.palette.success.main;
-      case 'paused': return theme.palette.warning.main;
-      case 'scheduled': return theme.palette.info.main;
+      case WorkflowStatus.ACTIVE: return theme.palette.success.main;
+      case WorkflowStatus.PAUSED: return theme.palette.warning.main;
+      case WorkflowStatus.SCHEDULED: return theme.palette.info.main;
+      case WorkflowStatus.ERROR: return theme.palette.error.main;
       default: return theme.palette.text.secondary;
     }
   };
 
-  const stats = {
-    activeWorkflows: 2,
-    scheduledTasks: 47,
-    successRate: 92,
-    timeSaved: '14.5 hrs/week',
+  const handleStatusToggle = async (workflow: AutomationWorkflow) => {
+    const newStatus = workflow.status === WorkflowStatus.ACTIVE 
+      ? WorkflowStatus.PAUSED 
+      : WorkflowStatus.ACTIVE;
+
+    const result = await automationService.updateWorkflowStatus(workflow.id, newStatus);
+    if (result.data) {
+      setWorkflows(prev => prev.map(w => w.id === workflow.id ? result.data! : w));
+    }
   };
+
+  const handleGenerateMagicLink = async () => {
+    const result = await automationService.generateMagicLink({
+      workflowType: WorkflowType.EMAIL_SEQUENCE,
+      expiresInHours: 48,
+    });
+
+    if (result.data) {
+      const baseUrl = window.location.origin;
+      setGeneratedLink(`${baseUrl}/magic/${result.data.token}`);
+      setMagicLinkDialog(true);
+      loadData(); // Reload to show new magic link
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ p: 4, textAlign: 'center' }}>
+        <CircularProgress />
+        <Typography sx={{ mt: 2 }}>Loading automation data...</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box>
       {/* Stats Overview */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        {[
+        {stats && [
           { label: 'Active Workflows', value: stats.activeWorkflows, color: themeAccents.primary },
           { label: 'Scheduled Tasks', value: stats.scheduledTasks, color: themeAccents.secondary },
           { label: 'Success Rate', value: `${stats.successRate}%`, color: themeAccents.glow },
           { label: 'Time Saved', value: stats.timeSaved, color: themeAccents.primary },
+          { label: 'Magic Links', value: stats.magicLinksGenerated, color: themeAccents.secondary },
         ].map((stat, index) => (
           <Grid item xs={6} md={3} key={index}>
             <Card
@@ -184,17 +211,30 @@ const AutomationHub: React.FC = () => {
               Automation Control Center
             </Typography>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            size="small"
-            sx={{
-              borderRadius: 1,
-              background: `linear-gradient(135deg, ${themeAccents.primary}, ${themeAccents.glow})`,
-            }}
-          >
-            New Workflow
-          </Button>
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant="outlined"
+              startIcon={<LinkIcon />}
+              size="small"
+              onClick={handleGenerateMagicLink}
+              sx={{
+                borderRadius: 1,
+              }}
+            >
+              Magic Link
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              size="small"
+              sx={{
+                borderRadius: 1,
+                background: `linear-gradient(135deg, ${themeAccents.primary}, ${themeAccents.glow})`,
+              }}
+            >
+              New Workflow
+            </Button>
+          </Stack>
         </Box>
 
         {/* View Selector */}
@@ -204,7 +244,7 @@ const AutomationHub: React.FC = () => {
               { value: 'overview', label: 'Overview' },
               { value: 'workflows', label: 'Workflows' },
               { value: 'scheduled', label: 'Scheduled' },
-              { value: 'history', label: 'History' },
+              { value: 'magiclinks', label: 'Magic Links' },
             ].map((mode) => (
               <Chip
                 key={mode.value}
@@ -228,10 +268,53 @@ const AutomationHub: React.FC = () => {
           </Stack>
         </Box>
 
-        {/* Workflows List */}
+        {/* Content based on view mode */}
         <Box sx={{ p: 2 }}>
-          <Stack spacing={2}>
-            {mockWorkflows.map((workflow) => (
+          {viewMode === 'magiclinks' ? (
+            // Magic Links View
+            <Stack spacing={2}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Active Magic Links
+              </Typography>
+              {magicLinks.length === 0 ? (
+                <Card sx={{ p: 3, textAlign: 'center', backgroundColor: alpha(theme.palette.background.paper, 0.3) }}>
+                  <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
+                    No active magic links. Generate one to enable one-click automation.
+                  </Typography>
+                </Card>
+              ) : (
+                magicLinks.map((link) => (
+                  <Card
+                    key={link.id}
+                    sx={{
+                      p: 2,
+                      backgroundColor: alpha(theme.palette.background.paper, 0.3),
+                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    }}
+                  >
+                    <Grid container alignItems="center" spacing={2}>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          {link.workflow_type.replace(/_/g, ' ').toUpperCase()}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
+                          Created: {new Date(link.created_at).toLocaleDateString()}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="caption" sx={{ wordBreak: 'break-all' }}>
+                          {`${window.location.origin}/magic/${link.token.substring(0, 20)}...`}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Card>
+                ))
+              )}
+            </Stack>
+          ) : (
+            // Workflows View
+            <Stack spacing={2}>
+              {workflows.map((workflow) => (
               <Fade in key={workflow.id}>
                 <Card
                   sx={{
@@ -276,8 +359,8 @@ const AutomationHub: React.FC = () => {
                       <Chip
                         label={workflow.status}
                         size="small"
-                        icon={workflow.status === 'active' ? <ActiveIcon /> : 
-                              workflow.status === 'paused' ? <PauseIcon /> : <ScheduleIcon />}
+                        icon={workflow.status === WorkflowStatus.ACTIVE ? <ActiveIcon /> : 
+                              workflow.status === WorkflowStatus.PAUSED ? <PauseIcon /> : <ScheduleIcon />}
                         sx={{
                           backgroundColor: alpha(getStatusColor(workflow.status), 0.1),
                           color: getStatusColor(workflow.status),
@@ -288,7 +371,7 @@ const AutomationHub: React.FC = () => {
                     </Grid>
                     <Grid item xs={6} md={2} sx={{ textAlign: 'center' }}>
                       <Typography variant="h6" sx={{ color: themeAccents.glow }}>
-                        {workflow.successRate}%
+                        {workflow.successRate || 0}%
                       </Typography>
                       <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
                         Success Rate
@@ -296,8 +379,11 @@ const AutomationHub: React.FC = () => {
                     </Grid>
                     <Grid item xs={12} md={2} sx={{ textAlign: 'right' }}>
                       <Stack direction="row" spacing={1} justifyContent={isMobile ? 'center' : 'flex-end'}>
-                        <IconButton size="small">
-                          {workflow.status === 'active' ? <PauseIcon /> : <StartIcon />}
+                        <IconButton 
+                          size="small"
+                          onClick={() => handleStatusToggle(workflow)}
+                        >
+                          {workflow.status === WorkflowStatus.ACTIVE ? <PauseIcon /> : <StartIcon />}
                         </IconButton>
                         <IconButton size="small">
                           <ConfigIcon />
@@ -315,7 +401,8 @@ const AutomationHub: React.FC = () => {
                 </Card>
               </Fade>
             ))}
-          </Stack>
+            </Stack>
+          )}
         </Box>
       </Box>
 
@@ -394,6 +481,49 @@ const AutomationHub: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Magic Link Dialog */}
+      <Dialog
+        open={magicLinkDialog}
+        onClose={() => setMagicLinkDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Magic Link Generated</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Share this link to enable one-click automation. The link expires in 48 hours.
+          </Typography>
+          <TextField
+            fullWidth
+            value={generatedLink}
+            InputProps={{
+              readOnly: true,
+              endAdornment: (
+                <IconButton onClick={() => navigator.clipboard.writeText(generatedLink)}>
+                  <CopyIcon />
+                </IconButton>
+              ),
+            }}
+            sx={{ mb: 2 }}
+          />
+          <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
+            Anyone with this link can trigger the automation workflow.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setMagicLinkDialog(false)}>Close</Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              navigator.clipboard.writeText(generatedLink);
+              setMagicLinkDialog(false);
+            }}
+          >
+            Copy & Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
