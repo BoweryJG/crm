@@ -245,7 +245,7 @@ const Metrics: React.FC = () => {
                   fontWeight: 400,
                   fontSize: '0.95rem',
                   color: theme.palette.text.secondary,
-                  ...animations.utils.createTransition(['background-color', 'color']),
+                  transition: 'background-color 300ms ease, color 300ms ease',
                   '&:hover': {
                     backgroundColor: alpha(theme.palette.primary.main, 0.05),
                   },
