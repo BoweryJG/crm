@@ -38,6 +38,7 @@ const PromptManagement = lazy(() => import('./pages/AI/PromptManagement'));
 const Research = lazy(() => import('./pages/Research'));
 const Analytics = lazy(() => import('./pages/Analytics'));
 const RepAnalytics = lazy(() => import('./pages/RepAnalytics'));
+const MarketAnalytics = lazy(() => import('./pages/MarketAnalytics'));
 const CallInsightDetail = lazy(() => import('./pages/CallInsightDetail'));
 const CallAnalysis = lazy(() => import('./pages/CallAnalysis'));
 const Subscribe = lazy(() => import('./pages/Subscribe'));
@@ -155,6 +156,8 @@ const App: React.FC = () => {
                 <Route path="contacts/:id" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="PROFILE" message="EXTRACTING DATA MATRIX" />}><ContactDetail /></React.Suspense>} />
                 <Route path="practices" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="PRACTICES" message="MAPPING NEURAL NETWORKS" />}><Practices /></React.Suspense>} />
                 <Route path="analytics" element={<Suspense fallback={<SphereLoadingScreen loadingText="ANALYTICS" message="PROCESSING QUANTUM DATA" />}><Analytics /></Suspense>} />
+                <Route path="analytics/rep" element={<Suspense fallback={<SphereLoadingScreen loadingText="REP MATRIX" message="ANALYZING PERFORMANCE VECTORS" />}><RepAnalytics /></Suspense>} />
+                <Route path="analytics/market" element={<Suspense fallback={<SphereLoadingScreen loadingText="MARKET INTEL" message="SCANNING MARKET DYNAMICS" />}><MarketAnalytics /></Suspense>} />
                 <Route path="rep-analytics" element={<Suspense fallback={<SphereLoadingScreen loadingText="REP MATRIX" message="ANALYZING PERFORMANCE VECTORS" />}><RepAnalytics /></Suspense>} />
                 <Route path="rep-analytics/:insightId" element={<Suspense fallback={<SphereLoadingScreen loadingText="INSIGHTS" message="DECODING CONVERSATION PATTERNS" />}><CallInsightDetail /></Suspense>} />
                 <Route path="research" element={<Suspense fallback={<div>Loading...</div>}><Research /></Suspense>} />

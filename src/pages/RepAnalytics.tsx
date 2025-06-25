@@ -51,7 +51,13 @@ import {
   EmojiEvents as TrophyIcon,
   Radar as RadarIcon,
   BarChart as ChartIcon,
-  AutoGraph as PipelineIcon
+  AutoGraph as PipelineIcon,
+  Dashboard as DashboardIcon,
+  AccountBalance as CanvasIcon,
+  Calculate as QuotaIcon,
+  Language as LinguistIcon,
+  Storage as VaultIcon,
+  ArrowForward as ArrowIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../themes/ThemeContext';
 import UrgentInsightsOverlay from '../components/insights/UrgentInsightsOverlay';
@@ -798,6 +804,248 @@ const RepAnalytics: React.FC = () => {
           </Grid>
         ))}
       </Grid>
+    </Box>,
+
+    // Command Room Tab
+    <Box key="command-room">
+      <Grid container spacing={3}>
+        {/* Strategic Canvas */}
+        <Grid item xs={12} md={6}>
+          <Card elevation={0} sx={{ borderRadius: 3, height: '100%' }}>
+            <CardHeader
+              title={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CanvasIcon color="primary" />
+                  <Typography variant="h6" fontWeight="bold">
+                    Strategic Canvas
+                  </Typography>
+                </Box>
+              }
+              action={
+                <Chip label="AI-POWERED" size="small" color="primary" />
+              }
+            />
+            <CardContent>
+              <Typography variant="body1" sx={{ mb: 3 }}>
+                Visual strategic planning for medical device sales professionals
+              </Typography>
+              <List dense>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <CheckCircleIcon fontSize="small" color="success" />
+                  </ListItemIcon>
+                  <ListItemText primary="Territory mapping & analysis" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <CheckCircleIcon fontSize="small" color="success" />
+                  </ListItemIcon>
+                  <ListItemText primary="Account segmentation strategy" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <CheckCircleIcon fontSize="small" color="success" />
+                  </ListItemIcon>
+                  <ListItemText primary="Competitive positioning maps" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <CheckCircleIcon fontSize="small" color="success" />
+                  </ListItemIcon>
+                  <ListItemText primary="Growth opportunity visualization" />
+                </ListItem>
+              </List>
+              <Button
+                fullWidth
+                variant="contained"
+                endIcon={<ArrowIcon />}
+                sx={{ mt: 3 }}
+                onClick={() => navigate('/intelligence/canvas')}
+              >
+                Open Canvas
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* QuotaCore */}
+        <Grid item xs={12} md={6}>
+          <Card elevation={0} sx={{ borderRadius: 3, height: '100%' }}>
+            <CardHeader
+              title={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <QuotaIcon color="secondary" />
+                  <Typography variant="h6" fontWeight="bold">
+                    QuotaCore
+                  </Typography>
+                </Box>
+              }
+              action={
+                <Chip label="REAL-TIME" size="small" color="secondary" />
+              }
+            />
+            <CardContent>
+              <Typography variant="body1" sx={{ mb: 3 }}>
+                Advanced quota tracking and revenue forecasting
+              </Typography>
+              <List dense>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <TrendingUpIcon fontSize="small" color="primary" />
+                  </ListItemIcon>
+                  <ListItemText primary="Real-time quota attainment" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <TrendingUpIcon fontSize="small" color="primary" />
+                  </ListItemIcon>
+                  <ListItemText primary="Pipeline coverage analysis" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <TrendingUpIcon fontSize="small" color="primary" />
+                  </ListItemIcon>
+                  <ListItemText primary="Revenue velocity tracking" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <TrendingUpIcon fontSize="small" color="primary" />
+                  </ListItemIcon>
+                  <ListItemText primary="Predictive achievement models" />
+                </ListItem>
+              </List>
+              <Box sx={{ mt: 3, p: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
+                <Typography variant="h6" color="primary" fontWeight="bold">
+                  Current: 118% of Quota
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  $354K ahead of target
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* LinguistIQ */}
+        <Grid item xs={12} md={6}>
+          <Card elevation={0} sx={{ borderRadius: 3, height: '100%' }}>
+            <CardHeader
+              title={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <LinguistIcon color="warning" />
+                  <Typography variant="h6" fontWeight="bold">
+                    LinguistIQ
+                  </Typography>
+                </Box>
+              }
+              action={
+                <Chip label="NLP ENGINE" size="small" color="warning" />
+              }
+            />
+            <CardContent>
+              <Typography variant="body1" sx={{ mb: 3 }}>
+                Advanced language optimization for medical sales
+              </Typography>
+              <List dense>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <PsychologyIcon fontSize="small" color="warning" />
+                  </ListItemIcon>
+                  <ListItemText primary="Clinical language mastery" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <PsychologyIcon fontSize="small" color="warning" />
+                  </ListItemIcon>
+                  <ListItemText primary="Objection handling scripts" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <PsychologyIcon fontSize="small" color="warning" />
+                  </ListItemIcon>
+                  <ListItemText primary="Email optimization AI" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <PsychologyIcon fontSize="small" color="warning" />
+                  </ListItemIcon>
+                  <ListItemText primary="Presentation enhancement" />
+                </ListItem>
+              </List>
+              <Button
+                fullWidth
+                variant="contained"
+                endIcon={<ArrowIcon />}
+                sx={{ mt: 3, backgroundColor: theme.palette.warning.main }}
+                onClick={() => navigate('/content')}
+              >
+                Enhance Communication
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* CallVault */}
+        <Grid item xs={12} md={6}>
+          <Card elevation={0} sx={{ borderRadius: 3, height: '100%' }}>
+            <CardHeader
+              title={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <VaultIcon color="info" />
+                  <Typography variant="h6" fontWeight="bold">
+                    CallVault
+                  </Typography>
+                </Box>
+              }
+              action={
+                <Badge badgeContent="127" color="info">
+                  <PhoneIcon />
+                </Badge>
+              }
+            />
+            <CardContent>
+              <Typography variant="body1" sx={{ mb: 3 }}>
+                AI-powered call recording and analysis vault
+              </Typography>
+              <List dense>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <AssessmentIcon fontSize="small" color="info" />
+                  </ListItemIcon>
+                  <ListItemText primary="Call transcription & analysis" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <AssessmentIcon fontSize="small" color="info" />
+                  </ListItemIcon>
+                  <ListItemText primary="Sentiment tracking" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <AssessmentIcon fontSize="small" color="info" />
+                  </ListItemIcon>
+                  <ListItemText primary="Best practice extraction" />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <AssessmentIcon fontSize="small" color="info" />
+                  </ListItemIcon>
+                  <ListItemText primary="Coaching recommendations" />
+                </ListItem>
+              </List>
+              <Button
+                fullWidth
+                variant="contained"
+                endIcon={<ArrowIcon />}
+                sx={{ mt: 3, backgroundColor: theme.palette.info.main }}
+                onClick={() => navigate('/operations/call-vault')}
+              >
+                Access Vault
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
     </Box>
   ];
 
@@ -930,6 +1178,14 @@ const RepAnalytics: React.FC = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <AnalyticsIcon />
                   Activity Efficiency
+                </Box>
+              } 
+            />
+            <Tab 
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <DashboardIcon />
+                  Command Room
                 </Box>
               } 
             />
