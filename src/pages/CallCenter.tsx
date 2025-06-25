@@ -207,12 +207,12 @@ const CallCenter: React.FC = () => {
     
     // Initialize Twilio call
     try {
-      await twilioCallService.makeCall({
-        to: contact.phone,
-        userId: user?.id || '',
-        contactId: contact.id,
-        contactName: contact.name
-      });
+      await twilioCallService.makeCall(
+        contact.phone,
+        user?.id || '',
+        contact.id,
+        contact.practice // Pass practice ID if available
+      );
     } catch (error) {
       console.error('Failed to start call:', error);
     }
@@ -221,7 +221,16 @@ const CallCenter: React.FC = () => {
   const handleEndCall = () => {
     setIsCallActive(false);
     setCurrentCall(null);
-    twilioCallService.endCall();
+    // In production, this would end the Twilio call
+    // For now, just update the state
+    if (currentCall) {
+      // Update call status to completed
+      twilioCallService.handleCallEvent({
+        type: 'completed',
+        call_sid: currentCall.id,
+        data: { duration: callDuration }
+      });
+    }
   };
 
   const handleAiSync = () => {
