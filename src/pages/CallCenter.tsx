@@ -52,7 +52,7 @@ import {
   Warning as WarningIcon,
   PlayArrow as PlayIcon,
   Pause as PauseIcon,
-  Skip as SkipIcon,
+  SkipNext as SkipIcon,
   AutoMode as AutoModeIcon,
   Dashboard as DashboardIcon,
   Sync as SyncIcon,
