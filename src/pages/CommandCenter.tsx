@@ -451,7 +451,16 @@ const CommandCenter: React.FC = () => {
               {viewMode === 'activities' && (
                 <Fade in={viewMode === 'activities'} timeout={300}>
                   <Box>
-                    <CompactActivityFeed />
+                    <CompactActivityFeed 
+                      activities={mockActivities?.map((activity, index) => ({
+                        id: `activity-${index}`,
+                        type: 'general',
+                        description: activity,
+                        timeAgo: `${Math.floor(Math.random() * 60)}m ago`,
+                        status: 'info' as const
+                      })) || []}
+                      themeAccents={themeAccents}
+                    />
                   </Box>
                 </Fade>
               )}
@@ -460,7 +469,10 @@ const CommandCenter: React.FC = () => {
               {viewMode === 'tasks' && (
                 <Fade in={viewMode === 'tasks'} timeout={300}>
                   <Box>
-                    <PriorityTaskList />
+                    <PriorityTaskList 
+                      tasks={mockTasks || []}
+                      themeAccents={themeAccents}
+                    />
                   </Box>
                 </Fade>
               )}
@@ -469,7 +481,7 @@ const CommandCenter: React.FC = () => {
               {viewMode === 'insights' && (
                 <Fade in={viewMode === 'insights'} timeout={300}>
                   <Box>
-                    <InsightCards />
+                    <InsightCards themeAccents={themeAccents} />
                   </Box>
                 </Fade>
               )}
