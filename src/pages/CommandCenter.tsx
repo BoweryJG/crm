@@ -384,9 +384,9 @@ const CommandCenter: React.FC = () => {
                             RECENT ACTIVITY
                           </Typography>
                           {mockActivities?.slice(0, 3).map((activity, index) => (
-                            <Box key={index} sx={{ mb: 1 }}>
+                            <Box key={activity.id || index} sx={{ mb: 1 }}>
                               <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
-                                • {activity}
+                                • {activity.description}
                               </Typography>
                             </Box>
                           )) || (
@@ -452,13 +452,7 @@ const CommandCenter: React.FC = () => {
                 <Fade in={viewMode === 'activities'} timeout={300}>
                   <Box>
                     <CompactActivityFeed 
-                      activities={mockActivities?.map((activity, index) => ({
-                        id: `activity-${index}`,
-                        type: 'general',
-                        description: activity,
-                        timeAgo: `${Math.floor(Math.random() * 60)}m ago`,
-                        status: 'info' as const
-                      })) || []}
+                      activities={mockActivities || []}
                       themeAccents={themeAccents}
                     />
                   </Box>
