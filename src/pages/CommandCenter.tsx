@@ -2,177 +2,163 @@ import React, { useState } from 'react';
 import {
   Box,
   Typography,
-  Select,
-  MenuItem,
-  FormControl,
-  Chip,
-  IconButton,
-  Skeleton,
-  useTheme,
-  useMediaQuery,
-  alpha,
+  Tabs,
+  Tab,
+  Stack,
   Fade,
-  Collapse,
   Paper,
   Grid,
-  Stack,
+  Button,
+  Chip,
+  useTheme,
+  useMediaQuery,
+  IconButton,
+  Drawer,
+  AppBar,
+  Toolbar,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from '@mui/material';
 import {
-  Dashboard as DashboardIcon,
-  Timeline as ActivityIcon,
-  Assignment as TaskIcon,
-  AutoAwesome as InsightIcon,
-  ExpandMore as ExpandIcon,
-  ExpandLess as CollapseIcon,
-  TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
-  Person as PersonIcon,
-  Business as BusinessIcon,
-  AttachMoney as RevenueIcon,
-  Timeline as PipelineIcon,
-  CheckCircle as ConversionIcon,
+  Dashboard as MissionControlIcon,
+  Business as OperationsIcon,
+  AutoMode as AutomationIcon,
+  Create as ContentForgeIcon,
+  Menu as MenuIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
-import { useThemeContext } from '../themes/ThemeContext';
-import { useDashboardData } from '../contexts/DashboardDataContext';
+import { alpha } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
-import { getUserDisplayName } from '../utils/userHelpers';
+import { useThemeContext } from '../themes/ThemeContext';
+import MissionControlHub from '../components/dashboard/MissionControlHub';
+import OperationsCenter from '../components/dashboard/OperationsCenter';
+import AutomationHub from '../components/automation/AutomationHub';
+import ContentForgeHub from '../components/content/ContentForgeHub';
 import glassEffects from '../themes/glassEffects';
-import MobileStatsRibbon from '../components/dashboard/MobileStatsRibbon';
-import CompactActivityFeed from '../components/dashboard/CompactActivityFeed';
-import PriorityTaskList from '../components/dashboard/PriorityTaskList';
-import InsightCards from '../components/dashboard/InsightCards';
-import { getThemeAccents, getThemeGlass } from '../components/dashboard/ThemeAwareComponents';
+import animations from '../themes/animations';
 
-type ViewMode = 'overview' | 'activities' | 'tasks' | 'insights';
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`command-center-tabpanel-${index}`}
+      aria-labelledby={`command-center-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Fade in={value === index} timeout={300}>
+          <Box>{children}</Box>
+        </Fade>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `command-center-tab-${index}`,
+    'aria-controls': `command-center-tabpanel-${index}`,
+  };
+}
 
 const CommandCenter: React.FC = () => {
   const theme = useTheme();
-  const { themeMode } = useThemeContext();
+  const navigate = useNavigate();
   const { user } = useAuth();
+  const { themeMode } = useThemeContext();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
-  const { dashboardData, loading, mockActivities, mockTasks } = useDashboardData();
   
-  const [viewMode, setViewMode] = useState<ViewMode>('overview');
-  const [expanded, setExpanded] = useState(true);
-  
-  const themeAccents = getThemeAccents(themeMode);
-  const themeGlass = getThemeGlass(themeMode);
-  
-  // Get view icon
-  const getViewIcon = (mode: ViewMode) => {
-    switch (mode) {
-      case 'overview': return <DashboardIcon />;
-      case 'activities': return <ActivityIcon />;
-      case 'tasks': return <TaskIcon />;
-      case 'insights': return <InsightIcon />;
-    }
-  };
-  
-  // Get view color
-  const getViewColor = (mode: ViewMode) => {
-    switch (mode) {
-      case 'overview': return themeAccents.primary;
-      case 'activities': return themeAccents.glow;
-      case 'tasks': return themeAccents.secondary;
-      case 'insights': return themeAccents.primary;
-    }
+  const [activeTab, setActiveTab] = useState(0);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
   };
 
-  // Format currency for display
-  const formatCurrency = (value: number): string => {
-    if (value >= 1000000) {
-      return `$${(value / 1000000).toFixed(1)}M`;
-    } else if (value >= 1000) {
-      return `$${(value / 1000).toFixed(0)}K`;
-    }
-    return `$${value}`;
-  };
+  const tabItems = [
+    { label: 'Mission Control', icon: MissionControlIcon, description: 'Strategic overview' },
+    { label: 'Operations', icon: OperationsIcon, description: 'Day-to-day execution' },
+    { label: 'Automation', icon: AutomationIcon, description: 'Automated workflows' },
+    { label: 'Content Forge', icon: ContentForgeIcon, description: 'Content creation' },
+  ];
 
-  // Format percentage
-  const formatPercentage = (value: number): string => {
-    return `${value}%`;
-  };
-  
-  // Loading state
-  if (loading && !dashboardData) {
-    return (
-      <Box sx={{ p: 2 }}>
-        <Skeleton variant="rectangular" height={60} sx={{ mb: 2, borderRadius: 2 }} />
-        <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
-      </Box>
-    );
-  }
-
-  const StatCard = ({ 
-    icon, 
-    title, 
-    value, 
-    change, 
-    color 
-  }: { 
-    icon: React.ReactNode; 
-    title: string; 
-    value: string; 
-    change?: { value: number; trend: 'up' | 'down' };
-    color: string;
-  }) => (
-    <Paper
-      elevation={0}
+  const drawer = (
+    <Box
       sx={{
-        p: 2.5,
-        ...themeGlass,
-        borderRadius: 2,
-        border: `1px solid ${alpha(color, 0.2)}`,
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'all 0.3s ease',
-        '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: `0 8px 24px ${alpha(color, 0.15)}`,
-          borderColor: alpha(color, 0.4),
-        },
+        height: '100%',
+        ...glassEffects.effects.obsidian,
+        backgroundColor: theme.palette.background.default,
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-        <Box>
-          <Box
-            sx={{
-              display: 'inline-flex',
-              p: 1,
-              borderRadius: 1,
-              backgroundColor: alpha(color, 0.1),
-              color: color,
-              mb: 1.5,
-            }}
-          >
-            {icon}
-          </Box>
-          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 0.5 }}>
-            {title}
-          </Typography>
-          <Typography variant="h4" sx={{ fontWeight: 600, letterSpacing: '-0.02em' }}>
-            {value}
-          </Typography>
-        </Box>
-        {change && (
-          <Chip
-            icon={change.trend === 'up' ? <TrendingUpIcon /> : <TrendingDownIcon />}
-            label={`${change.value}%`}
-            size="small"
-            sx={{
-              backgroundColor: alpha(change.trend === 'up' ? theme.palette.success.main : theme.palette.error.main, 0.1),
-              color: change.trend === 'up' ? theme.palette.success.main : theme.palette.error.main,
-              '& .MuiChip-icon': {
-                fontSize: '1rem',
-              },
-            }}
-          />
-        )}
+      <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h6" sx={{ letterSpacing: '0.1em' }}>
+          COMMAND CENTER
+        </Typography>
+        <IconButton onClick={() => setDrawerOpen(false)}>
+          <CloseIcon />
+        </IconButton>
       </Box>
-    </Paper>
+      <Divider sx={{ borderColor: alpha(theme.palette.primary.main, 0.1) }} />
+      <List sx={{ flex: 1, p: 2 }}>
+        {tabItems.map((item, index) => (
+          <ListItem key={item.label} disablePadding sx={{ mb: 1 }}>
+            <ListItemButton
+              selected={activeTab === index}
+              onClick={() => {
+                setActiveTab(index);
+                setDrawerOpen(false);
+              }}
+              sx={{
+                borderRadius: 0,
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                ...animations.utils.createTransition(),
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                  borderColor: alpha(theme.palette.primary.main, 0.3),
+                },
+                '&.Mui-selected': {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.15),
+                  borderColor: theme.palette.primary.main,
+                },
+              }}
+            >
+              <ListItemIcon sx={{ color: theme.palette.primary.main }}>
+                <item.icon />
+              </ListItemIcon>
+              <ListItemText
+                primary={item.label}
+                secondary={item.description}
+                primaryTypographyProps={{
+                  sx: { letterSpacing: '0.05em', fontWeight: 600 },
+                }}
+                secondaryTypographyProps={{
+                  sx: { opacity: 0.7, fontSize: '0.75rem' },
+                }}
+              />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Box>
   );
-  
+
   return (
     <Box
       sx={{
@@ -182,307 +168,191 @@ const CommandCenter: React.FC = () => {
         overflow: 'hidden',
       }}
     >
-      {/* Welcome Section */}
-      <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" component="h1" fontWeight={600} gutterBottom>
-            Welcome back, {getUserDisplayName(user)}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Here's an overview of your sales performance and activity
-          </Typography>
-        </Box>
-
-        {/* Mission Control Panel */}
-        <Box
-          sx={{
-            position: 'relative',
-            ...themeGlass,
-            borderRadius: 2,
-            overflow: 'hidden',
-            transition: 'all 0.3s ease',
-          }}
-        >
-          {/* Header with Dropdown */}
-          <Box
+      <AppBar
+        position="sticky"
+        elevation={0}
+        sx={{
+          ...glassEffects.effects.obsidian,
+          backgroundColor: alpha(theme.palette.background.default, 0.9),
+          borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+        }}
+      >
+        <Toolbar>
+          <Typography
+            variant="h6"
             sx={{
-              p: 2,
-              borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: 2,
+              flex: 1,
+              letterSpacing: '0.2em',
+              fontWeight: 300,
+              background: `linear-gradient(90deg, ${theme.palette.text.primary}, ${theme.palette.primary.main})`,
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
             }}
           >
-            <Typography
-              variant="h6"
+            COMMAND CENTER
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
+      <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+        {/* Mobile Navigation */}
+        {isMobile && (
+          <Box sx={{ mb: 3 }}>
+            <Button
+              variant="outlined"
+              startIcon={<MenuIcon />}
+              onClick={() => setDrawerOpen(true)}
               sx={{
-                letterSpacing: '0.1em',
-                fontWeight: 600,
-                color: themeAccents.primary,
-                textTransform: 'uppercase',
+                width: '100%',
+                justifyContent: 'flex-start',
+                borderColor: alpha(theme.palette.primary.main, 0.2),
+                color: theme.palette.text.primary,
+                ...animations.utils.createTransition(),
+                '&:hover': {
+                  borderColor: theme.palette.primary.main,
+                  backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                },
               }}
             >
+              {tabItems[activeTab].label}
+            </Button>
+          </Box>
+        )}
+
+        {/* Desktop Tabs */}
+        {!isMobile && (
+          <Paper
+            elevation={0}
+            sx={{
+              mb: 4,
+              ...glassEffects.effects.obsidian,
+              backgroundColor: alpha(theme.palette.background.paper, 0.5),
+              borderRadius: 2,
+              overflow: 'hidden',
+            }}
+          >
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              variant={isTablet ? 'scrollable' : 'fullWidth'}
+              scrollButtons={isTablet ? 'auto' : false}
+              sx={{
+                borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                '& .MuiTab-root': {
+                  minHeight: 80,
+                  textTransform: 'none',
+                  fontWeight: 400,
+                  fontSize: '0.95rem',
+                  color: theme.palette.text.secondary,
+                  transition: 'background-color 300ms ease, color 300ms ease',
+                  '&:hover': {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                  },
+                  '&.Mui-selected': {
+                    color: theme.palette.primary.main,
+                    fontWeight: 500,
+                    backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                  },
+                },
+                '& .MuiTabs-indicator': {
+                  height: 3,
+                  backgroundColor: theme.palette.primary.main,
+                },
+              }}
+            >
+              {tabItems.map((item, index) => (
+                <Tab
+                  key={item.label}
+                  label={
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                      <item.icon fontSize="small" />
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {item.label}
+                        </Typography>
+                        <Typography variant="caption" sx={{ opacity: 0.7, display: 'block' }}>
+                          {item.description}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  }
+                  {...a11yProps(index)}
+                />
+              ))}
+            </Tabs>
+          </Paper>
+        )}
+
+        <TabPanel value={activeTab} index={0}>
+          <Box sx={{ mb: 4 }}>
+            <Typography
+              variant="overline"
+              sx={{
+                color: theme.palette.primary.main,
+                letterSpacing: '0.3em',
+                display: 'block',
+                mb: 1,
+              }}
+            >
+              STRATEGIC OVERVIEW
+            </Typography>
+            <Typography variant="h4" sx={{ fontWeight: 200, letterSpacing: '0.05em', mb: 2 }}>
               Mission Control
             </Typography>
-            
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <FormControl size="small">
-                <Select
-                  value={viewMode}
-                  onChange={(e) => setViewMode(e.target.value as ViewMode)}
-                  startAdornment={getViewIcon(viewMode)}
-                  sx={{
-                    minWidth: 150,
-                    backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                    '& .MuiSelect-icon': {
-                      color: getViewColor(viewMode),
-                    },
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: alpha(getViewColor(viewMode), 0.3),
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: getViewColor(viewMode),
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: getViewColor(viewMode),
-                    },
-                  }}
-                >
-                  <MenuItem value="overview">Overview</MenuItem>
-                  <MenuItem value="activities">Activities</MenuItem>
-                  <MenuItem value="tasks">Tasks</MenuItem>
-                  <MenuItem value="insights">Insights</MenuItem>
-                </Select>
-              </FormControl>
-              
-              <IconButton
-                onClick={() => setExpanded(!expanded)}
-                sx={{
-                  color: themeAccents.primary,
-                  backgroundColor: alpha(themeAccents.primary, 0.1),
-                  '&:hover': {
-                    backgroundColor: alpha(themeAccents.primary, 0.2),
-                  },
-                }}
-              >
-                {expanded ? <CollapseIcon /> : <ExpandIcon />}
-              </IconButton>
-            </Box>
+            <Typography variant="body1" sx={{ color: theme.palette.text.secondary, mb: 4 }}>
+              Monitor high-priority alerts, AI insights, and strategic metrics
+            </Typography>
           </Box>
+          <MissionControlHub />
+        </TabPanel>
 
-          {/* Content */}
-          <Collapse in={expanded}>
-            <Box sx={{ p: { xs: 2, sm: 3 } }}>
-              {/* Overview Mode */}
-              {viewMode === 'overview' && (
-                <Fade in={viewMode === 'overview'} timeout={300}>
-                  <Box>
-                    {/* Stats Grid */}
-                    <Grid container spacing={2} sx={{ mb: 4 }}>
-                      <Grid item xs={12} sm={6} md={2.4}>
-                        <StatCard
-                          icon={<PersonIcon />}
-                          title="CONTACTS"
-                          value={dashboardData?.total_contacts.toLocaleString() || '1,317'}
-                          change={{ value: 11.3, trend: 'up' }}
-                          color={themeAccents.primary}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6} md={2.4}>
-                        <StatCard
-                          icon={<BusinessIcon />}
-                          title="PRACTICES"
-                          value={dashboardData?.active_practices.toLocaleString() || '340'}
-                          change={{ value: 8.5, trend: 'up' }}
-                          color={themeAccents.secondary}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6} md={2.4}>
-                        <StatCard
-                          icon={<RevenueIcon />}
-                          title="REVENUE"
-                          value={formatCurrency((dashboardData?.revenue_generated || 8840000) / 100)}
-                          change={{ value: 9.6, trend: 'up' }}
-                          color={themeAccents.glow}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6} md={2.4}>
-                        <StatCard
-                          icon={<PipelineIcon />}
-                          title="PIPELINE"
-                          value="$1.3M"
-                          change={{ value: 0, trend: 'down' }}
-                          color={themeAccents.error || theme.palette.error.main}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6} md={2.4}>
-                        <StatCard
-                          icon={<ConversionIcon />}
-                          title="CONVERSION"
-                          value="45%"
-                          change={{ value: 0, trend: 'down' }}
-                          color={themeAccents.success || theme.palette.success.main}
-                        />
-                      </Grid>
-                    </Grid>
+        <TabPanel value={activeTab} index={1}>
+          <Box sx={{ mb: 4 }}>
+            <Typography
+              variant="overline"
+              sx={{
+                color: theme.palette.primary.main,
+                letterSpacing: '0.3em',
+                display: 'block',
+                mb: 1,
+              }}
+            >
+              TACTICAL EXECUTION
+            </Typography>
+            <Typography variant="h4" sx={{ fontWeight: 200, letterSpacing: '0.05em', mb: 2 }}>
+              Operations Center
+            </Typography>
+            <Typography variant="body1" sx={{ color: theme.palette.text.secondary, mb: 4 }}>
+              Quick actions, communications, and live activity tracking
+            </Typography>
+          </Box>
+          <OperationsCenter />
+        </TabPanel>
 
-                    {/* Priority and Activity Section */}
-                    <Grid container spacing={3}>
-                      <Grid item xs={12} md={6}>
-                        <Paper
-                          elevation={0}
-                          sx={{
-                            p: 3,
-                            ...themeGlass,
-                            borderRadius: 2,
-                            border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
-                            backgroundColor: alpha(theme.palette.error.main, 0.02),
-                          }}
-                        >
-                          <Typography
-                            variant="h6"
-                            sx={{
-                              color: theme.palette.error.main,
-                              mb: 2,
-                              fontWeight: 600,
-                              letterSpacing: '0.05em',
-                            }}
-                          >
-                            HIGH PRIORITY
-                          </Typography>
-                          <Typography variant="h2" sx={{ fontWeight: 700, mb: 1 }}>
-                            {mockTasks?.filter(t => t.priority === 'high').length || 2}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Tasks requiring immediate attention
-                          </Typography>
-                        </Paper>
-                      </Grid>
-                      
-                      <Grid item xs={12} md={6}>
-                        <Paper
-                          elevation={0}
-                          sx={{
-                            p: 3,
-                            ...themeGlass,
-                            borderRadius: 2,
-                            border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`,
-                            backgroundColor: alpha(theme.palette.warning.main, 0.02),
-                          }}
-                        >
-                          <Typography
-                            variant="h6"
-                            sx={{
-                              color: theme.palette.warning.main,
-                              mb: 2,
-                              fontWeight: 600,
-                              letterSpacing: '0.05em',
-                            }}
-                          >
-                            RECENT ACTIVITY
-                          </Typography>
-                          {mockActivities?.slice(0, 3).map((activity, index) => (
-                            <Box key={activity.id || index} sx={{ mb: 1 }}>
-                              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
-                                • {activity.description}
-                              </Typography>
-                            </Box>
-                          )) || (
-                            <>
-                              <Typography variant="body2">• with Dr. Maria Anderson</Typography>
-                              <Typography variant="body2">• Dr. Maria Anderson to contacts</Typography>
-                              <Typography variant="body2">• to Dr. Priya Miller</Typography>
-                            </>
-                          )}
-                        </Paper>
-                      </Grid>
-                    </Grid>
+        <TabPanel value={activeTab} index={2}>
+          <AutomationHub />
+        </TabPanel>
 
-                    {/* AI Insights */}
-                    <Paper
-                      elevation={0}
-                      sx={{
-                        mt: 3,
-                        p: 3,
-                        ...themeGlass,
-                        borderRadius: 2,
-                        border: `1px solid ${alpha(themeAccents.primary, 0.2)}`,
-                        backgroundColor: alpha(themeAccents.primary, 0.02),
-                      }}
-                    >
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            color: themeAccents.primary,
-                            fontWeight: 600,
-                            letterSpacing: '0.05em',
-                          }}
-                        >
-                          AI INSIGHTS
-                        </Typography>
-                        <Chip
-                          label="View All"
-                          size="small"
-                          clickable
-                          sx={{
-                            backgroundColor: alpha(themeAccents.primary, 0.1),
-                            color: themeAccents.primary,
-                            '&:hover': {
-                              backgroundColor: alpha(themeAccents.primary, 0.2),
-                            },
-                          }}
-                        />
-                      </Box>
-                      <Typography variant="h5" sx={{ mb: 1 }}>
-                        3 High-Confidence Opportunities
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        $2.4M potential pipeline identified
-                      </Typography>
-                    </Paper>
-                  </Box>
-                </Fade>
-              )}
-
-              {/* Activities Mode */}
-              {viewMode === 'activities' && (
-                <Fade in={viewMode === 'activities'} timeout={300}>
-                  <Box>
-                    <CompactActivityFeed 
-                      activities={mockActivities || []}
-                      themeAccents={themeAccents}
-                    />
-                  </Box>
-                </Fade>
-              )}
-
-              {/* Tasks Mode */}
-              {viewMode === 'tasks' && (
-                <Fade in={viewMode === 'tasks'} timeout={300}>
-                  <Box>
-                    <PriorityTaskList 
-                      tasks={mockTasks || []}
-                      themeAccents={themeAccents}
-                    />
-                  </Box>
-                </Fade>
-              )}
-
-              {/* Insights Mode */}
-              {viewMode === 'insights' && (
-                <Fade in={viewMode === 'insights'} timeout={300}>
-                  <Box>
-                    <InsightCards themeAccents={themeAccents} />
-                  </Box>
-                </Fade>
-              )}
-            </Box>
-          </Collapse>
-        </Box>
+        <TabPanel value={activeTab} index={3}>
+          <ContentForgeHub />
+        </TabPanel>
       </Box>
+
+      {/* Mobile Drawer */}
+      <Drawer
+        anchor="left"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: 280,
+            backgroundColor: theme.palette.background.default,
+          },
+        }}
+      >
+        {drawer}
+      </Drawer>
     </Box>
   );
 };
