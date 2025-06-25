@@ -60,7 +60,7 @@ import {
   Analytics as AnalyticsIcon,
   Loop as LoopIcon,
   FilterList as FilterIcon,
-  BoltIcon as TriggerIcon,
+  FlashOn as TriggerIcon,
   AccountTree as WorkflowIcon,
   Assignment as TaskIcon
 } from '@mui/icons-material';
