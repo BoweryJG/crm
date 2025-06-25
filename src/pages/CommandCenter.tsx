@@ -314,7 +314,7 @@ const CommandCenter: React.FC = () => {
                           title="PIPELINE"
                           value="$1.3M"
                           change={{ value: 0, trend: 'down' }}
-                          color={themeAccents.error}
+                          color={themeAccents.error || theme.palette.error.main}
                         />
                       </Grid>
                       <Grid item xs={12} sm={6} md={2.4}>
@@ -323,7 +323,7 @@ const CommandCenter: React.FC = () => {
                           title="CONVERSION"
                           value="45%"
                           change={{ value: 0, trend: 'down' }}
-                          color={themeAccents.success}
+                          color={themeAccents.success || theme.palette.success.main}
                         />
                       </Grid>
                     </Grid>
