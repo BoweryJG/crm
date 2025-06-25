@@ -190,7 +190,7 @@ const AutomationHub: React.FC = () => {
       <Box
         sx={{
           ...themeGlass,
-          borderRadius: 2,
+          borderRadius: '16px',
           overflow: 'hidden',
           mb: 3,
         }}
@@ -218,7 +218,7 @@ const AutomationHub: React.FC = () => {
               size="small"
               onClick={handleGenerateMagicLink}
               sx={{
-                borderRadius: 1,
+                borderRadius: '12px',
               }}
             >
               Magic Link
@@ -228,7 +228,7 @@ const AutomationHub: React.FC = () => {
               startIcon={<AddIcon />}
               size="small"
               sx={{
-                borderRadius: 1,
+                borderRadius: '12px',
                 background: `linear-gradient(135deg, ${themeAccents.primary}, ${themeAccents.glow})`,
               }}
             >
@@ -251,7 +251,7 @@ const AutomationHub: React.FC = () => {
                 label={mode.label}
                 onClick={() => setViewMode(mode.value as AutomationMode)}
                 sx={{
-                  borderRadius: 1,
+                  borderRadius: '12px',
                   backgroundColor: viewMode === mode.value 
                     ? alpha(themeAccents.primary, 0.2)
                     : 'transparent',
@@ -335,7 +335,7 @@ const AutomationHub: React.FC = () => {
                           sx={{
                             width: 48,
                             height: 48,
-                            borderRadius: 1.5,
+                            borderRadius: '10px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',

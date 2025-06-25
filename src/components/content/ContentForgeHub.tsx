@@ -163,7 +163,7 @@ Best regards,
           <Box
             sx={{
               ...themeGlass,
-              borderRadius: 2,
+              borderRadius: '16px',
               overflow: 'hidden',
             }}
           >
@@ -198,7 +198,7 @@ Best regards,
                     icon={type.icon}
                     onClick={() => setSelectedType(type.value as ContentType)}
                     sx={{
-                      borderRadius: 1,
+                      borderRadius: '12px',
                       backgroundColor: selectedType === type.value 
                         ? alpha(themeAccents.primary, 0.2)
                         : 'transparent',
@@ -303,7 +303,7 @@ Best regards,
                   disabled={generating || !context}
                   sx={{
                     py: 1.5,
-                    borderRadius: 1,
+                    borderRadius: '12px',
                     background: generating 
                       ? undefined
                       : `linear-gradient(135deg, ${themeAccents.primary}, ${themeAccents.glow})`,
@@ -354,7 +354,7 @@ Best regards,
                     sx={{
                       p: 2,
                       backgroundColor: alpha(theme.palette.background.paper, 0.3),
-                      borderRadius: 1,
+                      borderRadius: '12px',
                       border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                       whiteSpace: 'pre-wrap',
                       fontFamily: 'monospace',
@@ -391,7 +391,7 @@ Best regards,
           <Box
             sx={{
               ...themeGlass,
-              borderRadius: 2,
+              borderRadius: '16px',
               p: 2,
             }}
           >

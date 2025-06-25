@@ -35,7 +35,7 @@ import { alpha } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { useThemeContext } from '../themes/ThemeContext';
-import MissionControlHub from '../components/dashboard/MissionControlHub';
+// Remove MissionControlHub - no longer needed
 import OperationsCenter from '../components/dashboard/OperationsCenter';
 import AutomationHub from '../components/automation/AutomationHub';
 import ContentForgeHub from '../components/content/ContentForgeHub';
@@ -91,10 +91,9 @@ const CommandCenter: React.FC = () => {
   };
 
   const tabItems = [
-    { label: 'Mission Control', icon: MissionControlIcon, description: 'Strategic overview' },
-    { label: 'Operations', icon: OperationsIcon, description: 'Day-to-day execution' },
-    { label: 'Automation', icon: AutomationIcon, description: 'Automated workflows' },
-    { label: 'Content Forge', icon: ContentForgeIcon, description: 'Content creation' },
+    { label: 'Operations', icon: OperationsIcon, description: 'Live activity & quick actions' },
+    { label: 'Automations', icon: AutomationIcon, description: 'Workflow management' },
+    { label: 'Content Forge', icon: ContentForgeIcon, description: 'AI-powered content creation' },
   ];
 
   const drawer = (
@@ -126,16 +125,23 @@ const CommandCenter: React.FC = () => {
                 setDrawerOpen(false);
               }}
               sx={{
-                borderRadius: 0,
+                borderRadius: '12px',
                 border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                mb: 1.5,
+                mx: 1,
+                backdropFilter: 'blur(10px)',
+                background: alpha(theme.palette.background.paper, 0.05),
                 ...animations.utils.createTransition(),
                 '&:hover': {
                   backgroundColor: alpha(theme.palette.primary.main, 0.08),
                   borderColor: alpha(theme.palette.primary.main, 0.3),
+                  transform: 'translateX(4px)',
+                  boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`,
                 },
                 '&.Mui-selected': {
                   backgroundColor: alpha(theme.palette.primary.main, 0.15),
                   borderColor: theme.palette.primary.main,
+                  boxShadow: `0 0 20px ${alpha(theme.palette.primary.main, 0.3)}`,
                 },
               }}
             >
@@ -175,9 +181,15 @@ const CommandCenter: React.FC = () => {
           ...glassEffects.effects.obsidian,
           backgroundColor: alpha(theme.palette.background.default, 0.9),
           borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+          borderRadius: '0 0 20px 20px',
         }}
       >
-        <Toolbar>
+        <Toolbar
+          sx={{
+            borderRadius: '0 0 20px 20px',
+            px: 3,
+          }}
+        >
           <Typography
             variant="h6"
             sx={{
@@ -206,12 +218,16 @@ const CommandCenter: React.FC = () => {
               sx={{
                 width: '100%',
                 justifyContent: 'flex-start',
+                borderRadius: '12px',
                 borderColor: alpha(theme.palette.primary.main, 0.2),
                 color: theme.palette.text.primary,
+                backdropFilter: 'blur(10px)',
                 ...animations.utils.createTransition(),
                 '&:hover': {
                   borderColor: theme.palette.primary.main,
                   backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                  transform: 'translateY(-2px)',
+                  boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}`,
                 },
               }}
             >
@@ -228,8 +244,10 @@ const CommandCenter: React.FC = () => {
               mb: 4,
               ...glassEffects.effects.obsidian,
               backgroundColor: alpha(theme.palette.background.paper, 0.5),
-              borderRadius: 2,
+              borderRadius: '18px',
               overflow: 'hidden',
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+              boxShadow: `0 8px 32px ${alpha(theme.palette.primary.main, 0.1)}`,
             }}
           >
             <Tabs
@@ -245,19 +263,23 @@ const CommandCenter: React.FC = () => {
                   fontWeight: 400,
                   fontSize: '0.95rem',
                   color: theme.palette.text.secondary,
-                  transition: 'background-color 300ms ease, color 300ms ease',
+                  borderRadius: '12px',
+                  margin: '8px',
+                  transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                    transform: 'translateY(-2px)',
+                    boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}`,
                   },
                   '&.Mui-selected': {
                     color: theme.palette.primary.main,
                     fontWeight: 500,
-                    backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    boxShadow: `0 0 20px ${alpha(theme.palette.primary.main, 0.2)}`,
                   },
                 },
                 '& .MuiTabs-indicator': {
-                  height: 3,
-                  backgroundColor: theme.palette.primary.main,
+                  display: 'none', // Remove the default indicator
                 },
               }}
             >
@@ -285,57 +307,114 @@ const CommandCenter: React.FC = () => {
         )}
 
         <TabPanel value={activeTab} index={0}>
-          <Box sx={{ mb: 4 }}>
-            <Typography
-              variant="overline"
-              sx={{
-                color: theme.palette.primary.main,
-                letterSpacing: '0.3em',
-                display: 'block',
-                mb: 1,
-              }}
-            >
-              STRATEGIC OVERVIEW
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 200, letterSpacing: '0.05em', mb: 2 }}>
-              Mission Control
-            </Typography>
-            <Typography variant="body1" sx={{ color: theme.palette.text.secondary, mb: 4 }}>
-              Monitor high-priority alerts, AI insights, and strategic metrics
-            </Typography>
-          </Box>
-          <MissionControlHub />
+          <Fade in timeout={300}>
+            <Box>
+              <Paper
+                elevation={0}
+                sx={{
+                  mb: 4,
+                  p: 3,
+                  ...glassEffects.effects.frostedSteel,
+                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                  borderRadius: '16px',
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                }}
+              >
+                <Typography
+                  variant="overline"
+                  sx={{
+                    color: theme.palette.primary.main,
+                    letterSpacing: '0.3em',
+                    display: 'block',
+                    mb: 1,
+                  }}
+                >
+                  TACTICAL EXECUTION
+                </Typography>
+                <Typography variant="h4" sx={{ fontWeight: 200, letterSpacing: '0.05em', mb: 2 }}>
+                  Operations Center
+                </Typography>
+                <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
+                  Quick actions, communications, and live activity tracking
+                </Typography>
+              </Paper>
+              <OperationsCenter />
+            </Box>
+          </Fade>
         </TabPanel>
 
         <TabPanel value={activeTab} index={1}>
-          <Box sx={{ mb: 4 }}>
-            <Typography
-              variant="overline"
-              sx={{
-                color: theme.palette.primary.main,
-                letterSpacing: '0.3em',
-                display: 'block',
-                mb: 1,
-              }}
-            >
-              TACTICAL EXECUTION
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 200, letterSpacing: '0.05em', mb: 2 }}>
-              Operations Center
-            </Typography>
-            <Typography variant="body1" sx={{ color: theme.palette.text.secondary, mb: 4 }}>
-              Quick actions, communications, and live activity tracking
-            </Typography>
-          </Box>
-          <OperationsCenter />
+          <Fade in timeout={300}>
+            <Box>
+              <Paper
+                elevation={0}
+                sx={{
+                  mb: 4,
+                  p: 3,
+                  ...glassEffects.effects.aurora,
+                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                  borderRadius: '16px',
+                  border: `1px solid ${alpha(theme.palette.secondary.main, 0.1)}`,
+                }}
+              >
+                <Typography
+                  variant="overline"
+                  sx={{
+                    color: theme.palette.secondary.main,
+                    letterSpacing: '0.3em',
+                    display: 'block',
+                    mb: 1,
+                  }}
+                >
+                  WORKFLOW AUTOMATION
+                </Typography>
+                <Typography variant="h4" sx={{ fontWeight: 200, letterSpacing: '0.05em', mb: 2 }}>
+                  Automation Hub
+                </Typography>
+                <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
+                  Create, manage, and monitor automated workflows
+                </Typography>
+              </Paper>
+              <AutomationHub />
+            </Box>
+          </Fade>
         </TabPanel>
 
         <TabPanel value={activeTab} index={2}>
-          <AutomationHub />
-        </TabPanel>
-
-        <TabPanel value={activeTab} index={3}>
-          <ContentForgeHub />
+          <Fade in timeout={300}>
+            <Box>
+              <Paper
+                elevation={0}
+                sx={{
+                  mb: 4,
+                  p: 3,
+                  ...glassEffects.effects.museum,
+                  backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                  borderRadius: '16px',
+                  border: `1px solid ${alpha(theme.palette.warning.main, 0.1)}`,
+                }}
+              >
+                <Typography
+                  variant="overline"
+                  sx={{
+                    color: theme.palette.warning.main,
+                    letterSpacing: '0.3em',
+                    display: 'block',
+                    mb: 1,
+                  }}
+                >
+                  AI-POWERED CREATION
+                </Typography>
+                <Typography variant="h4" sx={{ fontWeight: 200, letterSpacing: '0.05em', mb: 2 }}>
+                  Content Forge
+                </Typography>
+                <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
+                  Generate compelling content with AI assistance
+                </Typography>
+              </Paper>
+              <ContentForgeHub />
+            </Box>
+          </Fade>
         </TabPanel>
       </Box>
 
@@ -348,6 +427,8 @@ const CommandCenter: React.FC = () => {
           '& .MuiDrawer-paper': {
             width: 280,
             backgroundColor: theme.palette.background.default,
+            borderTopRightRadius: '20px',
+            borderBottomRightRadius: '20px',
           },
         }}
       >

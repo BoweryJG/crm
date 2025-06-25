@@ -126,7 +126,7 @@ const OperationsCenter: React.FC = () => {
       sx={{
         position: 'relative',
         ...themeGlass,
-        borderRadius: 2,
+        borderRadius: '16px',
         overflow: 'hidden',
         transition: 'all 0.3s ease',
       }}
@@ -341,7 +341,7 @@ const QuickActionsView: React.FC<{
             key={contact.id}
             onClick={() => onContactSelect(contact)}
             sx={{
-              borderRadius: 1,
+              borderRadius: '12px',
               mb: 1,
               background: alpha(theme.palette.background.paper, 0.5),
               '&:hover': {
@@ -475,7 +475,7 @@ const LiveFeed: React.FC<{
             sx={{
               p: 1.5,
               mb: 1,
-              borderRadius: 1,
+              borderRadius: '12px',
               background: alpha(theme.palette.background.paper, 0.5),
               border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
               display: 'flex',
@@ -487,7 +487,7 @@ const LiveFeed: React.FC<{
               sx={{
                 width: 36,
                 height: 36,
-                borderRadius: 1,
+                borderRadius: '12px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
