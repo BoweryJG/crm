@@ -18,6 +18,11 @@ import {
   Settings as SettingsIcon,
   Architecture as ArchitectureIcon,
   Psychology as PsychologyIcon,
+  AutoMode as AutomationIcon,
+  Analytics as AnalyticsIcon,
+  Create as ContentIcon,
+  Storage as VaultIcon,
+  Speed as PerformanceIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
@@ -281,18 +286,33 @@ const SculpturalSidebar: React.FC<{
 
   const navigationStructure = [
     {
-      title: 'Core',
+      title: 'Execute',
       items: [
         { title: 'Dashboard', path: '/', icon: <DashboardIcon /> },
-        { title: 'Command Center', path: '/command-center', icon: <DashboardIcon /> },
-        { title: 'Metrics', path: '/metrics', icon: <TrendingUpIcon /> },
         { title: getThemeAwareLabel('relationships'), path: '/relationships', icon: <PeopleIcon /> },
-        { title: 'Analytics', path: '/analytics', icon: <TrendingUpIcon /> },
-        { title: getThemeAwareLabel('intelligence'), path: '/intelligence', icon: <PsychologyIcon /> },
-        { title: 'Call Vault', path: '/operations/call-vault', icon: <PhoneIcon /> },
-        { title: 'Command Room', path: '/command-room', icon: <ArchitectureIcon /> },
+        { title: 'Call Center', path: '/call-center', icon: <PhoneIcon /> },
+        { title: 'Automations', path: '/automations', icon: <AutomationIcon /> },
       ],
       delayOffset: 0,
+    },
+    {
+      title: 'Analyze',
+      items: [
+        { title: 'Performance', path: '/metrics', icon: <PerformanceIcon /> },
+        { title: 'Analytics', path: '/analytics', icon: <AnalyticsIcon /> },
+        { title: 'Call Analytics', path: '/call-analytics', icon: <PhoneIcon /> },
+        { title: getThemeAwareLabel('intelligence'), path: '/intelligence', icon: <PsychologyIcon /> },
+      ],
+      delayOffset: 200,
+    },
+    {
+      title: 'Amplify',
+      items: [
+        { title: 'Command Center', path: '/command-center', icon: <ArchitectureIcon /> },
+        { title: 'Content Studio', path: '/content', icon: <ContentIcon /> },
+        { title: 'Call Vault', path: '/operations/call-vault', icon: <VaultIcon /> },
+      ],
+      delayOffset: 400,
     },
   ];
   

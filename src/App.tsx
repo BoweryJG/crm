@@ -40,7 +40,7 @@ const Analytics = lazy(() => import('./pages/Analytics'));
 const RepAnalytics = lazy(() => import('./pages/RepAnalytics'));
 const MarketAnalytics = lazy(() => import('./pages/MarketAnalytics'));
 const CallInsightDetail = lazy(() => import('./pages/CallInsightDetail'));
-const CallAnalysis = lazy(() => import('./pages/CallAnalysis'));
+const CallAnalytics = lazy(() => import('./pages/CallAnalytics'));
 const Subscribe = lazy(() => import('./pages/Subscribe'));
 const SubscribeSuccess = lazy(() => import('./pages/SubscribeSuccess'));
 const SubscribeCancel = lazy(() => import('./pages/SubscribeCancel'));
@@ -55,6 +55,8 @@ const CommandCenter = lazy(() => import('./pages/CommandCenter'));
 const CallVaultPage = lazy(() => import('./pages/CallVaultPage'));
 const MobileTest = lazy(() => import('./pages/MobileTest'));
 const Metrics = lazy(() => import('./pages/Metrics'));
+const CallCenter = lazy(() => import('./pages/CallCenter'));
+const Automations = lazy(() => import('./pages/Automations'));
 
 // Intelligence Hub Modules
 const StrategicCanvas = lazy(() => import('./modules/intelligence/components/StrategicCanvasMobile'));
@@ -151,6 +153,8 @@ const App: React.FC = () => {
                 <Route path="command-room" element={<Suspense fallback={<PremiumLoadingScreen loadingText="GALLERY" message="Curating your dominance" minimumDuration={2500} />}><CommandRoom /></Suspense>} />
                 <Route path="command-center" element={<Suspense fallback={<PremiumLoadingScreen loadingText="COMMAND CENTER" message="Initializing control systems" minimumDuration={2500} />}><CommandCenter /></Suspense>} />
                 <Route path="metrics" element={<Suspense fallback={<PremiumLoadingScreen loadingText="METRICS" message="Loading performance data" minimumDuration={2500} />}><Metrics /></Suspense>} />
+                <Route path="call-center" element={<Suspense fallback={<PremiumLoadingScreen loadingText="CALL CENTER" message="Initializing communication hub" minimumDuration={2500} />}><CallCenter /></Suspense>} />
+                <Route path="automations" element={<Suspense fallback={<PremiumLoadingScreen loadingText="AUTOMATIONS" message="Loading intelligent workflows" minimumDuration={2500} />}><Automations /></Suspense>} />
                 <Route path="relationships" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="SMART CRM" message="INITIALIZING AI INTELLIGENCE" />}><SmartCRM /></React.Suspense>} />
                 <Route path="contacts" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="CONTACTS" message="NEURAL DATABASE SYNC" />}><Contacts /></React.Suspense>} />
                 <Route path="contacts/:id" element={<React.Suspense fallback={<SphereLoadingScreen loadingText="PROFILE" message="EXTRACTING DATA MATRIX" />}><ContactDetail /></React.Suspense>} />
@@ -162,7 +166,7 @@ const App: React.FC = () => {
                 <Route path="rep-analytics/:insightId" element={<Suspense fallback={<SphereLoadingScreen loadingText="INSIGHTS" message="DECODING CONVERSATION PATTERNS" />}><CallInsightDetail /></Suspense>} />
                 <Route path="research" element={<Suspense fallback={<div>Loading...</div>}><Research /></Suspense>} />
                 <Route path="content" element={<Suspense fallback={<div>Loading...</div>}><PromptManagement /></Suspense>} />
-                <Route path="call-analysis" element={<Suspense fallback={<div>Loading...</div>}><CallAnalysis /></Suspense>} />
+                <Route path="call-analytics" element={<Suspense fallback={<PremiumLoadingScreen loadingText="CALL ANALYTICS" message="Analyzing communication patterns" minimumDuration={2500} />}><CallAnalytics /></Suspense>} />
                 <Route path="market" element={<div>Market Intelligence (Coming Soon)</div>} />
                 <Route path="market/dental-implants" element={<React.Suspense fallback={<div>Loading...</div>}><DentalImplantMarketDashboard /></React.Suspense>} />
                 <Route path="market/practice-interaction" element={<React.Suspense fallback={<div>Loading...</div>}><PracticeInteractionTracker /></React.Suspense>} />
@@ -191,7 +195,7 @@ const App: React.FC = () => {
                 <Route path="intelligence/contacts" element={<Suspense fallback={<SphereLoadingScreen loadingText="CONTACT UNIVERSE" message="MAPPING NEURAL CONNECTIONS" />}><ContactUniverse /></Suspense>} />
                 <Route path="intelligence/market" element={<Suspense fallback={<SphereLoadingScreen loadingText="MARKET INTELLIGENCE" message="ANALYZING MARKET SIGNALS" />}><MarketIntelligenceFeed /></Suspense>} />
                 <Route path="intelligence/learning" element={<Suspense fallback={<SphereLoadingScreen loadingText="LEARNING PATHWAY" message="PERSONALIZING CURRICULUM" />}><LearningPathway /></Suspense>} />
-                <Route path="intelligence/calls" element={<Suspense fallback={<SphereLoadingScreen loadingText="CALL COACH" message="PREPARING CALL ANALYSIS" />}><CallAnalysis /></Suspense>} />
+                <Route path="intelligence/calls" element={<Suspense fallback={<SphereLoadingScreen loadingText="CALL COACH" message="PREPARING CALL ANALYSIS" />}><CallAnalytics /></Suspense>} />
                 
                 {/* Operations Routes */}
                 <Route path="operations/call-vault" element={<Suspense fallback={<SphereLoadingScreen loadingText="CALL VAULT" message="LOADING ARCHIVE SYSTEM" />}><CallVaultPage /></Suspense>} />
