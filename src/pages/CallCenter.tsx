@@ -354,9 +354,9 @@ const CallCenter: React.FC = () => {
                       <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5 }}>
                         <Chip label={contact.specialty} size="small" />
                         <Chip 
-                          label={`Score: ${contact.score}`} 
+                          label={`Score: ${contact.score || 0}`} 
                           size="small" 
-                          color={contact.score > 90 ? 'success' : 'default'}
+                          color={(contact.score || 0) > 90 ? 'success' : 'default'}
                         />
                       </Box>
                     </Box>
