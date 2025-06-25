@@ -283,11 +283,11 @@ const SculpturalSidebar: React.FC<{
     {
       title: 'Core',
       items: [
-        { title: getThemeAwareLabel('dashboard'), path: '/', icon: <DashboardIcon /> },
+        { title: 'Dashboard', path: '/', icon: <DashboardIcon /> },
         { title: 'Command Center', path: '/command-center', icon: <DashboardIcon /> },
-        { title: getThemeAwareLabel('relationships'), path: '/relationships', icon: <PeopleIcon /> },
         { title: 'Metrics', path: '/metrics', icon: <TrendingUpIcon /> },
-        { title: getThemeAwareLabel('analytics'), path: '/analytics', icon: <TrendingUpIcon /> },
+        { title: getThemeAwareLabel('relationships'), path: '/relationships', icon: <PeopleIcon /> },
+        { title: 'Analytics', path: '/analytics', icon: <TrendingUpIcon /> },
         { title: getThemeAwareLabel('intelligence'), path: '/intelligence', icon: <PsychologyIcon /> },
         { title: 'Call Vault', path: '/operations/call-vault', icon: <PhoneIcon /> },
         { title: 'Command Room', path: '/command-room', icon: <ArchitectureIcon /> },
