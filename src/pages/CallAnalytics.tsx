@@ -419,7 +419,7 @@ const CallAnalytics: React.FC = () => {
   );
 
   const renderCallQuality = () => (
-    <Card elevation={0} sx={{ ...glassEffects.effects.glacier, borderRadius: 3 }}>
+    <Card elevation={0} sx={{ ...glassEffects.effects.frostedSteel, borderRadius: 3 }}>
       <CardHeader
         title="Call Quality Analysis"
         subheader="AI-powered call scoring breakdown"
@@ -459,7 +459,7 @@ const CallAnalytics: React.FC = () => {
   );
 
   const renderContactTypePerformance = () => (
-    <Card elevation={0} sx={{ ...glassEffects.effects.aurora, borderRadius: 3 }}>
+    <Card elevation={0} sx={{ ...glassEffects.effects.goldInfused, borderRadius: 3 }}>
       <CardHeader
         title="Performance by Contact Type"
         subheader="Conversion rates across different specialties"
