@@ -43,13 +43,8 @@ const MonolithTab: React.FC<{
   const theme = useTheme();
   const [isHovered, setIsHovered] = useState(false);
   
-  // Different sounds for variety (removed hover sounds)
-  const clickSound = useSound(
-    isActive ? 'ui-toggle' : 
-    soundVariant % 3 === 0 ? 'ui-click-primary' : 
-    soundVariant % 3 === 1 ? 'ui-click-secondary' : 
-    'navigation-forward'
-  );
+  // Use metal click sound for all sidebar interactions
+  const clickSound = useSound('ui-click-metal');
   
   return (
     <Box

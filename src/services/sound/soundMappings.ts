@@ -15,6 +15,11 @@ export const CORE_SOUNDS: Record<string, SoundMapping> = {
     fallbacks: ['/sounds/core/fallback-click.mp3', '/sounds/core/ui-click-primary.wav'],
     category: 'ui'
   },
+  'ui-click-metal': {
+    primary: '/sounds/475435__o_ciz__click_1metal.wav', // Metal click sound
+    fallbacks: ['/sounds/test-click.mp3', '/sounds/core/ui-click-primary.wav'],
+    category: 'ui'
+  },
   'ui-click-secondary': {
     primary: '/sounds/core/ui-click-secondary.mp3', // This file exists
     fallbacks: ['/sounds/core/ui-click-secondary.wav', '/sounds/test-click.mp3'],
