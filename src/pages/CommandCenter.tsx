@@ -351,7 +351,7 @@ const CommandCenter: React.FC = () => {
                 sx={{
                   mb: 4,
                   p: 3,
-                  ...glassEffects.effects.aurora,
+                  ...glassEffects.effects.goldInfused,
                   backgroundColor: alpha(theme.palette.background.paper, 0.5),
                   borderRadius: '16px',
                   border: `1px solid ${alpha(theme.palette.secondary.main, 0.1)}`,
