@@ -11,13 +11,13 @@ export interface SoundMapping {
 export const CORE_SOUNDS: Record<string, SoundMapping> = {
   // UI Sounds - Using actual existing files
   'ui-click-primary': {
-    primary: '/sounds/test-click.mp3', // This file exists
-    fallbacks: ['/sounds/core/fallback-click.mp3', '/sounds/core/ui-click-primary.wav'],
+    primary: '/sounds/core/ui-click-primary.wav', // This file exists
+    fallbacks: ['/sounds/core/ui-click-secondary.wav', '/sounds/core/ui-click-metal.wav'],
     category: 'ui'
   },
   'ui-click-metal': {
-    primary: '/sounds/475435__o_ciz__click_1metal.wav', // Metal click sound
-    fallbacks: ['/sounds/test-click.mp3', '/sounds/core/ui-click-primary.wav'],
+    primary: '/sounds/core/ui-click-metal.wav', // Metal click sound
+    fallbacks: ['/sounds/core/ui-click-primary.wav', '/sounds/core/ui-click-secondary.wav'],
     category: 'ui'
   },
   'ui-click-secondary': {

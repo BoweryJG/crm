@@ -49,9 +49,6 @@
     
     <script>
         const soundFiles = [
-            // Test sounds
-            '/sounds/test-click.mp3',
-            
             // Core sounds - MP3
             '/sounds/core/ui-click-primary.mp3',
             '/sounds/core/ui-click-secondary.mp3',
@@ -61,7 +58,6 @@
             '/sounds/core/navigation-back.mp3',
             '/sounds/core/notification-success.mp3',
             '/sounds/core/notification-error.mp3',
-            '/sounds/core/gauge-tick.mp3',
             
             // Core sounds - WAV
             '/sounds/core/ui-click-primary.wav',
@@ -73,21 +69,24 @@
             '/sounds/core/notification-success.wav',
             '/sounds/core/notification-error.wav',
             '/sounds/core/gauge-tick.wav',
+            '/sounds/core/ui-click-metal.wav',
+            '/sounds/core/diamond-click.wav',
             
-            // Direct references
-            '/sounds/ui-click-primary.mp3',
-            '/sounds/ui-click-secondary.mp3',
-            '/sounds/ui-toggle.mp3',
-            '/sounds/navigation-forward.mp3',
+            // Theme specific - Boeing 747
+            '/sounds/themes/boeing-747/boeing-button-press.wav',
+            '/sounds/themes/boeing-747/boeing-autopilot-engage.mp3',
+            '/sounds/themes/boeing-747/boeing-altitude-alert.wav',
             
-            // Theme specific
-            '/sounds/themes/boeing-747/switch-click.wav',
-            '/sounds/themes/boeing-747/switch-toggle.wav',
-            '/sounds/themes/boeing-747/chime-success.wav',
-            '/sounds/themes/luxury-hermes/crystal-tap.wav',
-            '/sounds/themes/luxury-hermes/bell-chime.wav',
-            '/sounds/themes/f16-viper/tactical-click.wav',
-            '/sounds/themes/f16-viper/weapon-select.wav',
+            // Theme specific - F-16 Viper
+            '/sounds/themes/f16-viper/f16-radar-ping.wav',
+            '/sounds/themes/f16-viper/f16-system-ready.wav',
+            '/sounds/themes/f16-viper/f16-missile-lock.wav',
+            
+            // Theme specific - Luxury Hermes
+            '/sounds/themes/luxury-hermes/crystal-ting.mp3',
+            '/sounds/themes/luxury-hermes/glass-clink.mp3',
+            '/sounds/themes/luxury-hermes/leather-creak.mp3',
+            '/sounds/themes/luxury-hermes/champagne-pop.mp3',
         ];
         
         const resultsDiv = document.getElementById('results');
