@@ -122,7 +122,10 @@ export const THEME_SOUND_OVERRIDES: Record<string, Partial<Record<string, string
     'ui-hover': '/sounds/themes/rolex-watchmaking/tick-precise.wav',
     'notification-success': '/sounds/themes/rolex-watchmaking/rolex-certification.mp3',
   },
-};,
+};
+
+// Theme-specific sound overrides
+export const themeOverrides: Record<string, Partial<SoundMapping>> = {
   'f16-viper': {
     'ui-click-primary': '/sounds/themes/f16-viper/f16-radar-ping.mp3',
     'ui-click-secondary': '/sounds/themes/f16-viper/f16-radar-short.wav',
