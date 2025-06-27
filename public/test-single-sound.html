@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Single Sound Test</title>
+</head>
+<body>
+    <h1>Sound Test</h1>
+    <button onclick="testSound()">Test Boeing 747 Sound</button>
+    <button onclick="testF16Sound()">Test F16 Sound</button>
+    <button onclick="testShelbySound()">Test Shelby Sound</button>
+    
+    <script>
+        function testSound() {
+            const audio = new Audio('/sounds/themes/boeing-747/ui-primary-switch-1.wav');
+            audio.play().then(() => {
+                console.log('Boeing sound played successfully');
+            }).catch(err => {
+                console.error('Boeing sound failed:', err);
+            });
+        }
+        
+        function testF16Sound() {
+            const audio = new Audio('/sounds/themes/f16-viper/ui-primary-radar-1.wav');
+            audio.play().then(() => {
+                console.log('F16 sound played successfully');
+            }).catch(err => {
+                console.error('F16 sound failed:', err);
+            });
+        }
+        
+        function testShelbySound() {
+            const audio = new Audio('/sounds/themes/shelbygt500cartier/shelby-engine-roar.mp3');
+            audio.play().then(() => {
+                console.log('Shelby sound played successfully');
+            }).catch(err => {
+                console.error('Shelby sound failed:', err);
+            });
+        }
+    </script>
+</body>
+</html>

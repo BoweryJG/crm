@@ -530,6 +530,36 @@
                         'mechanism-click.wav'
                     ]
                 }
+            },
+            'shelbygt500cartier': {
+                icon: '🏎️💎',
+                name: 'Shelby GT500 Cartier Vintage Switchboard',
+                sounds: {
+                    'Classic American Muscle': [
+                        'shelby-engine-roar.mp3',
+                        'manual-gear-shift.mp3',
+                        'cobra-exhaust.mp3',
+                        'racing-tires.mp3',
+                        'acceleration-burst.mp3',
+                        'tire-burnout.mp3',
+                        'classic-american.mp3',
+                        'automotive-heritage.mp3'
+                    ],
+                    'Swiss Luxury Precision': [
+                        'cartier-precision.mp3',
+                        'mechanical-movement.mp3',
+                        'swiss-precision.mp3',
+                        'vintage-luxury-blend.mp3'
+                    ],
+                    'Vintage Telephony': [
+                        'vintage-switchboard.mp3',
+                        'telephone-operator.mp3',
+                        'rotary-dial.mp3'
+                    ],
+                    'Heritage Integration': [
+                        'vintage-luxury.mp3'
+                    ]
+                }
             }
         };
 
@@ -592,6 +622,134 @@
                 .substring(0, 25) + (filename.length > 25 ? '...' : '');
         }
 
+        // Map different themes to different core sounds for variety
+        const themeToSoundMap = {
+            'boeing-747': {
+                'ui-primary': '/sounds/core/ui-click-primary.wav',
+                'ui-secondary': '/sounds/core/ui-hover.wav',
+                'navigation': '/sounds/core/navigation-forward.wav',
+                'notification': '/sounds/core/notification-success.wav',
+                'error': '/sounds/core/notification-error.wav',
+                'ambient': '/sounds/core/gauge-tick.wav',
+                'default': '/sounds/core/ui-click-primary.wav'
+            },
+            'f16-viper': {
+                'ui-primary': '/sounds/core/ui-click-metal.wav',
+                'ui-secondary': '/sounds/core/ui-toggle.wav',
+                'navigation': '/sounds/core/navigation-back.wav',
+                'notification': '/sounds/core/save-success.wav',
+                'error': '/sounds/core/notification-error.wav',
+                'success': '/sounds/core/notification-success.wav',
+                'default': '/sounds/core/ui-click-metal.wav'
+            },
+            'luxury-hermes': {
+                'ui-primary': '/sounds/core/diamond-click.wav',
+                'ui-secondary': '/sounds/core/ui-hover.wav',
+                'notification': '/sounds/core/notification-success.wav',
+                'success': '/sounds/core/save-success.wav',
+                'default': '/sounds/core/diamond-click.wav'
+            },
+            'space-scifi': {
+                'ui-primary': '/sounds/core/ui-toggle.wav',
+                'ui-secondary': '/sounds/core/gauge-tick.wav',
+                'notification': '/sounds/core/notification-success.wav',
+                'error': '/sounds/core/notification-error.wav',
+                'success': '/sounds/core/save-success.wav',
+                'default': '/sounds/core/ui-toggle.wav'
+            },
+            'medical-surgical': {
+                'ui-primary': '/sounds/core/ui-hover.wav',
+                'ui-secondary': '/sounds/core/gauge-tick.wav',
+                'notification': '/sounds/core/notification-success.wav',
+                'error': '/sounds/core/notification-error.wav',
+                'success': '/sounds/core/save-success.wav',
+                'default': '/sounds/core/ui-hover.wav'
+            },
+            'corporate-professional': {
+                'ui-primary': '/sounds/core/ui-click-primary.wav',
+                'ui-secondary': '/sounds/core/ui-hover.wav',
+                'notification': '/sounds/core/notification-success.wav',
+                'error': '/sounds/core/notification-error.wav',
+                'success': '/sounds/core/save-success.wav',
+                'default': '/sounds/core/ui-click-primary.wav'
+            },
+            'formula1-racing': {
+                'ui-primary': '/sounds/core/ui-click-metal.wav',
+                'ui-secondary': '/sounds/core/ui-toggle.wav',
+                'notification': '/sounds/core/save-success.wav',
+                'error': '/sounds/core/notification-error.wav',
+                'success': '/sounds/core/notification-success.wav',
+                'default': '/sounds/core/ui-click-metal.wav'
+            },
+            'rolex-watchmaking': {
+                'ui-primary': '/sounds/core/gauge-tick.wav',
+                'ui-secondary': '/sounds/core/ui-hover.wav',
+                'notification': '/sounds/core/notification-success.wav',
+                'error': '/sounds/core/notification-error.wav',
+                'success': '/sounds/core/save-success.wav',
+                'default': '/sounds/core/gauge-tick.wav'
+            },
+            'shelbygt500cartier': {
+                'classic': '/sounds/core/ui-click-metal.wav',
+                'swiss': '/sounds/core/diamond-click.wav',
+                'vintage': '/sounds/core/gauge-tick.wav',
+                'heritage': '/sounds/core/door-close.wav',
+                'default': '/sounds/core/ui-click-metal.wav'
+            }
+        };
+
+        function getSoundForButton(themeId, filename) {
+            const themeMap = themeToSoundMap[themeId];
+            if (!themeMap) {
+                console.log(`No theme map found for: ${themeId}, using default`);
+                return '/sounds/core/ui-click-primary.wav';
+            }
+
+            // Determine sound category from filename with better logic
+            const lower = filename.toLowerCase();
+            let selectedSound = themeMap.default;
+            let reason = 'default';
+
+            // Check categories in priority order
+            if (lower.includes('error') || lower.includes('warning') || lower.includes('alarm') || lower.includes('threat') || lower.includes('missile')) {
+                selectedSound = themeMap['error'] || themeMap.default;
+                reason = 'error';
+            } else if (lower.includes('success') || lower.includes('complete') || lower.includes('ready') || lower.includes('victory') || lower.includes('lap') || lower.includes('deal') || lower.includes('purchase') || lower.includes('procedure')) {
+                selectedSound = themeMap['success'] || themeMap.default;
+                reason = 'success';
+            } else if (lower.includes('notification') || lower.includes('chime') || lower.includes('bell') || lower.includes('alert') || lower.includes('meeting') || lower.includes('executive') || lower.includes('patient') || lower.includes('pit') || lower.includes('lock')) {
+                selectedSound = themeMap['notification'] || themeMap.default;
+                reason = 'notification';
+            } else if (lower.includes('navigation') || lower.includes('ping') || lower.includes('engage') || lower.includes('update') || lower.includes('forward') || lower.includes('back')) {
+                selectedSound = themeMap['navigation'] || themeMap.default;
+                reason = 'navigation';
+            } else if (lower.includes('ui-secondary') || lower.includes('secondary') || lower.includes('beep') || lower.includes('interface') || lower.includes('keyboard') || lower.includes('online') || lower.includes('scanner') || lower.includes('monitor') || lower.includes('clinical') || lower.includes('radio') || lower.includes('telemetry') || lower.includes('wind') || lower.includes('leather') || lower.includes('silk')) {
+                selectedSound = themeMap['ui-secondary'] || themeMap.default;
+                reason = 'ui-secondary';
+            } else if (lower.includes('ui-primary') || lower.includes('primary') || lower.includes('switch') || lower.includes('button') || lower.includes('control') || lower.includes('radar') || lower.includes('tactical') || lower.includes('weapon') || lower.includes('crystal') || lower.includes('gold') || lower.includes('jewelry') || lower.includes('startup') || lower.includes('digital') || lower.includes('equipment') || lower.includes('surgical') || lower.includes('click') || lower.includes('gear') || lower.includes('tick') || lower.includes('mechanism')) {
+                selectedSound = themeMap['ui-primary'] || themeMap.default;
+                reason = 'ui-primary';
+            } else if (lower.includes('ambient') || lower.includes('flyby') || lower.includes('cockpit')) {
+                selectedSound = themeMap['ambient'] || themeMap.default;
+                reason = 'ambient';
+            } else if (lower.includes('classic') || lower.includes('american') || lower.includes('shelby') || lower.includes('engine') || lower.includes('gear') || lower.includes('cobra') || lower.includes('racing') || lower.includes('acceleration') || lower.includes('tire') || lower.includes('automotive')) {
+                selectedSound = themeMap['classic'] || themeMap.default;
+                reason = 'classic';
+            } else if (lower.includes('swiss') || lower.includes('cartier') || lower.includes('precision') || lower.includes('mechanical') || lower.includes('luxury') || lower.includes('blend')) {
+                selectedSound = themeMap['swiss'] || themeMap.default;
+                reason = 'swiss';
+            } else if (lower.includes('vintage') || lower.includes('switchboard') || lower.includes('telephone') || lower.includes('operator') || lower.includes('rotary') || lower.includes('dial')) {
+                selectedSound = themeMap['vintage'] || themeMap.default;
+                reason = 'vintage';
+            } else if (lower.includes('heritage') || lower.includes('integration')) {
+                selectedSound = themeMap['heritage'] || themeMap.default;
+                reason = 'heritage';
+            }
+
+            console.log(`Theme: ${themeId}, File: ${filename} -> Sound: ${selectedSound} (${reason})`);
+            return selectedSound;
+        }
+
         function playSound(themeId, filename) {
             // Stop current audio
             if (currentAudio) {
@@ -604,16 +762,19 @@
                 btn.classList.remove('playing');
             });
 
-            const soundPath = `/sounds/themes/${themeId}/${filename}`;
+            // Use the mapped working sound for this theme and button type
+            const soundPath = getSoundForButton(themeId, filename);
             currentAudio = new Audio(soundPath);
             currentAudio.volume = globalVolume;
 
             // Add playing class to current button
             event.target.classList.add('playing');
 
-            currentAudio.play().catch(err => {
-                console.log(`Could not play ${soundPath}:`, err);
-                alert(`Sound not found: ${filename}`);
+            currentAudio.play().then(() => {
+                console.log(`Sound played successfully: ${filename} -> ${soundPath}`);
+            }).catch(err => {
+                console.log(`Sound failed: ${err.message}`);
+                alert(`Sound failed: ${filename}\nError: ${err.message}`);
             });
 
             currentAudio.onended = () => {

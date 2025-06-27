@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SIMPLE AUDIO TEST</title>
+</head>
+<body>
+    <h1>CLICK TO HEAR SOUND</h1>
+    <button onclick="playAudio()" style="font-size: 30px; padding: 20px;">🔊 CLICK ME TO HEAR SOUND</button>
+    
+    <audio id="testAudio" preload="auto">
+        <source src="/sounds/core/ui-click-primary.wav" type="audio/wav">
+        <source src="/sounds/core/ui-click-primary.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        function playAudio() {
+            const audio = document.getElementById('testAudio');
+            audio.play().then(() => {
+                alert('SOUND PLAYED SUCCESSFULLY!');
+            }).catch(err => {
+                alert('FAILED: ' + err.message);
+                console.error('Audio failed:', err);
+            });
+        }
+    </script>
+</body>
+</html>
