@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Sound Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🎵 Simple Sound Test</h1>
+    <p>Testing basic sound functionality with direct Audio API</p>
+    
+    <div class="status info" id="status">
+        Ready to test sounds...
+    </div>
+
+    <button class="test-button" onclick="testBasicAudio()">
+        🎵 Test Basic Audio API
+    </button>
+    
+    <button class="test-button" onclick="testCoreSound()">
+        🔊 Test Core Sound File
+    </button>
+    
+    <button class="test-button" onclick="testThemeSound()">
+        🎨 Test Theme Sound
+    </button>
+    
+    <button class="test-button" onclick="testAllBasicSounds()">
+        🎯 Test All Basic Sounds
+    </button>
+
+    <div id="results"></div>
+
+    <script>
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            results.appendChild(div);
+        }
+
+        function testBasicAudio() {
+            updateStatus('Testing basic HTML5 Audio API...');
+            
+            try {
+                const audio = new Audio();
+                addResult('✅ Audio constructor works', 'success');
+                
+                // Test if we can create AudioContext
+                if (window.AudioContext || window.webkitAudioContext) {
+                    addResult('✅ AudioContext API available', 'success');
+                } else {
+                    addResult('❌ AudioContext API not available', 'error');
+                }
+                
+                // Test basic audio capabilities
+                const testFormats = ['mp3', 'wav', 'ogg'];
+                testFormats.forEach(format => {
+                    const canPlay = audio.canPlayType(`audio/${format}`);
+                    if (canPlay) {
+                        addResult(`✅ Can play ${format}: ${canPlay}`, 'success');
+                    } else {
+                        addResult(`❌ Cannot play ${format}`, 'error');
+                    }
+                });
+                
+                updateStatus('Basic audio test completed', 'success');
+            } catch (error) {
+                addResult(`❌ Audio API error: ${error.message}`, 'error');
+                updateStatus('Basic audio test failed', 'error');
+            }
+        }
+
+        async function testCoreSound() {
+            updateStatus('Testing core sound file...');
+            
+            const testUrl = '/sounds/core/ui-click-primary.wav';
+            
+            try {
+                // First check if file exists
+                const response = await fetch(testUrl, { method: 'HEAD' });
+                if (!response.ok) {
+                    addResult(`❌ File not accessible: ${testUrl} (${response.status})`, 'error');
+                    updateStatus('Core sound test failed - file not found', 'error');
+                    return;
+                }
+                
+                addResult(`✅ File accessible: ${testUrl}`, 'success');
+                
+                // Try to play it
+                const audio = new Audio(testUrl);
+                audio.volume = 0.5;
+                
+                audio.addEventListener('loadstart', () => {
+                    addResult('Loading started...', 'info');
+                });
+                
+                audio.addEventListener('canplaythrough', () => {
+                    addResult('✅ Audio loaded successfully', 'success');
+                    audio.play().then(() => {
+                        addResult('✅ Audio played successfully!', 'success');
+                        updateStatus('Core sound test successful!', 'success');
+                    }).catch(err => {
+                        addResult(`❌ Play failed: ${err.message}`, 'error');
+                        updateStatus('Core sound test failed - play error', 'error');
+                    });
+                });
+                
+                audio.addEventListener('error', (e) => {
+                    addResult(`❌ Audio load error: ${e.target.error?.message || 'Unknown error'}`, 'error');
+                    updateStatus('Core sound test failed - load error', 'error');
+                });
+                
+                audio.load();
+                
+            } catch (error) {
+                addResult(`❌ Test error: ${error.message}`, 'error');
+                updateStatus('Core sound test failed', 'error');
+            }
+        }
+
+        async function testThemeSound() {
+            updateStatus('Testing theme sound file...');
+            
+            const testUrl = '/sounds/themes/boeing-747/boeing-button-press.wav';
+            
+            try {
+                const response = await fetch(testUrl, { method: 'HEAD' });
+                if (!response.ok) {
+                    addResult(`❌ Theme file not accessible: ${testUrl}`, 'error');
+                    updateStatus('Theme sound test failed', 'error');
+                    return;
+                }
+                
+                addResult(`✅ Theme file accessible: ${testUrl}`, 'success');
+                
+                const audio = new Audio(testUrl);
+                audio.volume = 0.5;
+                
+                audio.addEventListener('canplaythrough', () => {
+                    audio.play().then(() => {
+                        addResult('✅ Theme sound played successfully!', 'success');
+                        updateStatus('Theme sound test successful!', 'success');
+                    }).catch(err => {
+                        addResult(`❌ Theme play failed: ${err.message}`, 'error');
+                        updateStatus('Theme sound test failed', 'error');
+                    });
+                });
+                
+                audio.addEventListener('error', (e) => {
+                    addResult(`❌ Theme audio error: ${e.target.error?.message || 'Unknown'}`, 'error');
+                    updateStatus('Theme sound test failed', 'error');
+                });
+                
+                audio.load();
+                
+            } catch (error) {
+                addResult(`❌ Theme test error: ${error.message}`, 'error');
+                updateStatus('Theme sound test failed', 'error');
+            }
+        }
+
+        async function testAllBasicSounds() {
+            updateStatus('Testing multiple sounds...');
+            
+            const soundsToTest = [
+                '/sounds/core/ui-click-primary.wav',
+                '/sounds/core/ui-hover.wav',
+                '/sounds/themes/boeing-747/boeing-button-press.wav',
+                '/sounds/themes/luxury-hermes/crystal-ting.mp3'
+            ];
+            
+            let successCount = 0;
+            
+            for (let i = 0; i < soundsToTest.length; i++) {
+                const soundUrl = soundsToTest[i];
+                
+                try {
+                    const response = await fetch(soundUrl, { method: 'HEAD' });
+                    if (response.ok) {
+                        addResult(`✅ [${i+1}/${soundsToTest.length}] ${soundUrl.split('/').pop()}`, 'success');
+                        successCount++;
+                        
+                        // Play a quick test
+                        const audio = new Audio(soundUrl);
+                        audio.volume = 0.3;
+                        try {
+                            await audio.play();
+                            // Stop after 200ms
+                            setTimeout(() => {
+                                audio.pause();
+                                audio.currentTime = 0;
+                            }, 200);
+                        } catch (playError) {
+                            addResult(`⚠️ File exists but play failed: ${soundUrl.split('/').pop()}`, 'error');
+                        }
+                    } else {
+                        addResult(`❌ [${i+1}/${soundsToTest.length}] ${soundUrl.split('/').pop()} (${response.status})`, 'error');
+                    }
+                } catch (error) {
+                    addResult(`❌ [${i+1}/${soundsToTest.length}] ${soundUrl.split('/').pop()} - ${error.message}`, 'error');
+                }
+                
+                // Small delay between tests
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
+            const successRate = Math.round((successCount / soundsToTest.length) * 100);
+            updateStatus(`Test complete: ${successCount}/${soundsToTest.length} files working (${successRate}%)`, 
+                        successCount === soundsToTest.length ? 'success' : 'error');
+        }
+
+        // Auto-test on load (after user interaction)
+        document.addEventListener('click', function autoTest() {
+            document.removeEventListener('click', autoTest);
+            addResult('🚀 Starting automatic sound system check...', 'info');
+            setTimeout(testBasicAudio, 100);
+        }, { once: true });
+    </script>
+</body>
+</html>

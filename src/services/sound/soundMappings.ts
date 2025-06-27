@@ -122,6 +122,16 @@ export const THEME_SOUND_OVERRIDES: Record<string, Partial<Record<string, string
     'ui-hover': '/sounds/themes/rolex-watchmaking/tick-precise.wav',
     'notification-success': '/sounds/themes/rolex-watchmaking/rolex-certification.mp3',
   },
+  'shelbygt500cartier': {
+    'ui-click-primary': '/sounds/themes/shelbygt500cartier/manual-gear-shift.mp3',
+    'ui-click-secondary': '/sounds/themes/shelbygt500cartier/cartier-precision.mp3',
+    'ui-hover': '/sounds/themes/shelbygt500cartier/vintage-switchboard.mp3',
+    'ui-toggle': '/sounds/themes/shelbygt500cartier/rotary-dial.mp3',
+    'notification-success': '/sounds/themes/shelbygt500cartier/shelby-engine-roar.mp3',
+    'notification-error': '/sounds/themes/shelbygt500cartier/telephone-operator.mp3',
+    'navigation-forward': '/sounds/themes/shelbygt500cartier/acceleration-burst.mp3',
+    'navigation-back': '/sounds/themes/shelbygt500cartier/tire-burnout.mp3',
+  },
 };
 
 // Export for legacy compatibility

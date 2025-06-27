@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Sound System Diagnostic Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .test-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .test-button {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .test-button:hover {
+            background: linear-gradient(135deg, #2980b9, #1abc9c);
+            transform: translateY(-2px);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status.success {
+            background: #27ae60;
+        }
+
+        .status.error {
+            background: #e74c3c;
+        }
+
+        .status.testing {
+            background: #f39c12;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .log {
+            background: #2c3e50;
+            border: 1px solid #34495e;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .volume-control {
+            margin: 15px 0;
+        }
+
+        .volume-slider {
+            width: 200px;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Sound System Diagnostic Tool</h1>
+            <p>Comprehensive testing for CRM sound system</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🎛️ Quick Controls</h3>
+            <div class="volume-control">
+                <label>Volume: </label>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.1" value="0.5">
+                <span id="volumeDisplay">50%</span>
+            </div>
+            <button class="test-button" onclick="runFullDiagnostic()">🔍 Run Full Diagnostic</button>
+            <button class="test-button" onclick="testCoreSystem()">🎵 Test Core Sounds</button>
+            <button class="test-button" onclick="testAllThemes()">🎨 Test All Themes</button>
+            <button class="test-button" onclick="clearLog()">🗑️ Clear Log</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Quick Sound Tests</h3>
+            <div id="quickTests">
+                <!-- Quick test buttons will be generated here -->
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Individual Theme Tests</h3>
+            <div id="themeTests">
+                <!-- Theme test buttons will be generated here -->
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 Diagnostic Log</h3>
+            <div class="log" id="diagnosticLog">Ready to start diagnostics...\n</div>
+        </div>
+
+        <div class="results-grid" id="resultsGrid">
+            <!-- Results will be populated here -->
+        </div>
+    </div>
+
+    <script>
+        let globalVolume = 0.5;
+        let diagnosticResults = {};
+
+        // Core sound mappings for testing
+        const coreTests = [
+            { id: 'ui-click-primary', path: '/sounds/core/ui-click-primary.wav' },
+            { id: 'ui-click-secondary', path: '/sounds/core/ui-click-secondary.mp3' },
+            { id: 'ui-hover', path: '/sounds/core/ui-hover.wav' },
+            { id: 'ui-toggle', path: '/sounds/core/ui-toggle.mp3' },
+            { id: 'notification-success', path: '/sounds/core/notification-success.wav' },
+            { id: 'notification-error', path: '/sounds/core/notification-error.wav' }
+        ];
+
+        // Theme mappings for testing
+        const themeTests = {
+            'boeing-747': [
+                'boeing-button-press.wav',
+                'boeing-switch-variant.wav',
+                'boeing-altitude-alert.wav'
+            ],
+            'f16-viper': [
+                'f16-radar-ping.mp3',
+                'f16-missile-lock.wav',
+                'f16-system-ready.wav'
+            ],
+            'luxury-hermes': [
+                'crystal-ting.mp3',
+                'champagne-pop.mp3',
+                'bell-elegant.wav'
+            ],
+            'space-scifi': [
+                'space-hologram-touch.mp3',
+                'computer-boot.wav',
+                'space-critical-alert.mp3'
+            ]
+        };
+
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('diagnosticLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const typePrefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            logElement.textContent += `[${timestamp}] ${typePrefix} ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('diagnosticLog').textContent = 'Log cleared...\n';
+            diagnosticResults = {};
+            document.getElementById('resultsGrid').innerHTML = '';
+        }
+
+        async function testSound(path, id = null) {
+            return new Promise((resolve) => {
+                const audio = new Audio(path);
+                audio.volume = globalVolume;
+                
+                const timeout = setTimeout(() => {
+                    log(`Timeout testing ${path}`, 'error');
+                    resolve({ success: false, error: 'Timeout' });
+                }, 5000);
+
+                audio.addEventListener('loadstart', () => {
+                    log(`Loading started: ${path}`);
+                });
+
+                audio.addEventListener('canplaythrough', () => {
+                    clearTimeout(timeout);
+                    log(`✅ Sound loaded successfully: ${path}`, 'success');
+                    
+                    audio.play().then(() => {
+                        log(`✅ Sound played successfully: ${path}`, 'success');
+                        resolve({ success: true, canLoad: true, canPlay: true });
+                    }).catch((playError) => {
+                        log(`❌ Play error for ${path}: ${playError.message}`, 'error');
+                        resolve({ success: false, canLoad: true, canPlay: false, error: playError.message });
+                    });
+                });
+
+                audio.addEventListener('error', (e) => {
+                    clearTimeout(timeout);
+                    log(`❌ Load error for ${path}: ${e.target.error?.message || 'Unknown error'}`, 'error');
+                    resolve({ success: false, canLoad: false, canPlay: false, error: e.target.error?.message || 'Load failed' });
+                });
+
+                // Start loading
+                audio.load();
+            });
+        }
+
+        async function testCoreSystem() {
+            log('🎵 Testing core sound system...', 'info');
+            
+            for (const test of coreTests) {
+                log(`Testing core sound: ${test.id}`);
+                const result = await testSound(test.path, test.id);
+                diagnosticResults[`core-${test.id}`] = result;
+                
+                if (result.success) {
+                    log(`✅ Core sound ${test.id} working`, 'success');
+                } else {
+                    log(`❌ Core sound ${test.id} failed: ${result.error}`, 'error');
+                }
+                
+                // Small delay between tests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            updateResultsDisplay();
+        }
+
+        async function testAllThemes() {
+            log('🎨 Testing all theme sounds...', 'info');
+            
+            for (const [themeId, sounds] of Object.entries(themeTests)) {
+                log(`Testing theme: ${themeId}`);
+                
+                for (const sound of sounds) {
+                    const path = `/sounds/themes/${themeId}/${sound}`;
+                    const result = await testSound(path, `${themeId}-${sound}`);
+                    diagnosticResults[`theme-${themeId}-${sound}`] = result;
+                    
+                    if (result.success) {
+                        log(`✅ Theme sound ${themeId}/${sound} working`, 'success');
+                    } else {
+                        log(`❌ Theme sound ${themeId}/${sound} failed: ${result.error}`, 'error');
+                    }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+            }
+            
+            updateResultsDisplay();
+        }
+
+        async function runFullDiagnostic() {
+            log('🔍 Starting full diagnostic...', 'info');
+            clearLog();
+            log('🔍 Running comprehensive sound system diagnostic...', 'info');
+            
+            // Test browser capabilities
+            log('📊 Testing browser audio capabilities...');
+            const audioContext = window.AudioContext || window.webkitAudioContext;
+            if (audioContext) {
+                log('✅ Web Audio API supported', 'success');
+            } else {
+                log('❌ Web Audio API not supported', 'error');
+            }
+
+            // Test if we're on HTTPS or localhost
+            if (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+                log('✅ Secure context for audio playback', 'success');
+            } else {
+                log('⚠️ Non-secure context - audio may be restricted', 'warning');
+            }
+
+            // Test core sounds
+            await testCoreSystem();
+            
+            // Test themes
+            await testAllThemes();
+            
+            log('🎯 Full diagnostic complete!', 'success');
+            generateSummaryReport();
+        }
+
+        function updateResultsDisplay() {
+            const resultsGrid = document.getElementById('resultsGrid');
+            resultsGrid.innerHTML = '';
+
+            const coreResults = Object.entries(diagnosticResults).filter(([key]) => key.startsWith('core-'));
+            const themeResults = Object.entries(diagnosticResults).filter(([key]) => key.startsWith('theme-'));
+
+            if (coreResults.length > 0) {
+                const coreCard = document.createElement('div');
+                coreCard.className = 'result-card';
+                coreCard.innerHTML = `
+                    <h4>🎵 Core Sounds (${coreResults.filter(([,r]) => r.success).length}/${coreResults.length})</h4>
+                    ${coreResults.map(([key, result]) => 
+                        `<div>${key.replace('core-', '')}: ${result.success ? '✅' : '❌'} ${result.error || ''}</div>`
+                    ).join('')}
+                `;
+                resultsGrid.appendChild(coreCard);
+            }
+
+            if (themeResults.length > 0) {
+                const themeCard = document.createElement('div');
+                themeCard.className = 'result-card';
+                themeCard.innerHTML = `
+                    <h4>🎨 Theme Sounds (${themeResults.filter(([,r]) => r.success).length}/${themeResults.length})</h4>
+                    ${themeResults.map(([key, result]) => 
+                        `<div>${key.replace('theme-', '')}: ${result.success ? '✅' : '❌'} ${result.error || ''}</div>`
+                    ).join('')}
+                `;
+                resultsGrid.appendChild(themeCard);
+            }
+        }
+
+        function generateSummaryReport() {
+            const total = Object.keys(diagnosticResults).length;
+            const successful = Object.values(diagnosticResults).filter(r => r.success).length;
+            const failed = total - successful;
+
+            log(`\n📊 DIAGNOSTIC SUMMARY:`, 'info');
+            log(`Total sounds tested: ${total}`, 'info');
+            log(`Successful: ${successful}`, 'success');
+            log(`Failed: ${failed}`, failed > 0 ? 'error' : 'info');
+            log(`Success rate: ${Math.round((successful/total) * 100)}%`, 'info');
+
+            if (failed > 0) {
+                log(`\n❌ FAILED SOUNDS:`, 'error');
+                Object.entries(diagnosticResults).forEach(([key, result]) => {
+                    if (!result.success) {
+                        log(`  - ${key}: ${result.error}`, 'error');
+                    }
+                });
+            }
+        }
+
+        // Initialize
+        function init() {
+            // Setup volume control
+            const volumeSlider = document.getElementById('volumeSlider');
+            const volumeDisplay = document.getElementById('volumeDisplay');
+
+            volumeSlider.addEventListener('input', (e) => {
+                globalVolume = parseFloat(e.target.value);
+                volumeDisplay.textContent = Math.round(globalVolume * 100) + '%';
+            });
+
+            // Generate quick test buttons
+            const quickTestsDiv = document.getElementById('quickTests');
+            coreTests.forEach(test => {
+                const button = document.createElement('button');
+                button.className = 'test-button';
+                button.textContent = test.id;
+                button.onclick = async () => {
+                    button.disabled = true;
+                    const result = await testSound(test.path, test.id);
+                    button.disabled = false;
+                    
+                    // Visual feedback
+                    const status = document.createElement('span');
+                    status.className = `status ${result.success ? 'success' : 'error'}`;
+                    status.textContent = result.success ? 'OK' : 'FAIL';
+                    button.appendChild(status);
+                    
+                    setTimeout(() => {
+                        if (status.parentNode) {
+                            status.parentNode.removeChild(status);
+                        }
+                    }, 3000);
+                };
+                quickTestsDiv.appendChild(button);
+            });
+
+            // Generate theme test buttons
+            const themeTestsDiv = document.getElementById('themeTests');
+            Object.keys(themeTests).forEach(themeId => {
+                const button = document.createElement('button');
+                button.className = 'test-button';
+                button.textContent = themeId;
+                button.onclick = async () => {
+                    button.disabled = true;
+                    log(`Testing theme: ${themeId}`);
+                    
+                    const sounds = themeTests[themeId];
+                    let successCount = 0;
+                    
+                    for (const sound of sounds) {
+                        const path = `/sounds/themes/${themeId}/${sound}`;
+                        const result = await testSound(path);
+                        if (result.success) successCount++;
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    }
+                    
+                    button.disabled = false;
+                    
+                    const status = document.createElement('span');
+                    status.className = `status ${successCount === sounds.length ? 'success' : 'error'}`;
+                    status.textContent = `${successCount}/${sounds.length}`;
+                    button.appendChild(status);
+                    
+                    setTimeout(() => {
+                        if (status.parentNode) {
+                            status.parentNode.removeChild(status);
+                        }
+                    }, 3000);
+                };
+                themeTestsDiv.appendChild(button);
+            });
+
+            log('🔧 Diagnostic tool ready. Click "Run Full Diagnostic" to start testing.', 'success');
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
