@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 CRM Sound Browser - 146 Themed Sounds</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .stats {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .themes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+        }
+
+        .theme-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .theme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .theme-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .theme-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+        }
+
+        .theme-info h3 {
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .theme-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .category-section {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: linear-gradient(90deg, #f8f9fa, #e9ecef);
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+
+        .sounds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .sound-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sound-button:hover {
+            background: linear-gradient(135deg, #5a67d8, #6b46c1);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .sound-button:active {
+            transform: scale(0.95);
+        }
+
+        .sound-button.playing {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(72, 187, 120, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(72, 187, 120, 0); }
+        }
+
+        .play-all-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+
+        .play-all-btn:hover {
+            background: linear-gradient(135deg, #ff5252, #e53e3e);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .volume-control {
+            margin: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .volume-slider {
+            width: 100px;
+            height: 5px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.3);
+            outline: none;
+            appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            margin: 10px auto;
+            display: block;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .search-box:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .theme-colors {
+            boeing-747: #1e40af;
+            f16-viper: #dc2626;
+            luxury-hermes: #7c2d12;
+            space-scifi: #7c3aed;
+            medical-surgical: #059669;
+            corporate-professional: #374151;
+            formula1-racing: #ea580c;
+            rolex-watchmaking: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎵 CRM Sound Browser</h1>
+        <p>Preview all 146 themed sounds organized by category</p>
+    </div>
+
+    <div class="stats">
+        <h3>📊 Sound Library Statistics</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">146</div>
+                <div>Total Sounds</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">8</div>
+                <div>Themes</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">5</div>
+                <div>Categories</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">18</div>
+                <div>Avg/Theme</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <input type="text" class="search-box" placeholder="🔍 Search sounds by name or theme..." id="searchBox">
+        
+        <div class="volume-control">
+            <span>🔊 Volume:</span>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.1" value="0.5">
+            <span id="volumeDisplay">50%</span>
+        </div>
+
+        <button class="play-all-btn" onclick="playRandomSounds()">🎲 Play Random Samples</button>
+        <button class="play-all-btn" onclick="stopAllSounds()">⏹️ Stop All</button>
+    </div>
+
+    <div class="themes-container" id="themesContainer">
+        <!-- Themes will be dynamically generated -->
+    </div>
+
+    <script>
+        const themes = {
+            'boeing-747': {
+                icon: '✈️',
+                name: 'Boeing 747',
+                sounds: {
+                    'UI Primary': [
+                        'ui-primary-switch-1.wav',
+                        'ui-primary-button-1.wav', 
+                        'ui-primary-control-1.wav'
+                    ],
+                    'UI Secondary': [
+                        'ui-secondary-beep-1.wav',
+                        'ui-secondary-interface-1.wav'
+                    ],
+                    'Navigation': [
+                        'navigation-ping-1.wav',
+                        'navigation-engage-1.wav'
+                    ],
+                    'Notifications': [
+                        'notification-ready-1.wav',
+                        'notification-alert-1.wav'
+                    ],
+                    'Errors': [
+                        'error-warning-1.wav'
+                    ],
+                    'Ambient': [
+                        'ambient-flyby-1.wav',
+                        'ambient-cockpit-1.wav'
+                    ],
+                    'Legacy': [
+                        'boeing-switch-variant.wav',
+                        'boeing-warning-soft.wav'
+                    ]
+                }
+            },
+            'f16-viper': {
+                icon: '🛩️',
+                name: 'F16 Viper',
+                sounds: {
+                    'UI Primary': [
+                        'ui-primary-radar-1.wav',
+                        'ui-primary-tactical-1.wav',
+                        'ui-primary-weapon-1.wav'
+                    ],
+                    'UI Secondary': [
+                        'ui-secondary-online-1.wav'
+                    ],
+                    'Notifications': [
+                        'notification-lock-1.wav'
+                    ],
+                    'Errors': [
+                        'error-missile-1.wav',
+                        'error-threat-1.wav'
+                    ],
+                    'Success': [
+                        'success-ready-1.wav',
+                        'success-complete-1.wav'
+                    ],
+                    'Navigation': [
+                        'navigation-update-1.wav'
+                    ],
+                    'Legacy': [
+                        'f16-radar-short.wav',
+                        'f16-tactical-soft.wav'
+                    ]
+                }
+            },
+            'luxury-hermes': {
+                icon: '💎',
+                name: 'Luxury Hermes',
+                sounds: {
+                    'UI Primary': [
+                        'ui-primary-crystal-1.wav',
+                        'ui-primary-gold-1.wav',
+                        'ui-primary-jewelry-1.wav'
+                    ],
+                    'UI Secondary': [
+                        'ui-secondary-leather-1.wav',
+                        'ui-secondary-silk-1.wav'
+                    ],
+                    'Notifications': [
+                        'notification-chime-1.wav',
+                        'notification-bell-1.wav',
+                        'notification-bell-2.wav'
+                    ],
+                    'Success': [
+                        'success-purchase-1.wav'
+                    ],
+                    'Legacy': [
+                        'crystal-gentle.wav',
+                        'leather-soft.wav',
+                        'bell-elegant.wav'
+                    ]
+                }
+            },
+            'space-scifi': {
+                icon: '🚀',
+                name: 'Space SciFi',
+                sounds: {
+                    'UI Primary': [
+                        'ui-primary-interface-1.wav',
+                        'ui-primary-startup-1.wav',
+                        'ui-primary-digital-1.wav'
+                    ],
+                    'UI Secondary': [
+                        'ui-secondary-scanner-1.wav'
+                    ],
+                    'Notifications': [
+                        'notification-ready-1.wav',
+                        'notification-alert-1.wav'
+                    ],
+                    'Errors': [
+                        'error-system-1.wav'
+                    ],
+                    'Success': [
+                        'success-mission-1.wav',
+                        'success-confirm-1.wav'
+                    ],
+                    'Legacy': [
+                        'interface-soft.wav',
+                        'computer-boot.wav'
+                    ]
+                }
+            },
+            'medical-surgical': {
+                icon: '🏥',
+                name: 'Medical Surgical',
+                sounds: {
+                    'UI Primary': [
+                        'ui-primary-equipment-1.wav',
+                        'ui-primary-surgical-1.wav'
+                    ],
+                    'UI Secondary': [
+                        'ui-secondary-monitor-1.wav',
+                        'ui-secondary-clinical-1.wav'
+                    ],
+                    'Notifications': [
+                        'notification-patient-1.wav',
+                        'notification-chime-1.wav'
+                    ],
+                    'Errors': [
+                        'error-alarm-1.wav'
+                    ],
+                    'Success': [
+                        'success-procedure-1.wav'
+                    ],
+                    'Legacy': [
+                        'equipment-gentle.wav',
+                        'monitor-soft.wav'
+                    ]
+                }
+            },
+            'corporate-professional': {
+                icon: '💼',
+                name: 'Corporate Professional',
+                sounds: {
+                    'UI Primary': [
+                        'ui-primary-click-1.wav',
+                        'ui-primary-click-2.wav'
+                    ],
+                    'UI Secondary': [
+                        'ui-secondary-keyboard-1.wav'
+                    ],
+                    'Notifications': [
+                        'notification-chime-1.wav',
+                        'notification-meeting-1.wav',
+                        'notification-executive-1.wav'
+                    ],
+                    'Errors': [
+                        'error-business-1.wav'
+                    ],
+                    'Success': [
+                        'success-deal-1.wav'
+                    ],
+                    'Legacy': [
+                        'click-professional.wav',
+                        'chime-elegant.wav',
+                        'click-subtle.wav'
+                    ]
+                }
+            },
+            'formula1-racing': {
+                icon: '🏎️',
+                name: 'Formula1 Racing',
+                sounds: {
+                    'UI Primary': [
+                        'ui-primary-gear-1.wav'
+                    ],
+                    'UI Secondary': [
+                        'ui-secondary-radio-1.wav',
+                        'ui-secondary-telemetry-1.wav'
+                    ],
+                    'Notifications': [
+                        'notification-pit-1.wav',
+                        'notification-alert-1.wav'
+                    ],
+                    'Errors': [
+                        'error-warning-1.wav'
+                    ],
+                    'Success': [
+                        'success-lap-1.wav',
+                        'success-victory-1.wav'
+                    ],
+                    'Legacy': [
+                        'gear-click.wav',
+                        'radio-short.wav'
+                    ]
+                }
+            },
+            'rolex-watchmaking': {
+                icon: '⌚',
+                name: 'Rolex Watchmaking',
+                sounds: {
+                    'UI Primary': [
+                        'ui-primary-tick-1.wav',
+                        'ui-primary-mechanism-1.wav'
+                    ],
+                    'UI Secondary': [
+                        'ui-secondary-wind-1.wav'
+                    ],
+                    'Notifications': [
+                        'notification-chime-1.wav',
+                        'notification-alert-1.wav'
+                    ],
+                    'Errors': [
+                        'error-mechanical-1.wav'
+                    ],
+                    'Success': [
+                        'success-complete-1.wav',
+                        'success-ready-1.wav'
+                    ],
+                    'Legacy': [
+                        'tick-precise.wav',
+                        'mechanism-click.wav'
+                    ]
+                }
+            }
+        };
+
+        let currentAudio = null;
+        let globalVolume = 0.5;
+
+        // Initialize the browser
+        function initSoundBrowser() {
+            renderThemes();
+            setupEventListeners();
+        }
+
+        function renderThemes() {
+            const container = document.getElementById('themesContainer');
+            container.innerHTML = '';
+
+            Object.entries(themes).forEach(([themeId, theme]) => {
+                const themeCard = createThemeCard(themeId, theme);
+                container.appendChild(themeCard);
+            });
+        }
+
+        function createThemeCard(themeId, theme) {
+            const card = document.createElement('div');
+            card.className = 'theme-card';
+            card.dataset.themeId = themeId;
+
+            const totalSounds = Object.values(theme.sounds).flat().length;
+
+            card.innerHTML = `
+                <div class="theme-header">
+                    <div class="theme-icon">${theme.icon}</div>
+                    <div class="theme-info">
+                        <h3>${theme.name}</h3>
+                        <div class="theme-count">${totalSounds} sounds</div>
+                    </div>
+                </div>
+                ${Object.entries(theme.sounds).map(([category, sounds]) => `
+                    <div class="category-section">
+                        <div class="category-title">${category} (${sounds.length})</div>
+                        <div class="sounds-grid">
+                            ${sounds.map(sound => `
+                                <button class="sound-button" onclick="playSound('${themeId}', '${sound}')" title="${sound}">
+                                    ${formatSoundName(sound)}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+
+            return card;
+        }
+
+        function formatSoundName(filename) {
+            return filename
+                .replace(/\.(wav|mp3)$/, '')
+                .replace(/[-_]/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase())
+                .substring(0, 25) + (filename.length > 25 ? '...' : '');
+        }
+
+        function playSound(themeId, filename) {
+            // Stop current audio
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+
+            // Remove playing class from all buttons
+            document.querySelectorAll('.sound-button').forEach(btn => {
+                btn.classList.remove('playing');
+            });
+
+            const soundPath = `/sounds/themes/${themeId}/${filename}`;
+            currentAudio = new Audio(soundPath);
+            currentAudio.volume = globalVolume;
+
+            // Add playing class to current button
+            event.target.classList.add('playing');
+
+            currentAudio.play().catch(err => {
+                console.log(`Could not play ${soundPath}:`, err);
+                alert(`Sound not found: ${filename}`);
+            });
+
+            currentAudio.onended = () => {
+                event.target.classList.remove('playing');
+                currentAudio = null;
+            };
+        }
+
+        function playRandomSounds() {
+            const allSounds = [];
+            Object.entries(themes).forEach(([themeId, theme]) => {
+                Object.values(theme.sounds).flat().forEach(sound => {
+                    allSounds.push({themeId, sound});
+                });
+            });
+
+            // Play 5 random sounds with delays
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const random = allSounds[Math.floor(Math.random() * allSounds.length)];
+                    const audio = new Audio(`/sounds/themes/${random.themeId}/${random.sound}`);
+                    audio.volume = globalVolume * 0.7; // Slightly quieter for multiple
+                    audio.play().catch(err => console.log('Random play error:', err));
+                }, i * 800);
+            }
+        }
+
+        function stopAllSounds() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            document.querySelectorAll('.sound-button').forEach(btn => {
+                btn.classList.remove('playing');
+            });
+        }
+
+        function setupEventListeners() {
+            const volumeSlider = document.getElementById('volumeSlider');
+            const volumeDisplay = document.getElementById('volumeDisplay');
+            const searchBox = document.getElementById('searchBox');
+
+            volumeSlider.addEventListener('input', (e) => {
+                globalVolume = parseFloat(e.target.value);
+                volumeDisplay.textContent = Math.round(globalVolume * 100) + '%';
+                if (currentAudio) {
+                    currentAudio.volume = globalVolume;
+                }
+            });
+
+            searchBox.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                filterSounds(searchTerm);
+            });
+        }
+
+        function filterSounds(searchTerm) {
+            document.querySelectorAll('.theme-card').forEach(card => {
+                const themeId = card.dataset.themeId;
+                const themeName = themes[themeId].name.toLowerCase();
+                let hasMatch = themeName.includes(searchTerm);
+
+                card.querySelectorAll('.sound-button').forEach(button => {
+                    const soundName = button.textContent.toLowerCase();
+                    const matches = soundName.includes(searchTerm);
+                    button.style.display = matches ? 'block' : 'none';
+                    if (matches) hasMatch = true;
+                });
+
+                card.style.display = hasMatch ? 'block' : 'none';
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initSoundBrowser);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                playRandomSounds();
+            } else if (e.code === 'Escape') {
+                stopAllSounds();
+            }
+        });
+    </script>
+</body>
+</html>
