@@ -86,10 +86,29 @@
       "category": "gauge",
       "volume": 0.6,
       "description": "Diamond sparkle achievement"
+    },
+    "bell-elegant": {
+      "url": "/sounds/themes/luxury-hermes/bell-elegant.wav",
+      "category": "success",
+      "volume": 0.6
+    },
+    "crystal-gentle": {
+      "url": "/sounds/themes/luxury-hermes/crystal-gentle.wav",
+      "category": "ui-secondary",
+      "volume": 0.6
+    },
+    "leather-soft": {
+      "url": "/sounds/themes/luxury-hermes/leather-soft.wav",
+      "category": "ui-secondary",
+      "volume": 0.6
     }
   },
   "performance": {
-    "preload": ["theme-switch", "ui-click-primary", "navigation-forward"],
+    "preload": [
+      "theme-switch",
+      "ui-click-primary",
+      "navigation-forward"
+    ],
     "lowLatency": true,
     "cacheStrategy": "aggressive"
   }

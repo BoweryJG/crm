@@ -76,10 +76,95 @@ export const CORE_SOUNDS: Record<string, SoundMapping> = {
 // Theme-specific sound overrides - using actual existing files
 export const THEME_SOUND_OVERRIDES: Record<string, Partial<Record<string, string>>> = {
   'boeing-747': {
-    'ui-click-primary': '/sounds/themes/boeing-747/boeing-button-press.mp3',
-    'ui-toggle': '/sounds/themes/boeing-747/boeing-autopilot-engage.mp3',
-    'notification-success': '/sounds/themes/boeing-747/boeing-altitude-alert.mp3',
+    'ui-click-primary': '/sounds/themes/boeing-747/boeing-button-press.wav',
+    'ui-toggle': '/sounds/themes/boeing-747/boeing-switch-variant.wav',
+    'notification-success': '/sounds/themes/boeing-747/boeing-altitude-alert.wav',
+    'notification-error': '/sounds/themes/boeing-747/boeing-warning-soft.wav',
   },
+  'f16-viper': {
+    'ui-click-primary': '/sounds/themes/f16-viper/f16-radar-ping.mp3',
+    'ui-click-secondary': '/sounds/themes/f16-viper/f16-radar-short.wav',
+    'ui-toggle': '/sounds/themes/f16-viper/f16-system-ready.wav',
+    'notification-success': '/sounds/themes/f16-viper/f16-missile-lock.wav',
+    'notification-error': '/sounds/themes/f16-viper/f16-tactical-soft.wav',
+  },
+  'luxury-hermes': {
+    'ui-click-primary': '/sounds/themes/luxury-hermes/crystal-ting.mp3',
+    'ui-click-secondary': '/sounds/themes/luxury-hermes/crystal-gentle.wav',
+    'ui-hover': '/sounds/themes/luxury-hermes/bell-elegant.wav',
+    'notification-success': '/sounds/themes/luxury-hermes/champagne-pop.mp3',
+  },
+  'space-scifi': {
+    'ui-click-primary': '/sounds/themes/space-scifi/space-hologram-touch.mp3',
+    'ui-click-secondary': '/sounds/themes/space-scifi/interface-soft.wav',
+    'notification-success': '/sounds/themes/space-scifi/computer-boot.wav',
+    'notification-error': '/sounds/themes/space-scifi/space-critical-alert.mp3',
+  },
+  'medical-surgical': {
+    'ui-click-primary': '/sounds/themes/medical-surgical/med-instrument-select.mp3',
+    'ui-click-secondary': '/sounds/themes/medical-surgical/equipment-gentle.wav',
+    'notification-success': '/sounds/themes/medical-surgical/med-procedure-complete.mp3',
+    'notification-error': '/sounds/themes/medical-surgical/monitor-soft.wav',
+  },
+  'corporate-professional': {
+    'ui-click-primary': '/sounds/themes/corporate-professional/click-professional.wav',
+    'ui-click-secondary': '/sounds/themes/corporate-professional/click-subtle.wav',
+    'notification-success': '/sounds/themes/corporate-professional/chime-elegant.wav',
+  },
+  'formula1-racing': {
+    'ui-click-primary': '/sounds/themes/formula1-racing/f1-paddle-shift.mp3',
+    'ui-click-secondary': '/sounds/themes/formula1-racing/gear-click.wav',
+    'notification-success': '/sounds/themes/formula1-racing/radio-short.wav',
+  },
+  'rolex-watchmaking': {
+    'ui-click-primary': '/sounds/themes/rolex-watchmaking/rolex-bezel-click.mp3',
+    'ui-click-secondary': '/sounds/themes/rolex-watchmaking/mechanism-click.wav',
+    'ui-hover': '/sounds/themes/rolex-watchmaking/tick-precise.wav',
+    'notification-success': '/sounds/themes/rolex-watchmaking/rolex-certification.mp3',
+  },
+};,
+  'f16-viper': {
+    'ui-click-primary': '/sounds/themes/f16-viper/f16-radar-ping.mp3',
+    'ui-click-secondary': '/sounds/themes/f16-viper/f16-radar-short.wav',
+    'ui-toggle': '/sounds/themes/f16-viper/f16-system-ready.wav',
+    'notification-success': '/sounds/themes/f16-viper/f16-missile-lock.wav',
+    'notification-error': '/sounds/themes/f16-viper/f16-tactical-soft.wav',
+  },
+  'luxury-hermes': {
+    'ui-click-primary': '/sounds/themes/luxury-hermes/crystal-ting.mp3',
+    'ui-click-secondary': '/sounds/themes/luxury-hermes/crystal-gentle.wav',
+    'ui-hover': '/sounds/themes/luxury-hermes/bell-elegant.wav',
+    'notification-success': '/sounds/themes/luxury-hermes/champagne-pop.mp3',
+  },
+  'space-scifi': {
+    'ui-click-primary': '/sounds/themes/space-scifi/space-hologram-touch.mp3',
+    'ui-click-secondary': '/sounds/themes/space-scifi/interface-soft.wav',
+    'notification-success': '/sounds/themes/space-scifi/computer-boot.wav',
+    'notification-error': '/sounds/themes/space-scifi/space-critical-alert.mp3',
+  },
+  'medical-surgical': {
+    'ui-click-primary': '/sounds/themes/medical-surgical/med-instrument-select.mp3',
+    'ui-click-secondary': '/sounds/themes/medical-surgical/equipment-gentle.wav',
+    'notification-success': '/sounds/themes/medical-surgical/med-procedure-complete.mp3',
+    'notification-error': '/sounds/themes/medical-surgical/monitor-soft.wav',
+  },
+  'corporate-professional': {
+    'ui-click-primary': '/sounds/themes/corporate-professional/click-professional.wav',
+    'ui-click-secondary': '/sounds/themes/corporate-professional/click-subtle.wav',
+    'notification-success': '/sounds/themes/corporate-professional/chime-elegant.wav',
+  },
+  'formula1-racing': {
+    'ui-click-primary': '/sounds/themes/formula1-racing/f1-paddle-shift.mp3',
+    'ui-click-secondary': '/sounds/themes/formula1-racing/gear-click.wav',
+    'notification-success': '/sounds/themes/formula1-racing/radio-short.wav',
+  },
+  'rolex-watchmaking': {
+    'ui-click-primary': '/sounds/themes/rolex-watchmaking/rolex-bezel-click.mp3',
+    'ui-click-secondary': '/sounds/themes/rolex-watchmaking/mechanism-click.wav',
+    'ui-hover': '/sounds/themes/rolex-watchmaking/tick-precise.wav',
+    'notification-success': '/sounds/themes/rolex-watchmaking/rolex-certification.mp3',
+  },
+};,
   'f16-viper': {
     'ui-click-primary': '/sounds/themes/f16-viper/f16-radar-ping.mp3',
     'ui-toggle': '/sounds/themes/f16-viper/f16-system-ready.mp3',

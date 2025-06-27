@@ -93,10 +93,24 @@
       "category": "ambient",
       "volume": 0.05,
       "description": "Clean hospital ambience"
+    },
+    "equipment-gentle": {
+      "url": "/sounds/themes/medical-surgical/equipment-gentle.wav",
+      "category": "ui-secondary",
+      "volume": 0.6
+    },
+    "monitor-soft": {
+      "url": "/sounds/themes/medical-surgical/monitor-soft.wav",
+      "category": "notification",
+      "volume": 0.6
     }
   },
   "performance": {
-    "preload": ["theme-switch", "ui-click-primary", "gauge-tick"],
+    "preload": [
+      "theme-switch",
+      "ui-click-primary",
+      "gauge-tick"
+    ],
     "lowLatency": true,
     "cacheStrategy": "moderate"
   }

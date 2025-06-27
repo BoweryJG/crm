@@ -93,10 +93,24 @@
       "category": "ambient",
       "volume": 0.1,
       "description": "Swiss watchmaking workshop"
+    },
+    "mechanism-click": {
+      "url": "/sounds/themes/rolex-watchmaking/mechanism-click.wav",
+      "category": "ui-primary",
+      "volume": 0.6
+    },
+    "tick-precise": {
+      "url": "/sounds/themes/rolex-watchmaking/tick-precise.wav",
+      "category": "ui-secondary",
+      "volume": 0.6
     }
   },
   "performance": {
-    "preload": ["theme-switch", "ui-click-primary", "gauge-tick"],
+    "preload": [
+      "theme-switch",
+      "ui-click-primary",
+      "gauge-tick"
+    ],
     "lowLatency": true,
     "cacheStrategy": "aggressive"
   }

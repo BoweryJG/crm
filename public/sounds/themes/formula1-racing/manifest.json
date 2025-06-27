@@ -100,10 +100,24 @@
       "category": "startup",
       "volume": 0.8,
       "description": "Engine warm-up sequence"
+    },
+    "gear-click": {
+      "url": "/sounds/themes/formula1-racing/gear-click.wav",
+      "category": "ui-primary",
+      "volume": 0.6
+    },
+    "radio-short": {
+      "url": "/sounds/themes/formula1-racing/radio-short.wav",
+      "category": "ui-secondary",
+      "volume": 0.6
     }
   },
   "performance": {
-    "preload": ["theme-switch", "ui-click-primary", "navigation-forward"],
+    "preload": [
+      "theme-switch",
+      "ui-click-primary",
+      "navigation-forward"
+    ],
     "lowLatency": true,
     "cacheStrategy": "aggressive"
   }

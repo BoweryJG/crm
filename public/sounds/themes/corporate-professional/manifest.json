@@ -93,10 +93,29 @@
       "category": "ambient",
       "volume": 0.05,
       "description": "Quiet office ambience"
+    },
+    "chime-elegant": {
+      "url": "/sounds/themes/corporate-professional/chime-elegant.wav",
+      "category": "success",
+      "volume": 0.6
+    },
+    "click-professional": {
+      "url": "/sounds/themes/corporate-professional/click-professional.wav",
+      "category": "ui-primary",
+      "volume": 0.6
+    },
+    "click-subtle": {
+      "url": "/sounds/themes/corporate-professional/click-subtle.wav",
+      "category": "ui-primary",
+      "volume": 0.6
     }
   },
   "performance": {
-    "preload": ["theme-switch", "ui-click-primary", "notification-info"],
+    "preload": [
+      "theme-switch",
+      "ui-click-primary",
+      "notification-info"
+    ],
     "lowLatency": true,
     "cacheStrategy": "balanced"
   }

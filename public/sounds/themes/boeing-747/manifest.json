@@ -13,7 +13,7 @@
       "description": "Master caution reset button click"
     },
     "ui-click-primary": {
-      "id": "ui-click-primary", 
+      "id": "ui-click-primary",
       "url": "/sounds/themes/boeing-747/boeing-autopilot-engage.mp3",
       "category": "ui-primary",
       "volume": 0.7,
@@ -24,14 +24,14 @@
     },
     "ui-click-secondary": {
       "id": "ui-click-secondary",
-      "url": "/sounds/themes/boeing-747/radio-ptt.opus", 
+      "url": "/sounds/themes/boeing-747/radio-ptt.opus",
       "category": "ui-secondary",
       "volume": 0.6
     },
     "ui-hover": {
       "id": "ui-hover",
       "url": "/sounds/themes/boeing-747/altitude-selector-tick.opus",
-      "category": "ui-secondary", 
+      "category": "ui-secondary",
       "volume": 0.3
     },
     "ui-toggle": {
@@ -47,7 +47,7 @@
       "volume": 0.6
     },
     "navigation-back": {
-      "id": "navigation-back", 
+      "id": "navigation-back",
       "url": "/sounds/themes/boeing-747/fms-cancel.opus",
       "category": "navigation",
       "volume": 0.6
@@ -60,14 +60,14 @@
     },
     "gauge-zone-change": {
       "id": "gauge-zone-change",
-      "url": "/sounds/themes/boeing-747/boeing-altitude-alert.mp3", 
+      "url": "/sounds/themes/boeing-747/boeing-altitude-alert.mp3",
       "category": "gauge",
       "volume": 0.5
     },
     "gauge-peak": {
       "id": "gauge-peak",
       "url": "/sounds/themes/boeing-747/positive-rate.opus",
-      "category": "gauge", 
+      "category": "gauge",
       "volume": 0.7
     },
     "notification-success": {
@@ -77,14 +77,14 @@
       "volume": 0.8
     },
     "notification-error": {
-      "id": "notification-error", 
+      "id": "notification-error",
       "url": "/sounds/themes/boeing-747/stick-shaker.opus",
       "category": "error",
-      "volume": 1.0
+      "volume": 1
     },
     "notification-info": {
       "id": "notification-info",
-      "url": "/sounds/themes/boeing-747/selcal-chime.opus", 
+      "url": "/sounds/themes/boeing-747/selcal-chime.opus",
       "category": "notification",
       "volume": 0.7
     },
@@ -95,25 +95,40 @@
       "volume": 0.6
     },
     "startup-2": {
-      "id": "startup-2", 
+      "id": "startup-2",
       "url": "/sounds/themes/boeing-747/avionics-power.opus",
       "category": "startup",
       "volume": 0.5
     },
     "startup-3": {
       "id": "startup-3",
-      "url": "/sounds/themes/boeing-747/gyro-spinup.opus", 
+      "url": "/sounds/themes/boeing-747/gyro-spinup.opus",
       "category": "startup",
       "volume": 0.4
     },
     "startup-4": {
       "id": "startup-4",
       "url": "/sounds/themes/boeing-747/cockpit-ready.opus",
-      "category": "startup", 
+      "category": "startup",
       "volume": 0.8
+    },
+    "boeing-switch-variant": {
+      "url": "/sounds/themes/boeing-747/boeing-switch-variant.wav",
+      "category": "ui-primary",
+      "volume": 0.6
+    },
+    "boeing-warning-soft": {
+      "url": "/sounds/themes/boeing-747/boeing-warning-soft.wav",
+      "category": "error",
+      "volume": 0.6
     }
   },
-  "startupSequence": ["startup-1", "startup-2", "startup-3", "startup-4"],
+  "startupSequence": [
+    "startup-1",
+    "startup-2",
+    "startup-3",
+    "startup-4"
+  ],
   "ambient": {
     "id": "ambient",
     "url": "/sounds/themes/boeing-747/cockpit-ambience.opus",

@@ -100,10 +100,24 @@
       "category": "startup",
       "volume": 0.8,
       "description": "All systems online sequence"
+    },
+    "computer-boot": {
+      "url": "/sounds/themes/space-scifi/computer-boot.wav",
+      "category": "ui-secondary",
+      "volume": 0.6
+    },
+    "interface-soft": {
+      "url": "/sounds/themes/space-scifi/interface-soft.wav",
+      "category": "notification",
+      "volume": 0.6
     }
   },
   "performance": {
-    "preload": ["theme-switch", "ui-click-primary", "notification-error"],
+    "preload": [
+      "theme-switch",
+      "ui-click-primary",
+      "notification-error"
+    ],
     "lowLatency": true,
     "cacheStrategy": "aggressive"
   }

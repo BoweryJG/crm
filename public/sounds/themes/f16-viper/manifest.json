@@ -13,7 +13,7 @@
       "description": "Master arm switch activation"
     },
     "ui-click-primary": {
-      "id": "ui-click-primary", 
+      "id": "ui-click-primary",
       "url": "/sounds/themes/f16-viper/pickle-button.opus",
       "category": "ui-primary",
       "volume": 0.8,
@@ -25,7 +25,7 @@
     },
     "ui-click-secondary": {
       "id": "ui-click-secondary",
-      "url": "/sounds/themes/f16-viper/radio-transmit.opus", 
+      "url": "/sounds/themes/f16-viper/radio-transmit.opus",
       "category": "ui-secondary",
       "volume": 0.7,
       "description": "UHF radio transmit button"
@@ -33,7 +33,7 @@
     "ui-hover": {
       "id": "ui-hover",
       "url": "/sounds/themes/f16-viper/mfd-button.opus",
-      "category": "ui-secondary", 
+      "category": "ui-secondary",
       "volume": 0.4,
       "description": "Multi-function display button feedback"
     },
@@ -52,7 +52,7 @@
       "description": "HUD mode selection"
     },
     "navigation-back": {
-      "id": "navigation-back", 
+      "id": "navigation-back",
       "url": "/sounds/themes/f16-viper/hud-deselect.opus",
       "category": "navigation",
       "volume": 0.7,
@@ -67,7 +67,7 @@
     },
     "gauge-zone-change": {
       "id": "gauge-zone-change",
-      "url": "/sounds/themes/f16-viper/rwr-new-threat.opus", 
+      "url": "/sounds/themes/f16-viper/rwr-new-threat.opus",
       "category": "gauge",
       "volume": 0.8,
       "description": "RWR new threat indication"
@@ -75,7 +75,7 @@
     "gauge-peak": {
       "id": "gauge-peak",
       "url": "/sounds/themes/f16-viper/bingo-fuel.opus",
-      "category": "gauge", 
+      "category": "gauge",
       "volume": 0.9,
       "description": "Bingo fuel warning"
     },
@@ -87,15 +87,15 @@
       "description": "Fox Two missile launch confirmation"
     },
     "notification-error": {
-      "id": "notification-error", 
+      "id": "notification-error",
       "url": "/sounds/themes/f16-viper/missile-warning.opus",
       "category": "error",
-      "volume": 1.0,
+      "volume": 1,
       "description": "Missile launch warning"
     },
     "notification-info": {
       "id": "notification-info",
-      "url": "/sounds/themes/f16-viper/datalink-update.opus", 
+      "url": "/sounds/themes/f16-viper/datalink-update.opus",
       "category": "notification",
       "volume": 0.7,
       "description": "Datalink update notification"
@@ -104,7 +104,7 @@
       "id": "rwr-lock",
       "url": "/sounds/themes/f16-viper/rwr-lock-tone.opus",
       "category": "error",
-      "volume": 1.0,
+      "volume": 1,
       "description": "Radar lock warning tone"
     },
     "startup-1": {
@@ -114,25 +114,40 @@
       "volume": 0.7
     },
     "startup-2": {
-      "id": "startup-2", 
+      "id": "startup-2",
       "url": "/sounds/themes/f16-viper/engine-idle.opus",
       "category": "startup",
       "volume": 0.6
     },
     "startup-3": {
       "id": "startup-3",
-      "url": "/sounds/themes/f16-viper/avionics-online.opus", 
+      "url": "/sounds/themes/f16-viper/avionics-online.opus",
       "category": "startup",
       "volume": 0.5
     },
     "startup-4": {
       "id": "startup-4",
       "url": "/sounds/themes/f16-viper/systems-ready.opus",
-      "category": "startup", 
+      "category": "startup",
       "volume": 0.8
+    },
+    "f16-radar-short": {
+      "url": "/sounds/themes/f16-viper/f16-radar-short.wav",
+      "category": "notification",
+      "volume": 0.6
+    },
+    "f16-tactical-soft": {
+      "url": "/sounds/themes/f16-viper/f16-tactical-soft.wav",
+      "category": "ui-secondary",
+      "volume": 0.6
     }
   },
-  "startupSequence": ["startup-1", "startup-2", "startup-3", "startup-4"],
+  "startupSequence": [
+    "startup-1",
+    "startup-2",
+    "startup-3",
+    "startup-4"
+  ],
   "ambient": {
     "id": "ambient",
     "url": "/sounds/themes/f16-viper/jet-cockpit-idle.opus",
