@@ -299,33 +299,41 @@
                 icon: '✈️',
                 name: 'Boeing 747',
                 sounds: {
-                    'UI Primary': [
-                        'ui-primary-switch-1.wav',
-                        'ui-primary-button-1.wav', 
-                        'ui-primary-control-1.wav'
+                    'Engine Systems': [
+                        'boeing-autopilot-engage.mp3',
+                        'boeing-engine-startup.mp3',
+                        'boeing-engine-idle.mp3'
                     ],
-                    'UI Secondary': [
-                        'ui-secondary-beep-1.wav',
-                        'ui-secondary-interface-1.wav'
+                    'Cockpit Controls': [
+                        'boeing-switch-variant.wav',
+                        'boeing-button-press.wav',
+                        'boeing-heavy-switch.mp3'
                     ],
                     'Navigation': [
                         'navigation-ping-1.wav',
                         'navigation-engage-1.wav'
                     ],
-                    'Notifications': [
-                        'notification-ready-1.wav',
-                        'notification-alert-1.wav'
-                    ],
-                    'Errors': [
+                    'Alerts & Warnings': [
+                        'boeing-critical-alert.mp3',
+                        'boeing-altitude-alert.wav',
+                        'boeing-warning-soft.wav',
                         'error-warning-1.wav'
+                    ],
+                    'UI Controls': [
+                        'ui-primary-control-1.wav',
+                        'ui-primary-button-1.wav',
+                        'ui-primary-switch-1.wav',
+                        'ui-secondary-beep-1.wav',
+                        'ui-secondary-interface-1.wav'
                     ],
                     'Ambient': [
                         'ambient-flyby-1.wav',
-                        'ambient-cockpit-1.wav'
+                        'ambient-cockpit-1.wav',
+                        'boeing-cockpit-echo.mp3'
                     ],
-                    'Legacy': [
-                        'boeing-switch-variant.wav',
-                        'boeing-warning-soft.wav'
+                    'Notifications': [
+                        'notification-ready-1.wav',
+                        'notification-alert-1.wav'
                     ]
                 }
             },
@@ -333,29 +341,39 @@
                 icon: '🛩️',
                 name: 'F16 Viper',
                 sounds: {
-                    'UI Primary': [
+                    'Combat Systems': [
+                        'f16-missile-lock.wav',
+                        'f16-radar-ping.wav',
+                        'f16-target-lock.mp3',
+                        'f16-missile-warning.mp3'
+                    ],
+                    'Cockpit Operations': [
+                        'f16-cockpit-comm.mp3',
+                        'f16-jet-maneuver.mp3',
+                        'f16-system-ready.wav',
+                        'f16-threat-detected.mp3'
+                    ],
+                    'UI Controls': [
                         'ui-primary-radar-1.wav',
                         'ui-primary-tactical-1.wav',
-                        'ui-primary-weapon-1.wav'
-                    ],
-                    'UI Secondary': [
+                        'ui-primary-weapon-1.wav',
                         'ui-secondary-online-1.wav'
                     ],
                     'Notifications': [
                         'notification-lock-1.wav'
                     ],
-                    'Errors': [
+                    'Errors & Threats': [
                         'error-missile-1.wav',
                         'error-threat-1.wav'
                     ],
-                    'Success': [
+                    'Success States': [
                         'success-ready-1.wav',
                         'success-complete-1.wav'
                     ],
                     'Navigation': [
                         'navigation-update-1.wav'
                     ],
-                    'Legacy': [
+                    'Legacy Systems': [
                         'f16-radar-short.wav',
                         'f16-tactical-soft.wav'
                     ]
@@ -762,19 +780,29 @@
                 btn.classList.remove('playing');
             });
 
-            // Use the mapped working sound for this theme and button type
-            const soundPath = getSoundForButton(themeId, filename);
-            currentAudio = new Audio(soundPath);
+            // Try the ACTUAL theme sound first, then fall back to core sounds
+            const actualSoundPath = `/sounds/themes/${themeId}/${filename}`;
+            const fallbackSoundPath = getSoundForButton(themeId, filename);
+            
+            currentAudio = new Audio(actualSoundPath);
             currentAudio.volume = globalVolume;
 
             // Add playing class to current button
             event.target.classList.add('playing');
 
             currentAudio.play().then(() => {
-                console.log(`Sound played successfully: ${filename} -> ${soundPath}`);
+                console.log(`🎵 REAL THEME SOUND: ${filename} -> ${actualSoundPath}`);
             }).catch(err => {
-                console.log(`Sound failed: ${err.message}`);
-                alert(`Sound failed: ${filename}\nError: ${err.message}`);
+                console.log(`Real theme sound failed, trying fallback: ${err.message}`);
+                // Try fallback core sound
+                currentAudio = new Audio(fallbackSoundPath);
+                currentAudio.volume = globalVolume;
+                currentAudio.play().then(() => {
+                    console.log(`🔄 FALLBACK SOUND: ${filename} -> ${fallbackSoundPath}`);
+                }).catch(err2 => {
+                    console.log(`Both sounds failed: ${err2.message}`);
+                    alert(`Sound failed: ${filename}\nError: ${err2.message}`);
+                });
             });
 
             currentAudio.onended = () => {
