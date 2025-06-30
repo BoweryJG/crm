@@ -352,12 +352,193 @@
         .quick-btn:hover {
             transform: scale(1.05);
         }
+
+        /* Edit Mode Styles */
+        .edit-mode .theme-card {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        .edit-mode .sound-card {
+            cursor: grab;
+            user-select: none;
+        }
+
+        .edit-mode .sound-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .edit-mode .sound-card.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+            cursor: grabbing;
+        }
+
+        .sound-card.editable {
+            position: relative;
+        }
+
+        .sound-card.editable::after {
+            content: "✏️";
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .edit-controls {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+            min-width: 200px;
+        }
+
+        .edit-mode .edit-controls {
+            display: block;
+        }
+
+        .save-btn {
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px 0;
+            width: 100%;
+        }
+
+        .reset-btn {
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px 0;
+            width: 100%;
+        }
+
+        .sound-selector {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            border: 2px solid #00d4ff;
+        }
+
+        .sound-selector.active {
+            display: block;
+        }
+
+        .selector-header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00d4ff;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .available-sounds {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .available-sound {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .available-sound:hover {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        .changes-indicator {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-weight: 600;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        .changes-indicator.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="mode-toggle">
         <button class="toggle-btn active" onclick="setViewMode('manager')">🎛️ Manager</button>
         <button class="toggle-btn" onclick="setViewMode('browser')">🎵 Browser</button>
+        <button class="toggle-btn" onclick="toggleEditMode()">✏️ Edit</button>
+    </div>
+
+    <div class="edit-controls">
+        <div style="color: #00d4ff; font-weight: 600; margin-bottom: 10px;">🎛️ Edit Mode Active</div>
+        <button class="save-btn" onclick="saveConfiguration()">💾 Save Changes</button>
+        <button class="reset-btn" onclick="resetToDefault()">🔄 Reset All</button>
+        <button class="toggle-btn" onclick="toggleEditMode()" style="background: #f44336; width: 100%;">❌ Exit Edit</button>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeSoundSelector()"></div>
+    <div class="sound-selector" id="soundSelector">
+        <div class="selector-header">Select Sound for <span id="targetSlot"></span></div>
+        <div class="available-sounds" id="availableSounds">
+            <!-- Available sounds will be populated here -->
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="toggle-btn" onclick="closeSoundSelector()">Cancel</button>
+        </div>
+    </div>
+
+    <div class="changes-indicator" id="changesIndicator">
+        🔥 Unsaved Changes
     </div>
 
     <div class="header">
@@ -806,11 +987,214 @@
                 });
                 event.target.classList.add('active');
             }
+
+            // Edit Mode Functionality
+            enableEditMode() {
+                document.body.classList.add('edit-mode');
+                this.originalMappings = JSON.parse(JSON.stringify(this.soundMappings));
+                this.setupEditableCards();
+                console.log('✏️ Edit mode enabled - click sound cards to reassign');
+            }
+
+            disableEditMode() {
+                document.body.classList.remove('edit-mode');
+                this.removeEditableCards();
+                this.hideChangesIndicator();
+                console.log('❌ Edit mode disabled');
+            }
+
+            setupEditableCards() {
+                document.querySelectorAll('.sound-card').forEach(card => {
+                    card.classList.add('editable');
+                    card.addEventListener('click', this.handleCardEdit.bind(this));
+                });
+            }
+
+            removeEditableCards() {
+                document.querySelectorAll('.sound-card').forEach(card => {
+                    card.classList.remove('editable');
+                    card.removeEventListener('click', this.handleCardEdit.bind(this));
+                });
+            }
+
+            handleCardEdit(event) {
+                event.stopPropagation();
+                const card = event.currentTarget;
+                const cardId = card.id;
+                const [_, themeId, soundId] = cardId.split('-');
+                
+                this.currentEditTarget = { themeId, soundId, cardId };
+                this.showSoundSelector();
+            }
+
+            showSoundSelector() {
+                const { themeId, soundId } = this.currentEditTarget;
+                const targetSlot = document.getElementById('targetSlot');
+                targetSlot.textContent = `${themeId} → ${soundId}`;
+                
+                this.populateAvailableSounds();
+                document.getElementById('overlay').classList.add('active');
+                document.getElementById('soundSelector').classList.add('active');
+            }
+
+            populateAvailableSounds() {
+                const container = document.getElementById('availableSounds');
+                container.innerHTML = '';
+                
+                // Get all unique sound files from all themes
+                const allSounds = new Set();
+                Object.values(this.soundMappings).forEach(theme => {
+                    Object.values(theme.sounds).forEach(soundPath => {
+                        allSounds.add(soundPath);
+                    });
+                });
+
+                allSounds.forEach(soundPath => {
+                    const soundName = soundPath.split('/').pop().replace(/\.(wav|mp3|ogg)$/, '');
+                    const soundDiv = document.createElement('div');
+                    soundDiv.className = 'available-sound';
+                    soundDiv.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 5px;">${soundName}</div>
+                        <div style="font-size: 12px; opacity: 0.7;">${soundPath}</div>
+                    `;
+                    soundDiv.addEventListener('click', () => this.assignSound(soundPath));
+                    container.appendChild(soundDiv);
+                });
+            }
+
+            assignSound(newSoundPath) {
+                const { themeId, soundId, cardId } = this.currentEditTarget;
+                
+                // Update the mapping
+                this.soundMappings[themeId].sounds[soundId] = newSoundPath;
+                
+                // Update the card display
+                const card = document.getElementById(cardId);
+                const soundName = newSoundPath.split('/').pop().replace(/\.(wav|mp3|ogg)$/, '');
+                card.querySelector('.sound-name').textContent = soundName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                
+                // Update onclick handlers
+                const playBtn = card.querySelector('.sound-controls button:first-child');
+                playBtn.setAttribute('onclick', `soundCenter.playSound('${themeId}', '${soundId}', '${newSoundPath}')`);
+                
+                this.showChangesIndicator();
+                this.closeSoundSelector();
+                
+                console.log(`🔄 Assigned ${soundName} to ${themeId} → ${soundId}`);
+            }
+
+            showChangesIndicator() {
+                document.getElementById('changesIndicator').classList.add('active');
+            }
+
+            hideChangesIndicator() {
+                document.getElementById('changesIndicator').classList.remove('active');
+            }
+
+            closeSoundSelector() {
+                document.getElementById('overlay').classList.remove('active');
+                document.getElementById('soundSelector').classList.remove('active');
+                this.currentEditTarget = null;
+            }
+
+            saveConfiguration() {
+                // Generate updated soundMappings.ts content
+                const configContent = this.generateSoundMappingsFile();
+                
+                // Create download
+                const blob = new Blob([configContent], { type: 'text/typescript' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'soundMappings.ts';
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                // Save to localStorage as backup
+                localStorage.setItem('crm-custom-sound-mappings', JSON.stringify(this.soundMappings));
+                
+                this.hideChangesIndicator();
+                alert('✅ Configuration saved! Download the soundMappings.ts file and replace the existing one in your project.');
+                
+                console.log('💾 Sound configuration saved and downloaded');
+            }
+
+            generateSoundMappingsFile() {
+                let content = `// Auto-generated Sound Mappings Configuration
+// Generated on: ${new Date().toISOString()}
+
+export const THEME_SOUND_OVERRIDES: Record<string, Record<string, string>> = {
+`;
+
+                Object.entries(this.soundMappings).forEach(([themeId, themeData]) => {
+                    content += `  "${themeId}": {\n`;
+                    Object.entries(themeData.sounds).forEach(([soundId, soundPath]) => {
+                        content += `    "${soundId}": "${soundPath}",\n`;
+                    });
+                    content += `  },\n`;
+                });
+
+                content += `};
+
+export const getSoundUrl = (soundId: string, themeId?: string): string => {
+  const fallbackTheme = 'core';
+  const currentTheme = themeId || fallbackTheme;
+  
+  // Check theme-specific override first
+  if (THEME_SOUND_OVERRIDES[currentTheme]?.[soundId]) {
+    return THEME_SOUND_OVERRIDES[currentTheme][soundId];
+  }
+  
+  // Fallback to core sounds
+  if (THEME_SOUND_OVERRIDES[fallbackTheme]?.[soundId]) {
+    return THEME_SOUND_OVERRIDES[fallbackTheme][soundId];
+  }
+  
+  // Ultimate fallback
+  return \`/sounds/core/\${soundId}.wav\`;
+};
+
+export default {
+  THEME_SOUND_OVERRIDES,
+  getSoundUrl
+};
+`;
+                return content;
+            }
+
+            resetToDefault() {
+                if (confirm('⚠️ Reset all sounds to default mappings? This will lose all custom assignments.')) {
+                    this.soundMappings = JSON.parse(JSON.stringify(this.originalMappings));
+                    this.renderThemes();
+                    this.hideChangesIndicator();
+                    console.log('🔄 Sound mappings reset to default');
+                }
+            }
         }
 
         // Global functions
         function setViewMode(mode) {
             soundCenter.setViewMode(mode);
+        }
+
+        function toggleEditMode() {
+            if (document.body.classList.contains('edit-mode')) {
+                soundCenter.disableEditMode();
+            } else {
+                soundCenter.enableEditMode();
+            }
+        }
+
+        function saveConfiguration() {
+            soundCenter.saveConfiguration();
+        }
+
+        function resetToDefault() {
+            soundCenter.resetToDefault();
+        }
+
+        function closeSoundSelector() {
+            soundCenter.closeSoundSelector();
         }
 
         function testAllSounds() {
