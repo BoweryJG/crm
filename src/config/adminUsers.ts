@@ -2,8 +2,8 @@
 // These users have unlimited access to all features and bypass all restrictions
 
 // Admin emails should be defined in environment variables for security
-// Use comma-separated values in VITE_ADMIN_EMAILS
-const adminEmailsEnv = import.meta.env.VITE_ADMIN_EMAILS || '';
+// Use comma-separated values in REACT_APP_ADMIN_EMAILS
+const adminEmailsEnv = process.env.REACT_APP_ADMIN_EMAILS || '';
 export const ADMIN_EMAILS = adminEmailsEnv
   ? adminEmailsEnv.split(',').map((email: string) => email.trim().toLowerCase())
   : [];

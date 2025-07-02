@@ -3,8 +3,8 @@ import { logger } from './logger';
 
 // Initialize Sentry only in production
 export function initSentry() {
-  const dsn = import.meta.env.VITE_SENTRY_DSN;
-  const environment = import.meta.env.VITE_NODE_ENV || 'development';
+  const dsn = process.env.REACT_APP_SENTRY_DSN;
+  const environment = process.env.NODE_ENV || 'development';
   
   if (!dsn) {
     logger.warn('Sentry DSN not configured. Error monitoring disabled.');

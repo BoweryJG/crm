@@ -29,6 +29,7 @@ import { supabase } from '../../services/supabase/supabase';
 import { useAuth } from '../../auth';
 import { useAppMode } from '../../contexts/AppModeContext';
 import { ValidationFeedback, ValidationSummary } from './ValidationFeedback';
+import { logger } from '../../utils/logger';
 
 interface ContactFormProps {
   contact?: Contact | null;
@@ -266,17 +267,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         contactData.is_starred = false;
       }
 
-      // Determine practice type based on contact type
-      let practiceType = 'dental';
-      if (['aesthetic_doctor', 'plastic_surgeon', 'dermatologist', 
-           'cosmetic_dermatologist', 'nurse_practitioner', 
-           'physician_assistant', 'aesthetician'].includes(formData.type)) {
-        practiceType = 'aesthetic';
-      }
-      
-      await onSubmit({ ...contactData, practiceType });
+      await onSubmit(contactData);
     } catch (error: any) {
-      console.error('Error saving contact:', error);
+      logger.error('Error saving contact:', error);
       setSubmitError(error.message || 'Failed to save contact. Please try again.');
     } finally {
       setLoading(false);
