@@ -377,14 +377,14 @@ const SoundSettings: React.FC = () => {
         </Stack>
       </Box>
       
-      {/* Current Theme Info */}
+      {/* Current Sound System Info */}
       <Box sx={{ mt: 3, p: 2, background: 'rgba(201, 176, 55, 0.1)', borderRadius: 1 }}>
         <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {getThemeIcon()}
-          Current Theme: <strong>{themeMode}</strong>
+          <DiamondIcon />
+          Luxury Sound System Active
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          Theme-specific sounds will be loaded automatically
+          Refined, minimal sounds inspired by haute couture
         </Typography>
       </Box>
     </Paper>

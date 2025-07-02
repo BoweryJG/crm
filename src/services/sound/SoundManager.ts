@@ -1,5 +1,6 @@
 // The Omnisensory Experience Engine™ - Core Sound Manager
 import { SoundCache } from './SoundCache';
+import { getLuxurySound, LUXURY_SOUNDS } from './luxurySounds';
 
 export type SoundCategory = 
   | 'ui-primary' 
@@ -139,14 +140,52 @@ class SoundManager {
     this.lastPlayedTimes.set(soundId, now);
 
     try {
-      // Get sound buffer with fallback support
-      const buffer = await this.cache.getSoundBuffer(soundId, this.currentTheme);
-      if (!buffer) {
-        // Silently fail - fallbacks have already been tried
+      // First check luxury sounds
+      const luxurySound = getLuxurySound(soundId);
+      if (luxurySound) {
+        // Use luxury sound directly
+        const response = await fetch(luxurySound.url);
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = await this.audioContext.decodeAudioData(arrayBuffer);
+        
+        // Create audio nodes
+        const source = this.audioContext.createBufferSource();
+        const gainNode = this.audioContext.createGain();
+        
+        // Use luxury sound volume
+        const finalVolume = this.masterVolume * luxurySound.volume * (options.volume ?? 1.0);
+        gainNode.gain.value = finalVolume;
+        
+        // Connect and play
+        source.buffer = buffer;
+        source.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        // Apply pitch if requested
+        if (options.pitch) {
+          source.playbackRate.value = options.pitch;
+        }
+        
+        // Schedule playback
+        const startTime = this.audioContext.currentTime + (options.delay ?? 0) / 1000;
+        source.start(startTime);
+        
+        // Track playing sounds
+        const id = `${soundId}-${now}`;
+        this.playingSounds.set(id, source);
+        source.onended = () => {
+          this.playingSounds.delete(id);
+        };
+        
         return;
       }
       
-      // Get config for volume settings
+      // Fallback to original system if not a luxury sound
+      const buffer = await this.cache.getSoundBuffer(soundId, this.currentTheme);
+      if (!buffer) {
+        return;
+      }
+      
       const config = await this.cache.getSoundConfig(soundId, this.currentTheme);
       if (!config) {
         return;
@@ -214,48 +253,9 @@ class SoundManager {
   }
 
   setTheme(themeId: string) {
-    // Map theme IDs to sound pack IDs
-    const soundPackMap: Record<string, string> = {
-      'boeing-cockpit': 'boeing-747',
-      'boeing-cockpit-enhanced': 'boeing-747',
-      'airbus-modern': 'boeing-747',
-      'gulfstream-elite': 'boeing-747',
-      'cessna-classic': 'boeing-747',
-      'f16-viper': 'f16-viper',
-      'cartier-gold': 'luxury-hermes',
-      'cartier-gold-enhanced': 'luxury-hermes',
-      'rolex-platinum': 'rolex-watchmaking',
-      'hermes-orange': 'luxury-hermes',
-      'tiffany-blue': 'luxury-hermes',
-      'chanel-noir': 'luxury-hermes',
-      'chanel-noir-enhanced': 'luxury-hermes',
-      'dior-rouge': 'luxury-hermes',
-      'ysl-purple': 'luxury-hermes',
-      'mac-studio': 'luxury-hermes',
-      'sephora-glow': 'luxury-hermes',
-      'ulta-beauty': 'luxury-hermes',
-      'glossier-pink': 'luxury-hermes',
-      'surgical-precision': 'medical-surgical',
-      'surgical-precision-enhanced': 'medical-surgical',
-      'dental-clean': 'medical-surgical',
-      'aesthetic-spa': 'medical-surgical',
-      'space-exploration': 'space-scifi',
-      'cyber-neon': 'space-scifi',
-      'cyber-neon-enhanced': 'space-scifi',
-      'minimal-zen': 'corporate-professional',
-      'gradient-sunset': 'space-scifi',
-      'corporate-blue': 'corporate-professional',
-      'forest-green': 'space-scifi',
-      'forest-sanctuary': 'space-scifi',
-      'ocean-depths': 'space-scifi',
-      'gallery-dominance': 'luxury-hermes',
-      'gallery-dominance-pro': 'luxury-hermes'
-    };
-
-    const soundPackId = soundPackMap[themeId] || 'boeing-747';
-    this.currentTheme = soundPackId;
-    // Preload essential sounds for the new theme
-    this.cache.preloadTheme(soundPackId);
+    // All themes now use luxury sounds
+    this.currentTheme = 'luxury';
+    // No need to preload different themes
   }
 
   setMasterVolume(volume: number) {
