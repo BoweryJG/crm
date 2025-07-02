@@ -254,9 +254,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         updated_at: new Date().toISOString()
       };
 
-      // Add user_id for authenticated users
+      // Add created_by for authenticated users
       if (user && !isDemo) {
-        contactData.user_id = user.id;
+        contactData.created_by = user.id;
       }
 
       // Add created_at for new contacts
