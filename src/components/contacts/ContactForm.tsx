@@ -242,14 +242,14 @@ export const ContactForm: React.FC<ContactFormProps> = ({
       const contactData: Partial<Contact> = {
         first_name: sanitize.whitespace(formData.first_name),
         last_name: sanitize.whitespace(formData.last_name),
-        email: formData.email ? sanitize.whitespace(formData.email.toLowerCase()) : null,
-        phone: formData.phone ? sanitize.whitespace(formData.phone) : null,
-        city: formData.city ? sanitize.whitespace(formData.city) : null,
-        state: formData.state || null,
-        specialty: formData.specialty ? sanitize.whitespace(formData.specialty) : null,
-        practice_name: formData.practice_name ? sanitize.whitespace(formData.practice_name) : null,
+        email: formData.email ? sanitize.whitespace(formData.email.toLowerCase()) : undefined,
+        phone: formData.phone ? sanitize.whitespace(formData.phone) : undefined,
+        city: formData.city ? sanitize.whitespace(formData.city) : undefined,
+        state: formData.state || undefined,
+        specialty: formData.specialty ? sanitize.whitespace(formData.specialty) : undefined,
+        practice_name: formData.practice_name ? sanitize.whitespace(formData.practice_name) : undefined,
         type: formData.type,
-        notes: formData.notes ? sanitize.html(formData.notes) : null,
+        notes: formData.notes ? sanitize.html(formData.notes) : undefined,
         tags: formData.tags,
         updated_at: new Date().toISOString()
       };
