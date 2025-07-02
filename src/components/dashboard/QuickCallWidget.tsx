@@ -40,6 +40,7 @@ import { useAuth } from '../../auth';
 import { Contact } from '../../types/models';
 import mockDataService from '../../services/mockData/mockDataService';
 import { useAppMode } from '../../contexts/AppModeContext';
+import { logger } from '../../utils/logger';
 
 const QuickCallWidget: React.FC = () => {
   const theme = useTheme();
@@ -63,9 +64,9 @@ const QuickCallWidget: React.FC = () => {
     if (user) {
       initializeTwilioDevice(user.id).then(success => {
         if (!success) {
-          console.error('Failed to initialize Twilio device');
+          logger.error('Failed to initialize Twilio device');
         } else {
-          console.log('Twilio device initialized successfully');
+          logger.info('Twilio device initialized successfully');
         }
       });
     }
@@ -118,18 +119,18 @@ const QuickCallWidget: React.FC = () => {
           .limit(5);
         
         // Log the raw response for sales_activities
-        console.log('QuickCallWidget: sales_activities query result:', { activityData, activityError });
+        logger.debug('QuickCallWidget: sales_activities query result:', { activityData, activityError });
 
         if (activityError) {
-          console.error('Error fetching sales activities:', activityError.message, activityError);
-          console.log('Falling back to mock contacts data for QuickCallWidget due to activityError.');
+          logger.error('Error fetching sales activities:', activityError);
+          logger.info('Falling back to mock contacts data for QuickCallWidget due to activityError.');
           const mockContacts = mockDataService.generateRecentCallContacts(5);
           setRecentContacts(mockContacts);
           return;
         }
         
         if (!activityData || activityData.length === 0) {
-          console.log('No call activities found (activityData is null or empty), using mock data. ActivityData:', activityData);
+          logger.info('No call activities found (activityData is null or empty), using mock data. ActivityData:', activityData);
           const mockContacts = mockDataService.generateRecentCallContacts(5);
           setRecentContacts(mockContacts);
           return;
@@ -143,7 +144,7 @@ const QuickCallWidget: React.FC = () => {
         ));
         
         if (uniqueContactIds.length === 0) {
-          console.log('No valid contact IDs found, using mock data');
+          logger.info('No valid contact IDs found, using mock data');
           const mockContacts = mockDataService.generateRecentCallContacts(5);
           setRecentContacts(mockContacts);
           return;
@@ -156,8 +157,8 @@ const QuickCallWidget: React.FC = () => {
           .in('id', uniqueContactIds);
         
         if (contactsError) {
-          console.error('Error fetching contacts:', contactsError);
-          console.log('Falling back to mock contacts data for QuickCallWidget');
+          logger.error('Error fetching contacts:', contactsError);
+          logger.info('Falling back to mock contacts data for QuickCallWidget');
           const mockContacts = mockDataService.generateRecentCallContacts(5);
           setRecentContacts(mockContacts);
           return;
@@ -166,13 +167,13 @@ const QuickCallWidget: React.FC = () => {
         if (contactsData && contactsData.length > 0) {
           setRecentContacts(contactsData as Contact[]);
         } else {
-          console.log('No contacts found for the given IDs, using mock data');
+          logger.info('No contacts found for the given IDs, using mock data');
           const mockContacts = mockDataService.generateRecentCallContacts(5);
           setRecentContacts(mockContacts);
         }
       } catch (error) {
-        console.error('Error fetching recent contacts:', error);
-        console.log('Falling back to mock contacts data for QuickCallWidget');
+        logger.error('Error fetching recent contacts:', error);
+        logger.info('Falling back to mock contacts data for QuickCallWidget');
         // Use mock data if there's an exception
         const mockContacts = mockDataService.generateRecentCallContacts(5);
         setRecentContacts(mockContacts);

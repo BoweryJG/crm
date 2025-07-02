@@ -1,5 +1,6 @@
 // Twilio Call Service - Integration for call recording, transcription, and analysis
 import { supabase } from './supabase/supabase';
+import { logger } from '../utils/logger';
 
 export interface TwilioCallRecord {
   id: string;
@@ -102,7 +103,7 @@ class TwilioCallService {
   async initialize(config: TwilioConfig) {
     this.config = config;
     // In production, validate Twilio credentials
-    console.log('Twilio service initialized');
+    logger.info('Twilio service initialized');
   }
 
   // Initiate an outbound call
@@ -145,7 +146,7 @@ class TwilioCallService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error making call:', error);
+      logger.error('Error making call:', error);
       throw error;
     }
   }
@@ -548,10 +549,10 @@ class TwilioCallService {
       // Trigger analysis for completed calls
       if (event.type === 'completed' && event.data.recording_url) {
         // In production, this would trigger transcription and analysis
-        console.log('Call completed, triggering analysis...');
+        logger.info('Call completed, triggering analysis...');
       }
     } catch (error) {
-      console.error('Error handling call event:', error);
+      logger.error('Error handling call event:', error);
     }
   }
 }

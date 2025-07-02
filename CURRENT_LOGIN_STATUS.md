@@ -15,8 +15,8 @@
    - Updated Dashboard to wait for auth state
 
 ## OAuth Configuration:
-- **Supabase Project**: cbopynuvhcymbumjnvay
-- **Redirect URLs Configured**: All localhost variants and RepSpheres domains
+- **Supabase Project**: [Your Supabase Project ID]
+- **Redirect URLs Configured**: All localhost variants and your production domains
 
 ## What You Need to Test:
 
@@ -30,7 +30,7 @@
 5. Complete OAuth flow
 
 ## Expected Debug Messages in Console:
-- "Supabase URL: https://cbopynuvhcymbumjnvay.supabase.co"
+- "Supabase URL: [Your Supabase URL from environment]"
 - "Current app URL for OAuth redirect: http://localhost:3000"
 - "OAuth sign in - redirect URL: http://localhost:3000/"
 - "Auth state changed: SIGNED_IN [email]"

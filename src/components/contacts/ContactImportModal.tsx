@@ -39,6 +39,7 @@ import { supabase } from '../../services/supabase/supabase';
 import { Contact } from '../../types/models';
 import { useAuth } from '../../auth';
 import { useAppMode } from '../../contexts/AppModeContext';
+import { sanitize, ValidationRules } from '../../utils/validation';
 
 interface ContactImportModalProps {
   open: boolean;
@@ -187,17 +188,18 @@ export const ContactImportModal: React.FC<ContactImportModalProps> = ({
     setFieldMapping(mapping);
   };
 
-  // Process and prepare data for import
+  // Process and prepare data for import with validation and sanitization
   const prepareDataForImport = (): Partial<Contact>[] => {
     return parsedData.map(row => {
+      // Sanitize all input fields
       const contact: Partial<Contact> = {
-        first_name: row[fieldMapping.first_name] || 'Unknown',
-        last_name: row[fieldMapping.last_name] || 'Contact',
-        email: row[fieldMapping.email] || null,
-        phone: row[fieldMapping.phone] || null,
-        city: row[fieldMapping.city] || null,
-        state: row[fieldMapping.state] || null,
-        specialty: row[fieldMapping.specialty] || null,
+        first_name: sanitize.whitespace(row[fieldMapping.first_name] || 'Unknown'),
+        last_name: sanitize.whitespace(row[fieldMapping.last_name] || 'Contact'),
+        email: null,
+        phone: null,
+        city: row[fieldMapping.city] ? sanitize.whitespace(row[fieldMapping.city]) : null,
+        state: row[fieldMapping.state] ? sanitize.whitespace(row[fieldMapping.state]).toUpperCase() : null,
+        specialty: row[fieldMapping.specialty] ? sanitize.whitespace(row[fieldMapping.specialty]) : null,
         type: 'imported',
         overall_score: 50,
         is_starred: false,
@@ -206,9 +208,45 @@ export const ContactImportModal: React.FC<ContactImportModalProps> = ({
         updated_at: new Date().toISOString()
       };
 
-      // Clean up phone numbers
-      if (contact.phone) {
-        contact.phone = contact.phone.replace(/[^\d+]/g, '');
+      // Validate and sanitize email
+      if (row[fieldMapping.email]) {
+        const email = sanitize.whitespace(row[fieldMapping.email]).toLowerCase();
+        if (ValidationRules.email.pattern.test(email)) {
+          contact.email = email;
+        }
+      }
+
+      // Validate and clean up phone numbers
+      if (row[fieldMapping.phone]) {
+        let phone = row[fieldMapping.phone].toString();
+        // Remove all non-digit characters except + at the beginning
+        phone = phone.replace(/[^\d+]/g, '');
+        // Ensure + is only at the beginning
+        if (phone.includes('+') && !phone.startsWith('+')) {
+          phone = phone.replace(/\+/g, '');
+        }
+        // Basic validation
+        if (phone.length >= 10 && phone.length <= 15) {
+          contact.phone = phone;
+        }
+      }
+
+      // Validate state code (US states)
+      if (contact.state && contact.state.length !== 2) {
+        // Try to match common state names to codes
+        const stateMap: { [key: string]: string } = {
+          'california': 'CA', 'texas': 'TX', 'new york': 'NY', 'florida': 'FL',
+          'illinois': 'IL', 'pennsylvania': 'PA', 'ohio': 'OH', 'georgia': 'GA',
+          'north carolina': 'NC', 'michigan': 'MI'
+          // Add more as needed
+        };
+        const stateLower = contact.state.toLowerCase();
+        contact.state = stateMap[stateLower] || contact.state.substring(0, 2).toUpperCase();
+      }
+
+      // Sanitize practice name if provided
+      if (row[fieldMapping.practice_name]) {
+        contact.practice_name = sanitize.whitespace(row[fieldMapping.practice_name]);
       }
 
       return contact;
@@ -461,7 +499,7 @@ export const ContactImportModal: React.FC<ContactImportModalProps> = ({
                       <TableCell>
                         {fieldMapping[field] && parsedData[0] && (
                           <Typography variant="caption" color="text.secondary">
-                            {parsedData[0][fieldMapping[field]] || 'N/A'}
+                            {sanitize.escape(parsedData[0][fieldMapping[field]] || 'N/A')}
                           </Typography>
                         )}
                       </TableCell>
@@ -521,9 +559,12 @@ export const ContactImportModal: React.FC<ContactImportModalProps> = ({
 
             <Alert severity="info" sx={{ mb: 3 }}>
               <Typography variant="body2">
+                • Invalid emails will be skipped<br />
+                • Phone numbers will be cleaned and validated<br />
                 • Duplicate emails will be skipped automatically<br />
                 • Missing names will be set to "Unknown Contact"<br />
                 • All contacts will be imported with a default score of 50<br />
+                • Data is sanitized to prevent security issues<br />
                 {!user && '• Sign up to save your cleaned contacts permanently'}
                 {user && '• Contacts will be saved to your private CRM'}
               </Typography>

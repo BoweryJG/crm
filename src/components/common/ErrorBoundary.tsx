@@ -1,4 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Sentry } from '../../utils/sentry';
+import { logger } from '../../utils/logger';
 
 interface Props {
   children: ReactNode;
@@ -33,8 +35,16 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Log the error to an error reporting service
-    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+    // Log the error locally
+    logger.error('Error caught by ErrorBoundary:', error);
+    
+    // Send to Sentry in production
+    Sentry.withScope((scope) => {
+      scope.setContext('errorBoundary', {
+        componentStack: errorInfo.componentStack,
+      });
+      Sentry.captureException(error);
+    });
     
     // Call the onError callback if provided
     if (this.props.onError) {

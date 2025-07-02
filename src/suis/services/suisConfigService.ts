@@ -66,7 +66,7 @@ export const getSUISConfig = async (): Promise<SUISAPIConfig> => {
   
   return {
     supabase: {
-      url: process.env.REACT_APP_SUPABASE_URL || 'https://cbopynuvhcymbumjnvay.supabase.co',
+      url: process.env.REACT_APP_SUPABASE_URL || '',
       anonKey: process.env.REACT_APP_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_KEY || '',
       serviceKey: process.env.REACT_APP_SUPABASE_SERVICE_KEY || ''
     },
@@ -101,7 +101,7 @@ export const getSUISConfigSync = (): SUISAPIConfig => {
   
   return {
     supabase: {
-      url: process.env.REACT_APP_SUPABASE_URL || 'https://cbopynuvhcymbumjnvay.supabase.co',
+      url: process.env.REACT_APP_SUPABASE_URL || '',
       anonKey: process.env.REACT_APP_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_KEY || '',
       serviceKey: process.env.REACT_APP_SUPABASE_SERVICE_KEY || ''
     },

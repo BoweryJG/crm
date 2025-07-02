@@ -1,5 +1,6 @@
 import { Handler } from '@netlify/functions';
 import Stripe from 'stripe';
+import { checkRateLimit, rateLimitResponse } from './rate-limiter.js';
 
 const stripeSecret = process.env.STRIPE_SECRET_KEY || '';
 const stripe = new Stripe(stripeSecret, { apiVersion: '2024-04-10' });
@@ -32,6 +33,12 @@ const PRICE_IDS = {
 const DEFAULT_PRICE_ID = process.env.STRIPE_PRICE_ID || 'price_1RRurNGRiAPUZqWuklICsE4P';
 
 export const handler: Handler = async (event) => {
+  // Check rate limit
+  const rateLimitResult = checkRateLimit(event, { maxRequests: 10, windowMs: 60000 }); // 10 requests per minute
+  if (!rateLimitResult.allowed) {
+    return rateLimitResponse(rateLimitResult.resetTime!);
+  }
+
   try {
     // Parse the request body to get tier, billing cycle, and price ID
     const { tier = 'professional', billingCycle = 'monthly', priceId: directPriceId } = 

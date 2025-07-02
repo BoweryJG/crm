@@ -8,8 +8,11 @@ import { ThemeProvider } from './themes/ThemeContext';
 import { AuthProvider, AuthGuard } from './auth';
 import { AppModeProvider } from './contexts/AppModeContext';
 import { DashboardDataProvider } from './contexts/DashboardDataContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import { cleanupPerformance, isLowPerformanceDevice } from './utils/performance';
 import { SUISProvider } from './suis';
+import { logger } from './utils/logger';
+import { initSentry, Sentry } from './utils/sentry';
 import { SoundProvider } from './contexts/SoundContext';
 import SphereLoadingScreen from './components/common/SphereLoadingScreen';
 import PremiumLoadingScreen from './components/common/PremiumLoadingScreen';
@@ -75,18 +78,25 @@ const ResearchAssistant = lazy(() => import('./suis/components/ResearchAssistant
 const MarketIntelligenceFeed = lazy(() => import('./suis/components/MarketIntelligenceFeed'));
 const LearningPathway = lazy(() => import('./suis/components/LearningPathway'));
 
+// Initialize Sentry on app start
+initSentry();
+
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Get Supabase configuration
-  const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://cbopynuvhcymbumjnvay.supabase.co';
-  const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNib3B5bnV2aGN5bWJ1bWpudmF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5OTUxNzMsImV4cCI6MjA1OTU3MTE3M30.UZElMkoHugIt984RtYWyfrRuv2rB67opQdCrFVPCfzU';
+  const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+  const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_KEY;
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('Missing Supabase environment variables. Please set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY in your .env file');
+  }
 
   useEffect(() => {
     // Check for performance issues
     if (isLowPerformanceDevice()) {
       cleanupPerformance();
-      console.log('Performance mode activated - animations disabled');
+      logger.info('Performance mode activated - animations disabled');
     }
     
     // Premium loading experience with minimum duration
@@ -114,9 +124,10 @@ const App: React.FC = () => {
           <AuthProvider>
             <SUISProvider supabaseUrl={supabaseUrl} supabaseAnonKey={supabaseAnonKey}>
               <AppModeProvider>
-                <DashboardDataProvider>
-                  <CssBaseline />
-                  <BrowserRouter>
+                <NotificationProvider>
+                  <DashboardDataProvider>
+                    <CssBaseline />
+                    <BrowserRouter>
               <Routes>
                 {/* Luxury Landing Page - default for non-authenticated users */}
                 <Route path="/welcome" element={
@@ -215,7 +226,8 @@ const App: React.FC = () => {
             <FeatureUpgradeModal />
             <DemoModeIndicator />
           </BrowserRouter>
-                </DashboardDataProvider>
+                  </DashboardDataProvider>
+                </NotificationProvider>
               </AppModeProvider>
             </SUISProvider>
           </AuthProvider>

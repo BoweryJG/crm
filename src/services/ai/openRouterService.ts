@@ -1,5 +1,6 @@
 import { AIPrompt, AIResponse, AIGeneratedAsset, AIPromptExecutionParams } from '../../types/ai';
 import axios from 'axios';
+import { logger } from '../../utils/logger';
 
 // Get the backend URL from environment variables
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com';
@@ -44,7 +45,7 @@ const openRouterService = {
         throw new Error('Invalid response format from backend');
       }
     } catch (error) {
-      console.error('Error fetching prompts:', error);
+      logger.error('Error fetching prompts:', error);
       return { data: null, error: error as Error };
     }
   },
@@ -74,7 +75,7 @@ const openRouterService = {
       // Replace variables in the prompt content
       const processedContent = replaceVariables(prompt.prompt_content, variables);
       
-      console.log('Sending request to backend:', `${BACKEND_URL}/webhook`);
+      logger.debug('Sending request to backend:', `${BACKEND_URL}/webhook`);
       
       // Make a request to the backend's webhook endpoint
       const response = await axios.post(`${BACKEND_URL}/webhook`, {
@@ -86,7 +87,7 @@ const openRouterService = {
         }
       });
       
-      console.log('Backend response:', response.data);
+      logger.debug('Backend response:', response.data);
       
       // Create a response object from the backend response
       const aiResponse: AIResponse = {
@@ -128,7 +129,7 @@ const openRouterService = {
       try {
         await axios.post(`${BACKEND_URL}/api/prompts/${promptId}/increment-usage`);
       } catch (error) {
-        console.warn('Failed to increment prompt usage count:', error);
+        logger.warn('Failed to increment prompt usage count:', error);
       }
       
       return {
@@ -138,7 +139,7 @@ const openRouterService = {
         error: null
       };
     } catch (error) {
-      console.error('Error executing prompt:', error);
+      logger.error('Error executing prompt:', error);
       return {
         prompt: null,
         response: null,

@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient, Session, User, AuthChangeEvent } from '@supabase/supabase-js';
+import { logger } from '../../utils/logger';
 import {
   generateMockContacts,
   generateMockPractices,
@@ -16,21 +17,26 @@ import {
 } from '../mockData/mockLinguisticsData';
 
 // Environment variables for Supabase
-console.log('NODE_ENV:', process.env.NODE_ENV || 'development');
+logger.debug('NODE_ENV:', process.env.NODE_ENV || 'development');
 
 const rawSupabaseUrl = process.env.REACT_APP_SUPABASE_URL;
 const rawSupabaseAnonKey = process.env.REACT_APP_SUPABASE_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY;
 
-console.log('Raw REACT_APP_SUPABASE_URL:', rawSupabaseUrl ? `Set (ends with "${rawSupabaseUrl.slice(-10)}")` : 'Not Set');
-console.log('Raw REACT_APP_SUPABASE_KEY/ANON_KEY:', rawSupabaseAnonKey ? `Set (starts with "${rawSupabaseAnonKey.substring(0, 10)}...", ends with "${rawSupabaseAnonKey.slice(-4)}")` : 'Not Set');
+logger.debug('Raw REACT_APP_SUPABASE_URL:', rawSupabaseUrl ? `Set (ends with "${rawSupabaseUrl.slice(-10)}")` : 'Not Set');
+logger.debug('Raw REACT_APP_SUPABASE_KEY/ANON_KEY:', rawSupabaseAnonKey ? `Set (starts with "${rawSupabaseAnonKey.substring(0, 10)}...", ends with "${rawSupabaseAnonKey.slice(-4)}")` : 'Not Set');
 
 // Use the actual Supabase credentials from environment variables
-const supabaseUrl = rawSupabaseUrl || 'https://cbopynuvhcymbumjnvay.supabase.co';
-const supabaseAnonKey = rawSupabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNib3B5bnV2aGN5bWJ1bWpudmF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5OTUxNzMsImV4cCI6MjA1OTU3MTE3M30.UZElMkoHugIt984RtYWyfrRuv2rB67opQdCrFVPCfzU';
+const supabaseUrl = rawSupabaseUrl;
+const supabaseAnonKey = rawSupabaseAnonKey;
+
+// Validate that environment variables are set
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables. Please set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY in your .env file');
+}
 
 // Log the values being used
-console.log('Effective Supabase URL being used:', supabaseUrl);
-console.log('Effective Supabase Anon Key being used:', supabaseAnonKey ? `Starts with "${supabaseAnonKey.substring(0, 10)}...", ends with "${supabaseAnonKey.slice(-4)}"` : 'Not Set');
+logger.debug('Effective Supabase URL being used:', supabaseUrl);
+logger.debug('Effective Supabase Anon Key being used:', supabaseAnonKey ? `Starts with "${supabaseAnonKey.substring(0, 10)}...", ends with "${supabaseAnonKey.slice(-4)}"` : 'Not Set');
 
 // Create a mock Supabase client for development when URL is invalid
 const createMockClient = (): SupabaseClient => {

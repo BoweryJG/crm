@@ -30,16 +30,21 @@ import {
   ImportExport as ImportExportIcon,
   Email as EmailIcon,
   Star as StarIcon,
-  StarBorder as StarBorderIcon
+  StarBorder as StarBorderIcon,
+  Edit as EditIcon
 } from '@mui/icons-material';
 import CallButton from '../components/contacts/CallButton';
 import ContactMetrics from '../components/contacts/ContactMetrics';
 import ContactChatWidget from '../components/contacts/ContactChatWidget';
 import { ContactImportModal } from '../components/contacts/ContactImportModal';
+import { ContactFormModal } from '../components/contacts/ContactFormModal';
 import { Contact } from '../types/models';
 import { supabase } from '../services/supabase/supabase';
+import { sanitize } from '../utils/validation';
 import mockDataService from '../services/mockData/mockDataService';
+import { useNotification } from '../contexts/NotificationContext';
 import { useAppMode } from '../contexts/AppModeContext';
+import { logger } from '../utils/logger';
 import { useAuth } from '../auth';
 
 interface TabPanelProps {
@@ -77,6 +82,7 @@ const Contacts: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isDemo, mode } = useAppMode();
+  const { showSuccess, showError } = useNotification();
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -89,6 +95,9 @@ const Contacts: React.FC = () => {
   const [totalContacts, setTotalContacts] = useState<number>(0);
   const [searchDebounce, setSearchDebounce] = useState<NodeJS.Timeout | null>(null);
   const [importModalOpen, setImportModalOpen] = useState<boolean>(false);
+  const [formModalOpen, setFormModalOpen] = useState<boolean>(false);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
   const CONTACTS_PER_PAGE = 100;
 
   const fetchContactsPage = async (page: number, append: boolean = false, search: string = '') => {
@@ -98,7 +107,7 @@ const Contacts: React.FC = () => {
       
       // Determine which table to use based on mode and authentication
       const tableName = (!user || isDemo) ? 'public_contacts' : 'contacts';
-      console.log(`Using ${tableName} table (user: ${user?.email}, user ID: ${user?.id}, mode: ${mode})`);
+      logger.debug(`Using ${tableName} table (user: ${user?.email}, user ID: ${user?.id}, mode: ${mode}`);
       
       // Build query to match actual table structure
       let countQuery = supabase.from(tableName).select('*', { count: 'exact', head: true });
@@ -125,7 +134,7 @@ const Contacts: React.FC = () => {
       const { count } = await countQuery;
       if (count !== null) {
         setTotalContacts(count);
-        console.log(`Total contacts in ${tableName}: ${count}`);
+        logger.debug(`Total contacts in ${tableName}: ${count}`);
       }
       
       // Also check both tables for debugging
@@ -148,13 +157,13 @@ const Contacts: React.FC = () => {
           userContactCount = userCount || 0;
         }
           
-        console.log('=== Contact Count Debug ===');
-        console.log(`public_contacts table: ${publicCount || 0} contacts`);
-        console.log(`contacts table (private): ${privateCount || 0} contacts`);
-        console.log(`Contacts for current user (${user?.id}): ${userContactCount} contacts`);
-        console.log(`Currently viewing: ${tableName} table`);
-        console.log(`Authenticated: ${!!user}, Demo mode: ${isDemo}`);
-        console.log('==========================');
+        logger.debug('=== Contact Count Debug ===');
+        logger.debug(`public_contacts table: ${publicCount || 0} contacts`);
+        logger.debug(`contacts table (private): ${privateCount || 0} contacts`);
+        logger.debug(`Contacts for current user (${user?.id}): ${userContactCount} contacts`);
+        logger.debug(`Currently viewing: ${tableName} table`);
+        logger.debug(`Authenticated: ${!!user}, Demo mode: ${isDemo}`);
+        logger.debug('==========================');
       }
       
       // Fetch contacts with search filter and pagination
@@ -165,8 +174,8 @@ const Contacts: React.FC = () => {
         .range(page * CONTACTS_PER_PAGE, (page + 1) * CONTACTS_PER_PAGE - 1);
         
         if (error) {
-          console.error(`Error fetching contacts from ${tableName}:`, error);
-          console.log('Falling back to mock contacts data');
+          logger.error(`Error fetching contacts from ${tableName}:`, error);
+          logger.info('Falling back to mock contacts data');
           // Use mock data if the table doesn't exist (404) or there's another error
           const mockContacts = mockDataService.generateMockContacts(20);
           setContacts(mockContacts);
@@ -250,7 +259,8 @@ const Contacts: React.FC = () => {
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newSearchTerm = event.target.value;
+    // Sanitize search input to prevent XSS
+    const newSearchTerm = sanitize.escape(event.target.value);
     setSearchTerm(newSearchTerm);
     
     // Clear existing debounce
@@ -389,6 +399,11 @@ const Contacts: React.FC = () => {
             variant="contained" 
             startIcon={<AddIcon />}
             sx={{ ml: 1 }}
+            onClick={() => {
+              setSelectedContact(null);
+              setFormMode('add');
+              setFormModalOpen(true);
+            }}
           >
             Add Contact
           </Button>
@@ -499,6 +514,11 @@ const Contacts: React.FC = () => {
                 toggleStarred={toggleStarred}
                 getContactInitials={getContactInitials}
                 getAvatarColor={getAvatarColor}
+                onEditContact={(contact) => {
+                  setSelectedContact(contact);
+                  setFormMode('edit');
+                  setFormModalOpen(true);
+                }}
               />
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
@@ -507,6 +527,11 @@ const Contacts: React.FC = () => {
                 toggleStarred={toggleStarred}
                 getContactInitials={getContactInitials}
                 getAvatarColor={getAvatarColor}
+                onEditContact={(contact) => {
+                  setSelectedContact(contact);
+                  setFormMode('edit');
+                  setFormModalOpen(true);
+                }}
               />
             </TabPanel>
             <TabPanel value={tabValue} index={2}>
@@ -515,6 +540,11 @@ const Contacts: React.FC = () => {
                 toggleStarred={toggleStarred}
                 getContactInitials={getContactInitials}
                 getAvatarColor={getAvatarColor}
+                onEditContact={(contact) => {
+                  setSelectedContact(contact);
+                  setFormMode('edit');
+                  setFormModalOpen(true);
+                }}
               />
             </TabPanel>
             <TabPanel value={tabValue} index={3}>
@@ -523,6 +553,11 @@ const Contacts: React.FC = () => {
                 toggleStarred={toggleStarred}
                 getContactInitials={getContactInitials}
                 getAvatarColor={getAvatarColor}
+                onEditContact={(contact) => {
+                  setSelectedContact(contact);
+                  setFormMode('edit');
+                  setFormModalOpen(true);
+                }}
               />
             </TabPanel>
           </Box>
@@ -560,8 +595,57 @@ const Contacts: React.FC = () => {
           setImportModalOpen(false);
           // Refresh the contacts list
           fetchContactsPage(0, false, searchTerm);
-          // Show success message (you could add a snackbar here)
-          console.log(`Successfully imported ${importedCount} contacts`);
+          // Show success message
+          showSuccess(`Successfully imported ${importedCount} contacts`);
+        }}
+      />
+
+      {/* Contact Form Modal */}
+      <ContactFormModal
+        open={formModalOpen}
+        onClose={() => {
+          setFormModalOpen(false);
+          setSelectedContact(null);
+        }}
+        contact={selectedContact}
+        mode={formMode}
+        onSubmit={async (contactData) => {
+          try {
+            if (formMode === 'add') {
+              // Add new contact
+              const tableName = (!user || isDemo) ? 'public_contacts' : 'contacts';
+              const { error } = await supabase
+                .from(tableName)
+                .insert([contactData]);
+              
+              if (error) throw error;
+              
+              // Refresh the contacts list
+              fetchContactsPage(0, false, searchTerm);
+              showSuccess('Contact added successfully!');
+            } else {
+              // Update existing contact
+              const tableName = (!user || isDemo) ? 'public_contacts' : 'contacts';
+              const { error } = await supabase
+                .from(tableName)
+                .update(contactData)
+                .eq('id', selectedContact?.id);
+              
+              if (error) throw error;
+              
+              // Update local state
+              setContacts(prevContacts =>
+                prevContacts.map(c =>
+                  c.id === selectedContact?.id ? { ...c, ...contactData } : c
+                )
+              );
+              showSuccess('Contact updated successfully!');
+            }
+          } catch (error: any) {
+            console.error('Error saving contact:', error);
+            showError(error.message || 'Failed to save contact');
+            throw error;
+          }
         }}
       />
     </Box>
@@ -573,13 +657,15 @@ interface ContactsListProps {
   toggleStarred: (id: string) => void;
   getContactInitials: (firstName: string, lastName: string) => string;
   getAvatarColor: (id: string) => string;
+  onEditContact: (contact: Contact) => void;
 }
 
 const ContactsList: React.FC<ContactsListProps> = ({ 
   contacts, 
   toggleStarred,
   getContactInitials,
-  getAvatarColor
+  getAvatarColor,
+  onEditContact
 }) => {
   const navigate = useNavigate();
   
@@ -642,18 +728,30 @@ const ContactsList: React.FC<ContactsListProps> = ({
                     )}
                   </Box>
                 </Box>
-                <IconButton 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleStarred(contact.id);
-                  }}
-                >
-                  {contact.isStarred ? (
-                    <StarIcon sx={{ color: theme.palette.warning.main }} />
-                  ) : (
-                    <StarBorderIcon />
-                  )}
-                </IconButton>
+                <Box>
+                  <IconButton 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditContact(contact);
+                    }}
+                    size="small"
+                    sx={{ mr: 1 }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleStarred(contact.id);
+                    }}
+                  >
+                    {contact.isStarred ? (
+                      <StarIcon sx={{ color: theme.palette.warning.main }} />
+                    ) : (
+                      <StarBorderIcon />
+                    )}
+                  </IconButton>
+                </Box>
               </Box>
 
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>

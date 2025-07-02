@@ -1,10 +1,17 @@
 import { Handler, HandlerEvent } from '@netlify/functions';
 import twilio from 'twilio';
+import { checkRateLimit, rateLimitResponse } from './rate-limiter.js';
 const AccessToken = twilio.jwt.AccessToken;
 const VoiceGrant = AccessToken.VoiceGrant;
 
 // Handle token generation for the browser client
 const generateAccessToken = async (event: HandlerEvent) => {
+  // Check rate limit
+  const rateLimitResult = checkRateLimit(event, { maxRequests: 30, windowMs: 60000 }); // 30 requests per minute
+  if (!rateLimitResult.allowed) {
+    return rateLimitResponse(rateLimitResult.resetTime!);
+  }
+
   try {
     // Parse query parameters or body
     let identity;

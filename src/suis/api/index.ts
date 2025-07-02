@@ -13,6 +13,7 @@ import {
   UnifiedAnalytics,
   APIResponse
 } from '../types';
+import { logger } from '../../utils/logger';
 
 // ==================================================================
 // CONFIGURATION INTERFACES
@@ -164,7 +165,7 @@ export class Sphere1AClient extends BaseAPIClient {
 
   protected async handleAuthError(): Promise<void> {
     // Implement Sphere1a authentication refresh logic
-    console.warn('Sphere1a authentication error - implement refresh logic');
+    logger.warn('Sphere1a authentication error - implement refresh logic');
   }
 
   async getProcedureData(params: {
@@ -250,7 +251,7 @@ export class Sphere1AClient extends BaseAPIClient {
 
   async subscribeToProcedureUpdates(callback: (data: any) => void): Promise<void> {
     // Implement WebSocket connection to Sphere1a for real-time updates
-    console.log('Setting up Sphere1a real-time subscription');
+    logger.info('Setting up Sphere1a real-time subscription');
     // This would typically establish a WebSocket connection
   }
 }
@@ -266,7 +267,7 @@ export class OpenRouterClient extends BaseAPIClient {
 
   protected async handleAuthError(): Promise<void> {
     // OpenRouter uses API keys, so just log the error
-    console.error('OpenRouter authentication error - check API key');
+    logger.error('OpenRouter authentication error - check API key');
   }
 
   async generateCompletion(params: {
@@ -441,7 +442,7 @@ export class TwilioClient extends BaseAPIClient {
   }
 
   protected async handleAuthError(): Promise<void> {
-    console.error('Twilio authentication error - check credentials');
+    logger.error('Twilio authentication error - check credentials');
   }
 
   async getCallDetails(callSid: string): Promise<APIResponse<any>> {
@@ -539,7 +540,7 @@ export class TwilioClient extends BaseAPIClient {
 
   async subscribeToCallEvents(callback: (event: any) => void): Promise<void> {
     // Implement webhook subscription for real-time call events
-    console.log('Setting up Twilio webhook subscription');
+    logger.info('Setting up Twilio webhook subscription');
   }
 }
 
@@ -571,7 +572,7 @@ export class SUISAPIManager {
         .from('suis_market_intelligence')
         .upsert(response.data);
       
-      if (error) console.error('Failed to cache market intelligence:', error);
+      if (error) logger.error('Failed to cache market intelligence:', error);
       
       return response.data;
     }
@@ -589,7 +590,7 @@ export class SUISAPIManager {
         .select()
         .single();
       
-      if (error) console.error('Failed to store research query:', error);
+      if (error) logger.error('Failed to store research query:', error);
       
       return storedQuery || response.data;
     }
@@ -607,7 +608,7 @@ export class SUISAPIManager {
         .select()
         .single();
       
-      if (error) console.error('Failed to store generated content:', error);
+      if (error) logger.error('Failed to store generated content:', error);
       
       return storedContent || response.data;
     }
@@ -625,7 +626,7 @@ export class SUISAPIManager {
         .select()
         .single();
       
-      if (error) console.error('Failed to store call intelligence:', error);
+      if (error) logger.error('Failed to store call intelligence:', error);
       
       return storedCall || response.data;
     }
@@ -681,7 +682,7 @@ export class SUISAPIManager {
 
       return storedAnalytics;
     } catch (error) {
-      console.error('Failed to calculate analytics:', error);
+      logger.error('Failed to calculate analytics:', error);
       return null;
     }
   }
@@ -726,7 +727,7 @@ export class SUISAPIManager {
 
       return storedContact;
     } catch (error) {
-      console.error('Failed to enrich contact:', error);
+      logger.error('Failed to enrich contact:', error);
       return null;
     }
   }

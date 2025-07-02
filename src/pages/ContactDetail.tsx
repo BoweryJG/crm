@@ -30,6 +30,12 @@ import { fetchContactById } from '../services/supabase/supabaseService';
 import { Contact } from '../types/models';
 import CallButton from '../components/contacts/CallButton';
 import CallHistory from '../components/contacts/CallHistory';
+import { ContactFormModal } from '../components/contacts/ContactFormModal';
+import { DeleteContactDialog } from '../components/contacts/DeleteContactDialog';
+import { supabase } from '../services/supabase/supabase';
+import { useAuth } from '../auth';
+import { useAppMode } from '../contexts/AppModeContext';
+import { useNotification } from '../contexts/NotificationContext';
 
 const ContactDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,6 +43,12 @@ const ContactDetail: React.FC = () => {
   const theme = useTheme();
   const [loading, setLoading] = useState<boolean>(true);
   const [contact, setContact] = useState<Contact | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const { user } = useAuth();
+  const { isDemo } = useAppMode();
+  const { showSuccess, showError } = useNotification();
 
   useEffect(() => {
     const loadContact = async () => {
@@ -68,15 +80,37 @@ const ContactDetail: React.FC = () => {
   };
 
   const handleEdit = () => {
-    // Navigate to edit page or open edit modal
-    navigate(`/contacts/edit/${id}`);
+    // Open edit modal instead of navigating
+    setEditModalOpen(true);
   };
 
   const handleDelete = () => {
-    // Implement delete functionality
-    if (window.confirm('Are you sure you want to delete this contact?')) {
-      // Delete contact logic here
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!contact || !user || isDemo) return;
+    
+    try {
+      setDeleteLoading(true);
+      const tableName = 'contacts';
+      
+      const { error } = await supabase
+        .from(tableName)
+        .delete()
+        .eq('id', contact.id)
+        .eq('user_id', user.id); // Ensure user can only delete their own contacts
+      
+      if (error) throw error;
+      
+      // Navigate back to contacts list after successful deletion
+      showSuccess('Contact deleted successfully');
       navigate('/contacts');
+    } catch (error: any) {
+      console.error('Error deleting contact:', error);
+      showError(error.message || 'Failed to delete contact. Please try again.');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -305,6 +339,47 @@ const ContactDetail: React.FC = () => {
           {/* Additional sections can be added here */}
         </Box>
       </Box>
+
+      {/* Contact Edit Modal */}
+      <ContactFormModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        contact={contact}
+        mode="edit"
+        onSubmit={async (contactData) => {
+          try {
+            const tableName = (!user || isDemo) ? 'public_contacts' : 'contacts';
+            const { error } = await supabase
+              .from(tableName)
+              .update(contactData)
+              .eq('id', contact?.id);
+            
+            if (error) throw error;
+            
+            // Update local state
+            setContact(prevContact => {
+              if (!prevContact) return null;
+              return { ...prevContact, ...contactData } as Contact;
+            });
+            
+            setEditModalOpen(false);
+            showSuccess('Contact updated successfully!');
+          } catch (error: any) {
+            console.error('Error updating contact:', error);
+            showError(error.message || 'Failed to update contact');
+            throw error;
+          }
+        }}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteContactDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        contact={contact}
+        onConfirm={confirmDelete}
+        loading={deleteLoading}
+      />
     </Box>
   );
 };

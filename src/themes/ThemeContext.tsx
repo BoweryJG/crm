@@ -11,6 +11,7 @@ import {
   legacyThemeMap,
   ExtendedTheme 
 } from './themeLibrary';
+import { logger } from '../utils/logger';
 
 // Define theme types - now supports any theme ID from the library
 export type ThemeMode = string;
@@ -70,7 +71,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         try {
           return JSON.parse(saved);
         } catch (e) {
-          console.warn('Failed to parse theme preferences:', e);
+          logger.warn('Failed to parse theme preferences:', e);
         }
       }
     }
@@ -85,7 +86,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('crm-theme-mode', themeMode);
-      console.log('🎨 Theme changed to:', themeMode);
+      logger.debug('🎨 Theme changed to:', themeMode);
       
       // Add to recent themes (max 10)
       setUserPreferences(prev => {
@@ -113,7 +114,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     const nextIndex = (currentIndex + 1) % allThemes.length;
     const nextTheme = allThemes[nextIndex];
     
-    console.log('🔄 Theme toggled from', themeMode, 'to', nextTheme);
+    logger.debug('🔄 Theme toggled from', themeMode, 'to', nextTheme);
     setThemeMode(nextTheme);
   };
 

@@ -69,6 +69,7 @@ import { useAuth } from '../auth';
 import glassEffects from '../themes/glassEffects';
 import { twilioCallService } from '../services/twilioCallService';
 import { useDashboardData } from '../contexts/DashboardDataContext';
+import { logger } from '../utils/logger';
 
 interface Contact {
   id: string;
@@ -214,7 +215,7 @@ const CallCenter: React.FC = () => {
         contact.practice // Pass practice ID if available
       );
     } catch (error) {
-      console.error('Failed to start call:', error);
+      logger.error('Failed to start call:', error);
     }
   };
 
@@ -235,7 +236,7 @@ const CallCenter: React.FC = () => {
 
   const handleAiSync = () => {
     // This would integrate with RepConnect1's NLP processor
-    console.log('AI Sync Query:', aiSyncQuery);
+    logger.debug('AI Sync Query:', aiSyncQuery);
     // Parse natural language and create smart queue
   };
 

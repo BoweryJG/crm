@@ -1,10 +1,12 @@
 // Admin user configuration
 // These users have unlimited access to all features and bypass all restrictions
 
-export const ADMIN_EMAILS = [
-  'jasonwilliamgolden@gmail.com',
-  'jgolden@bowerycreativeagency.com'
-];
+// Admin emails should be defined in environment variables for security
+// Use comma-separated values in VITE_ADMIN_EMAILS
+const adminEmailsEnv = import.meta.env.VITE_ADMIN_EMAILS || '';
+export const ADMIN_EMAILS = adminEmailsEnv
+  ? adminEmailsEnv.split(',').map((email: string) => email.trim().toLowerCase())
+  : [];
 
 export const isAdminUser = (email: string | null | undefined): boolean => {
   if (!email) return false;

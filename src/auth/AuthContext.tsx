@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { supabase, getRedirectUrl } from './supabase';
 import type { User, AuthSession, AuthState, AuthProvider as AuthProviderType, SignInOptions } from './types';
 import type { Session } from '@supabase/supabase-js';
+import { logger } from '../utils/logger';
 
 interface AuthContextType extends AuthState {
   signInWithProvider: (provider: AuthProviderType, options?: SignInOptions) => Promise<void>;
@@ -53,7 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         
-        console.log('Initial auth check:', session?.user?.email, error);
+        logger.debug('Initial auth check:', session?.user?.email, error);
         
         if (error) throw error;
         
@@ -66,7 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           });
         }
       } catch (error: any) {
-        console.error('Auth initialization error:', error);
+        logger.error('Auth initialization error:', error);
         if (mounted) {
           setState({
             user: null,
@@ -83,7 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
+        logger.debug('Auth state changed:', event, session?.user?.email);
         if (mounted) {
           setState(prev => ({
             ...prev,
@@ -112,7 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Use local domain for OAuth redirect
       const redirectUrl = `${window.location.origin}/auth/callback`;
       
-      console.log('OAuth sign in - redirect URL:', redirectUrl);
+      logger.debug('OAuth sign in - redirect URL:', redirectUrl);
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: provider as any,
@@ -123,11 +124,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         },
       });
       
-      console.log('OAuth response:', { data, error });
+      logger.debug('OAuth response:', { data, error });
       
       if (error) throw error;
     } catch (error: any) {
-      console.error('OAuth sign in error:', error);
+      logger.error('OAuth sign in error:', error);
       setState(prev => ({ 
         ...prev, 
         loading: false, 
