@@ -49,8 +49,6 @@ interface FormData {
   type: string;
   notes: string;
   tags: string[];
-  linkedin_url?: string;
-  website?: string;
 }
 
 interface FormErrors {
@@ -109,9 +107,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
     practice_name: contact?.practice_name || '',
     type: contact?.type || 'dentist',
     notes: contact?.notes || '',
-    tags: contact?.tags || [],
-    linkedin_url: contact?.linkedin_url || '',
-    website: contact?.website || ''
+    tags: contact?.tags || []
   });
   
   const [errors, setErrors] = useState<FormErrors>({});
@@ -142,7 +138,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
     
     // Sanitize input based on field type
     let sanitizedValue = value;
-    if (field === 'email' || field === 'website' || field === 'linkedin_url') {
+    if (field === 'email') {
       sanitizedValue = sanitize.whitespace(value);
     } else if (field === 'notes') {
       sanitizedValue = sanitize.html(value);
@@ -217,20 +213,6 @@ export const ContactForm: React.FC<ContactFormProps> = ({
       isValid = false;
     }
 
-    if (formData.website && formData.website.trim() && !ValidationRules.url.pattern.test(formData.website)) {
-      newErrors.website = ValidationRules.url.message;
-      isValid = false;
-    }
-
-    if (formData.linkedin_url && formData.linkedin_url.trim()) {
-      if (!ValidationRules.url.pattern.test(formData.linkedin_url)) {
-        newErrors.linkedin_url = 'Please enter a valid LinkedIn URL';
-        isValid = false;
-      } else if (!formData.linkedin_url.includes('linkedin.com')) {
-        newErrors.linkedin_url = 'Please enter a valid LinkedIn URL';
-        isValid = false;
-      }
-    }
 
     setErrors(newErrors);
     setTouched(new Set(Object.keys(formData)));
@@ -269,8 +251,6 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         type: formData.type,
         notes: formData.notes ? sanitize.html(formData.notes) : null,
         tags: formData.tags,
-        linkedin_url: formData.linkedin_url ? sanitize.whitespace(formData.linkedin_url) : null,
-        website: formData.website ? sanitize.whitespace(formData.website) : null,
         updated_at: new Date().toISOString()
       };
 
@@ -477,31 +457,6 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="LinkedIn URL"
-            value={formData.linkedin_url}
-            onChange={handleChange('linkedin_url')}
-            onBlur={handleBlur('linkedin_url')}
-            error={touched.has('linkedin_url') && !!errors.linkedin_url}
-            helperText={touched.has('linkedin_url') ? errors.linkedin_url : 'Optional'}
-            disabled={loading}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Website"
-            value={formData.website}
-            onChange={handleChange('website')}
-            onBlur={handleBlur('website')}
-            error={touched.has('website') && !!errors.website}
-            helperText={touched.has('website') ? errors.website : 'Optional'}
-            disabled={loading}
-          />
-        </Grid>
 
         <Grid item xs={12}>
           <TextField
