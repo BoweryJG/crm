@@ -404,7 +404,9 @@ const isPlaceholderValue =
 
 try {
   // Validate URL format
-  new URL(supabaseUrl);
+  if (supabaseUrl) {
+    new URL(supabaseUrl);
+  }
   
   if (isPlaceholderValue) {
     if (process.env.NODE_ENV === 'production') {
