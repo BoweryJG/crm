@@ -10,15 +10,16 @@ jest.mock('../../services/contactService', () => ({
   updateContact: jest.fn(),
 }));
 
-const mockOnSave = jest.fn();
+const mockOnSubmit = jest.fn();
 const mockOnCancel = jest.fn();
 
 const renderContactForm = (props = {}) => {
   return render(
     <NotificationProvider>
       <ContactForm
-        onSave={mockOnSave}
+        onSubmit={mockOnSubmit}
         onCancel={mockOnCancel}
+        mode="add"
         {...props}
       />
     </NotificationProvider>
@@ -101,7 +102,7 @@ describe('ContactForm', () => {
         email: 'john@example.com',
         phone: '1234567890',
       }));
-      expect(mockOnSave).toHaveBeenCalled();
+      expect(mockOnSubmit).toHaveBeenCalled();
     });
   });
 
@@ -117,7 +118,7 @@ describe('ContactForm', () => {
       phone: '1234567890',
     };
     
-    renderContactForm({ contact: existingContact });
+    renderContactForm({ contact: existingContact, mode: 'edit' });
     
     const firstNameInput = screen.getByLabelText(/first name/i);
     await userEvent.clear(firstNameInput);
@@ -133,7 +134,7 @@ describe('ContactForm', () => {
         email: 'john@example.com',
         phone: '1234567890',
       }));
-      expect(mockOnSave).toHaveBeenCalled();
+      expect(mockOnSubmit).toHaveBeenCalled();
     });
   });
 
