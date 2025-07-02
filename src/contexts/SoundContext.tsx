@@ -31,7 +31,7 @@ export const SoundProvider: React.FC<SoundProviderProps> = ({ children }) => {
   const { getCurrentTheme } = useThemeContext();
   const [soundEnabled, setSoundEnabled] = useState(() => {
     const saved = localStorage.getItem('crm-sound-enabled');
-    return saved === null ? true : saved === 'true';
+    return saved === null ? false : saved === 'true';
   });
   
   const [masterVolume, setMasterVolume] = useState(() => {
