@@ -106,7 +106,17 @@ const Contacts: React.FC = () => {
       else setLoadingMore(true);
       
       // Determine which table to use based on mode and authentication
-      const tableName = (!user || isDemo) ? 'public_contacts' : 'contacts';
+      let tableName = 'public_contacts'; // Default to public
+      
+      if (user && !isDemo) {
+        // Check if this is your account for personal contacts
+        if (user.id === '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd') {
+          // Use personal_contacts for your private tracking
+          tableName = 'personal_contacts';
+        }
+        // Other authenticated users still see public_contacts
+      }
+      
       logger.debug(`Using ${tableName} table (user: ${user?.email}, user ID: ${user?.id}, mode: ${mode}`);
       
       // Build query to match actual table structure
@@ -303,7 +313,10 @@ const Contacts: React.FC = () => {
       if (!contactToUpdate) return;
 
       // Update the contact in the database (only in live mode with authenticated user)
-      const tableName = 'contacts'; // Only authenticated users can toggle stars
+      let tableName = 'public_contacts';
+      if (user.id === '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd') {
+        tableName = 'personal_contacts';
+      }
       const { error } = await supabase
         .from(tableName)
         .update({ is_starred: !contactToUpdate.isStarred })
@@ -380,10 +393,11 @@ const Contacts: React.FC = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
           <Typography variant="h4" sx={{ color: theme.palette.primary.main }}>
-            Contacts
+            {user && !isDemo && user.id === '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd' ? 'Personal Contacts' : 'Contacts'}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Total: {totalContacts.toLocaleString()} contacts in database
+            {user && !isDemo && user.id === '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd' && ' (Private - Only visible to you)'}
           </Typography>
         </Box>
         <Box>
@@ -613,7 +627,10 @@ const Contacts: React.FC = () => {
           try {
             if (formMode === 'add') {
               // Add new contact
-              const tableName = (!user || isDemo) ? 'public_contacts' : 'contacts';
+              let tableName = 'public_contacts';
+              if (user && !isDemo && user.id === '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd') {
+                tableName = 'personal_contacts';
+              }
               const { error } = await supabase
                 .from(tableName)
                 .insert([contactData]);
@@ -625,7 +642,10 @@ const Contacts: React.FC = () => {
               showSuccess('Contact added successfully!');
             } else {
               // Update existing contact
-              const tableName = (!user || isDemo) ? 'public_contacts' : 'contacts';
+              let tableName = 'public_contacts';
+              if (user && !isDemo && user.id === '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd') {
+                tableName = 'personal_contacts';
+              }
               const { error } = await supabase
                 .from(tableName)
                 .update(contactData)
