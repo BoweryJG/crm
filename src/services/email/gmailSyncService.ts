@@ -1,4 +1,4 @@
-import { supabase } from '@/services/supabase/supabaseClient';
+import { supabase } from '../supabase/supabase';
 
 interface SyncResult {
   success: boolean;
