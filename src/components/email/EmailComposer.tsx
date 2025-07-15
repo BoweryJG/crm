@@ -35,7 +35,7 @@ import {
 import { useAuth } from '../../auth';
 import { Contact } from '../../types/models';
 import { emailService } from '../../services/email/emailService';
-import { supabase } from '../../services/supabase/supabaseClient';
+import { supabase } from '../../services/supabase/supabase';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 

@@ -23,7 +23,7 @@ import {
   Refresh as RefreshIcon
 } from '@mui/icons-material';
 import { format } from 'date-fns';
-import { supabase } from '../../services/supabase/supabaseClient';
+import { supabase } from '../../services/supabase/supabase';
 import { useAuth } from '../../auth';
 
 interface EmailHistoryProps {
