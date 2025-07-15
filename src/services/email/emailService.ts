@@ -1,3 +1,4 @@
+// Email Service for CRM
 import { supabase } from '../supabase/supabase';
 
 interface EmailAccount {
