@@ -86,11 +86,12 @@ class EmailService {
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
 
-      // Call the Netlify function
-      const response = await fetch('/.netlify/functions/send-email', {
+      // Call the Render backend
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/email/send`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
         },
         body: JSON.stringify({
           ...options,

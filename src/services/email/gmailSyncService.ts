@@ -37,11 +37,12 @@ class GmailSyncService {
         return { success: false, syncedCount: 0, error: 'User not authenticated' };
       }
 
-      // Call the Netlify function to sync Gmail
-      const response = await fetch('/.netlify/functions/gmail-sync', {
+      // Call the Render backend to sync Gmail
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/email/sync`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
         },
         body: JSON.stringify({
           userId: user.id
@@ -78,10 +79,11 @@ class GmailSyncService {
         return { success: false, syncedCount: 0, error: 'User not authenticated' };
       }
 
-      const response = await fetch('/.netlify/functions/gmail-sync', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/email/sync`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
         },
         body: JSON.stringify({
           userId: user.id,
