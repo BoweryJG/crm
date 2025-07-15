@@ -33,7 +33,8 @@ import {
   Search as SearchIcon,
   TrendingUp as TrendingUpIcon,
   Route as RouteIcon,
-  Museum as MuseumIcon
+  Museum as MuseumIcon,
+  SmartToy as AgentIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -65,7 +66,8 @@ const Sidebar: React.FC<{ open: boolean; onClose: () => void; drawerWidth: numbe
       items: [
         { title: 'Dashboard', path: '/', icon: <DashboardIcon /> },
         { title: 'Command Room', path: '/command-room', icon: <MuseumIcon /> },
-        { title: 'Command Center', path: '/command-center', icon: <DashboardIcon /> }
+        { title: 'Command Center', path: '/command-center', icon: <DashboardIcon /> },
+        { title: 'Agent Control', path: '/agents', icon: <AgentIcon /> }
       ]
     },
     {

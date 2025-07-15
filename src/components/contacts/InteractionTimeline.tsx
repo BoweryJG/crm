@@ -4,13 +4,6 @@ import {
   Card,
   CardContent,
   Typography,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineOppositeContent,
   Chip,
   Alert,
   Divider,
@@ -21,6 +14,15 @@ import {
   Collapse,
   IconButton
 } from '@mui/material';
+import {
+  Timeline,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineOppositeContent
+} from '@mui/lab';
 import {
   Phone as PhoneIcon,
   Warning as WarningIcon,

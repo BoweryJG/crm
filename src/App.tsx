@@ -28,6 +28,7 @@ import GlobalCallPanel from './components/communications/GlobalCallPanel';
 import { SubscriptionUpgradeModal } from './components/common/SubscriptionUpgradeModal';
 import { FeatureUpgradeModal } from './components/common/FeatureUpgradeModal';
 import { DemoModeIndicator } from './components/common/DemoModeIndicator';
+import { AgentAuthProvider } from './components/agentManagement/AgentAuthProvider';
 
 // CSS baseline reset
 import CssBaseline from '@mui/material/CssBaseline';
@@ -78,6 +79,9 @@ const ResearchAssistant = lazy(() => import('./suis/components/ResearchAssistant
 const MarketIntelligenceFeed = lazy(() => import('./suis/components/MarketIntelligenceFeed'));
 const LearningPathway = lazy(() => import('./suis/components/LearningPathway'));
 
+// Agent Management Components
+const AgentCommandCenter = lazy(() => import('./pages/AgentManagement/AgentCommandCenter'));
+
 // Initialize Sentry on app start
 initSentry();
 
@@ -122,11 +126,12 @@ const App: React.FC = () => {
       <SoundProvider>
         <ErrorBoundary>
           <AuthProvider>
-            <SUISProvider supabaseUrl={supabaseUrl} supabaseAnonKey={supabaseAnonKey}>
-              <AppModeProvider>
-                <NotificationProvider>
-                  <DashboardDataProvider>
-                    <CssBaseline />
+            <AgentAuthProvider>
+              <SUISProvider supabaseUrl={supabaseUrl} supabaseAnonKey={supabaseAnonKey}>
+                <AppModeProvider>
+                  <NotificationProvider>
+                    <DashboardDataProvider>
+                      <CssBaseline />
                     <BrowserRouter>
               <Routes>
                 {/* Luxury Landing Page - default for non-authenticated users */}
@@ -208,6 +213,10 @@ const App: React.FC = () => {
                 <Route path="intelligence/learning" element={<Suspense fallback={<SphereLoadingScreen loadingText="LEARNING PATHWAY" message="PERSONALIZING CURRICULUM" />}><LearningPathway /></Suspense>} />
                 <Route path="intelligence/calls" element={<Suspense fallback={<SphereLoadingScreen loadingText="CALL COACH" message="PREPARING CALL ANALYSIS" />}><CallAnalytics /></Suspense>} />
                 
+                {/* Agent Management Routes */}
+                <Route path="agents" element={<Suspense fallback={<SphereLoadingScreen loadingText="AGENT COMMAND" message="INITIALIZING AGENT CONTROL CENTER" />}><AgentCommandCenter /></Suspense>} />
+                <Route path="agents/management" element={<Suspense fallback={<SphereLoadingScreen loadingText="AGENT MANAGEMENT" message="LOADING AGENT ADMINISTRATION" />}><AgentCommandCenter /></Suspense>} />
+                
                 {/* Operations Routes */}
                 <Route path="operations/call-vault" element={<Suspense fallback={<SphereLoadingScreen loadingText="CALL VAULT" message="LOADING ARCHIVE SYSTEM" />}><CallVaultPage /></Suspense>} />
                 
@@ -226,10 +235,11 @@ const App: React.FC = () => {
             <FeatureUpgradeModal />
             <DemoModeIndicator />
           </BrowserRouter>
-                  </DashboardDataProvider>
-                </NotificationProvider>
-              </AppModeProvider>
-            </SUISProvider>
+                    </DashboardDataProvider>
+                  </NotificationProvider>
+                </AppModeProvider>
+              </SUISProvider>
+            </AgentAuthProvider>
           </AuthProvider>
         </ErrorBoundary>
       </SoundProvider>
