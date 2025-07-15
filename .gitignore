@@ -27,3 +27,9 @@ supabase/.temp/
 
 # Local Netlify folder
 .netlify
+
+# Private data files
+/src/data/private/
+greg_pedro_interaction_history_updated.json
+**/private-data/
+**/sensitive-accounts.json

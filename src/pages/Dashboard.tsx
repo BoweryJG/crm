@@ -31,6 +31,7 @@ const LiveActionTicker = lazy(() => import('../components/dashboard/LiveActionTi
 const CommandCenterFeed = lazy(() => import('../components/dashboard/CommandCenterFeed'));
 const MissionBriefingCard = lazy(() => import('../components/dashboard/MissionBriefingCard'));
 const CartierBlended = lazy(() => import('../components/dashboard/CartierBlended'));
+const AtRiskAccounts = lazy(() => import('../components/dashboard/AtRiskAccounts'));
 
 // Mobile-optimized components
 const MissionControlHub = lazy(() => import('../components/dashboard/MissionControlHub'));
@@ -259,6 +260,22 @@ const Dashboard: React.FC = () => {
       {/* Stats Cards */}
       <Box sx={{ mb: 4 }}>
         <DashboardStats />
+      </Box>
+
+      {/* At-Risk Accounts Alert - Critical Priority */}
+      <Box sx={{ mb: 4 }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '1fr 2fr' }, gap: 3 }}>
+          <Box>
+            <Suspense fallback={
+              <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
+            }>
+              <AtRiskAccounts maxItems={3} showActions={true} />
+            </Suspense>
+          </Box>
+          <Box>
+            {/* Space for additional widgets or expanded view */}
+          </Box>
+        </Box>
       </Box>
 
       {/* Now Cards Stack */}

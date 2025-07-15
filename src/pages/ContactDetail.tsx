@@ -13,7 +13,9 @@ import {
   Paper,
   IconButton,
   CircularProgress,
-  useTheme
+  useTheme,
+  Tab,
+  Tabs
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
@@ -24,7 +26,9 @@ import {
   Phone as PhoneIcon,
   Star as StarIcon,
   StarBorder as StarBorderIcon,
-  Event as EventIcon
+  Event as EventIcon,
+  Timeline as TimelineIcon,
+  Warning as WarningIcon
 } from '@mui/icons-material';
 import { fetchContactById } from '../services/supabase/supabaseService';
 import { Contact } from '../types/models';
@@ -36,6 +40,9 @@ import { supabase } from '../services/supabase/supabase';
 import { useAuth } from '../auth';
 import { useAppMode } from '../contexts/AppModeContext';
 import { useNotification } from '../contexts/NotificationContext';
+import InteractionTimeline from '../components/contacts/InteractionTimeline';
+import AtRiskAccountAlert from '../components/contacts/AtRiskAccountAlert';
+import { PrivateDataService } from '../services/privateDataService';
 
 const ContactDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +53,9 @@ const ContactDetail: React.FC = () => {
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const [tabValue, setTabValue] = useState(0);
+  const [interactions, setInteractions] = useState<any[]>([]);
+  const [atRiskData, setAtRiskData] = useState<any | null>(null);
   const { user } = useAuth();
   const { isDemo } = useAppMode();
   const { showSuccess, showError } = useNotification();
@@ -64,6 +74,24 @@ const ContactDetail: React.FC = () => {
           // Use the data directly since it matches the Contact interface
           const mappedContact: Contact = data;
           setContact(mappedContact);
+          
+          // Check if this is a special contact with private data
+          const contactName = `${data.first_name} ${data.last_name}`.toLowerCase();
+          const isGregPedro = contactName.includes('greg pedro') || contactName.includes('cindi') || contactName.includes('cyndi');
+          
+          if (isGregPedro && user) {
+            // Load private interaction data
+            const privateInteractions = await PrivateDataService.loadContactInteractions(id, user.id);
+            setInteractions(privateInteractions);
+            
+            // Load at-risk account data
+            const riskAccounts = await PrivateDataService.loadAtRiskAccounts(user.id);
+            const thisAccountRisk = riskAccounts.find(a => 
+              a.accountName.toLowerCase().includes('pedro') || 
+              a.accountId === id
+            );
+            setAtRiskData(thisAccountRisk);
+          }
         }
       } catch (error) {
         console.error('Error in contact fetch:', error);
@@ -73,7 +101,7 @@ const ContactDetail: React.FC = () => {
     };
 
     loadContact();
-  }, [id]);
+  }, [id, user]);
 
   const handleBack = () => {
     navigate('/contacts');
@@ -324,19 +352,70 @@ const ContactDetail: React.FC = () => {
         </Box>
         
         <Box>
-          <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Notes
-            </Typography>
-            <Typography variant="body1">
-              {contact.notes || 'No notes available for this contact.'}
-            </Typography>
+          {/* Show At-Risk Alert if applicable */}
+          {atRiskData && (
+            <Box sx={{ mb: 3 }}>
+              <AtRiskAccountAlert 
+                data={atRiskData}
+                onContactClick={() => window.location.href = `tel:${contact.phone}`}
+                onActionClick={(action) => {
+                  showSuccess(`Action noted: ${action.action}`);
+                }}
+              />
+            </Box>
+          )}
+          
+          {/* Tabs for different sections */}
+          <Paper variant="outlined">
+            <Tabs 
+              value={tabValue} 
+              onChange={(e, newValue) => setTabValue(newValue)}
+              variant="fullWidth"
+            >
+              <Tab label="Overview" icon={<BusinessIcon />} iconPosition="start" />
+              <Tab label="Call History" icon={<PhoneIcon />} iconPosition="start" />
+              {interactions.length > 0 && (
+                <Tab label="Interactions" icon={<TimelineIcon />} iconPosition="start" />
+              )}
+            </Tabs>
+            
+            <Box sx={{ p: 2 }}>
+              {/* Overview Tab */}
+              {tabValue === 0 && (
+                <Box>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    Notes
+                  </Typography>
+                  <Typography variant="body1">
+                    {contact.notes || 'No notes available for this contact.'}
+                  </Typography>
+                </Box>
+              )}
+              
+              {/* Call History Tab */}
+              {tabValue === 1 && (
+                <CallHistory contactId={contact.id} />
+              )}
+              
+              {/* Interactions Timeline Tab */}
+              {tabValue === 2 && interactions.length > 0 && (
+                <InteractionTimeline
+                  contact={{
+                    name: `${contact.first_name} ${contact.last_name}`,
+                    role: contact.title,
+                    company: contact.practice_name || 'Unknown Practice',
+                    status: atRiskData ? 'at_risk' : 'active',
+                    metrics: atRiskData ? {
+                      'Monthly Value': `$${atRiskData.monthlyValue?.toLocaleString() || 0}`,
+                      'Risk Score': `${atRiskData.riskScore}/100`
+                    } : undefined
+                  }}
+                  interactions={interactions}
+                  showFinancials={!!user && process.env.REACT_APP_ENABLE_PRIVATE_DATA === 'true'}
+                />
+              )}
+            </Box>
           </Paper>
-          
-          {/* Call History Component */}
-          <CallHistory contactId={contact.id} />
-          
-          {/* Additional sections can be added here */}
         </Box>
       </Box>
 
