@@ -44,17 +44,22 @@ export const PrivateDataService = {
         return this.getMockInteractions();
       }
 
-      // Try to load from private data file
-      try {
-        const response = await import('../data/private/greg_pedro_interaction_history_updated.json');
-        const data = response.default;
-        
-        // Match contact by ID or name
-        if (contactId === 'greg-pedro' || contactId === 'cindi-weiss') {
-          return data.interactions || [];
+      // Try to load from private data file (only in development)
+      if (process.env.NODE_ENV === 'development') {
+        try {
+          // Use dynamic import with a fallback
+          const response = await import('../data/private/greg_pedro_interaction_history_updated.json').catch(() => null);
+          if (response) {
+            const data = response.default;
+            
+            // Match contact by ID or name
+            if (contactId === 'greg-pedro' || contactId === 'cindi-weiss') {
+              return data.interactions || [];
+            }
+          }
+        } catch (error) {
+          console.log('Private data file not found, using database');
         }
-      } catch (error) {
-        console.log('Private data file not found, using database');
       }
 
       // Fall back to database - first check contact_interactions table
@@ -118,63 +123,67 @@ export const PrivateDataService = {
         return this.getMockAtRiskAccounts();
       }
 
-      // Try to load from private data
-      try {
-        const response = await import('../data/private/greg_pedro_interaction_history_updated.json');
-        const data = response.default;
-        
-        if (data.deal_information?.status === 'At risk') {
-          return [{
-            accountName: data.client.primary_contact.name,
-            accountId: 'greg-pedro',
-            riskScore: 85,
-            monthlyValue: 40000,
-            lastContact: '2025-07-15',
-            riskFactors: [
-              {
-                type: 'financial',
-                severity: 'critical',
-                description: 'Hemorrhaging $40k/month',
-                impact: 'Using personal retirement funds'
-              },
-              {
-                type: 'relationship',
-                severity: 'critical',
-                description: 'Trust severely damaged',
-                impact: 'Sales rep threatened to end relationship'
-              },
-              {
-                type: 'performance',
-                severity: 'critical',
-                description: 'No working deliverables after 6 months',
-                impact: '$180k in lost opportunities'
-              }
-            ],
-            actionItems: [
-              {
-                id: '1',
-                action: 'Apologize to Cindi immediately',
-                priority: 'immediate',
-                deadline: 'Today'
-              },
-              {
-                id: '2',
-                action: 'Deliver ONE working feature in 48 hours',
-                priority: 'immediate',
-                deadline: 'Within 48 hours'
-              },
-              {
-                id: '3',
-                action: 'Create phased rollout plan',
-                priority: 'urgent',
-                deadline: 'This week'
-              }
-            ],
-            notes: 'Relationship at critical juncture. Immediate intervention required to salvage $85k deal.'
-          }];
+      // Try to load from private data (only in development)
+      if (process.env.NODE_ENV === 'development') {
+        try {
+          const response = await import('../data/private/greg_pedro_interaction_history_updated.json').catch(() => null);
+          if (response) {
+            const data = response.default;
+            
+            if (data.deal_information?.status === 'At risk') {
+              return [{
+                accountName: data.client.primary_contact.name,
+                accountId: 'greg-pedro',
+                riskScore: 85,
+                monthlyValue: 40000,
+                lastContact: '2025-07-15',
+                riskFactors: [
+                  {
+                    type: 'financial',
+                    severity: 'critical',
+                    description: 'Hemorrhaging $40k/month',
+                    impact: 'Using personal retirement funds'
+                  },
+                  {
+                    type: 'relationship',
+                    severity: 'critical',
+                    description: 'Trust severely damaged',
+                    impact: 'Sales rep threatened to end relationship'
+                  },
+                  {
+                    type: 'performance',
+                    severity: 'critical',
+                    description: 'No working deliverables after 6 months',
+                    impact: '$180k in lost opportunities'
+                  }
+                ],
+                actionItems: [
+                  {
+                    id: '1',
+                    action: 'Apologize to Cindi immediately',
+                    priority: 'immediate',
+                    deadline: 'Today'
+                  },
+                  {
+                    id: '2',
+                    action: 'Deliver ONE working feature in 48 hours',
+                    priority: 'immediate',
+                    deadline: 'Within 48 hours'
+                  },
+                  {
+                    id: '3',
+                    action: 'Create phased rollout plan',
+                    priority: 'urgent',
+                    deadline: 'This week'
+                  }
+                ],
+                notes: 'Relationship at critical juncture. Immediate intervention required to salvage $85k deal.'
+              }];
+            }
+          }
+        } catch (error) {
+          console.log('Private at-risk data not found');
         }
-      } catch (error) {
-        console.log('Private at-risk data not found');
       }
 
       // Fall back to database - first check at_risk_accounts table
@@ -235,38 +244,42 @@ export const PrivateDataService = {
         return null;
       }
 
-      // Try private data first
-      try {
-        const response = await import('../data/private/greg_pedro_interaction_history_updated.json');
-        const data = response.default;
-        
-        if (contactId === 'greg-pedro') {
-          return {
-            name: data.client.primary_contact.name,
-            role: data.client.primary_contact.title,
-            company: data.practice.name,
-            status: 'at_risk',
-            metrics: {
-              'Monthly Overhead': '$40,000',
-              'Lost Revenue': '$180,000',
-              'Risk Score': '85/100'
+      // Try private data first (only in development)
+      if (process.env.NODE_ENV === 'development') {
+        try {
+          const response = await import('../data/private/greg_pedro_interaction_history_updated.json').catch(() => null);
+          if (response) {
+            const data = response.default;
+            
+            if (contactId === 'greg-pedro') {
+              return {
+                name: data.client.primary_contact.name,
+                role: data.client.primary_contact.title,
+                company: data.practice.name,
+                status: 'at_risk',
+                metrics: {
+                  'Monthly Overhead': '$40,000',
+                  'Lost Revenue': '$180,000',
+                  'Risk Score': '85/100'
+                }
+              };
+            } else if (contactId === 'cindi-weiss') {
+              return {
+                name: data.client.secondary_contact.name,
+                role: data.client.secondary_contact.role,
+                company: data.practice.name,
+                status: 'at_risk',
+                metrics: {
+                  'Monthly Overhead': '$40,000',
+                  'Lost Revenue': '$180,000',
+                  'Risk Score': '85/100'
+                }
+              };
             }
-          };
-        } else if (contactId === 'cindi-weiss') {
-          return {
-            name: data.client.secondary_contact.name,
-            role: data.client.secondary_contact.role,
-            company: data.practice.name,
-            status: 'at_risk',
-            metrics: {
-              'Monthly Overhead': '$40,000',
-              'Lost Revenue': '$180,000',
-              'Risk Score': '85/100'
-            }
-          };
+          }
+        } catch (error) {
+          console.log('Private contact data not found');
         }
-      } catch (error) {
-        console.log('Private contact data not found');
       }
 
       return null;
