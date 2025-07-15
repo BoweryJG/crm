@@ -43,6 +43,8 @@ import { useNotification } from '../contexts/NotificationContext';
 import InteractionTimeline from '../components/contacts/InteractionTimeline';
 import AtRiskAccountAlert from '../components/contacts/AtRiskAccountAlert';
 import { PrivateDataService } from '../services/privateDataService';
+import EmailButton from '../components/email/EmailButton';
+import EmailHistory from '../components/email/EmailHistory';
 
 const ContactDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -265,11 +267,13 @@ const ContactDetail: React.FC = () => {
                   {contact.title}
                 </Typography>
                 
-                <Box sx={{ display: 'flex', mt: 2 }}>
+                <Box sx={{ display: 'flex', mt: 2, gap: 1 }}>
                   <CallButton contact={contact} />
-                  <IconButton color="primary" aria-label="send email" sx={{ ml: 1 }}>
-                    <EmailIcon />
-                  </IconButton>
+                  <EmailButton 
+                    contact={contact}
+                    variant="outlined"
+                    size="medium"
+                  />
                 </Box>
               </Box>
 
@@ -370,10 +374,12 @@ const ContactDetail: React.FC = () => {
             <Tabs 
               value={tabValue} 
               onChange={(e, newValue) => setTabValue(newValue)}
-              variant="fullWidth"
+              variant="scrollable"
+              scrollButtons="auto"
             >
               <Tab label="Overview" icon={<BusinessIcon />} iconPosition="start" />
               <Tab label="Call History" icon={<PhoneIcon />} iconPosition="start" />
+              <Tab label="Email History" icon={<EmailIcon />} iconPosition="start" />
               {interactions.length > 0 && (
                 <Tab label="Interactions" icon={<TimelineIcon />} iconPosition="start" />
               )}
@@ -397,8 +403,13 @@ const ContactDetail: React.FC = () => {
                 <CallHistory contactId={contact.id} />
               )}
               
+              {/* Email History Tab */}
+              {tabValue === 2 && (
+                <EmailHistory contactId={contact.id} />
+              )}
+              
               {/* Interactions Timeline Tab */}
-              {tabValue === 2 && interactions.length > 0 && (
+              {tabValue === 3 && interactions.length > 0 && (
                 <InteractionTimeline
                   contact={{
                     name: `${contact.first_name} ${contact.last_name}`,

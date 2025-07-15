@@ -50,6 +50,7 @@ import ThemeToggle from '../ui/ThemeToggle';
 import { getUserDisplayName, getUserInitials } from '../../utils/userHelpers';
 import SculpturalMenuToggle from './SculpturalMenuToggle';
 import { useSound } from '../../hooks/useSound';
+import EmailSyncButton from '../email/EmailSyncButton';
 
 // Theme-aware color mapping (matching LiveActionTicker)
 const getThemeColors = (themeMode: string) => {
@@ -490,6 +491,13 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
 
         {/* Spacer */}
         <Box sx={{ flexGrow: 1 }} />
+
+        {/* Email Sync Button */}
+        {user && (
+          <Box sx={{ mr: 1 }}>
+            <EmailSyncButton variant="icon" />
+          </Box>
+        )}
 
         {/* Theme Toggle */}
         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
