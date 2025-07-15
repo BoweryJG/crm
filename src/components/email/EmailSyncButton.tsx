@@ -18,7 +18,7 @@ import {
   Schedule as ScheduleIcon
 } from '@mui/icons-material';
 import { gmailSyncService } from '../../services/email/gmailSyncService';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 
 interface EmailSyncButtonProps {
   variant?: 'icon' | 'button';
