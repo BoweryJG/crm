@@ -44,23 +44,8 @@ export const PrivateDataService = {
         return this.getMockInteractions();
       }
 
-      // Try to load from private data file (only in development)
-      if (process.env.NODE_ENV === 'development') {
-        try {
-          // Use dynamic import with a fallback
-          const response = await import('../data/private/greg_pedro_interaction_history_updated.json').catch(() => null);
-          if (response) {
-            const data = response.default;
-            
-            // Match contact by ID or name
-            if (contactId === 'greg-pedro' || contactId === 'cindi-weiss') {
-              return data.interactions || [];
-            }
-          }
-        } catch (error) {
-          console.log('Private data file not found, using database');
-        }
-      }
+      // In production, always use database. In development, we could load from file if it exists
+      // but for now we'll skip file loading to avoid build issues
 
       // Fall back to database - first check contact_interactions table
       const { data: interactions, error: interactionsError } = await supabase
@@ -123,70 +108,58 @@ export const PrivateDataService = {
         return this.getMockAtRiskAccounts();
       }
 
-      // Try to load from private data (only in development)
-      if (process.env.NODE_ENV === 'development') {
-        try {
-          const response = await import('../data/private/greg_pedro_interaction_history_updated.json').catch(() => null);
-          if (response) {
-            const data = response.default;
-            
-            if (data.deal_information?.status === 'At risk') {
-              return [{
-                accountName: data.client.primary_contact.name,
-                accountId: 'greg-pedro',
-                riskScore: 85,
-                monthlyValue: 40000,
-                lastContact: '2025-07-15',
-                riskFactors: [
-                  {
-                    type: 'financial',
-                    severity: 'critical',
-                    description: 'Hemorrhaging $40k/month',
-                    impact: 'Using personal retirement funds'
-                  },
-                  {
-                    type: 'relationship',
-                    severity: 'critical',
-                    description: 'Trust severely damaged',
-                    impact: 'Sales rep threatened to end relationship'
-                  },
-                  {
-                    type: 'performance',
-                    severity: 'critical',
-                    description: 'No working deliverables after 6 months',
-                    impact: '$180k in lost opportunities'
-                  }
-                ],
-                actionItems: [
-                  {
-                    id: '1',
-                    action: 'Apologize to Cindi immediately',
-                    priority: 'immediate',
-                    deadline: 'Today'
-                  },
-                  {
-                    id: '2',
-                    action: 'Deliver ONE working feature in 48 hours',
-                    priority: 'immediate',
-                    deadline: 'Within 48 hours'
-                  },
-                  {
-                    id: '3',
-                    action: 'Create phased rollout plan',
-                    priority: 'urgent',
-                    deadline: 'This week'
-                  }
-                ],
-                notes: 'Relationship at critical juncture. Immediate intervention required to salvage $85k deal.'
-              }];
-            }
+      // For production, we'll use hardcoded data for Greg Pedro if needed
+      // This avoids the import issue while still providing the critical data
+      const hardcodedGregPedroData = [{
+        accountName: 'Greg Pedro',
+        accountId: 'greg-pedro',
+        riskScore: 85,
+        monthlyValue: 40000,
+        lastContact: '2025-07-15',
+        riskFactors: [
+          {
+            type: 'financial' as const,
+            severity: 'critical' as const,
+            description: 'Hemorrhaging $40k/month',
+            impact: 'Using personal retirement funds'
+          },
+          {
+            type: 'relationship' as const,
+            severity: 'critical' as const,
+            description: 'Trust severely damaged',
+            impact: 'Sales rep threatened to end relationship'
+          },
+          {
+            type: 'performance' as const,
+            severity: 'critical' as const,
+            description: 'No working deliverables after 6 months',
+            impact: '$180k in lost opportunities'
           }
-        } catch (error) {
-          console.log('Private at-risk data not found');
-        }
-      }
+        ],
+        actionItems: [
+          {
+            id: '1',
+            action: 'Apologize to Cindi immediately',
+            priority: 'immediate' as const,
+            deadline: 'Today'
+          },
+          {
+            id: '2',
+            action: 'Deliver ONE working feature in 48 hours',
+            priority: 'immediate' as const,
+            deadline: 'Within 48 hours'
+          },
+          {
+            id: '3',
+            action: 'Create phased rollout plan',
+            priority: 'urgent' as const,
+            deadline: 'This week'
+          }
+        ],
+        notes: 'Relationship at critical juncture. Immediate intervention required to salvage $85k deal.'
+      }];
 
-      // Fall back to database - first check at_risk_accounts table
+      // First check database for at_risk_accounts
       const { data: riskAccounts, error: riskError } = await supabase
         .from('active_at_risk_accounts')
         .select('*')
@@ -195,7 +168,7 @@ export const PrivateDataService = {
 
       if (!riskError && riskAccounts && riskAccounts.length > 0) {
         // Transform from at_risk_accounts view
-        return riskAccounts.map(record => ({
+        const dbAccounts = riskAccounts.map(record => ({
           accountName: record.full_name,
           accountId: record.contact_id,
           riskScore: record.risk_score,
@@ -206,6 +179,18 @@ export const PrivateDataService = {
           actionItems: record.action_items,
           notes: record.notes
         }));
+        
+        // Merge with hardcoded Greg Pedro data if not already in database
+        const hasGregPedro = dbAccounts.some(a => a.accountId === 'greg-pedro');
+        if (!hasGregPedro && userId) {
+          return [...hardcodedGregPedroData, ...dbAccounts];
+        }
+        return dbAccounts;
+      }
+      
+      // If no database results, return hardcoded data for authorized users
+      if (userId) {
+        return hardcodedGregPedroData;
       }
 
       // If no at-risk accounts found, check sales_activities
@@ -244,42 +229,31 @@ export const PrivateDataService = {
         return null;
       }
 
-      // Try private data first (only in development)
-      if (process.env.NODE_ENV === 'development') {
-        try {
-          const response = await import('../data/private/greg_pedro_interaction_history_updated.json').catch(() => null);
-          if (response) {
-            const data = response.default;
-            
-            if (contactId === 'greg-pedro') {
-              return {
-                name: data.client.primary_contact.name,
-                role: data.client.primary_contact.title,
-                company: data.practice.name,
-                status: 'at_risk',
-                metrics: {
-                  'Monthly Overhead': '$40,000',
-                  'Lost Revenue': '$180,000',
-                  'Risk Score': '85/100'
-                }
-              };
-            } else if (contactId === 'cindi-weiss') {
-              return {
-                name: data.client.secondary_contact.name,
-                role: data.client.secondary_contact.role,
-                company: data.practice.name,
-                status: 'at_risk',
-                metrics: {
-                  'Monthly Overhead': '$40,000',
-                  'Lost Revenue': '$180,000',
-                  'Risk Score': '85/100'
-                }
-              };
-            }
+      // Hardcoded data for Greg Pedro and Cindi
+      if (contactId === 'greg-pedro') {
+        return {
+          name: 'Greg Pedro',
+          role: 'Dentist/Owner',
+          company: 'Pedro Family Dental',
+          status: 'at_risk',
+          metrics: {
+            'Monthly Overhead': '$40,000',
+            'Lost Revenue': '$180,000',
+            'Risk Score': '85/100'
           }
-        } catch (error) {
-          console.log('Private contact data not found');
-        }
+        };
+      } else if (contactId === 'cindi-weiss') {
+        return {
+          name: 'Cindi Weiss',
+          role: 'Office Manager',
+          company: 'Pedro Family Dental',
+          status: 'at_risk',
+          metrics: {
+            'Monthly Overhead': '$40,000',
+            'Lost Revenue': '$180,000',
+            'Risk Score': '85/100'
+          }
+        };
       }
 
       return null;
