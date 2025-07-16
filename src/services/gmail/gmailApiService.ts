@@ -70,7 +70,15 @@ class GmailApiService {
 
   private loadStoredTokens(): void {
     try {
-      const storedTokens = localStorage.getItem('gmail_tokens');
+      // Get current user ID from Supabase
+      const userEmail = this.getCurrentUserEmail();
+      if (!userEmail) {
+        console.log('No authenticated user - skipping token load');
+        return;
+      }
+      
+      const storageKey = `gmail_tokens_${userEmail}`;
+      const storedTokens = localStorage.getItem(storageKey);
       if (storedTokens) {
         const tokens: AuthTokens = JSON.parse(storedTokens);
         this.accessToken = tokens.access_token;
@@ -86,11 +94,23 @@ class GmailApiService {
       console.error('Failed to load stored tokens:', error);
     }
   }
+  
+  private getCurrentUserEmail(): string | null {
+    // Check for user email in localStorage (set during login)
+    return localStorage.getItem('crm_user_email');
+  }
 
   private saveTokens(tokens: AuthTokens): void {
     try {
+      const userEmail = this.getCurrentUserEmail();
+      if (!userEmail) {
+        console.error('Cannot save tokens - no authenticated user');
+        return;
+      }
+      
       tokens.expires_at = Date.now() + (tokens.expires_in * 1000);
-      localStorage.setItem('gmail_tokens', JSON.stringify(tokens));
+      const storageKey = `gmail_tokens_${userEmail}`;
+      localStorage.setItem(storageKey, JSON.stringify(tokens));
       this.accessToken = tokens.access_token;
       this.refreshToken = tokens.refresh_token || null;
       this.tokenExpiry = tokens.expires_at;
@@ -419,7 +439,11 @@ class GmailApiService {
    * Logout and clear stored tokens
    */
   logout(): void {
-    localStorage.removeItem('gmail_tokens');
+    const userEmail = this.getCurrentUserEmail();
+    if (userEmail) {
+      const storageKey = `gmail_tokens_${userEmail}`;
+      localStorage.removeItem(storageKey);
+    }
     this.isInitialized = false;
     this.accessToken = null;
     this.refreshToken = null;

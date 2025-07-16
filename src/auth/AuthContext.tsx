@@ -85,6 +85,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         logger.debug('Auth state changed:', event, session?.user?.email);
+        
+        // Update stored user email
+        if (session?.user?.email) {
+          localStorage.setItem('crm_user_email', session.user.email);
+        } else if (event === 'SIGNED_OUT') {
+          localStorage.removeItem('crm_user_email');
+        }
+        
         if (mounted) {
           setState(prev => ({
             ...prev,
@@ -149,6 +157,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       if (error) throw error;
       
+      // Store user email for Gmail token isolation
+      localStorage.setItem('crm_user_email', email);
+      
       setState(prev => ({
         ...prev,
         user: data.user as User,
@@ -209,6 +220,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      
+      // Clear user email on sign out
+      localStorage.removeItem('crm_user_email');
       
       setState({
         user: null,
