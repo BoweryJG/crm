@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -36,6 +37,7 @@ import { useAuth } from '../auth';
 import ApiKeyManager from '../components/settings/ApiKeyManager';
 import ThemeSettings from '../components/settings/ThemeSettings';
 import SoundSettings from '../components/settings/SoundSettings';
+import EmailSettings from '../components/settings/EmailSettings';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -62,8 +64,17 @@ const Settings: React.FC = () => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
   const { user } = useAuth();
+  const location = useLocation();
   const [tabValue, setTabValue] = useState(0);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  useEffect(() => {
+    // Check if we should navigate to a specific tab
+    const state = location.state as { activeTab?: string } | undefined;
+    if (state?.activeTab === 'email') {
+      setTabValue(7); // Email tab index
+    }
+  }, [location]);
 
   // Settings state
   const [settings, setSettings] = useState({
@@ -189,6 +200,7 @@ const Settings: React.FC = () => {
             <Tab icon={<PaletteIcon />} label="Appearance" />
             <Tab icon={<GraphicEqIcon />} label="Sound" />
             <Tab icon={<KeyIcon />} label="API Keys" />
+            <Tab icon={<EmailIcon />} label="Email" />
           </Tabs>
         </Box>
 
@@ -476,6 +488,13 @@ const Settings: React.FC = () => {
         <TabPanel value={tabValue} index={6}>
           <Box sx={{ p: 3 }}>
             <ApiKeyManager />
+          </Box>
+        </TabPanel>
+
+        {/* Email Settings */}
+        <TabPanel value={tabValue} index={7}>
+          <Box sx={{ p: 3 }}>
+            <EmailSettings />
           </Box>
         </TabPanel>
 

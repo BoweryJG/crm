@@ -1,11 +1,15 @@
 // Email Service for CRM
 import { supabase } from '../supabase/supabase';
+import { gmailSyncService } from './gmailSyncService';
 
 interface EmailAccount {
+  id: string;
   email: string;
-  password: string;
+  provider: 'gmail' | 'outlook' | 'smtp';
   dailyLimit: number;
   sentToday: number;
+  isActive: boolean;
+  settings?: any;
 }
 
 interface EmailOptions {
@@ -37,31 +41,41 @@ class EmailService {
   private accounts: EmailAccount[] = [];
   private currentAccountIndex = 0;
   private initialized = false;
-  private gmailCredentials: { email: string; password: string }[] = [
-    { 
-      email: 'jgolden@bowerycreativeagency.com', 
-      password: 'udyt jdfa huqe bicx' 
-    },
-    { 
-      email: 'jasonwilliamgolden@gmail.com', 
-      password: 'smom nvay ojrr xnnj' 
-    }
-  ];
 
   constructor() {
     this.initializeAccounts();
   }
 
-  private initializeAccounts() {
-    this.accounts = this.gmailCredentials.map(cred => ({
-      email: cred.email,
-      password: cred.password,
-      dailyLimit: cred.email.includes('bowerycreativeagency.com') ? 2000 : 500,
-      sentToday: 0
-    }));
+  private async initializeAccounts() {
+    try {
+      // Get email accounts from database instead of hardcoded credentials
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: accounts } = await supabase
+          .from('email_accounts')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_active', true);
 
-    this.initialized = true;
-    console.log(`Email service initialized with ${this.accounts.length} accounts`);
+        if (accounts && accounts.length > 0) {
+          this.accounts = accounts.map(account => ({
+            id: account.id,
+            email: account.email,
+            provider: account.provider,
+            dailyLimit: account.daily_limit || 500,
+            sentToday: 0,
+            isActive: account.is_active,
+            settings: account.settings
+          }));
+        }
+      }
+
+      this.initialized = true;
+      console.log(`Email service initialized with ${this.accounts.length} accounts`);
+    } catch (error) {
+      console.error('Failed to initialize email accounts:', error);
+      this.initialized = true; // Still mark as initialized to prevent infinite loops
+    }
   }
 
   private getNextAvailableAccount(): EmailAccount | null {
@@ -86,8 +100,32 @@ class EmailService {
     try {
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        return { success: false, error: 'User not authenticated' };
+      }
 
-      // Call the Render backend
+      // Check if Gmail is authenticated and available
+      if (gmailSyncService.isGmailAuthenticated()) {
+        try {
+          // Use Gmail API directly
+          const messageId = await gmailSyncService.sendEmail(
+            options.to,
+            options.subject,
+            options.html || options.text || '',
+            !!options.html
+          );
+
+          return {
+            success: true,
+            messageId
+          };
+        } catch (gmailError) {
+          console.error('Gmail API send failed, falling back to backend:', gmailError);
+          // Fall back to backend if Gmail API fails
+        }
+      }
+
+      // Fallback to backend API
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/email/send`, {
         method: 'POST',
         headers: {
@@ -96,7 +134,7 @@ class EmailService {
         },
         body: JSON.stringify({
           ...options,
-          userId: user?.id
+          userId: user.id
         })
       });
 
@@ -191,10 +229,96 @@ class EmailService {
     };
   }
 
-  async syncGmailEmails(userId: string): Promise<void> {
-    // This will be implemented to sync emails from Gmail
-    // For now, it's a placeholder
-    console.log('Gmail sync not yet implemented');
+  async syncGmailEmails(userId: string): Promise<{ success: boolean; syncedCount: number; error?: string }> {
+    try {
+      if (!gmailSyncService.isGmailAuthenticated()) {
+        return { success: false, syncedCount: 0, error: 'Gmail not authenticated' };
+      }
+
+      const result = await gmailSyncService.syncAllAccounts();
+      return result;
+    } catch (error) {
+      console.error('Gmail sync error:', error);
+      return {
+        success: false,
+        syncedCount: 0,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  /**
+   * Add a Gmail account to the user's email accounts
+   */
+  async addGmailAccount(): Promise<{ success: boolean; error?: string }> {
+    try {
+      if (!gmailSyncService.isGmailAuthenticated()) {
+        return { success: false, error: 'Gmail not authenticated' };
+      }
+
+      const profile = await gmailSyncService.getGmailProfile();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
+      // Check if account already exists
+      const { data: existing } = await supabase
+        .from('email_accounts')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('email', profile.emailAddress)
+        .single();
+
+      if (existing) {
+        return { success: false, error: 'Account already exists' };
+      }
+
+      // Add account to database
+      const { error } = await supabase
+        .from('email_accounts')
+        .insert({
+          user_id: user.id,
+          email: profile.emailAddress,
+          provider: 'gmail',
+          daily_limit: 500,
+          is_active: true,
+          settings: {
+            messagesTotal: profile.messagesTotal,
+            threadsTotal: profile.threadsTotal
+          }
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      // Refresh accounts
+      await this.initializeAccounts();
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error adding Gmail account:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to add account'
+      };
+    }
+  }
+
+  /**
+   * Get Gmail authentication status
+   */
+  isGmailAuthenticated(): boolean {
+    return gmailSyncService.isGmailAuthenticated();
+  }
+
+  /**
+   * Initialize Gmail API
+   */
+  async initializeGmail(): Promise<boolean> {
+    return await gmailSyncService.initializeGmailApi();
   }
 
   // Reset daily counts (should be called by a cron job or scheduler)

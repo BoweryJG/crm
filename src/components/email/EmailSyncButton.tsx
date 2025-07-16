@@ -15,9 +15,12 @@ import {
   Sync as SyncIcon,
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
-  Schedule as ScheduleIcon
+  Schedule as ScheduleIcon,
+  Google as GoogleIcon,
+  Warning as WarningIcon
 } from '@mui/icons-material';
 import { gmailSyncService } from '../../services/email/gmailSyncService';
+import GmailAuthComponent from '../gmail/GmailAuthComponent';
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 
 interface EmailSyncButtonProps {
@@ -34,14 +37,35 @@ const EmailSyncButton: React.FC<EmailSyncButtonProps> = ({
   const [syncStatus, setSyncStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [autoSyncEnabled, setAutoSyncEnabled] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Get last sync time on mount
-    const lastSyncTime = gmailSyncService.getLastSyncTime();
-    setLastSync(lastSyncTime);
+    // Initialize Gmail API and check authentication status
+    const initializeGmail = async () => {
+      try {
+        const initialized = await gmailSyncService.initializeGmailApi();
+        setIsAuthenticated(initialized);
+        
+        if (initialized) {
+          const lastSyncTime = gmailSyncService.getLastSyncTime();
+          setLastSync(lastSyncTime);
+        }
+      } catch (error) {
+        console.error('Failed to initialize Gmail:', error);
+        setIsAuthenticated(false);
+      }
+    };
+
+    initializeGmail();
   }, []);
 
   const handleSync = async () => {
+    if (!isAuthenticated) {
+      setShowAuthDialog(true);
+      return;
+    }
+
     setSyncing(true);
     setSyncStatus('idle');
 
@@ -65,6 +89,17 @@ const EmailSyncButton: React.FC<EmailSyncButtonProps> = ({
     }
   };
 
+  const handleAuthSuccess = (profile: any) => {
+    setIsAuthenticated(true);
+    setShowAuthDialog(false);
+    console.log('Gmail authenticated:', profile);
+  };
+
+  const handleAuthError = (error: string) => {
+    console.error('Gmail auth error:', error);
+    setSyncStatus('error');
+  };
+
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -73,13 +108,24 @@ const EmailSyncButton: React.FC<EmailSyncButtonProps> = ({
     setAnchorEl(null);
   };
 
-  const toggleAutoSync = () => {
-    if (autoSyncEnabled) {
-      gmailSyncService.stopAutoSync();
-      setAutoSyncEnabled(false);
-    } else {
-      gmailSyncService.startAutoSync(15); // Sync every 15 minutes
-      setAutoSyncEnabled(true);
+  const toggleAutoSync = async () => {
+    if (!isAuthenticated) {
+      setShowAuthDialog(true);
+      handleMenuClose();
+      return;
+    }
+
+    try {
+      if (autoSyncEnabled) {
+        gmailSyncService.stopAutoSync();
+        setAutoSyncEnabled(false);
+      } else {
+        await gmailSyncService.startAutoSync(15); // Sync every 15 minutes
+        setAutoSyncEnabled(true);
+      }
+    } catch (error) {
+      console.error('Error toggling auto-sync:', error);
+      setSyncStatus('error');
     }
     handleMenuClose();
   };
@@ -96,6 +142,10 @@ const EmailSyncButton: React.FC<EmailSyncButtonProps> = ({
   };
 
   const getStatusIcon = () => {
+    if (!isAuthenticated) {
+      return <WarningIcon />;
+    }
+    
     switch (syncStatus) {
       case 'success':
         return <CheckCircleIcon />;
@@ -109,8 +159,15 @@ const EmailSyncButton: React.FC<EmailSyncButtonProps> = ({
   const syncButton = variant === 'icon' ? (
     <Tooltip title={
       <div>
-        <Typography variant="body2">Sync Gmail</Typography>
-        {lastSync && (
+        <Typography variant="body2">
+          {!isAuthenticated ? 'Connect Gmail' : 'Sync Gmail'}
+        </Typography>
+        {!isAuthenticated && (
+          <Typography variant="caption" color="warning.main">
+            Gmail not connected
+          </Typography>
+        )}
+        {isAuthenticated && lastSync && (
           <Typography variant="caption">
             Last synced {formatDistanceToNow(lastSync, { addSuffix: true })}
           </Typography>
@@ -121,7 +178,7 @@ const EmailSyncButton: React.FC<EmailSyncButtonProps> = ({
         <IconButton
           onClick={handleSync}
           disabled={syncing}
-          color={getStatusColor() as any}
+          color={!isAuthenticated ? 'warning' : getStatusColor() as any}
           onContextMenu={(e) => {
             e.preventDefault();
             handleMenuOpen(e);
@@ -130,7 +187,7 @@ const EmailSyncButton: React.FC<EmailSyncButtonProps> = ({
           <Badge
             color="success"
             variant="dot"
-            invisible={!autoSyncEnabled}
+            invisible={!autoSyncEnabled || !isAuthenticated}
           >
             {syncing ? <CircularProgress size={24} /> : getStatusIcon()}
           </Badge>
@@ -143,13 +200,13 @@ const EmailSyncButton: React.FC<EmailSyncButtonProps> = ({
       startIcon={syncing ? <CircularProgress size={16} /> : getStatusIcon()}
       onClick={handleSync}
       disabled={syncing}
-      color={getStatusColor() as any}
+      color={!isAuthenticated ? 'warning' : getStatusColor() as any}
       onContextMenu={(e) => {
         e.preventDefault();
         handleMenuOpen(e);
       }}
     >
-      {syncing ? 'Syncing...' : 'Sync Gmail'}
+      {syncing ? 'Syncing...' : (!isAuthenticated ? 'Connect Gmail' : 'Sync Gmail')}
     </Button>
   );
 
@@ -161,15 +218,27 @@ const EmailSyncButton: React.FC<EmailSyncButtonProps> = ({
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={toggleAutoSync}>
-          <ListItemIcon>
-            <ScheduleIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>
-            {autoSyncEnabled ? 'Disable' : 'Enable'} Auto-sync
-          </ListItemText>
-        </MenuItem>
-        {lastSync && (
+        {!isAuthenticated && (
+          <MenuItem onClick={() => { setShowAuthDialog(true); handleMenuClose(); }}>
+            <ListItemIcon>
+              <GoogleIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>
+              Connect Gmail
+            </ListItemText>
+          </MenuItem>
+        )}
+        {isAuthenticated && (
+          <MenuItem onClick={toggleAutoSync}>
+            <ListItemIcon>
+              <ScheduleIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>
+              {autoSyncEnabled ? 'Disable' : 'Enable'} Auto-sync
+            </ListItemText>
+          </MenuItem>
+        )}
+        {isAuthenticated && lastSync && (
           <MenuItem disabled>
             <ListItemText>
               <Typography variant="caption">
@@ -179,6 +248,13 @@ const EmailSyncButton: React.FC<EmailSyncButtonProps> = ({
           </MenuItem>
         )}
       </Menu>
+      
+      <GmailAuthComponent
+        open={showAuthDialog}
+        onClose={() => setShowAuthDialog(false)}
+        onAuthSuccess={handleAuthSuccess}
+        onAuthError={handleAuthError}
+      />
     </>
   );
 };

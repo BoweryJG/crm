@@ -52,6 +52,7 @@ const KnowledgeDental = lazy(() => import('./pages/KnowledgeDental'));
 const KnowledgeAesthetic = lazy(() => import('./pages/KnowledgeAesthetic'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Profile = lazy(() => import('./pages/Profile'));
+const GmailAuthCallback = lazy(() => import('./pages/GmailAuthCallback'));
 const RipplePage = lazy(() => import('./pages/RipplePage'));
 const CommandRoom = lazy(() => import('./pages/CommandRoom'));
 const CommandCenter = lazy(() => import('./pages/CommandCenter'));
@@ -142,6 +143,7 @@ const App: React.FC = () => {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/auth/google/callback" element={<Suspense fallback={<SphereLoadingScreen loadingText="GMAIL AUTH" message="COMPLETING AUTHENTICATION" />}><GmailAuthCallback /></Suspense>} />
                 
                 {/* Public Ripple Route - no layout needed */}
                 <Route path="/ripple/:rippleToken" element={<Suspense fallback={<SphereLoadingScreen loadingText="RIPPLE" message="LOADING PERSONALIZED CONTENT" />}><RipplePage /></Suspense>} />
