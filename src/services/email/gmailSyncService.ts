@@ -32,9 +32,16 @@ interface EmailLog {
   attachments?: any[];
 }
 
+interface UserSyncPreferences {
+  auto_sync_enabled: boolean;
+  sync_interval_minutes: number;
+  last_sync_time?: Date;
+}
+
 class GmailSyncService {
   private syncInterval: NodeJS.Timer | null = null;
   private lastSyncTime: Date | null = null;
+  private currentIntervalMinutes: number = 15;
   private rateLimiter = {
     requests: 0,
     resetTime: Date.now() + 60000, // Reset every minute
@@ -50,6 +57,12 @@ class GmailSyncService {
       throw new Error('Gmail API not initialized. Please authenticate first.');
     }
 
+    // Store the interval for later use
+    this.currentIntervalMinutes = intervalMinutes;
+
+    // Save sync preferences to database
+    await this.saveSyncPreferences(true, intervalMinutes);
+
     // Start new sync interval
     this.syncInterval = setInterval(() => {
       this.syncAllAccounts();
@@ -63,6 +76,68 @@ class GmailSyncService {
     if (this.syncInterval) {
       clearInterval(this.syncInterval);
       this.syncInterval = null;
+    }
+    
+    // Update preferences in database
+    this.saveSyncPreferences(false, this.currentIntervalMinutes).catch(console.error);
+  }
+
+  async loadSyncPreferences(): Promise<UserSyncPreferences | null> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('auto_sync_enabled, sync_interval_minutes, last_sync_time')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) {
+        // No preferences exist yet, return defaults
+        return {
+          auto_sync_enabled: false,
+          sync_interval_minutes: 15,
+          last_sync_time: undefined
+        };
+      }
+      
+      return {
+        auto_sync_enabled: data.auto_sync_enabled || false,
+        sync_interval_minutes: data.sync_interval_minutes || 15,
+        last_sync_time: data.last_sync_time ? new Date(data.last_sync_time) : undefined
+      };
+    } catch (error) {
+      console.error('Error loading sync preferences:', error);
+      return null;
+    }
+  }
+
+  async saveSyncPreferences(autoSyncEnabled: boolean, intervalMinutes: number): Promise<void> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      await supabase
+        .from('user_preferences')
+        .upsert({
+          user_id: user.id,
+          auto_sync_enabled: autoSyncEnabled,
+          sync_interval_minutes: intervalMinutes,
+          last_sync_time: this.lastSyncTime?.toISOString(),
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
+        });
+    } catch (error) {
+      console.error('Error saving sync preferences:', error);
+    }
+  }
+
+  async initializeFromPreferences(): Promise<void> {
+    const prefs = await this.loadSyncPreferences();
+    if (prefs?.auto_sync_enabled && gmailApiService.isReady()) {
+      await this.startAutoSync(prefs.sync_interval_minutes);
     }
   }
 
@@ -184,6 +259,9 @@ class GmailSyncService {
       }
 
       this.lastSyncTime = new Date();
+      
+      // Update last sync time in preferences
+      await this.saveSyncPreferences(this.syncInterval !== null, this.currentIntervalMinutes);
 
       return {
         success: true,
@@ -337,7 +415,14 @@ class GmailSyncService {
    * Initialize Gmail API service
    */
   async initializeGmailApi(): Promise<boolean> {
-    return await gmailApiService.initialize();
+    const initialized = await gmailApiService.initialize();
+    
+    // If initialized, check for saved preferences and start auto-sync if enabled
+    if (initialized) {
+      await this.initializeFromPreferences();
+    }
+    
+    return initialized;
   }
 
   /**

@@ -56,7 +56,16 @@ const EmailSettings: React.FC = () => {
 
   useEffect(() => {
     checkEmailAccounts();
+    loadSyncPreferences();
   }, []);
+
+  const loadSyncPreferences = async () => {
+    const prefs = await gmailSyncService.loadSyncPreferences();
+    if (prefs) {
+      setAutoSyncEnabled(prefs.auto_sync_enabled);
+      setSyncInterval(prefs.sync_interval_minutes);
+    }
+  };
 
   const checkEmailAccounts = async () => {
     setLoading(true);
@@ -263,7 +272,15 @@ const EmailSettings: React.FC = () => {
                   fullWidth
                   label="Sync Interval"
                   value={syncInterval}
-                  onChange={(e) => setSyncInterval(Number(e.target.value))}
+                  onChange={async (e) => {
+                    const newInterval = Number(e.target.value);
+                    setSyncInterval(newInterval);
+                    // Update if auto-sync is enabled
+                    if (autoSyncEnabled) {
+                      await gmailSyncService.startAutoSync(newInterval);
+                      showNotification(`Auto-sync interval updated to ${newInterval} minutes`, 'success');
+                    }
+                  }}
                   helperText="How often to check for new emails"
                 >
                   <MenuItem value={5}>Every 5 minutes</MenuItem>
