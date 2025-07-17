@@ -81,8 +81,8 @@ const PriorityTaskList: React.FC<PriorityTaskListProps> = ({ tasks, themeAccents
   
   // Sort tasks by priority
   const sortedTasks = [...tasks].sort((a, b) => {
-    const priorityOrder = { 'High': 0, 'Medium': 1, 'Low': 2 };
-    return priorityOrder[a.priority] - priorityOrder[b.priority];
+    const priorityOrder: Record<string, number> = { 'High': 0, 'Medium': 1, 'Low': 2 };
+    return (priorityOrder[a.priority] || 0) - (priorityOrder[b.priority] || 0);
   });
   
   return (

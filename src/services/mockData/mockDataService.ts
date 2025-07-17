@@ -867,9 +867,9 @@ export const generateUpcomingTasksFromContacts = async (contacts: any[], count: 
   });
   
   // Sort by priority (High first) and return requested count
-  const priorityOrder = { 'High': 3, 'Medium': 2, 'Low': 1 };
+  const priorityOrder: Record<string, number> = { 'High': 3, 'Medium': 2, 'Low': 1 };
   return realTasks
-    .sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority])
+    .sort((a, b) => (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0))
     .slice(0, count);
 };
 

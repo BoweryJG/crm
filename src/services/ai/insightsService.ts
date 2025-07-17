@@ -68,9 +68,9 @@ export class AIInsightsService {
 
       // Sort by priority and confidence score
       insights.sort((a, b) => {
-        const priorityOrder = { high: 3, medium: 2, low: 1 };
-        if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
-          return priorityOrder[b.priority] - priorityOrder[a.priority];
+        const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
+        if ((priorityOrder[a.priority] || 0) !== (priorityOrder[b.priority] || 0)) {
+          return (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
         }
         return b.confidenceScore - a.confidenceScore;
       });
