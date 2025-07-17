@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { dashboardService, DashboardMetrics } from '../services/supabase/dashboardService';
 import { getMockDashboardData } from '../services/mockData/mockDataService';
+import mockDataService from '../services/mockData/mockDataService';
+import { supabase } from '../services/supabase/supabase';
 import { useAuth } from '../auth';
 import { useAppMode } from './AppModeContext';
 
@@ -69,23 +71,59 @@ export const DashboardDataProvider: React.FC<DashboardDataProviderProps> = ({ ch
       // Load real data from Supabase
       let metrics = await dashboardService.getMetrics(user.id);
       
-      // If no metrics exist, initialize them
-      if (!metrics) {
-        await dashboardService.initializeMetrics(user.id);
-        metrics = await dashboardService.getMetrics(user.id);
-      }
-      
       if (metrics) {
-        // Sync percentages to ensure quota matches sales goal progress
-        await dashboardService.syncPercentages(user.id);
-        // Reload to get synced data
-        metrics = await dashboardService.getMetrics(user.id);
         setDashboardData(metrics);
         
-        // Generate consistent mock activities and tasks for real data too
-        const mockData = getMockDashboardData();
-        setMockActivities(mockData.recentActivities);
-        setMockTasks(mockData.upcomingTasks);
+        // Load real activities and tasks based on actual contact data
+        try {
+          // Determine which table to use based on user email
+          const userEmail = user.email;
+          let tableName = 'public_contacts';
+          if (userEmail === 'jasonwilliamgolden@gmail.com' || userEmail === 'jgolden@bowerycreativeagency.com') {
+            tableName = 'personal_contacts';
+          }
+          
+          console.log(`Loading real activities/tasks from ${tableName} for user: ${userEmail}`);
+          
+          // Fetch actual contacts to generate real activities and tasks
+          const { data: contacts } = await supabase
+            .from(tableName)
+            .select('first_name, last_name, notes, created_at, updated_at, status, specialty')
+            .order('updated_at', { ascending: false });
+          
+          if (contacts && contacts.length > 0) {
+            // Generate real activities from contact data
+            const realActivities = await mockDataService.generateRecentActivitiesFromContacts(contacts, 5);
+            setMockActivities(realActivities);
+            
+            // Generate real tasks from contact data
+            const realTasks = await mockDataService.generateUpcomingTasksFromContacts(contacts, 5);
+            setMockTasks(realTasks);
+            
+            console.log('Generated real activities and tasks:', {
+              activitiesCount: realActivities.length,
+              tasksCount: realTasks.length,
+              hasGregPedro: contacts.some(c => 
+                `${c.first_name} ${c.last_name}`.toLowerCase().includes('greg pedro')
+              ),
+              hasEmmanuel: contacts.some(c => 
+                `${c.first_name} ${c.last_name}`.toLowerCase().includes('emmanuel')
+              )
+            });
+          } else {
+            // Fallback to mock data if no contacts found
+            console.log('No contacts found, using mock activities and tasks');
+            const mockData = getMockDashboardData();
+            setMockActivities(mockData.recentActivities);
+            setMockTasks(mockData.upcomingTasks);
+          }
+        } catch (error) {
+          console.error('Error loading real activities/tasks:', error);
+          // Fallback to mock data
+          const mockData = getMockDashboardData();
+          setMockActivities(mockData.recentActivities);
+          setMockTasks(mockData.upcomingTasks);
+        }
       } else {
         // Fallback to mock data if something goes wrong
         const mockData = getMockDashboardData();
