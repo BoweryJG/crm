@@ -147,7 +147,7 @@ class DashboardService {
       const salesGoalProgress = Math.min(Math.round((currentRevenue / salesGoal) * 100), 100);
       
       // Calculate conversion rate based on customers vs total contacts
-      const conversionRate = totalContacts > 0 ? Math.round((activePractices / totalContacts) * 100) : 0;
+      const conversionRate = totalContacts && totalContacts > 0 ? Math.round((activePractices / totalContacts) * 100) : 0;
       
       // Generate recent activity metrics
       const contactsThisMonth = contacts?.filter(c => {
