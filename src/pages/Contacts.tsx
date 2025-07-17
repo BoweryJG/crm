@@ -110,7 +110,7 @@ const Contacts: React.FC = () => {
       
       if (user && !isDemo) {
         // Check if this is your account for personal contacts
-        if (user.id === '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd') {
+        if (user.email === 'jasonwilliamgolden@gmail.com') {
           // Use personal_contacts for your private tracking
           tableName = 'personal_contacts';
         }
@@ -314,7 +314,7 @@ const Contacts: React.FC = () => {
 
       // Update the contact in the database (only in live mode with authenticated user)
       let tableName = 'public_contacts';
-      if (user.id === '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd') {
+      if (user.email === 'jasonwilliamgolden@gmail.com') {
         tableName = 'personal_contacts';
       }
       const { error } = await supabase
@@ -393,11 +393,11 @@ const Contacts: React.FC = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
           <Typography variant="h4" sx={{ color: theme.palette.primary.main }}>
-            {user && !isDemo && user.id === '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd' ? 'Personal Contacts' : 'Contacts'}
+            {user && !isDemo && user.email === 'jasonwilliamgolden@gmail.com' ? 'Personal Contacts' : 'Contacts'}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Total: {totalContacts.toLocaleString()} contacts in database
-            {user && !isDemo && user.id === '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd' && ' (Private - Only visible to you)'}
+            {user && !isDemo && user.email === 'jasonwilliamgolden@gmail.com' && ' (Private - Only visible to you)'}
           </Typography>
         </Box>
         <Box>
@@ -628,7 +628,7 @@ const Contacts: React.FC = () => {
             if (formMode === 'add') {
               // Add new contact
               let tableName = 'public_contacts';
-              if (user && !isDemo && user.id === '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd') {
+              if (user && !isDemo && user.email === 'jasonwilliamgolden@gmail.com') {
                 tableName = 'personal_contacts';
               }
               const { error } = await supabase
@@ -643,7 +643,7 @@ const Contacts: React.FC = () => {
             } else {
               // Update existing contact
               let tableName = 'public_contacts';
-              if (user && !isDemo && user.id === '5fe37075-c2f5-4acd-abef-1ef15d0c1ffd') {
+              if (user && !isDemo && user.email === 'jasonwilliamgolden@gmail.com') {
                 tableName = 'personal_contacts';
               }
               const { error } = await supabase
