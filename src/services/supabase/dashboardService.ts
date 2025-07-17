@@ -53,17 +53,57 @@ class DashboardService {
         .from(tableName)
         .select('*', { count: 'exact', head: true });
       
-      // Calculate revenue metrics based on actual contact data
-      // Look for high-value contacts like Greg Pedro
+      // Calculate revenue metrics based on actual contact and contract data
+      // First get contract data (join with contacts)
+      const { data: contracts, error: contractError } = await supabase
+        .from('contracts')
+        .select(`
+          *,
+          personal_contacts(first_name, last_name, status)
+        `);
+      
+      if (contractError) {
+        console.error('Error fetching contracts:', contractError);
+      }
+      
+      // Get contact data
       const { data: contacts } = await supabase
         .from(tableName)
         .select('first_name, last_name, notes, created_at, status')
         .order('created_at', { ascending: false });
       
-      // Calculate revenue based on real client data
+      // Calculate revenue based on real client data and contracts
       let currentRevenue = 0;
       let activePractices = 0;
       let pipelineValue = 0;
+      
+      console.log('Found contracts:', contracts?.length || 0);
+      
+      // Calculate revenue from active contracts
+      if (contracts && contracts.length > 0) {
+        contracts.forEach(contract => {
+          if (contract.status === 'active' || contract.status === 'draft') {
+            // Use minimum monthly fee or estimated revenue
+            const monthlyRevenue = contract.minimum_monthly_fee || 
+                                 contract.estimated_monthly_revenue_min || 
+                                 0;
+            
+            // Convert to annual revenue
+            currentRevenue += (monthlyRevenue * 12);
+            activePractices += 1;
+            
+            console.log(`Contract revenue: ${contract.contract_name} - $${monthlyRevenue}/month = $${monthlyRevenue * 12}/year`);
+          }
+          
+          // Add to pipeline if in draft status
+          if (contract.status === 'draft') {
+            const pipelineAmount = contract.projected_annual_value_min || 
+                                 (contract.minimum_monthly_fee * 12) || 
+                                 0;
+            pipelineValue += pipelineAmount;
+          }
+        });
+      }
       
       if (contacts) {
         // Look for revenue indicators in notes and status

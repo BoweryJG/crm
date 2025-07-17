@@ -626,22 +626,32 @@ export const generateRecentActivitiesFromContacts = async (contacts: any[], coun
     c.notes?.toLowerCase().includes('emmanuel')
   );
   
-  // Generate activities for Greg Pedro ($2000/month client)
+  // Generate activities for Greg Pedro ($6000/month minimum fee client)
   if (gregPedro) {
     realActivities.push({
       id: 'activity-greg-1',
-      type: 'Contract renewal',
-      description: `Monthly retainer payment received from ${gregPedro.first_name} ${gregPedro.last_name}`,
+      type: 'Contract executed',
+      description: `Management Services Agreement signed with ${gregPedro.first_name} ${gregPedro.last_name} - $6k minimum monthly fee`,
       timeAgo: '2 hours ago',
       timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
       priority: 'high',
-      revenue: 2000
+      revenue: 6000
     });
     
     realActivities.push({
       id: 'activity-greg-2',
-      type: 'Meeting completed',
-      description: `Strategy session with ${gregPedro.first_name} ${gregPedro.last_name} - Q4 expansion plans`,
+      type: 'Contract milestone',
+      description: `${gregPedro.first_name} ${gregPedro.last_name} - Implementation fee ($6,000) processed`,
+      timeAgo: '6 hours ago',
+      timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
+      priority: 'high',
+      revenue: 6000
+    });
+    
+    realActivities.push({
+      id: 'activity-greg-3',
+      type: 'Strategy session',
+      description: `${gregPedro.first_name} ${gregPedro.last_name} - Website consolidation strategy meeting`,
       timeAgo: '1 day ago',
       timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
       priority: 'high',
@@ -771,25 +781,35 @@ export const generateUpcomingTasksFromContacts = async (contacts: any[], count: 
     c.notes?.toLowerCase().includes('emmanuel')
   );
   
-  // Generate high-priority tasks for Greg Pedro ($2000/month client)
+  // Generate high-priority tasks for Greg Pedro ($6000/month minimum fee client)
   if (gregPedro) {
     realTasks.push({
       id: 'task-greg-1',
-      type: 'Monthly check-in',
-      description: `${gregPedro.first_name} ${gregPedro.last_name} - Monthly strategy review`,
-      dueDate: 'Tomorrow',
+      type: 'Contract implementation',
+      description: `${gregPedro.first_name} ${gregPedro.last_name} - Begin website platform migration`,
+      dueDate: 'Today',
       priority: 'High',
-      revenue: 2000,
+      revenue: 6000,
       contact: gregPedro
     });
     
     realTasks.push({
       id: 'task-greg-2',
-      type: 'Contract renewal',
-      description: `${gregPedro.first_name} ${gregPedro.last_name} - Prepare Q1 retainer renewal`,
+      type: 'Performance review',
+      description: `${gregPedro.first_name} ${gregPedro.last_name} - Monthly performance reporting`,
+      dueDate: 'Tomorrow',
+      priority: 'High',
+      revenue: 0,
+      contact: gregPedro
+    });
+    
+    realTasks.push({
+      id: 'task-greg-3',
+      type: 'Service delivery',
+      description: `${gregPedro.first_name} ${gregPedro.last_name} - Set up AI booking system`,
       dueDate: 'Next week',
       priority: 'High',
-      revenue: 6000, // Quarterly renewal
+      revenue: 0,
       contact: gregPedro
     });
   }
