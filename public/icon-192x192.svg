@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="sphereGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9f58fa;stop-opacity:1" />
+      <stop offset="25%" style="stop-color:#ff00ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00ffff;stop-opacity:1" />
+      <stop offset="75%" style="stop-color:#4bd48e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4B96DC;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="20%" style="stop-color:#ff00ff;stop-opacity:0.9" />
+      <stop offset="40%" style="stop-color:#00ffff;stop-opacity:0.7" />
+      <stop offset="70%" style="stop-color:#4B96DC;stop-opacity:0.4" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:0" />
+    </radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="innerGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Premium background -->
+  <rect width="192" height="192" rx="34" fill="url(#centerGlow)" opacity="0.1"/>
+  <rect width="192" height="192" rx="34" fill="#0a0a0a" stroke="url(#sphereGradient)" stroke-width="2" opacity="0.5"/>
+  
+  <!-- Multiple concentric rings for luxury effect -->
+  <circle cx="96" cy="96" r="80" fill="none" stroke="url(#sphereGradient)" stroke-width="6" opacity="0.4" filter="url(#glow)"/>
+  <circle cx="96" cy="96" r="68" fill="none" stroke="url(#sphereGradient)" stroke-width="5" opacity="0.5" filter="url(#glow)"/>
+  <circle cx="96" cy="96" r="56" fill="none" stroke="url(#sphereGradient)" stroke-width="4" opacity="0.6"/>
+  <circle cx="96" cy="96" r="44" fill="none" stroke="url(#sphereGradient)" stroke-width="3" opacity="0.7"/>
+  <circle cx="96" cy="96" r="32" fill="none" stroke="url(#sphereGradient)" stroke-width="2.5" opacity="0.8"/>
+  
+  <!-- Central jewel core -->
+  <circle cx="96" cy="96" r="20" fill="url(#centerGlow)" filter="url(#innerGlow)"/>
+  
+  <!-- Primary orbital constellation -->
+  <circle cx="96" cy="16" r="7" fill="#9f58fa" filter="url(#glow)"/>
+  <circle cx="176" cy="96" r="7" fill="#00ffff" filter="url(#glow)"/>
+  <circle cx="96" cy="176" r="7" fill="#4bd48e" filter="url(#glow)"/>
+  <circle cx="16" cy="96" r="7" fill="#ff00ff" filter="url(#glow)"/>
+  
+  <!-- Secondary constellation -->
+  <circle cx="144" cy="48" r="5" fill="#ffffff" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="144" cy="144" r="5" fill="#ffffff" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="48" cy="144" r="5" fill="#ffffff" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="48" cy="48" r="5" fill="#ffffff" opacity="0.8" filter="url(#glow)"/>
+  
+  <!-- Tertiary micro constellation -->
+  <circle cx="124" cy="24" r="3" fill="#9f58fa" opacity="0.7"/>
+  <circle cx="168" cy="68" r="3" fill="#00ffff" opacity="0.7"/>
+  <circle cx="168" cy="124" r="3" fill="#4bd48e" opacity="0.7"/>
+  <circle cx="124" cy="168" r="3" fill="#ff00ff" opacity="0.7"/>
+  <circle cx="68" cy="168" r="3" fill="#9f58fa" opacity="0.7"/>
+  <circle cx="24" cy="124" r="3" fill="#00ffff" opacity="0.7"/>
+  <circle cx="24" cy="68" r="3" fill="#4bd48e" opacity="0.7"/>
+  <circle cx="68" cy="24" r="3" fill="#ff00ff" opacity="0.7"/>
+</svg>

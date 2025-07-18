@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="sphereGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9f58fa;stop-opacity:1" />
+      <stop offset="20%" style="stop-color:#ff00ff;stop-opacity:1" />
+      <stop offset="40%" style="stop-color:#00ffff;stop-opacity:1" />
+      <stop offset="60%" style="stop-color:#4bd48e;stop-opacity:1" />
+      <stop offset="80%" style="stop-color:#4B96DC;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9f58fa;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="15%" style="stop-color:#ff00ff;stop-opacity:0.95" />
+      <stop offset="30%" style="stop-color:#00ffff;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#4bd48e;stop-opacity:0.6" />
+      <stop offset="75%" style="stop-color:#4B96DC;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:0" />
+    </radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="innerGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="superGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="16" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Ultra-premium background with depth -->
+  <rect width="512" height="512" rx="90" fill="url(#centerGlow)" opacity="0.08"/>
+  <rect width="512" height="512" rx="90" fill="#0a0a0a" stroke="url(#sphereGradient)" stroke-width="4" opacity="0.6"/>
+  
+  <!-- Intricate concentric ring system -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="url(#sphereGradient)" stroke-width="12" opacity="0.3" filter="url(#superGlow)"/>
+  <circle cx="256" cy="256" r="200" fill="none" stroke="url(#sphereGradient)" stroke-width="10" opacity="0.4" filter="url(#glow)"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="url(#sphereGradient)" stroke-width="8" opacity="0.5" filter="url(#glow)"/>
+  <circle cx="256" cy="256" r="160" fill="none" stroke="url(#sphereGradient)" stroke-width="7" opacity="0.6"/>
+  <circle cx="256" cy="256" r="140" fill="none" stroke="url(#sphereGradient)" stroke-width="6" opacity="0.65"/>
+  <circle cx="256" cy="256" r="120" fill="none" stroke="url(#sphereGradient)" stroke-width="5" opacity="0.7"/>
+  <circle cx="256" cy="256" r="100" fill="none" stroke="url(#sphereGradient)" stroke-width="4" opacity="0.75"/>
+  <circle cx="256" cy="256" r="80" fill="none" stroke="url(#sphereGradient)" stroke-width="3" opacity="0.8"/>
+  
+  <!-- Central jewel with maximum luxury -->
+  <circle cx="256" cy="256" r="55" fill="url(#centerGlow)" filter="url(#superGlow)"/>
+  
+  <!-- Primary orbital constellation -->
+  <circle cx="256" cy="36" r="18" fill="#9f58fa" filter="url(#glow)"/>
+  <circle cx="476" cy="256" r="18" fill="#00ffff" filter="url(#glow)"/>
+  <circle cx="256" cy="476" r="18" fill="#4bd48e" filter="url(#glow)"/>
+  <circle cx="36" cy="256" r="18" fill="#ff00ff" filter="url(#glow)"/>
+  
+  <!-- Secondary constellation -->
+  <circle cx="392" cy="120" r="14" fill="#ffffff" opacity="0.9" filter="url(#glow)"/>
+  <circle cx="392" cy="392" r="14" fill="#ffffff" opacity="0.9" filter="url(#glow)"/>
+  <circle cx="120" cy="392" r="14" fill="#ffffff" opacity="0.9" filter="url(#glow)"/>
+  <circle cx="120" cy="120" r="14" fill="#ffffff" opacity="0.9" filter="url(#glow)"/>
+  
+  <!-- Tertiary constellation -->
+  <circle cx="340" cy="60" r="10" fill="#9f58fa" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="452" cy="172" r="10" fill="#00ffff" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="452" cy="340" r="10" fill="#4bd48e" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="340" cy="452" r="10" fill="#ff00ff" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="172" cy="452" r="10" fill="#9f58fa" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="60" cy="340" r="10" fill="#00ffff" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="60" cy="172" r="10" fill="#4bd48e" opacity="0.8" filter="url(#glow)"/>
+  <circle cx="172" cy="60" r="10" fill="#ff00ff" opacity="0.8" filter="url(#glow)"/>
+  
+  <!-- Quaternary micro constellation -->
+  <circle cx="300" cy="80" r="6" fill="#9f58fa" opacity="0.6"/>
+  <circle cx="432" cy="212" r="6" fill="#00ffff" opacity="0.6"/>
+  <circle cx="432" cy="300" r="6" fill="#4bd48e" opacity="0.6"/>
+  <circle cx="300" cy="432" r="6" fill="#ff00ff" opacity="0.6"/>
+  <circle cx="212" cy="432" r="6" fill="#9f58fa" opacity="0.6"/>
+  <circle cx="80" cy="300" r="6" fill="#00ffff" opacity="0.6"/>
+  <circle cx="80" cy="212" r="6" fill="#4bd48e" opacity="0.6"/>
+  <circle cx="212" cy="80" r="6" fill="#ff00ff" opacity="0.6"/>
+  
+  <!-- Ultra-fine accent points -->
+  <circle cx="320" cy="96" r="3" fill="#ffffff" opacity="0.5"/>
+  <circle cx="416" cy="192" r="3" fill="#ffffff" opacity="0.5"/>
+  <circle cx="416" cy="320" r="3" fill="#ffffff" opacity="0.5"/>
+  <circle cx="320" cy="416" r="3" fill="#ffffff" opacity="0.5"/>
+  <circle cx="192" cy="416" r="3" fill="#ffffff" opacity="0.5"/>
+  <circle cx="96" cy="320" r="3" fill="#ffffff" opacity="0.5"/>
+  <circle cx="96" cy="192" r="3" fill="#ffffff" opacity="0.5"/>
+  <circle cx="192" cy="96" r="3" fill="#ffffff" opacity="0.5"/>
+</svg>
