@@ -1,4 +1,4 @@
-import { supabase } from '../supabase/supabaseClient';
+import { supabase } from '../supabase/supabase';
 
 // Twilio Recording Types
 interface TwilioRecording {

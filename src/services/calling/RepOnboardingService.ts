@@ -1,4 +1,4 @@
-import { supabase } from '../supabase/supabaseClient';
+import { supabase } from '../supabase/supabase';
 import TwilioProvisioningService, { ProvisioningOptions } from './TwilioProvisioningService';
 import BillingReceiptService from '../billing/BillingReceiptService';
 
