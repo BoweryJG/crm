@@ -1,5 +1,6 @@
 import { supabase } from '../supabase/supabaseClient';
 import TwilioProvisioningService, { ProvisioningOptions } from './TwilioProvisioningService';
+import BillingReceiptService from '../billing/BillingReceiptService';
 
 export interface RepProfile {
   id: string;
@@ -65,6 +66,10 @@ class RepOnboardingService {
       // Step 6: Send welcome notification
       await this.sendWelcomeNotification(repProfile, twilioConfig.phone_number);
       console.log(`📧 Sent welcome notification`);
+
+      // Step 7: Send automated billing receipt
+      await this.sendBillingReceipt(repProfile, twilioConfig.phone_number);
+      console.log(`📧 Sent billing receipt`);
 
       const duration = Date.now() - startTime;
       console.log(`✅ Onboarding completed in ${duration}ms`);
@@ -396,6 +401,38 @@ class RepOnboardingService {
 
     // Default to San Francisco Bay Area
     return '415';
+  }
+
+  /**
+   * Send automated billing receipt for calling platform activation
+   */
+  private async sendBillingReceipt(repProfile: RepProfile, phoneNumber: string): Promise<void> {
+    try {
+      const receiptData = {
+        rep_id: repProfile.id,
+        rep_email: repProfile.email,
+        rep_name: repProfile.full_name,
+        phone_number: phoneNumber,
+        plan_type: 'professional' as const, // Default plan
+        billing_amount: 97.00, // Professional plan monthly rate
+        billing_period: 'monthly' as const,
+        transaction_id: `RP_${Date.now()}_${repProfile.id.substr(0, 8)}`,
+        onboarding_date: new Date().toISOString()
+      };
+
+      const result = await BillingReceiptService.sendCallingPlatformReceipt(receiptData);
+      
+      if (!result.success) {
+        console.error('Failed to send billing receipt:', result.error);
+        // Don't throw error - receipt failure shouldn't stop onboarding
+      } else {
+        console.log(`✅ Billing receipt sent to ${repProfile.email}`);
+      }
+
+    } catch (error) {
+      console.error('Failed to send billing receipt:', error);
+      // Don't throw error - receipt is nice-to-have, not critical
+    }
   }
 
   /**

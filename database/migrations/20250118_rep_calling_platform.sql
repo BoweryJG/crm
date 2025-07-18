@@ -397,6 +397,56 @@ CREATE POLICY "rep_dashboard_summary_select_own" ON public.rep_dashboard_summary
         rep_id IN (SELECT id FROM public.rep_profiles WHERE user_id = auth.uid())
     );
 
+-- Billing Receipts table - Track all billing receipts sent to reps
+CREATE TABLE IF NOT EXISTS public.billing_receipts (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    rep_id UUID REFERENCES public.rep_profiles(id) ON DELETE CASCADE,
+    transaction_id VARCHAR(100) NOT NULL,
+    receipt_type VARCHAR(50) NOT NULL CHECK (receipt_type IN ('calling_platform_activation', 'subscription_change', 'renewal', 'cancellation')),
+    amount DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(3) DEFAULT 'USD',
+    billing_period VARCHAR(20) CHECK (billing_period IN ('monthly', 'annual')),
+    plan_type VARCHAR(50),
+    service_details JSONB DEFAULT '{}',
+    email_sent BOOLEAN DEFAULT FALSE,
+    email_message_id VARCHAR(255),
+    email_sent_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(transaction_id)
+);
+
+-- Create index for billing receipts
+CREATE INDEX IF NOT EXISTS idx_billing_receipts_rep_id ON public.billing_receipts(rep_id);
+CREATE INDEX IF NOT EXISTS idx_billing_receipts_transaction_id ON public.billing_receipts(transaction_id);
+CREATE INDEX IF NOT EXISTS idx_billing_receipts_created_at ON public.billing_receipts(created_at);
+
+-- Enable RLS on billing receipts
+ALTER TABLE public.billing_receipts ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for billing_receipts
+CREATE POLICY "billing_receipts_select_own" ON public.billing_receipts
+    FOR SELECT USING (
+        rep_id IN (SELECT id FROM public.rep_profiles WHERE user_id = auth.uid())
+    );
+
+CREATE POLICY "billing_receipts_insert_own" ON public.billing_receipts
+    FOR INSERT WITH CHECK (
+        rep_id IN (SELECT id FROM public.rep_profiles WHERE user_id = auth.uid())
+    );
+
+-- Add trigger for email sent timestamp
+CREATE OR REPLACE FUNCTION update_email_sent_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.email_sent = TRUE AND OLD.email_sent = FALSE THEN
+        NEW.email_sent_at = NOW();
+    END IF;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_billing_receipts_email_sent_at BEFORE UPDATE ON public.billing_receipts FOR EACH ROW EXECUTE FUNCTION update_email_sent_timestamp();
+
 -- Add comments for documentation
 COMMENT ON TABLE public.rep_profiles IS 'Core rep profile information and settings';
 COMMENT ON TABLE public.rep_twilio_config IS 'Twilio phone number and webhook configuration per rep';
@@ -408,3 +458,4 @@ COMMENT ON TABLE public.rep_tasks IS 'Onboarding tasks and ongoing action items'
 COMMENT ON TABLE public.rep_notifications IS 'In-app notifications and alerts';
 COMMENT ON TABLE public.call_transcription_segments IS 'Detailed call transcription with speaker identification';
 COMMENT ON TABLE public.rep_coaching_sessions IS 'AI-powered coaching sessions and feedback';
+COMMENT ON TABLE public.billing_receipts IS 'Automated billing receipts sent to reps for calling platform services';
