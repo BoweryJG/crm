@@ -25,6 +25,7 @@ import {
   Business as OperationsIcon,
   AutoMode as AutomationIcon,
   Create as ContentForgeIcon,
+  Phone as CommunicationsIcon,
   ExpandMore as ExpandIcon,
   ExpandLess as CollapseIcon,
   TrendingUp as TrendingUpIcon,
@@ -40,9 +41,10 @@ import InsightCards from './InsightCards';
 import OperationsCenter from './OperationsCenter';
 import AutomationHub from '../automation/AutomationHub';
 import ContentForgeHub from '../content/ContentForgeHub';
+import CommunicationsHub from '../communications/CommunicationsHub';
 import { getThemeAccents, getThemeGlass } from './ThemeAwareComponents';
 
-type ViewMode = 'overview' | 'activities' | 'tasks' | 'insights' | 'operations' | 'automations' | 'content-forge';
+type ViewMode = 'overview' | 'activities' | 'tasks' | 'insights' | 'operations' | 'automations' | 'content-forge' | 'communications';
 
 const MissionControlHub: React.FC = () => {
   const theme = useTheme();
@@ -67,6 +69,7 @@ const MissionControlHub: React.FC = () => {
       case 'operations': return <OperationsIcon />;
       case 'automations': return <AutomationIcon />;
       case 'content-forge': return <ContentForgeIcon />;
+      case 'communications': return <CommunicationsIcon />;
     }
   };
   
@@ -80,6 +83,7 @@ const MissionControlHub: React.FC = () => {
       case 'operations': return themeAccents.glow;
       case 'automations': return themeAccents.secondary;
       case 'content-forge': return theme.palette.warning.main;
+      case 'communications': return theme.palette.success.main;
     }
   };
   
@@ -152,14 +156,15 @@ const MissionControlHub: React.FC = () => {
                 },
               }}
             >
-              {(['overview', 'activities', 'tasks', 'insights', 'operations', 'automations', 'content-forge'] as ViewMode[]).map((mode) => (
+              {(['overview', 'activities', 'tasks', 'insights', 'operations', 'automations', 'content-forge', 'communications'] as ViewMode[]).map((mode) => (
                 <MenuItem key={mode} value={mode}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     {React.cloneElement(getViewIcon(mode), { 
                       sx: { fontSize: 16, color: getViewColor(mode) } 
                     })}
                     <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
-                      {mode === 'content-forge' ? 'Content Forge' : mode}
+                      {mode === 'content-forge' ? 'Content Forge' : 
+                       mode === 'communications' ? 'Communications' : mode}
                     </Typography>
                   </Box>
                 </MenuItem>
@@ -229,6 +234,10 @@ const MissionControlHub: React.FC = () => {
               
               {viewMode === 'content-forge' && (
                 <ContentForgeHub />
+              )}
+              
+              {viewMode === 'communications' && (
+                <CommunicationsHub />
               )}
             </Box>
           </Fade>
