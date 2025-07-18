@@ -114,7 +114,7 @@ class ComprehensiveAutomationService {
           .select('id, created_at')
           .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
         supabase
-          .from('magic_links')
+          .from('automation_magic_links')
           .select('id, created_at')
           .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
       ]);
@@ -212,7 +212,7 @@ class ComprehensiveAutomationService {
       const expiresAt = new Date(Date.now() + (params.expiresInHours || 24) * 60 * 60 * 1000);
 
       const { data, error } = await supabase
-        .from('magic_links')
+        .from('automation_magic_links')
         .insert([{
           token,
           workflow_type: params.workflowType,
@@ -238,7 +238,7 @@ class ComprehensiveAutomationService {
   async getMagicLinks(filter?: { used?: boolean; expired?: boolean }): Promise<{ data: MagicLinkAutomation[] | null; error: Error | null }> {
     try {
       let query = supabase
-        .from('magic_links')
+        .from('automation_magic_links')
         .select('*')
         .order('created_at', { ascending: false });
 
