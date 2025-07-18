@@ -22,6 +22,9 @@ import {
   Timeline as ActivityIcon,
   Assignment as TaskIcon,
   AutoAwesome as InsightIcon,
+  Business as OperationsIcon,
+  AutoMode as AutomationIcon,
+  Create as ContentForgeIcon,
   ExpandMore as ExpandIcon,
   ExpandLess as CollapseIcon,
   TrendingUp as TrendingUpIcon,
@@ -34,9 +37,12 @@ import MobileStatsRibbon from './MobileStatsRibbon';
 import CompactActivityFeed from './CompactActivityFeed';
 import PriorityTaskList from './PriorityTaskList';
 import InsightCards from './InsightCards';
+import OperationsCenter from './OperationsCenter';
+import AutomationHub from '../automation/AutomationHub';
+import ContentForgeHub from '../content/ContentForgeHub';
 import { getThemeAccents, getThemeGlass } from './ThemeAwareComponents';
 
-type ViewMode = 'overview' | 'activities' | 'tasks' | 'insights';
+type ViewMode = 'overview' | 'activities' | 'tasks' | 'insights' | 'operations' | 'automations' | 'content-forge';
 
 const MissionControlHub: React.FC = () => {
   const theme = useTheme();
@@ -58,6 +64,9 @@ const MissionControlHub: React.FC = () => {
       case 'activities': return <ActivityIcon />;
       case 'tasks': return <TaskIcon />;
       case 'insights': return <InsightIcon />;
+      case 'operations': return <OperationsIcon />;
+      case 'automations': return <AutomationIcon />;
+      case 'content-forge': return <ContentForgeIcon />;
     }
   };
   
@@ -68,6 +77,9 @@ const MissionControlHub: React.FC = () => {
       case 'activities': return themeAccents.glow;
       case 'tasks': return themeAccents.secondary;
       case 'insights': return themeAccents.primary;
+      case 'operations': return themeAccents.glow;
+      case 'automations': return themeAccents.secondary;
+      case 'content-forge': return theme.palette.warning.main;
     }
   };
   
@@ -140,14 +152,14 @@ const MissionControlHub: React.FC = () => {
                 },
               }}
             >
-              {(['overview', 'activities', 'tasks', 'insights'] as ViewMode[]).map((mode) => (
+              {(['overview', 'activities', 'tasks', 'insights', 'operations', 'automations', 'content-forge'] as ViewMode[]).map((mode) => (
                 <MenuItem key={mode} value={mode}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     {React.cloneElement(getViewIcon(mode), { 
                       sx: { fontSize: 16, color: getViewColor(mode) } 
                     })}
                     <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
-                      {mode}
+                      {mode === 'content-forge' ? 'Content Forge' : mode}
                     </Typography>
                   </Box>
                 </MenuItem>
@@ -205,6 +217,18 @@ const MissionControlHub: React.FC = () => {
                 <InsightCards
                   themeAccents={themeAccents}
                 />
+              )}
+              
+              {viewMode === 'operations' && (
+                <OperationsCenter />
+              )}
+              
+              {viewMode === 'automations' && (
+                <AutomationHub />
+              )}
+              
+              {viewMode === 'content-forge' && (
+                <ContentForgeHub />
               )}
             </Box>
           </Fade>
