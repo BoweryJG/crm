@@ -43,8 +43,7 @@ import { useThemeContext } from '../../themes/ThemeContext';
 import { useAuth } from '../../auth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AppModeToggle } from '../common/AppModeToggle';
-import AuthModal from '../common/AuthModal';
-import { CRMQuickLoginModal } from '../common/CRMQuickLoginModal';
+import GlobalAuthModal from '../common/GlobalAuthModal';
 import { RepSpheresAppSwitcher } from '../common/RepSpheresAppSwitcher';
 import ThemeToggle from '../ui/ThemeToggle';
 import { getUserDisplayName, getUserInitials } from '../../utils/userHelpers';
@@ -760,7 +759,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
     </NotificationCenter>
 
     {/* Auth Modals */}
-    <CRMQuickLoginModal 
+    <GlobalAuthModal 
       open={loginOpen} 
       onClose={() => setLoginOpen(false)}
       onSuccess={() => {
@@ -768,7 +767,10 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
         window.location.reload();
       }}
     />
-    <AuthModal open={signupOpen} onClose={() => setSignupOpen(false)} mode="signup" />
+    <GlobalAuthModal open={signupOpen} onClose={() => setSignupOpen(false)} onSuccess={() => {
+        setSignupOpen(false);
+        window.location.reload();
+      }} />
     </>
   );
 };

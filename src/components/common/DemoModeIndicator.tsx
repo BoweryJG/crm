@@ -4,7 +4,7 @@ import { useAuth } from '../../auth';
 import { Chip, Box, Tooltip } from '@mui/material';
 import ScienceIcon from '@mui/icons-material/Science';
 import LoginIcon from '@mui/icons-material/Login';
-import { CRMQuickLoginModal } from './CRMQuickLoginModal';
+import GlobalAuthModal from './GlobalAuthModal';
 
 export const DemoModeIndicator: React.FC = () => {
   const { isDemo } = useAppMode();
@@ -43,7 +43,7 @@ export const DemoModeIndicator: React.FC = () => {
       </Tooltip>
       
       {/* Login Modal */}
-      <CRMQuickLoginModal
+      <GlobalAuthModal
         open={showLoginModal}
         onClose={() => setShowLoginModal(false)}
         onSuccess={() => {
