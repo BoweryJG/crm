@@ -58,7 +58,7 @@ interface CallingStats {
 const CommunicationsHub: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const { contactService } = useServiceFactory();
+  // const { contactService } = useServiceFactory();
   
   const [loading, setLoading] = useState(true);
   const [onboardingStatus, setOnboardingStatus] = useState<any>(null);
