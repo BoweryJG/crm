@@ -408,15 +408,18 @@ class RepOnboardingService {
    */
   private async sendBillingReceipt(repProfile: RepProfile, phoneNumber: string): Promise<void> {
     try {
+      // Get actual subscription data from Stripe
+      const subscriptionData = await this.getStripeSubscriptionData(repProfile.email);
+      
       const receiptData = {
         rep_id: repProfile.id,
         rep_email: repProfile.email,
         rep_name: repProfile.full_name,
         phone_number: phoneNumber,
-        plan_type: 'professional' as const, // Default plan
-        billing_amount: 97.00, // Professional plan monthly rate
-        billing_period: 'monthly' as const,
-        transaction_id: `RP_${Date.now()}_${repProfile.id.substr(0, 8)}`,
+        plan_type: subscriptionData.plan_type,
+        billing_amount: subscriptionData.amount,
+        billing_period: subscriptionData.billing_period,
+        transaction_id: subscriptionData.transaction_id || `RP_${Date.now()}_${repProfile.id.substr(0, 8)}`,
         onboarding_date: new Date().toISOString()
       };
 
@@ -426,12 +429,74 @@ class RepOnboardingService {
         console.error('Failed to send billing receipt:', result.error);
         // Don't throw error - receipt failure shouldn't stop onboarding
       } else {
-        console.log(`✅ Billing receipt sent to ${repProfile.email}`);
+        console.log(`✅ Billing receipt sent to ${repProfile.email} for ${subscriptionData.plan_type} plan ($${subscriptionData.amount})`);
       }
 
     } catch (error) {
       console.error('Failed to send billing receipt:', error);
       // Don't throw error - receipt is nice-to-have, not critical
+    }
+  }
+
+  /**
+   * Get actual subscription data from Stripe
+   */
+  private async getStripeSubscriptionData(email: string): Promise<{
+    plan_type: 'starter' | 'professional' | 'enterprise';
+    amount: number;
+    billing_period: 'monthly' | 'annual';
+    transaction_id?: string;
+  }> {
+    try {
+      // Call backend to get Stripe subscription data
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com'}/api/stripe/subscription`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ customer_email: email }),
+      });
+
+      if (response.ok) {
+        const stripeData = await response.json();
+        
+        // Map Stripe subscription to our format
+        return {
+          plan_type: this.mapStripePlanToType(stripeData.plan_name, stripeData.amount),
+          amount: stripeData.amount / 100, // Stripe uses cents
+          billing_period: stripeData.interval === 'year' ? 'annual' : 'monthly',
+          transaction_id: stripeData.latest_invoice_id || stripeData.subscription_id
+        };
+      } else {
+        console.warn('Could not fetch Stripe subscription data, using defaults');
+        throw new Error('Stripe subscription not found');
+      }
+
+    } catch (error) {
+      console.warn('Failed to get Stripe subscription data, using defaults:', error);
+      
+      // Fallback to defaults - likely the $19 starter plan
+      return {
+        plan_type: 'starter',
+        amount: 19.00, // The $19 plan you mentioned
+        billing_period: 'monthly',
+      };
+    }
+  }
+
+  /**
+   * Map Stripe plan details to our plan types
+   */
+  private mapStripePlanToType(planName: string, amountCents: number): 'starter' | 'professional' | 'enterprise' {
+    const amount = amountCents / 100;
+    
+    // Map based on amount or plan name
+    if (amount <= 19) {
+      return 'starter';
+    } else if (amount <= 97) {
+      return 'professional';
+    } else {
+      return 'enterprise';
     }
   }
 

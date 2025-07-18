@@ -95,6 +95,8 @@ import { supabase } from '../../services/supabase/supabase';
 import { useSound, useButtonSound, useNotificationSound, useThemeSound } from '../../hooks/useSound';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import SmartComposer from './SmartComposer';
+import InstantTranslator from './InstantTranslator';
 
 // Award-winning floating glass animations
 const ultraFloatingGlass = keyframes`
@@ -1118,50 +1120,142 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
                 />
               )}
 
-              {/* Rich Text Editor */}
-              <Box 
-                sx={{ 
-                  flexGrow: 1, 
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  minHeight: '300px'
-                }}
-              >
-                <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
-                  Message
-                </Typography>
-                <Paper 
-                  variant="outlined" 
-                  sx={{ 
-                    flexGrow: 1, 
-                    overflow: 'hidden',
-                    backgroundColor: alpha(theme.palette.background.paper, 0.6),
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '12px',
-                    border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                    '& .ql-toolbar': {
-                      borderTopLeftRadius: '12px',
-                      borderTopRightRadius: '12px',
-                      borderColor: alpha(theme.palette.divider, 0.1),
-                      backgroundColor: alpha(theme.palette.background.paper, 0.8)
-                    },
-                    '& .ql-container': {
-                      borderBottomLeftRadius: '12px',
-                      borderBottomRightRadius: '12px',
-                      borderColor: alpha(theme.palette.divider, 0.1),
-                      minHeight: '250px'
+              {/* Tabs for Composer and Translator */}
+              <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                <Tabs
+                  value={tabValue}
+                  onChange={(_, newValue) => setTabValue(newValue)}
+                  variant="fullWidth"
+                  sx={{
+                    borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    '& .MuiTab-root': {
+                      borderRadius: '12px 12px 0 0',
+                      margin: '0 4px',
+                      '&.Mui-selected': {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                      }
                     }
                   }}
                 >
-                  <ReactQuill
-                    ref={quillRef}
-                    theme="snow"
-                    value={body}
-                    onChange={setBody}
-                    modules={modules}
-                    style={{ height: '100%' }}
+                  <Tab
+                    icon={<TextsmsIcon />}
+                    label="Compose"
+                    sx={{ minHeight: 48 }}
                   />
-                </Paper>
+                  <Tab
+                    icon={<SmartToyIcon />}
+                    label="Smart Composer"
+                    sx={{ minHeight: 48 }}
+                  />
+                  <Tab
+                    icon={<TranslateIcon />}
+                    label="Translator"
+                    sx={{ minHeight: 48 }}
+                  />
+                </Tabs>
+
+                {/* Tab Panels */}
+                <TabPanel value={tabValue} index={0}>
+                  {/* Standard Rich Text Editor */}
+                  <Box 
+                    sx={{ 
+                      flexGrow: 1, 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      minHeight: '300px',
+                      p: 2
+                    }}
+                  >
+                    <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
+                      Message
+                    </Typography>
+                    <Paper 
+                      variant="outlined" 
+                      sx={{ 
+                        flexGrow: 1, 
+                        overflow: 'hidden',
+                        backgroundColor: alpha(theme.palette.background.paper, 0.6),
+                        backdropFilter: 'blur(10px)',
+                        borderRadius: '12px',
+                        border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                        '& .ql-toolbar': {
+                          borderTopLeftRadius: '12px',
+                          borderTopRightRadius: '12px',
+                          borderColor: alpha(theme.palette.divider, 0.1),
+                          backgroundColor: alpha(theme.palette.background.paper, 0.8)
+                        },
+                        '& .ql-container': {
+                          borderBottomLeftRadius: '12px',
+                          borderBottomRightRadius: '12px',
+                          borderColor: alpha(theme.palette.divider, 0.1),
+                          minHeight: '250px'
+                        }
+                      }}
+                    >
+                      <ReactQuill
+                        ref={quillRef}
+                        theme="snow"
+                        value={body}
+                        onChange={setBody}
+                        modules={modules}
+                        style={{ height: '100%' }}
+                      />
+                    </Paper>
+                  </Box>
+                </TabPanel>
+
+                <TabPanel value={tabValue} index={1}>
+                  {/* Smart Composer */}
+                  <Box sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                    <SmartComposer
+                      value={body}
+                      onChange={setBody}
+                      placeholder="Start composing with AI assistance..."
+                      disabled={sending}
+                      onAISuggestion={(suggestion) => {
+                        console.log('AI Suggestion applied:', suggestion);
+                        if (soundEnabled) notificationSound.info();
+                      }}
+                      onVoiceInput={(text) => {
+                        console.log('Voice input received:', text);
+                        if (soundEnabled) notificationSound.success();
+                      }}
+                      templates={templates.map(t => ({
+                        id: t.id,
+                        name: t.name,
+                        content: t.html_content || t.text_content || '',
+                        tone: t.tone || 'professional',
+                        category: t.category || 'general'
+                      }))}
+                      autoComplete={true}
+                      grammarCheck={true}
+                      styleGuide="professional"
+                    />
+                  </Box>
+                </TabPanel>
+
+                <TabPanel value={tabValue} index={2}>
+                  {/* Instant Translator */}
+                  <Box sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                    <InstantTranslator
+                      sourceText={body}
+                      onTranslation={(translation, language) => {
+                        setBody(translation);
+                        if (soundEnabled) notificationSound.success();
+                        console.log('Translation received:', { translation, language });
+                      }}
+                      onLanguageDetect={(language) => {
+                        console.log('Language detected:', language);
+                        if (soundEnabled) notificationSound.info();
+                      }}
+                      preserveTechnicalTerms={true}
+                      culturalAdaptation={true}
+                      showQualityIndicators={true}
+                      defaultSourceLang="auto"
+                      defaultTargetLang="es"
+                    />
+                  </Box>
+                </TabPanel>
               </Box>
             </Box>
           </DialogContent>
