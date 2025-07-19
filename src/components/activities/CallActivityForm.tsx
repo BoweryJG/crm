@@ -19,10 +19,9 @@ import {
   CircularProgress,
   Autocomplete
 } from '@mui/material';
-// Temporarily removed MUI date picker to fix build
-// import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import {
   Phone as PhoneIcon,
   AccessTime as DurationIcon,
@@ -197,7 +196,7 @@ const CallActivityForm: React.FC<CallActivityFormProps> = ({
   };
 
   return (
-    <Box>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
         <DialogTitle>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -256,13 +255,16 @@ const CallActivityForm: React.FC<CallActivityFormProps> = ({
                 )}
               />
 
-              <TextField
+              <DateTimePicker
                 label="Call Date & Time"
-                type="datetime-local"
-                value={formData.callDate?.toISOString().slice(0,16) || ''}
-                onChange={(e) => setFormData({ ...formData, callDate: new Date(e.target.value) })}
-                required
-                fullWidth
+                value={formData.callDate}
+                onChange={(value) => value && setFormData({ ...formData, callDate: value })}
+                slotProps={{
+                  textField: {
+                    required: true,
+                    fullWidth: true
+                  }
+                }}
               />
 
               <TextField
@@ -421,7 +423,7 @@ const CallActivityForm: React.FC<CallActivityFormProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </LocalizationProvider>
   );
 };
 

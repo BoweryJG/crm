@@ -73,10 +73,9 @@ import {
   HealthAndSafety as HealthIcon
 } from '@mui/icons-material';
 import { keyframes, styled } from '@mui/material/styles';
-// Temporarily removed MUI date picker to fix build
-// import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import {
   AreaChart,
   Area,
@@ -658,7 +657,7 @@ const SendOptimizer: React.FC<SendOptimizerProps> = ({
   }, [contactAnalytics]);
 
   return (
-    <Box>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto', p: 2 }}>
         {/* Header */}
         <Box sx={{ mb: 3 }}>
@@ -948,15 +947,18 @@ const SendOptimizer: React.FC<SendOptimizerProps> = ({
                     <Typography variant="subtitle2" gutterBottom>
                       Custom Send Time
                     </Typography>
-                    <TextField
-                      type="datetime-local"
-                      value={customDateTime?.toISOString().slice(0,16) || ''}
-                      onChange={handleDateTimeInputChange}
-                      fullWidth
-                      size="small"
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: '8px'
+                    <DateTimePicker
+                      value={customDateTime}
+                      onChange={handleCustomTimeChange}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          size: 'small',
+                          sx: {
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: '8px'
+                            }
+                          }
                         }
                       }}
                     />
@@ -1101,7 +1103,7 @@ const SendOptimizer: React.FC<SendOptimizerProps> = ({
           )}
         </Grid>
       </Box>
-    </Box>
+    </LocalizationProvider>
   );
 };
 
