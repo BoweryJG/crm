@@ -61,7 +61,7 @@ import {
   Stop as StopIcon,
   Settings as SettingsIcon,
   Tune as TuneIcon,
-  TimerIcon,
+  Timer as TimerIcon,
   WatchLater as WatchLaterIcon,
   Today as TodayIcon,
   Event as EventIcon,
@@ -620,6 +620,12 @@ const SendOptimizer: React.FC<SendOptimizerProps> = ({
     }
   };
 
+  // Handle text field change for datetime input
+  const handleDateTimeInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newDateTime = event.target.value ? new Date(event.target.value) : null;
+    handleCustomTimeChange(newDateTime);
+  };
+
   // Generate hourly engagement chart data
   const hourlyEngagementData = useMemo(() => {
     return Array.from({ length: 24 }, (_, hour) => {
@@ -943,17 +949,14 @@ const SendOptimizer: React.FC<SendOptimizerProps> = ({
                       Custom Send Time
                     </Typography>
                     <TextField
-                      value={customDateTime}
-                      onChange={handleCustomTimeChange}
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          size: 'small',
-                          sx: {
-                            '& .MuiOutlinedInput-root': {
-                              borderRadius: '8px'
-                            }
-                          }
+                      type="datetime-local"
+                      value={customDateTime?.toISOString().slice(0,16) || ''}
+                      onChange={handleDateTimeInputChange}
+                      fullWidth
+                      size="small"
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: '8px'
                         }
                       }}
                     />

@@ -355,6 +355,11 @@ interface UltraEmailModalProps {
   contacts?: Contact[];
   mode?: 'compose' | 'reply' | 'forward';
   replyToEmail?: any;
+  defaultRecipient?: string;
+  defaultSubject?: string;
+  defaultContent?: string;
+  contextData?: any;
+  onEmailSent?: (data: any) => void;
 }
 
 interface TabPanelProps {

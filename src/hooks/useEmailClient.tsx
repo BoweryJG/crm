@@ -66,9 +66,9 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
     try {
       // Prepare email data
       const emailData = {
-        to: Array.isArray(options.to) ? options.to : [options.to].filter(Boolean),
-        cc: Array.isArray(options.cc) ? options.cc : [options.cc].filter(Boolean),
-        bcc: Array.isArray(options.bcc) ? options.bcc : [options.bcc].filter(Boolean),
+        to: Array.isArray(options.to) ? options.to.filter(Boolean) as string[] : [options.to].filter(Boolean) as string[],
+        cc: Array.isArray(options.cc) ? options.cc.filter(Boolean) as string[] : [options.cc].filter(Boolean) as string[],
+        bcc: Array.isArray(options.bcc) ? options.bcc.filter(Boolean) as string[] : [options.bcc].filter(Boolean) as string[],
         subject: options.subject || '',
         content: options.content || '',
         priority: options.priority || 'normal',
@@ -79,16 +79,19 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
 
       // Auto-translate if requested
       if (options.autoTranslate && options.targetLanguage) {
-        emailData.subject = await translationService.translateText(
-          emailData.subject,
-          'auto',
-          options.targetLanguage
-        );
-        emailData.content = await translationService.translateText(
-          emailData.content,
-          'auto',
-          options.targetLanguage
-        );
+        const subjectResult = await translationService.translate({
+          text: emailData.subject,
+          sourceLanguage: 'auto',
+          targetLanguage: options.targetLanguage
+        });
+        emailData.subject = subjectResult.translatedText;
+
+        const contentResult = await translationService.translate({
+          text: emailData.content,
+          sourceLanguage: 'auto',
+          targetLanguage: options.targetLanguage
+        });
+        emailData.content = contentResult.translatedText;
       }
 
       // Send email
@@ -96,7 +99,7 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
       
       if (result.success) {
         // Track sending
-        await emailAnalyticsService.trackEmailSent({
+        await emailAnalyticsService.trackEmailEvent('sent', {
           emailId: result.emailId,
           recipientCount: emailData.to.length,
           hasTracking: emailData.trackOpens,
@@ -160,7 +163,12 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
   // Translation
   const translateText = useCallback(async (text: string, targetLanguage: string) => {
     try {
-      return await translationService.translateText(text, 'auto', targetLanguage);
+      const result = await translationService.translate({
+        text,
+        sourceLanguage: 'auto',
+        targetLanguage
+      });
+      return result.translatedText;
     } catch (error) {
       console.error('Translation failed:', error);
       throw error;
