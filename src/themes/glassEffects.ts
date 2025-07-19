@@ -7,12 +7,12 @@ import { alpha } from '@mui/material/styles';
 export const glassEffects = {
   // Obsidian glass - deep black with subtle reflections
   obsidian: {
-    backgroundColor: alpha('#0D0D0D', 0.85),
-    backdropFilter: 'blur(20px) saturate(180%)',
+    backgroundColor: alpha('#0D0D0D', 0.65),
+    backdropFilter: 'blur(12px) saturate(150%)',
     border: `1px solid ${alpha('#D4AF37', 0.08)}`,
     boxShadow: `
       inset 0 1px 0 0 ${alpha('#ECECEC', 0.05)},
-      0 8px 32px 0 ${alpha('#0D0D0D', 0.9)}
+      0 8px 32px 0 ${alpha('#0D0D0D', 0.7)}
     `,
     '&::before': {
       content: '""',
@@ -28,12 +28,12 @@ export const glassEffects = {
 
   // Carbon fiber glass - textured depth
   carbon: {
-    backgroundColor: alpha('#1F1F1F', 0.9),
-    backdropFilter: 'blur(16px) saturate(150%)',
+    backgroundColor: alpha('#1F1F1F', 0.7),
+    backdropFilter: 'blur(10px) saturate(130%)',
     border: `1px solid ${alpha('#C0C0C0', 0.1)}`,
     boxShadow: `
       inset 0 1px 0 0 ${alpha('#C0C0C0', 0.08)},
-      0 12px 48px 0 ${alpha('#0D0D0D', 0.8)}
+      0 12px 48px 0 ${alpha('#0D0D0D', 0.6)}
     `,
     backgroundImage: `
       repeating-linear-gradient(
@@ -48,24 +48,24 @@ export const glassEffects = {
 
   // Museum glass - ultra clear with minimal tint
   museum: {
-    backgroundColor: alpha('#1F1F1F', 0.6),
-    backdropFilter: 'blur(24px) saturate(200%) brightness(1.1)',
+    backgroundColor: alpha('#1F1F1F', 0.4),
+    backdropFilter: 'blur(8px) saturate(120%) brightness(1.05)',
     border: `1px solid ${alpha('#ECECEC', 0.05)}`,
     boxShadow: `
       0 0 0 1px ${alpha('#D4AF37', 0.05)},
-      0 20px 80px 0 ${alpha('#0D0D0D', 0.5)}
+      0 20px 80px 0 ${alpha('#0D0D0D', 0.3)}
     `,
   },
 
   // Gold-infused glass - premium accent
   goldInfused: {
-    backgroundColor: alpha('#1F1F1F', 0.85),
-    backdropFilter: 'blur(20px) saturate(180%)',
+    backgroundColor: alpha('#1F1F1F', 0.6),
+    backdropFilter: 'blur(12px) saturate(140%)',
     border: `2px solid ${alpha('#D4AF37', 0.2)}`,
     boxShadow: `
       inset 0 0 20px 0 ${alpha('#D4AF37', 0.05)},
       0 0 40px 0 ${alpha('#D4AF37', 0.1)},
-      0 10px 40px 0 ${alpha('#0D0D0D', 0.8)}
+      0 10px 40px 0 ${alpha('#0D0D0D', 0.5)}
     `,
     position: 'relative',
     overflow: 'hidden',
@@ -83,12 +83,12 @@ export const glassEffects = {
 
   // Frosted steel - industrial elegance
   frostedSteel: {
-    backgroundColor: alpha('#2C2C2C', 0.8),
-    backdropFilter: 'blur(12px) saturate(120%)',
+    backgroundColor: alpha('#2C2C2C', 0.6),
+    backdropFilter: 'blur(8px) saturate(110%)',
     border: `1px solid ${alpha('#C0C0C0', 0.15)}`,
     boxShadow: `
       inset 0 2px 4px 0 ${alpha('#ECECEC', 0.05)},
-      0 4px 24px 0 ${alpha('#0D0D0D', 0.7)}
+      0 4px 24px 0 ${alpha('#0D0D0D', 0.5)}
     `,
     backgroundImage: `
       linear-gradient(180deg, 
@@ -102,50 +102,50 @@ export const glassEffects = {
 // Dynamic glass effect creator
 export const createGlassEffect = (
   baseColor: string = '#1F1F1F',
-  opacity: number = 0.8,
-  blur: number = 20,
+  opacity: number = 0.5,
+  blur: number = 10,
   borderColor: string = '#D4AF37',
   borderOpacity: number = 0.1
 ) => ({
   backgroundColor: alpha(baseColor, opacity),
-  backdropFilter: `blur(${blur}px) saturate(180%)`,
+  backdropFilter: `blur(${blur}px) saturate(130%)`,
   border: `1px solid ${alpha(borderColor, borderOpacity)}`,
   boxShadow: `
     inset 0 1px 0 0 ${alpha('#ECECEC', 0.05)},
-    0 8px 32px 0 ${alpha('#0D0D0D', 0.8)}
+    0 8px 32px 0 ${alpha('#0D0D0D', 0.5)}
   `,
 });
 
 // Hover state transformations
 export const glassHoverEffects = {
   subtle: {
-    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     '&:hover': {
-      backdropFilter: 'blur(24px) saturate(200%)',
-      borderColor: alpha('#D4AF37', 0.2),
-      transform: 'translateY(-2px)',
+      backdropFilter: 'blur(16px) saturate(160%)',
+      borderColor: alpha('#D4AF37', 0.15),
+      transform: 'translateY(-1px)',
       boxShadow: `
-        inset 0 1px 0 0 ${alpha('#ECECEC', 0.1)},
-        0 12px 48px 0 ${alpha('#D4AF37', 0.15)}
+        inset 0 1px 0 0 ${alpha('#ECECEC', 0.08)},
+        0 8px 32px 0 ${alpha('#D4AF37', 0.1)}
       `,
     },
   },
 
   dramatic: {
-    transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     '&:hover': {
-      backdropFilter: 'blur(28px) saturate(250%) brightness(1.05)',
-      borderColor: alpha('#D4AF37', 0.4),
-      transform: 'translateY(-4px) scale(1.02)',
+      backdropFilter: 'blur(18px) saturate(180%) brightness(1.03)',
+      borderColor: alpha('#D4AF37', 0.25),
+      transform: 'translateY(-2px) scale(1.01)',
       boxShadow: `
-        inset 0 0 30px 0 ${alpha('#D4AF37', 0.1)},
-        0 20px 80px 0 ${alpha('#D4AF37', 0.2)}
+        inset 0 0 20px 0 ${alpha('#D4AF37', 0.08)},
+        0 12px 48px 0 ${alpha('#D4AF37', 0.15)}
       `,
     },
   },
 
   glow: {
-    transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     position: 'relative',
     overflow: 'hidden',
     '&::before': {
@@ -156,19 +156,19 @@ export const glassHoverEffects = {
       width: '0',
       height: '0',
       borderRadius: '50%',
-      background: alpha('#D4AF37', 0.3),
+      background: alpha('#D4AF37', 0.15),
       transform: 'translate(-50%, -50%)',
-      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     },
     '&:hover::before': {
-      width: '300px',
-      height: '300px',
+      width: '200px',
+      height: '200px',
     },
     '&:hover': {
-      borderColor: alpha('#D4AF37', 0.3),
+      borderColor: alpha('#D4AF37', 0.2),
       boxShadow: `
-        0 0 60px 0 ${alpha('#D4AF37', 0.2)},
-        0 20px 60px 0 ${alpha('#0D0D0D', 0.8)}
+        0 0 32px 0 ${alpha('#D4AF37', 0.12)},
+        0 12px 40px 0 ${alpha('#0D0D0D', 0.6)}
       `,
     },
   },
@@ -177,21 +177,24 @@ export const glassHoverEffects = {
 // Performance-optimized glass variants
 export const performanceGlass = {
   light: {
-    backgroundColor: alpha('#1F1F1F', 0.8),
-    backdropFilter: 'blur(8px)',
-    border: `1px solid ${alpha('#D4AF37', 0.1)}`,
+    backgroundColor: alpha('#1F1F1F', 0.4),
+    backdropFilter: 'blur(6px)',
+    border: `1px solid ${alpha('#D4AF37', 0.08)}`,
+    transition: 'all 0.2s ease',
   },
   
   medium: {
-    backgroundColor: alpha('#1F1F1F', 0.85),
-    backdropFilter: 'blur(12px) saturate(150%)',
-    border: `1px solid ${alpha('#D4AF37', 0.12)}`,
+    backgroundColor: alpha('#1F1F1F', 0.5),
+    backdropFilter: 'blur(8px) saturate(120%)',
+    border: `1px solid ${alpha('#D4AF37', 0.1)}`,
+    transition: 'all 0.3s ease',
   },
   
   heavy: {
-    backgroundColor: alpha('#1F1F1F', 0.9),
-    backdropFilter: 'blur(20px) saturate(180%)',
-    border: `1px solid ${alpha('#D4AF37', 0.15)}`,
+    backgroundColor: alpha('#1F1F1F', 0.6),
+    backdropFilter: 'blur(12px) saturate(140%)',
+    border: `1px solid ${alpha('#D4AF37', 0.12)}`,
+    transition: 'all 0.3s ease',
   },
 };
 

@@ -7,7 +7,9 @@ import {
   LocalFireDepartment as FireIcon,
   Warning as WarningIcon,
   CheckCircle as CheckIcon,
-  Circle as DotIcon
+  Circle as DotIcon,
+  PlayArrow as PlayIcon,
+  Pause as PauseIcon
 } from '@mui/icons-material';
 
 interface AlertItem {
@@ -79,11 +81,12 @@ const TickerHeader = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: '12px 24px',
-  background: 'rgba(0, 0, 0, 0.5)',
-  backdropFilter: 'blur(20px)',
+  background: 'rgba(0, 0, 0, 0.3)',
+  backdropFilter: 'blur(12px)',
   borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
   position: 'relative',
-  zIndex: 10
+  zIndex: 10,
+  transition: 'all 0.3s ease'
 }));
 
 const CategoryDot = styled(Box)<{ level: string }>(({ level }) => ({
@@ -187,10 +190,12 @@ const scroll = keyframes`
   }
 `;
 
-const MessageScroller = styled(Box)(({ theme }) => ({
+const MessageScroller = styled(Box)<{ isPaused: boolean }>(({ theme, isPaused }) => ({
   display: 'flex',
-  animation: `${scroll} 30s linear infinite`,
+  animation: isPaused ? 'none' : `${scroll} 45s linear infinite`,
   paddingLeft: '100%',
+  animationPlayState: isPaused ? 'paused' : 'running',
+  transition: 'transform 0.3s ease',
   '&:hover': {
     animationPlayState: 'paused'
   }
@@ -298,6 +303,7 @@ const alerts: AlertItem[] = [
 
 const IconicUrgentTicker: React.FC = () => {
   const [expanded, setExpanded] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [criticalAlerts] = useState(alerts.filter(a => a.level === 'critical'));
   const [warningAlerts] = useState(alerts.filter(a => a.level === 'warning'));
   const [successAlerts] = useState(alerts.filter(a => a.level === 'success'));
@@ -326,7 +332,7 @@ const IconicUrgentTicker: React.FC = () => {
 
         {/* Scrolling Messages */}
         <ScrollingText>
-          <MessageScroller>
+          <MessageScroller isPaused={isPaused}>
             {[...alerts, ...alerts].map((alert, index) => (
               <AlertMessage key={`${alert.id}-${index}`} level={alert.level}>
                 {alert.level === 'critical' && <FireIcon sx={{ fontSize: 16 }} />}
@@ -338,16 +344,34 @@ const IconicUrgentTicker: React.FC = () => {
           </MessageScroller>
         </ScrollingText>
 
-        {/* Expand/Collapse */}
+        {/* Play/Pause Control */}
         <IconButton 
-          onClick={() => setExpanded(!expanded)}
+          onClick={() => setIsPaused(!isPaused)}
           sx={{ 
-            ml: 2,
+            ml: 1,
             color: 'rgba(255, 255, 255, 0.6)',
             transition: 'all 0.2s ease',
             '&:hover': {
               color: 'rgba(255, 255, 255, 0.9)',
-              transform: 'scale(1.1)'
+              transform: 'scale(1.1)',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)'
+            }
+          }}
+        >
+          {isPaused ? <PlayIcon /> : <PauseIcon />}
+        </IconButton>
+
+        {/* Expand/Collapse */}
+        <IconButton 
+          onClick={() => setExpanded(!expanded)}
+          sx={{ 
+            ml: 1,
+            color: 'rgba(255, 255, 255, 0.6)',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              color: 'rgba(255, 255, 255, 0.9)',
+              transform: 'scale(1.1)',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)'
             }
           }}
         >
