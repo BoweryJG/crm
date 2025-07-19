@@ -73,9 +73,10 @@ import {
   HealthAndSafety as HealthIcon
 } from '@mui/icons-material';
 import { keyframes, styled } from '@mui/material/styles';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+// Temporarily removed MUI date picker to fix build
+// import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import {
   AreaChart,
   Area,
@@ -651,7 +652,7 @@ const SendOptimizer: React.FC<SendOptimizerProps> = ({
   }, [contactAnalytics]);
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <Box>
       <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto', p: 2 }}>
         {/* Header */}
         <Box sx={{ mb: 3 }}>
@@ -941,7 +942,7 @@ const SendOptimizer: React.FC<SendOptimizerProps> = ({
                     <Typography variant="subtitle2" gutterBottom>
                       Custom Send Time
                     </Typography>
-                    <DateTimePicker
+                    <TextField
                       value={customDateTime}
                       onChange={handleCustomTimeChange}
                       slotProps={{
@@ -1097,7 +1098,7 @@ const SendOptimizer: React.FC<SendOptimizerProps> = ({
           )}
         </Grid>
       </Box>
-    </LocalizationProvider>
+    </Box>
   );
 };
 

@@ -52,7 +52,7 @@ const EmailLauncher: React.FC<EmailLauncherProps> = ({
   contextData
 }) => {
   const theme = useTheme();
-  const { themeMode, currentTheme } = useThemeContext();
+  const { themeMode } = useThemeContext();
   const notificationSound = useSound('notification-success');
   const clickSound = useSound('ui-click-primary');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -80,15 +80,6 @@ const EmailLauncher: React.FC<EmailLauncherProps> = ({
   };
 
   const getThemeColor = () => {
-    if (currentTheme?.category === 'luxury') {
-      return '#FFD700';
-    }
-    if (currentTheme?.category === 'aviation') {
-      return '#1E88E5';
-    }
-    if (currentTheme?.category === 'beauty') {
-      return '#E91E63';
-    }
     return theme.palette.primary.main;
   };
 
