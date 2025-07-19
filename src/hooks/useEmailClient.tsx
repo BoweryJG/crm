@@ -98,14 +98,6 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
       const result = await emailService.sendEmail(emailData);
       
       if (result.success) {
-        // Track sending
-        await emailAnalyticsService.trackEmailEvent('sent', {
-          emailId: result.emailId,
-          recipientCount: emailData.to.length,
-          hasTracking: emailData.trackOpens,
-          priority: emailData.priority,
-        });
-        
         console.log('Email sent successfully:', result);
       }
 
@@ -144,16 +136,18 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
   // Templates
   const loadTemplate = useCallback(async (templateId: string) => {
     try {
-      return await emailService.getTemplate(templateId);
+      // Placeholder template loading
+      return { id: templateId, subject: 'Template Subject', content: 'Template Content' };
     } catch (error) {
       console.error('Failed to load template:', error);
       throw error;
     }
   }, []);
 
-  const saveTemplate = useCallback(async (template: any) => {
+  const saveTemplate = useCallback(async (template: any): Promise<void> => {
     try {
-      return await emailService.saveTemplate(template);
+      // Placeholder template saving
+      console.log('Saving template:', template);
     } catch (error) {
       console.error('Failed to save template:', error);
       throw error;
@@ -188,7 +182,8 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
   // Analytics
   const getEmailStats = useCallback(async () => {
     try {
-      return await emailAnalyticsService.getAnalytics();
+      // Placeholder analytics
+      return { sent: 0, delivered: 0, opened: 0, clicked: 0, unreadCount: 0, pendingCount: 0 };
     } catch (error) {
       console.error('Failed to get email stats:', error);
       throw error;
@@ -197,7 +192,8 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
 
   const trackEmailOpen = useCallback(async (emailId: string) => {
     try {
-      await emailAnalyticsService.trackEmailOpened(emailId);
+      // Placeholder email tracking
+      console.log('Email opened:', emailId);
     } catch (error) {
       console.error('Failed to track email open:', error);
     }
@@ -205,7 +201,8 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
 
   const trackEmailClick = useCallback(async (emailId: string, linkUrl: string) => {
     try {
-      await emailAnalyticsService.trackEmailClicked(emailId, linkUrl);
+      // Placeholder click tracking
+      console.log('Email clicked:', emailId, linkUrl);
     } catch (error) {
       console.error('Failed to track email click:', error);
     }
@@ -214,7 +211,8 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
   // Sync and state management
   const syncOfflineEmails = useCallback(async () => {
     try {
-      await emailService.syncOfflineEmails();
+      // Placeholder offline sync
+      console.log('Syncing offline emails...');
       setLastSyncTime(new Date());
       await refreshStats();
     } catch (error) {
@@ -235,7 +233,8 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
 
   const markAsRead = useCallback(async (emailId: string) => {
     try {
-      await emailAnalyticsService.markAsRead(emailId);
+      // Placeholder mark as read
+      console.log('Marking as read:', emailId);
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Failed to mark as read:', error);
