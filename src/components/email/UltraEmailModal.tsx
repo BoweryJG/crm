@@ -72,7 +72,7 @@ import {
   Forward as ForwardIcon,
   MoreVert as MoreVertIcon,
   Translate as TranslateIcon,
-  SpellCheck as SpellCheckIcon,
+  Spellcheck as SpellCheckIcon,
   SmartToy as SmartToyIcon,
   Brush as BrushIcon,
   Palette as PaletteIcon,
@@ -91,6 +91,8 @@ import { useThemeContext } from '../../themes/ThemeContext';
 import { useAuth } from '../../auth';
 import { Contact } from '../../types/models';
 import { emailService } from '../../services/email/emailService';
+import { translationService } from '../../services/email/TranslationService';
+import { emailAnalyticsService } from '../../services/email/EmailAnalyticsService';
 import { supabase } from '../../services/supabase/supabase';
 import { useSound, useButtonSound, useNotificationSound, useThemeSound } from '../../hooks/useSound';
 import ReactQuill from 'react-quill';
@@ -649,28 +651,88 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
     if (soundEnabled) buttonSound.play();
 
     try {
+      // Prepare email options with enhanced features
       const allRecipients = [...to, ...cc, ...bcc];
-      const sendPromises = allRecipients.map(recipient => 
-        emailService.sendEmail({
-          to: recipient,
-          subject,
-          html: body,
-          contactId: contact?.id,
-          priority,
-          scheduled: scheduled ? new Date(scheduleDate) : undefined
-        })
-      );
+      
+      // Process each recipient with enhanced email service
+      const sendPromises = allRecipients.map(async (recipient) => {
+        try {
+          // Process email content for tracking
+          const messageId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          const { processedHtml } = await emailAnalyticsService.processEmailForTracking(
+            messageId,
+            body,
+            true, // Enable open tracking
+            true  // Enable click tracking
+          );
+
+          // Send email with enhanced options
+          const result = await emailService.sendEmail({
+            to: recipient,
+            cc: cc.length > 0 ? cc : undefined,
+            bcc: bcc.length > 0 ? bcc : undefined,
+            subject,
+            html: processedHtml,
+            text: body.replace(/<[^>]*>/g, ''), // Strip HTML for text version
+            contactId: contact?.id,
+            priority,
+            scheduled: scheduled ? new Date(scheduleDate) : undefined,
+            trackOpens: true,
+            trackClicks: true,
+            tags: ['ultra-email-modal'],
+            metadata: {
+              source: 'ultra-email-modal',
+              userAgent: navigator.userAgent,
+              timestamp: new Date().toISOString()
+            }
+          });
+
+          // Track the send event
+          if (result.success && result.messageId) {
+            await emailAnalyticsService.trackEmailEvent(
+              result.messageId,
+              'sent',
+              {
+                ip_address: await fetch('https://api.ipify.org?format=json')
+                  .then(res => res.json())
+                  .then(data => data.ip)
+                  .catch(() => undefined),
+                user_agent: navigator.userAgent,
+                device_info: {
+                  type: /Mobile|Android|iPhone|iPad/.test(navigator.userAgent) ? 'mobile' : 'desktop',
+                  os: navigator.platform,
+                  browser: navigator.userAgent.split(' ').pop()
+                }
+              }
+            );
+          }
+
+          return result;
+        } catch (error) {
+          console.error(`Failed to send to ${recipient}:`, error);
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            recipient
+          };
+        }
+      });
 
       const results = await Promise.all(sendPromises);
       const failed = results.filter(r => !r.success);
 
       if (failed.length > 0) {
-        setError(`Failed to send to ${failed.length} recipient(s)`);
+        setError(`Failed to send to ${failed.length} recipient(s): ${failed.map(f => f.recipient || 'unknown').join(', ')}`);
         if (soundEnabled) notificationSound.error();
       } else {
         setSuccess(true);
         if (soundEnabled) notificationSound.success();
         localStorage.removeItem('ultraEmailModal_draft');
+        
+        // Show success analytics if available
+        const successCount = results.filter(r => r.success).length;
+        console.log(`Successfully sent ${successCount} emails with tracking enabled`);
+        
         setTimeout(() => {
           handleClose();
         }, 1500);
@@ -1235,24 +1297,55 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
                 </TabPanel>
 
                 <TabPanel value={tabValue} index={2}>
-                  {/* Instant Translator */}
+                  {/* Instant Translator with Enhanced Service */}
                   <Box sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                     <InstantTranslator
                       sourceText={body}
-                      onTranslation={(translation, language) => {
+                      onTranslation={async (translation, language) => {
                         setBody(translation);
                         if (soundEnabled) notificationSound.success();
+                        
+                        // Also update subject if it was translated
+                        if (subject && subject.trim()) {
+                          try {
+                            const subjectTranslation = await translationService.translate({
+                              text: subject,
+                              sourceLanguage: 'auto',
+                              targetLanguage: language,
+                              domain: 'business',
+                              preserveTechnicalTerms: true
+                            });
+                            setSubject(subjectTranslation.translatedText);
+                          } catch (error) {
+                            console.warn('Failed to translate subject:', error);
+                          }
+                        }
+                        
                         console.log('Translation received:', { translation, language });
                       }}
-                      onLanguageDetect={(language) => {
+                      onLanguageDetect={async (language) => {
                         console.log('Language detected:', language);
                         if (soundEnabled) notificationSound.info();
+                        
+                        // Store detected language for analytics
+                        try {
+                          await supabase
+                            .from('user_preferences')
+                            .upsert({
+                              user_id: user?.id,
+                              detected_language: language,
+                              updated_at: new Date().toISOString()
+                            });
+                        } catch (error) {
+                          console.warn('Failed to store detected language:', error);
+                        }
                       }}
                       preserveTechnicalTerms={true}
                       culturalAdaptation={true}
                       showQualityIndicators={true}
                       defaultSourceLang="auto"
                       defaultTargetLang="es"
+                      translationService={translationService}
                     />
                   </Box>
                 </TabPanel>

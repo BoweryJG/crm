@@ -91,7 +91,7 @@ class RepOnboardingService {
         success: false,
         rep_profile: {} as RepProfile,
         onboarding_duration_ms: duration,
-        error: error.message
+        error: (error as Error).message
       };
     }
   }

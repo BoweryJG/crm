@@ -124,7 +124,7 @@ class CallRecordingService {
       console.error(`❌ Call processing failed for ${callSid}:`, error);
       
       // Update call record with error status
-      await this.updateCallStatus(callSid, 'failed', error.message);
+      await this.updateCallStatus(callSid, 'failed', (error as Error).message);
 
       return {
         call_id: callSid,

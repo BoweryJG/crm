@@ -544,7 +544,7 @@ const CulturalAdvisor: React.FC<CulturalAdvisorProps> = ({
         title: 'Cultural Taboos',
         description: `Avoid: ${guidance.communicationStyle.taboos.join(', ')}`,
         action: 'Review content for cultural sensitivity',
-        severity: 'error' as const
+        severity: 'warning' as const
       });
     }
 
@@ -702,7 +702,7 @@ With appreciation,
           user_id: 'current-user-id' // Replace with actual user ID
         });
 
-      setSavedTemplates(prev => new Set([...prev, templateId]));
+      setSavedTemplates(prev => new Set([...Array.from(prev), templateId]));
       notificationSound.success();
     } catch (error) {
       console.error('Error saving template:', error);
@@ -832,6 +832,7 @@ With appreciation,
             {filteredTemplates.map((template) => (
               <TemplateCard 
                 key={template.id} 
+                theme={theme}
                 featured={template.featured || false}
                 onClick={() => handleTemplateSelect(template)}
               >
@@ -902,6 +903,7 @@ With appreciation,
                         {template.culturalNotes.slice(0, 2).map((note, index) => (
                           <EtiquetteChip
                             key={index}
+                            theme={theme}
                             icon={<LightbulbIcon />}
                             label={note}
                             size="small"
@@ -927,7 +929,7 @@ With appreciation,
         ) : (
           <Stack spacing={2}>
             {culturalInsights.map((insight) => (
-              <CulturalInsight key={insight.id} priority={insight.priority}>
+              <CulturalInsight key={insight.id} theme={theme} priority={insight.priority}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
                     <Box sx={{ 
@@ -944,6 +946,7 @@ With appreciation,
                           {insight.title}
                         </Typography>
                         <EtiquetteChip 
+                          theme={theme}
                           label={insight.priority} 
                           size="small" 
                           severity={insight.severity}

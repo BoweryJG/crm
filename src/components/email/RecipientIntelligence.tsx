@@ -523,7 +523,7 @@ const RecipientIntelligence: React.FC<RecipientIntelligenceProps> = ({
       newSelection = selectedContacts.filter(c => c.id !== contact.id);
     } else {
       if (selectedContacts.length >= maxRecipients) {
-        notificationSound.warning();
+        notificationSound.error();
         return;
       }
       newSelection = [...selectedContacts, contact];
@@ -699,12 +699,13 @@ const RecipientIntelligence: React.FC<RecipientIntelligenceProps> = ({
               return (
                 <ContactCard
                   key={contact.id}
+                  theme={theme}
                   selected={isSelected}
                   onClick={() => handleContactToggle(contact)}
                 >
                   <CardContent sx={{ position: 'relative', p: 2 }}>
                     {intelligenceEnabled && score > 0 && (
-                      <ScoreIndicator score={score}>
+                      <ScoreIndicator theme={theme} score={score}>
                         {score}
                       </ScoreIndicator>
                     )}

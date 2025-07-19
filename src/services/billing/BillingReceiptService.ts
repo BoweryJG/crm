@@ -62,7 +62,7 @@ class BillingReceiptService {
 
     } catch (error) {
       console.error('Failed to send receipt email:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: (error as Error).message };
     }
   }
 
@@ -282,7 +282,7 @@ ${this.companyName}
 
     } catch (error) {
       console.error('Failed to send email:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: (error as Error).message };
     }
   }
 
@@ -424,7 +424,7 @@ ${this.companyName}
 
     } catch (error) {
       console.error('Failed to send bulk receipts:', error);
-      return { sent: 0, failed: 1, errors: [error.message] };
+      return { sent: 0, failed: 1, errors: [(error as Error).message] };
     }
   }
 
@@ -467,7 +467,7 @@ ${this.companyName}
 
     } catch (error) {
       console.error('Failed to send subscription change receipt:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: (error as Error).message };
     }
   }
 }

@@ -443,7 +443,7 @@ const InstantTranslator: React.FC<InstantTranslatorProps> = ({
       const result: TranslationResult = {
         text: finalTranslation,
         confidence: quality.overall / 100,
-        detectedLanguage: sourceLang === 'auto' ? detectedLanguage : sourceLang,
+        detectedLanguage: sourceLang === 'auto' ? (detectedLanguage || undefined) : sourceLang,
         alternativeTranslations: [
           `${finalTranslation} (alternative 1)`,
           `${finalTranslation} (alternative 2)`

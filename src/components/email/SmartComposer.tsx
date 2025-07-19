@@ -43,7 +43,7 @@ import {
   Psychology as PsychologyIcon,
   RecordVoiceOver as VoiceIcon,
   MicOff as MicOffIcon,
-  SpellCheck as SpellCheckIcon,
+  Spellcheck as SpellCheckIcon,
   Lightbulb as LightbulbIcon,
   TrendingUp as TrendingUpIcon,
   Speed as SpeedIcon,

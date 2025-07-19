@@ -255,7 +255,7 @@ class TwilioProvisioningService {
 
     } catch (error) {
       console.error(`❌ Provisioning failed for rep ${options.rep_id}:`, error);
-      throw new Error(`Failed to provision rep: ${error.message}`);
+      throw new Error(`Failed to provision rep: ${(error as Error).message}`);
     }
   }
 

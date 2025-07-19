@@ -155,7 +155,7 @@ const CommunicationsHub: React.FC = () => {
           completed: true,
           phone_number: result.phone_number
         });
-        setPhoneNumber(result.phone_number);
+        setPhoneNumber(result.phone_number || null);
         await loadCallingData();
       }
     } catch (error) {
