@@ -611,7 +611,8 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
     if (!autoSave || !open) return;
     
     const saveData = {
-      to, cc, bcc, subject, body, priority, scheduled, scheduleDate: scheduleDate?.toISOString()
+      to, cc, bcc, subject, body, priority, scheduled, 
+      scheduleDate: scheduleDate?.toISOString()
     };
     
     const saveTimeout = setTimeout(() => {
