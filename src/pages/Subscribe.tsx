@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Button, 
@@ -43,11 +43,14 @@ const Subscribe: React.FC = () => {
 
   const handleSubscribe = async (tier: SubscriptionTier) => {
     try {
-      // Set the selected tier before proceeding to checkout
       setSelectedTier(tier);
       
-      // Use the Render backend for Stripe checkout
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com';
+      if (!pricing) {
+        alert('Pricing information not loaded. Please wait a moment and try again.');
+        return;
+      }
+      
+      const backendUrl = 'https://osbackend-zl1h.onrender.com';
       const res = await fetch(`${backendUrl}/api/stripe/create-checkout-session`, { 
         method: 'POST',
         headers: {
@@ -56,8 +59,7 @@ const Subscribe: React.FC = () => {
         body: JSON.stringify({
           tier,
           billingCycle,
-          priceId: pricing[tier].priceIds[billingCycle],
-          customerEmail: '', // Add customer email if available
+          customerEmail: '', 
           successUrl: `${window.location.origin}/subscription/success`,
           cancelUrl: `${window.location.origin}/subscription/cancel`
         })
@@ -70,9 +72,6 @@ const Subscribe: React.FC = () => {
       const data = await res.json();
       if (data.success && data.data && data.data.url) {
         window.location.assign(data.data.url);
-      } else if (data.url) {
-        // Fallback for old response format
-        window.location.assign(data.url);
       } else {
         console.error('Failed to create checkout session:', data);
         alert('Failed to create checkout session. Please try again.');
@@ -83,130 +82,42 @@ const Subscribe: React.FC = () => {
     }
   };
 
-  // RepX Enhancement Levels Pricing Configuration
-  const pricing = {
-    repx1: {
-      monthly: 39,
-      annual: 390,
-      priceIds: {
-        monthly: 'price_1RRutVGRiAPUZqWuDMSAqHsD',
-        annual: 'price_1RWMSCGRiAPUZqWu30j19b9G'
-      },
-      productId: 'prod_SMeBmeB7knfARi',
-      features: {
-        basic: [
-          'Your Professional Business Line for Life',
-          'AI transcription of every sales call',
-          'Transcriptions sent directly to your CRM',
-          'Professional/personal call separation',
-          'Basic call analytics and history',
-          '100 calls per month',
-          'Eternal professional phone number'
-        ],
-        premium: []
+  // Fetch pricing from centralized osbackend API
+  const [pricing, setPricing] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchPricing = async () => {
+      try {
+        const response = await fetch('https://osbackend-zl1h.onrender.com/api/stripe/repx/plans');
+        const data = await response.json();
+        if (data.success) {
+          setPricing(data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch pricing:', error);
       }
-    },
-    repx2: {
-      monthly: 97,
-      annual: 970,
-      priceIds: {
-        monthly: 'price_1RRushGRiAPUZqWuIvqueK7h',
-        annual: 'price_1RWMT4GRiAPUZqWuqiNhkZfw'
-      },
-      productId: 'prod_SMeBAukl5Fqeeh',
-      features: {
-        basic: [
-          'Everything in Rep<sup>x</sup>1, plus:',
-          'Work email integration (no IT approval needed)',
-          'Basic Market Data access (all procedures)',
-          '200 calls per month',
-          '50 emails per day',
-          '10 Canvas practice scans per day',
-          'Enhanced call analytics and insights'
-        ],
-        premium: []
-      }
-    },
-    repx3: {
-      monthly: 197,
-      annual: 1970,
-      priceIds: {
-        monthly: 'price_1RWMW3GRiAPUZqWuoTA0eLUC',
-        annual: 'price_1RRus5GRiAPUZqWup3jk1S8U'
-      },
-      productId: 'prod_SMeAJE1MaklEQi',
-      features: {
-        basic: [
-          'Everything in Rep<sup>x</sup>2, plus:',
-          'Full Canvas practice intelligence platform',
-          'Territory mapping and local insights',
-          'Advanced market analytics with trends',
-          '400 calls per month',
-          '100 emails per day',
-          '25 Canvas practice scans per day',
-          'Competitive intelligence reports'
-        ],
-        premium: []
-      }
-    },
-    repx4: {
-      monthly: 397,
-      annual: 3970,
-      priceIds: {
-        monthly: 'price_1RRurNGRiAPUZqWuklICsE4P',
-        annual: 'price_1RWMWjGRiAPUZqWu6YBZY7o4'
-      },
-      productId: 'prod_SMe9s5P6OirVgP',
-      features: {
-        basic: [
-          'Everything in Rep<sup>x</sup>3, plus:',
-          'AI coaching insights and recommendations',
-          'Workflow automation (up to 5 workflows)',
-          'Advanced CRM integration and automation',
-          '600 calls per month',
-          '200 emails per day', 
-          '50 Canvas practice scans per day',
-          'Real-time sales performance analytics'
-        ],
-        premium: []
-      }
-    },
-    repx5: {
-      monthly: 797,
-      annual: 7970,
-      priceIds: {
-        monthly: 'price_1RRuqbGRiAPUZqWu3f91wnNx',
-        annual: 'price_1RWMXEGRiAPUZqWuPwcgrovN'
-      },
-      productId: 'prod_SMe8fPX6r65llM',
-      features: {
-        basic: [
-          'Everything in Rep<sup>x</sup>4, plus:',
-          'Real-time AI whisper coaching during live calls',
-          'Unlimited calls, emails, and Canvas scans',
-          'Unlimited workflow automations',
-          'Custom AI agent configuration'
-        ],
-        premium: [
-          'Dedicated success manager',
-          'Priority support and training',
-          'Custom integrations and setup',
-          'Early access to new AI features',
-          'The complete "Enhanced Rep" experience'
-        ]
-      }
-    }
-  };
+    };
+    fetchPricing();
+  }, []);
 
   // Calculate savings for annual billing
   const getSavings = (tier: SubscriptionTier) => {
-    const monthlyCost = pricing[tier].monthly;
-    const annualCost = pricing[tier].annual;
+    if (!pricing || !pricing[tier]) return { savings: 0, savingsPercentage: 0 };
+    const monthlyCost = pricing[tier].monthly.amount / 100;
+    const annualCost = pricing[tier].annual.amount / 100;
     const monthlyCostForYear = monthlyCost * 12;
     const savings = monthlyCostForYear - annualCost;
     const savingsPercentage = Math.round((savings / monthlyCostForYear) * 100);
     return { savings, savingsPercentage };
   };
+
+  if (!pricing) {
+    return (
+      <Box sx={{ maxWidth: 1400, mx: 'auto', p: 3, textAlign: 'center' }}>
+        <Typography variant="h4">Loading pricing information...</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ maxWidth: 1400, mx: 'auto', p: 3 }}>
@@ -263,7 +174,7 @@ const Subscribe: React.FC = () => {
               Rep<sup style={{ fontSize: '0.75em' }}>x</sup>1
             </Typography>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
-              ${pricing.repx1[billingCycle]}
+              ${pricing.repx1[billingCycle].amount / 100}
               <Typography component="span" variant="body1" color="text.secondary">
                 /{billingCycle === 'monthly' ? 'mo' : 'yr'}
               </Typography>
@@ -274,7 +185,7 @@ const Subscribe: React.FC = () => {
               </Typography>
             )}
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
-              Your Professional Business Line for Life
+              {pricing.repx1.name}
             </Typography>
             
             <Divider sx={{ my: 2 }} />
@@ -340,7 +251,7 @@ const Subscribe: React.FC = () => {
               Rep<sup style={{ fontSize: '0.75em' }}>x</sup>2
             </Typography>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
-              ${pricing.repx2[billingCycle]}
+              ${pricing.repx2[billingCycle].amount / 100}
               <Typography component="span" variant="body1" color="text.secondary">
                 /{billingCycle === 'monthly' ? 'mo' : 'yr'}
               </Typography>
@@ -351,7 +262,7 @@ const Subscribe: React.FC = () => {
               </Typography>
             )}
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
-              Professional calling + work email integration
+              {pricing.repx2.name}
             </Typography>
             
             <Divider sx={{ my: 2 }} />
@@ -406,7 +317,7 @@ const Subscribe: React.FC = () => {
               <StarIcon color="primary" sx={{ ml: 1 }} />
             </Box>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
-              ${pricing.repx3[billingCycle]}
+              ${pricing.repx3[billingCycle].amount / 100}
               <Typography component="span" variant="body1" color="text.secondary">
                 /{billingCycle === 'monthly' ? 'mo' : 'yr'}
               </Typography>
@@ -417,7 +328,7 @@ const Subscribe: React.FC = () => {
               </Typography>
             )}
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
-              Full Canvas intelligence + territory mapping
+              {pricing.repx3.name}
             </Typography>
             
             <Divider sx={{ my: 2 }} />
@@ -478,7 +389,7 @@ const Subscribe: React.FC = () => {
               <DiamondIcon color="secondary" sx={{ ml: 1 }} />
             </Box>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
-              ${pricing.repx4[billingCycle]}
+              ${pricing.repx4[billingCycle].amount / 100}
               <Typography component="span" variant="body1" color="text.secondary">
                 /{billingCycle === 'monthly' ? 'mo' : 'yr'}
               </Typography>
@@ -489,7 +400,7 @@ const Subscribe: React.FC = () => {
               </Typography>
             )}
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
-              AI coaching insights + workflow automation
+              {pricing.repx4.name}
             </Typography>
             
             <Divider sx={{ my: 2 }} />
@@ -559,7 +470,7 @@ const Subscribe: React.FC = () => {
               <EmojiEventsIcon color="warning" sx={{ ml: 1 }} />
             </Box>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
-              ${pricing.repx5[billingCycle]}
+              ${pricing.repx5[billingCycle].amount / 100}
               <Typography component="span" variant="body1" color="text.secondary">
                 /{billingCycle === 'monthly' ? 'mo' : 'yr'}
               </Typography>
@@ -570,7 +481,7 @@ const Subscribe: React.FC = () => {
               </Typography>
             )}
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
-              The complete Enhanced Rep experience
+              {pricing.repx5.name}
             </Typography>
             
             <Divider sx={{ my: 2 }} />
