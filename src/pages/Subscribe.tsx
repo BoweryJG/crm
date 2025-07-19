@@ -191,7 +191,7 @@ const Subscribe: React.FC = () => {
             <Divider sx={{ my: 2 }} />
             
             <List dense sx={{ flexGrow: 1 }}>
-              {pricing.repx1.features.basic.map((feature, index) => (
+              {pricing.repx1.features.basic.map((feature: string, index: number) => (
                 <ListItem key={index} disableGutters>
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="success" fontSize="small" />
@@ -268,7 +268,7 @@ const Subscribe: React.FC = () => {
             <Divider sx={{ my: 2 }} />
             
             <List dense sx={{ flexGrow: 1 }}>
-              {pricing.repx2.features.basic.map((feature, index) => (
+              {pricing.repx2.features.basic.map((feature: string, index: number) => (
                 <ListItem key={index} disableGutters>
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="success" fontSize="small" />
@@ -334,7 +334,7 @@ const Subscribe: React.FC = () => {
             <Divider sx={{ my: 2 }} />
             
             <List dense sx={{ flexGrow: 1 }}>
-              {pricing.repx3.features.basic.map((feature, index) => (
+              {pricing.repx3.features.basic.map((feature: string, index: number) => (
                 <ListItem key={index} disableGutters>
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="success" fontSize="small" />
@@ -406,7 +406,7 @@ const Subscribe: React.FC = () => {
             <Divider sx={{ my: 2 }} />
             
             <List dense sx={{ flexGrow: 1 }}>
-              {pricing.repx4.features.basic.map((feature, index) => (
+              {pricing.repx4.features.basic.map((feature: string, index: number) => (
                 <ListItem key={index} disableGutters>
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="success" fontSize="small" />
@@ -487,7 +487,7 @@ const Subscribe: React.FC = () => {
             <Divider sx={{ my: 2 }} />
             
             <List dense sx={{ flexGrow: 1 }}>
-              {pricing.repx5.features.basic.map((feature, index) => (
+              {pricing.repx5.features.basic.map((feature: string, index: number) => (
                 <ListItem key={index} disableGutters>
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="success" fontSize="small" />
@@ -501,7 +501,7 @@ const Subscribe: React.FC = () => {
               
               {pricing.repx5.features.premium.length > 0 && (
                 <>
-                  {pricing.repx5.features.premium.map((feature, index) => (
+                  {pricing.repx5.features.premium.map((feature: string, index: number) => (
                     <ListItem key={`premium-${index}`} disableGutters>
                       <ListItemIcon sx={{ minWidth: 36 }}>
                         <EmojiEventsIcon color="warning" fontSize="small" />
