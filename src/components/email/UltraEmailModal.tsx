@@ -413,6 +413,10 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [hapticEnabled, setHapticEnabled] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [queuedForRetry, setQueuedForRetry] = useState(false);
+  const [backendStatus, setBackendStatus] = useState<'unknown' | 'online' | 'offline'>('unknown');
+  const [retryAttempts, setRetryAttempts] = useState(0);
   
   // Refs
   const modalRef = useRef<HTMLDivElement>(null);
@@ -424,6 +428,73 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
   const isLuxuryTheme = currentThemeData?.category === 'luxury' || 
                        currentThemeData?.category === 'beauty' || 
                        themeMode === 'luxury';
+
+  // Online/offline monitoring and backend status
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      console.log('Email modal: Back online');
+      
+      // Check backend status when coming back online
+      checkBackendStatus();
+      
+      if (queuedForRetry) {
+        setError('Back online - you can retry sending your email');
+        if (soundEnabled) notificationSound.info();
+      }
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      setBackendStatus('offline');
+      console.log('Email modal: Offline mode');
+      
+      if (sending) {
+        setError('Connection lost - email will be queued for retry when online');
+        if (soundEnabled) notificationSound.error();
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [queuedForRetry, sending, soundEnabled, notificationSound]);
+
+  // Backend status checking function
+  const checkBackendStatus = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/health`, {
+        method: 'GET'
+      });
+      
+      if (response.ok) {
+        setBackendStatus('online');
+      } else {
+        setBackendStatus('offline');
+      }
+    } catch (error) {
+      setBackendStatus('offline');
+    }
+  };
+
+  // Check backend status periodically
+  useEffect(() => {
+    // Check immediately
+    checkBackendStatus();
+
+    // Check every 30 seconds if modal is open
+    const interval = setInterval(() => {
+      if (open) {
+        checkBackendStatus();
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [open]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -459,11 +530,17 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
         event.preventDefault();
         setAiAssistant(!aiAssistant);
       }
+      
+      // Ctrl/Cmd + R to retry failed send
+      if ((event.ctrlKey || event.metaKey) && event.key === 'r' && (queuedForRetry || error)) {
+        event.preventDefault();
+        handleRetry();
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [open, isFullscreen, aiAssistant]);
+  }, [open, isFullscreen, aiAssistant, queuedForRetry, error]);
 
   // Floating particles effect
   useEffect(() => {
@@ -569,20 +646,33 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
     }
   }, [prefilledTo, prefilledSubject, contact, mode, replyToEmail]);
 
-  // Load email templates
+  // Load email templates with enhanced service
   useEffect(() => {
     const loadTemplates = async () => {
       if (!user) return;
       
-      const { data } = await supabase
-        .from('email_templates')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .order('name');
-      
-      if (data) {
-        setTemplates(data);
+      try {
+        // Use enhanced email service for template loading
+        const templates = await emailService.getEmailTemplates(user.id);
+        setTemplates(templates);
+        
+        // Also load email stats for analytics
+        const stats = await emailService.getEmailStats(user.id);
+        setEmailStats(stats);
+      } catch (error) {
+        console.error('Failed to load templates and stats:', error);
+        
+        // Fallback to direct Supabase query
+        const { data } = await supabase
+          .from('email_templates')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .order('name');
+        
+        if (data) {
+          setTemplates(data);
+        }
       }
     };
 
@@ -646,8 +736,17 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
       return;
     }
 
+    // Check online status
+    if (!isOnline) {
+      setError('You are offline. Email will be queued for sending when connection is restored.');
+      setQueuedForRetry(true);
+      if (soundEnabled) notificationSound.error();
+      return;
+    }
+
     setSending(true);
     setError(null);
+    setRetryAttempts(0);
     if (soundEnabled) buttonSound.play();
 
     try {
@@ -659,12 +758,19 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
         try {
           // Process email content for tracking
           const messageId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-          const { processedHtml } = await emailAnalyticsService.processEmailForTracking(
-            messageId,
-            body,
-            true, // Enable open tracking
-            true  // Enable click tracking
-          );
+          let processedHtml = body;
+          
+          try {
+            const trackingResult = await emailAnalyticsService.processEmailForTracking(
+              messageId,
+              body,
+              true, // Enable open tracking
+              true  // Enable click tracking
+            );
+            processedHtml = trackingResult.processedHtml;
+          } catch (trackingError) {
+            console.warn('Failed to process email tracking, sending without tracking:', trackingError);
+          }
 
           // Send email with enhanced options
           const result = await emailService.sendEmail({
@@ -683,31 +789,36 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
             metadata: {
               source: 'ultra-email-modal',
               userAgent: navigator.userAgent,
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString(),
+              retryAttempt: retryAttempts
             }
           });
 
-          // Track the send event
+          // Track the send event if successful
           if (result.success && result.messageId) {
-            await emailAnalyticsService.trackEmailEvent(
-              result.messageId,
-              'sent',
-              {
-                ip_address: await fetch('https://api.ipify.org?format=json')
-                  .then(res => res.json())
-                  .then(data => data.ip)
-                  .catch(() => undefined),
-                user_agent: navigator.userAgent,
-                device_info: {
-                  type: /Mobile|Android|iPhone|iPad/.test(navigator.userAgent) ? 'mobile' : 'desktop',
-                  os: navigator.platform,
-                  browser: navigator.userAgent.split(' ').pop()
+            try {
+              await emailAnalyticsService.trackEmailEvent(
+                result.messageId,
+                'sent',
+                {
+                  ip_address: await fetch('https://api.ipify.org?format=json')
+                    .then(res => res.json())
+                    .then(data => data.ip)
+                    .catch(() => undefined),
+                  user_agent: navigator.userAgent,
+                  device_info: {
+                    type: /Mobile|Android|iPhone|iPad/.test(navigator.userAgent) ? 'mobile' : 'desktop',
+                    os: navigator.platform,
+                    browser: navigator.userAgent.split(' ').pop()
+                  }
                 }
-              }
-            );
+              );
+            } catch (trackingError) {
+              console.warn('Failed to track send event:', trackingError);
+            }
           }
 
-          return result;
+          return { ...result, recipient };
         } catch (error) {
           console.error(`Failed to send to ${recipient}:`, error);
           return {
@@ -720,12 +831,20 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
 
       const results = await Promise.all(sendPromises);
       const failed = results.filter(r => !r.success);
+      const offline = results.filter(r => r.error?.includes('offline') || r.error?.includes('Offline'));
 
-      if (failed.length > 0) {
-        setError(`Failed to send to ${failed.length} recipient(s): ${failed.map(f => f.recipient || 'unknown').join(', ')}`);
+      if (offline.length > 0) {
+        setError(`${offline.length} email(s) queued for retry when online`);
+        setQueuedForRetry(true);
+        if (soundEnabled) notificationSound.info();
+      } else if (failed.length > 0) {
+        const failedRecipients = failed.map(f => (f as any).recipient || 'unknown').join(', ');
+        setError(`Failed to send to ${failed.length} recipient(s): ${failedRecipients}`);
+        setQueuedForRetry(true);
         if (soundEnabled) notificationSound.error();
       } else {
         setSuccess(true);
+        setQueuedForRetry(false);
         if (soundEnabled) notificationSound.success();
         localStorage.removeItem('ultraEmailModal_draft');
         
@@ -738,12 +857,39 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
         }, 1500);
       }
     } catch (err) {
-      setError('Failed to send email');
-      if (soundEnabled) notificationSound.error();
       console.error('Email send error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to send email';
+      
+      if (errorMessage.includes('offline') || errorMessage.includes('network')) {
+        setError('Connection failed - email queued for retry when online');
+        setQueuedForRetry(true);
+        if (soundEnabled) notificationSound.info();
+      } else {
+        setError(errorMessage);
+        setQueuedForRetry(true);
+        if (soundEnabled) notificationSound.error();
+      }
     } finally {
       setSending(false);
     }
+  };
+
+  const handleRetry = async () => {
+    if (!isOnline) {
+      setError('Still offline - please check your connection');
+      if (soundEnabled) notificationSound.error();
+      return;
+    }
+
+    if (retryAttempts >= 3) {
+      setError('Maximum retry attempts reached. Please check your email configuration.');
+      if (soundEnabled) notificationSound.error();
+      return;
+    }
+
+    setRetryAttempts(prev => prev + 1);
+    setQueuedForRetry(false);
+    await handleSend();
   };
 
   const handleSaveDraft = () => {
@@ -854,9 +1000,36 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
                 {mode === 'compose' ? 'Ultra Email Composer' : 
                  mode === 'reply' ? 'Reply Message' : 'Forward Message'}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {sending ? `Sending... ${progress}%` : 'AI-Powered Email Experience'}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {sending ? `Sending... ${progress}%` : 
+                   queuedForRetry ? 'Queued for retry' :
+                   'AI-Powered Email Experience'}
+                </Typography>
+                
+                {/* Connection Status Indicator */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Box
+                    sx={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      backgroundColor: 
+                        !isOnline ? theme.palette.error.main :
+                        backendStatus === 'online' ? theme.palette.success.main :
+                        backendStatus === 'offline' ? theme.palette.warning.main :
+                        theme.palette.grey[400],
+                      animation: sending ? 'pulse 2s infinite' : 'none'
+                    }}
+                  />
+                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>
+                    {!isOnline ? 'Offline' :
+                     backendStatus === 'online' ? 'Online' :
+                     backendStatus === 'offline' ? 'Backend Down' :
+                     'Checking...'}
+                  </Typography>
+                </Box>
+              </Box>
             </Box>
           </Box>
 
@@ -962,6 +1135,44 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
                   label="Schedule"
                 />
               </Stack>
+              
+              {/* Email Stats Quick View */}
+              {emailStats && (
+                <Box sx={{ mt: 2, p: 1, backgroundColor: alpha(theme.palette.info.main, 0.05), borderRadius: '8px' }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                    Today's Email Stats
+                  </Typography>
+                  <Stack direction="row" spacing={3} sx={{ fontSize: '0.75rem' }}>
+                    <Box>
+                      <Typography variant="caption" color="success.main">
+                        ↗ {emailStats.sentToday} sent
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="info.main">
+                        📬 {emailStats.deliveredToday || 0} delivered
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="warning.main">
+                        👁 {emailStats.openedToday || 0} opened
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" color="primary.main">
+                        🖱 {emailStats.clickedToday || 0} clicked
+                      </Typography>
+                    </Box>
+                    {emailStats.openRate > 0 && (
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">
+                          📊 {emailStats.openRate.toFixed(1)}% open rate
+                        </Typography>
+                      </Box>
+                    )}
+                  </Stack>
+                </Box>
+              )}
             </Box>
           </Collapse>
 
@@ -1345,7 +1556,6 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
                       showQualityIndicators={true}
                       defaultSourceLang="auto"
                       defaultTargetLang="es"
-                      translationService={translationService}
                     />
                   </Box>
                 </TabPanel>
@@ -1387,19 +1597,51 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
                 Draft
               </UltraGlassButton>
               
+              {/* Retry Button for failed sends */}
+              {queuedForRetry && (
+                <UltraGlassButton
+                  variant="outlined"
+                  startIcon={<ReplyIcon />}
+                  onClick={handleRetry}
+                  disabled={sending || !isOnline}
+                  sx={{
+                    borderColor: theme.palette.warning.main,
+                    color: theme.palette.warning.main,
+                    '&:hover': {
+                      borderColor: theme.palette.warning.dark,
+                      backgroundColor: alpha(theme.palette.warning.main, 0.1)
+                    }
+                  }}
+                >
+                  Retry ({retryAttempts}/3)
+                </UltraGlassButton>
+              )}
+              
               <UltraGlassButton
                 variant="contained"
                 startIcon={sending ? <CircularProgress size={16} /> : <SendIcon />}
-                onClick={handleSend}
-                disabled={sending || !to.length || !subject || !body}
+                onClick={queuedForRetry ? handleRetry : handleSend}
+                disabled={sending || !to.length || !subject || !body || (!isOnline && !queuedForRetry)}
                 sx={{
-                  background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                  background: queuedForRetry ? 
+                    `linear-gradient(45deg, ${theme.palette.warning.main}, ${theme.palette.warning.dark})` :
+                    `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                   '&:hover': {
-                    background: `linear-gradient(45deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
+                    background: queuedForRetry ?
+                      `linear-gradient(45deg, ${theme.palette.warning.dark}, ${theme.palette.warning.dark})` :
+                      `linear-gradient(45deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
+                  },
+                  '&:disabled': {
+                    background: alpha(theme.palette.action.disabled, 0.12),
+                    color: theme.palette.action.disabled
                   }
                 }}
               >
-                {sending ? 'Sending...' : scheduled ? 'Schedule' : 'Send'}
+                {sending ? 'Sending...' : 
+                 queuedForRetry ? 'Retry Send' :
+                 scheduled ? 'Schedule' : 
+                 !isOnline ? 'Offline' :
+                 'Send'}
               </UltraGlassButton>
             </ButtonGroup>
           </DialogActions>
