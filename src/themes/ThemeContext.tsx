@@ -36,6 +36,7 @@ interface ThemeContextType {
   removeCustomTheme: (themeId: string) => void;
   getAllAvailableThemes: () => ExtendedTheme[];
   getCurrentTheme: () => ExtendedTheme | null;
+  currentTheme: ExtendedTheme | null;
 }
 
 // Create the context
@@ -194,6 +195,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       removeCustomTheme,
       getAllAvailableThemes,
       getCurrentTheme,
+      currentTheme: getCurrentTheme(),
     }),
     [themeMode, userPreferences]
   );
