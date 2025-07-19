@@ -42,26 +42,44 @@ const Subscribe: React.FC = () => {
   };
 
   const handleSubscribe = async (tier: SubscriptionTier) => {
-    // Set the selected tier before proceeding to checkout
-    setSelectedTier(tier);
-    
-    // Use the Render backend for Stripe checkout
-    const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com';
-    const res = await fetch(`${backendUrl}/api/stripe/create-checkout-session`, { 
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        tier,
-        billingCycle,
-        priceId: pricing[tier].priceIds[billingCycle]
-      })
-    });
-    
-    const data = await res.json();
-    if (data.url) {
-      window.location.assign(data.url);
+    try {
+      // Set the selected tier before proceeding to checkout
+      setSelectedTier(tier);
+      
+      // Use the Render backend for Stripe checkout
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com';
+      const res = await fetch(`${backendUrl}/api/stripe/create-checkout-session`, { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          tier,
+          billingCycle,
+          priceId: pricing[tier].priceIds[billingCycle],
+          customerEmail: '', // Add customer email if available
+          successUrl: `${window.location.origin}/subscription/success`,
+          cancelUrl: `${window.location.origin}/subscription/cancel`
+        })
+      });
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
+      const data = await res.json();
+      if (data.success && data.data && data.data.url) {
+        window.location.assign(data.data.url);
+      } else if (data.url) {
+        // Fallback for old response format
+        window.location.assign(data.url);
+      } else {
+        console.error('Failed to create checkout session:', data);
+        alert('Failed to create checkout session. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      alert('Network error occurred. Please check your connection and try again.');
     }
   };
 
@@ -71,10 +89,10 @@ const Subscribe: React.FC = () => {
       monthly: 39,
       annual: 390,
       priceIds: {
-        monthly: 'price_1RRuqbGRiAPUZqWu3f91wnNx', // Will need new Stripe price IDs
-        annual: 'price_1RWMXEGRiAPUZqWuPwcgrovN'
+        monthly: 'price_1RRutVGRiAPUZqWuDMSAqHsD',
+        annual: 'price_1RWMSCGRiAPUZqWu30j19b9G'
       },
-      productId: 'prod_SMe8fPX6r65llM',
+      productId: 'prod_SMeBmeB7knfARi',
       features: {
         basic: [
           'Your Professional Business Line for Life',
@@ -92,10 +110,10 @@ const Subscribe: React.FC = () => {
       monthly: 97,
       annual: 970,
       priceIds: {
-        monthly: 'price_1RRurNGRiAPUZqWuklICsE4P',
-        annual: 'price_1RWMWjGRiAPUZqWu6YBZY7o4'
+        monthly: 'price_1RRushGRiAPUZqWuIvqueK7h',
+        annual: 'price_1RWMT4GRiAPUZqWuqiNhkZfw'
       },
-      productId: 'prod_SMe9s5P6OirVgP',
+      productId: 'prod_SMeBAukl5Fqeeh',
       features: {
         basic: [
           'Everything in Rep<sup>x</sup>1, plus:',
@@ -135,10 +153,10 @@ const Subscribe: React.FC = () => {
       monthly: 397,
       annual: 3970,
       priceIds: {
-        monthly: 'price_1RRushGRiAPUZqWuIvqueK7h',
-        annual: 'price_1RWMT4GRiAPUZqWuqiNhkZfw'
+        monthly: 'price_1RRurNGRiAPUZqWuklICsE4P',
+        annual: 'price_1RWMWjGRiAPUZqWu6YBZY7o4'
       },
-      productId: 'prod_SMeBAukl5Fqeeh',
+      productId: 'prod_SMe9s5P6OirVgP',
       features: {
         basic: [
           'Everything in Rep<sup>x</sup>3, plus:',
@@ -154,13 +172,13 @@ const Subscribe: React.FC = () => {
       }
     },
     repx5: {
-      monthly: 697,
-      annual: 6970,
+      monthly: 797,
+      annual: 7970,
       priceIds: {
-        monthly: 'price_1RRutVGRiAPUZqWuDMSAqHsD',
-        annual: 'price_1RWMSCGRiAPUZqWu30j19b9G'
+        monthly: 'price_1RRuqbGRiAPUZqWu3f91wnNx',
+        annual: 'price_1RWMXEGRiAPUZqWuPwcgrovN'
       },
-      productId: 'prod_SMeBmeB7knfARi',
+      productId: 'prod_SMe8fPX6r65llM',
       features: {
         basic: [
           'Everything in Rep<sup>x</sup>4, plus:',
