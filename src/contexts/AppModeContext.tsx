@@ -5,6 +5,7 @@ import { isAdminUser } from '../config/adminUsers';
 
 export type AppMode = 'demo' | 'live';
 export type FeatureTier = 'basic' | 'premium';
+export type RepxTier = 'repx1' | 'repx2' | 'repx3' | 'repx4' | 'repx5';
 
 interface AppModeContextType {
   mode: AppMode;
@@ -18,12 +19,16 @@ interface AppModeContextType {
   canAccessLiveMode: boolean;
   canAccessPremiumFeatures: boolean;
   subscriptionTier: string | null;
+  repxTier: RepxTier | null;
   subscriptionStatus: 'active' | 'inactive' | 'loading';
   showUpgradeModal: boolean;
   showFeatureUpgradeModal: boolean;
   closeUpgradeModal: () => void;
   closeFeatureUpgradeModal: () => void;
   openFeatureUpgradeModal: () => void;
+  // Rep^x specific features
+  hasRepxAccess: (feature: 'calls' | 'emails' | 'canvas_scans') => boolean;
+  getRepxFeatureLimits: () => { calls: number | 'unlimited'; emails: number | 'unlimited'; canvas_scans: number | 'unlimited' } | null;
 }
 
 const AppModeContext = createContext<AppModeContextType | undefined>(undefined);
@@ -33,6 +38,7 @@ export const AppModeProvider: React.FC<{children: React.ReactNode}> = ({ childre
   const [mode, setModeState] = useState<AppMode>('demo');
   const [featureTier, setFeatureTierState] = useState<FeatureTier>('basic');
   const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
+  const [repxTier, setRepxTier] = useState<RepxTier | null>(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'inactive' | 'loading'>('loading');
   const [canAccessLiveMode, setCanAccessLiveMode] = useState(false);
   const [canAccessPremiumFeatures, setCanAccessPremiumFeatures] = useState(false);
@@ -86,8 +92,19 @@ export const AppModeProvider: React.FC<{children: React.ReactNode}> = ({ childre
         setSubscriptionStatus(hasActiveSubscription ? 'active' : 'inactive');
         setCanAccessLiveMode(hasActiveSubscription);
         
+        // Set Rep^x tier if it's a valid Rep^x subscription
+        const validRepxTiers: RepxTier[] = ['repx1', 'repx2', 'repx3', 'repx4', 'repx5'];
+        if (validRepxTiers.includes(tier as RepxTier)) {
+          setRepxTier(tier as RepxTier);
+        } else {
+          setRepxTier(null);
+        }
+        
         // Determine if user can access premium features based on subscription tier
-        const canAccessPremium = hasActiveSubscription && (tier === 'premium' || tier === 'enterprise');
+        const canAccessPremium = hasActiveSubscription && (
+          tier === 'premium' || tier === 'enterprise' || 
+          tier === 'repx3' || tier === 'repx4' || tier === 'repx5'
+        );
         setCanAccessPremiumFeatures(canAccessPremium);
         
         // Get user's app settings
@@ -222,6 +239,37 @@ export const AppModeProvider: React.FC<{children: React.ReactNode}> = ({ childre
     setShowFeatureUpgradeModal(true);
   };
   
+  // Rep^x specific feature access check
+  const hasRepxAccess = (feature: 'calls' | 'emails' | 'canvas_scans'): boolean => {
+    if (!repxTier) return false;
+    
+    switch (feature) {
+      case 'calls':
+        return true; // All Rep^x tiers have calls
+      case 'emails':
+        return ['repx2', 'repx3', 'repx4', 'repx5'].includes(repxTier);
+      case 'canvas_scans':
+        return ['repx2', 'repx3', 'repx4', 'repx5'].includes(repxTier);
+      default:
+        return false;
+    }
+  };
+  
+  // Get Rep^x feature limits
+  const getRepxFeatureLimits = () => {
+    if (!repxTier) return null;
+    
+    const limits = {
+      repx1: { calls: 100, emails: 0, canvas_scans: 0 },
+      repx2: { calls: 200, emails: 50, canvas_scans: 10 },
+      repx3: { calls: 400, emails: 100, canvas_scans: 25 },
+      repx4: { calls: 800, emails: 200, canvas_scans: 50 },
+      repx5: { calls: 'unlimited' as const, emails: 'unlimited' as const, canvas_scans: 'unlimited' as const }
+    };
+    
+    return limits[repxTier];
+  };
+  
   const value = {
     mode,
     featureTier,
@@ -234,12 +282,15 @@ export const AppModeProvider: React.FC<{children: React.ReactNode}> = ({ childre
     canAccessLiveMode,
     canAccessPremiumFeatures,
     subscriptionTier,
+    repxTier,
     subscriptionStatus,
     showUpgradeModal,
     showFeatureUpgradeModal,
     closeUpgradeModal,
     closeFeatureUpgradeModal,
-    openFeatureUpgradeModal
+    openFeatureUpgradeModal,
+    hasRepxAccess,
+    getRepxFeatureLimits
   };
   
   return (

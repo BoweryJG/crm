@@ -30,17 +30,18 @@ export const SubscriptionUpgradeModal: React.FC = () => {
       <DialogTitle>
         <Box display="flex" alignItems="center">
           <LockIcon color="primary" sx={{ mr: 1 }} />
-          <Typography variant="h5">Upgrade to Access Live Mode</Typography>
+          <Typography variant="h5">Upgrade to Rep^x to Access Live Mode</Typography>
         </Box>
       </DialogTitle>
       
       <DialogContent>
         <Typography variant="body1" paragraph>
           Live mode connects to your real data sources and enables all premium features of SphereOS CRM.
+          Choose from Rep^x1 through Rep^x5 based on your needs.
         </Typography>
         
         <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 'bold' }}>
-          With a subscription, you'll get:
+          With Rep^x, you'll get:
         </Typography>
         
         <List dense>
@@ -49,8 +50,8 @@ export const SubscriptionUpgradeModal: React.FC = () => {
               <CheckCircleIcon color="success" />
             </ListItemIcon>
             <ListItemText 
-              primary="Real-time data synchronization" 
-              secondary="Connect to your actual contacts, practices, and call data"
+              primary="Professional Business Line (All Rep^x tiers)" 
+              secondary="Your eternal professional phone number with AI transcription"
             />
           </ListItem>
           <ListItem>
@@ -58,8 +59,8 @@ export const SubscriptionUpgradeModal: React.FC = () => {
               <CheckCircleIcon color="success" />
             </ListItemIcon>
             <ListItemText 
-              primary="Advanced linguistics analysis" 
-              secondary="Get detailed insights from your actual sales calls"
+              primary="Market Intelligence (Rep^x2+)" 
+              secondary="Email integration and Canvas practice scans"
             />
           </ListItem>
           <ListItem>
@@ -67,8 +68,8 @@ export const SubscriptionUpgradeModal: React.FC = () => {
               <CheckCircleIcon color="success" />
             </ListItemIcon>
             <ListItemText 
-              primary="Customized dental/aesthetic sales intelligence" 
-              secondary="Industry-specific insights tailored to your specialty"
+              primary="Territory Command (Rep^x3+)" 
+              secondary="Advanced analytics and competitive intelligence"
             />
           </ListItem>
           <ListItem>
@@ -76,8 +77,8 @@ export const SubscriptionUpgradeModal: React.FC = () => {
               <CheckCircleIcon color="success" />
             </ListItemIcon>
             <ListItemText 
-              primary="Unlimited call recordings and analysis" 
-              secondary="No limits on the number of calls you can analyze"
+              primary="Elite Global Access (Rep^x5)" 
+              secondary="Unlimited everything plus real-time AI coaching"
             />
           </ListItem>
         </List>
@@ -94,7 +95,7 @@ export const SubscriptionUpgradeModal: React.FC = () => {
           color="primary"
           onClick={closeUpgradeModal}
         >
-          View Subscription Plans
+          View Rep^x Plans
         </Button>
       </DialogActions>
     </Dialog>
