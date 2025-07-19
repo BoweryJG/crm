@@ -73,9 +73,9 @@ import {
   HealthAndSafety as HealthIcon
 } from '@mui/icons-material';
 import { keyframes, styled } from '@mui/material/styles';
-// import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import {
   AreaChart,
   Area,
@@ -657,6 +657,7 @@ const SendOptimizer: React.FC<SendOptimizerProps> = ({
   }, [contactAnalytics]);
 
   return (
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto', p: 2 }}>
         {/* Header */}
         <Box sx={{ mb: 3 }}>
@@ -946,17 +947,21 @@ const SendOptimizer: React.FC<SendOptimizerProps> = ({
                     <Typography variant="subtitle2" gutterBottom>
                       Custom Send Time
                     </Typography>
-                    <TextField
-                      type="datetime-local"
-                      value={customDateTime ? customDateTime.toISOString().slice(0, 16) : ''}
-                      onChange={(e) => handleCustomTimeChange(e.target.value ? new Date(e.target.value) : null)}
-                      fullWidth
-                      size="small"
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: '8px'
-                        }
-                      }}
+                    <DateTimePicker
+                      value={customDateTime}
+                      onChange={handleCustomTimeChange}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          fullWidth
+                          size="small"
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: '8px'
+                            }
+                          }}
+                        />
+                      )}
                     />
                   </Box>
 
@@ -1099,6 +1104,7 @@ const SendOptimizer: React.FC<SendOptimizerProps> = ({
           )}
         </Grid>
       </Box>
+    </LocalizationProvider>
   );
 };
 

@@ -91,6 +91,9 @@ import {
   Analytics as AnalyticsIcon
 } from '@mui/icons-material';
 import { keyframes, styled } from '@mui/material/styles';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useAuth } from '../../auth';
 import { Contact } from '../../types/models';
@@ -409,7 +412,7 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
   const [body, setBody] = useState('');
   const [priority, setPriority] = useState<'low' | 'normal' | 'high'>('normal');
   const [scheduled, setScheduled] = useState(false);
-  const [scheduleDate, setScheduleDate] = useState('');
+  const [scheduleDate, setScheduleDate] = useState<Date | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -608,7 +611,7 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
     if (!autoSave || !open) return;
     
     const saveData = {
-      to, cc, bcc, subject, body, priority, scheduled, scheduleDate
+      to, cc, bcc, subject, body, priority, scheduled, scheduleDate?.toISOString()
     };
     
     const saveTimeout = setTimeout(() => {
@@ -632,7 +635,7 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
           setBody(data.body || '');
           setPriority(data.priority || 'normal');
           setScheduled(data.scheduled || false);
-          setScheduleDate(data.scheduleDate || '');
+          setScheduleDate(data.scheduleDate ? new Date(data.scheduleDate) : null);
         } catch (e) {
           console.warn('Failed to load draft:', e);
         }
@@ -800,7 +803,7 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
             text: body.replace(/<[^>]*>/g, ''), // Strip HTML for text version
             contactId: contact?.id,
             priority,
-            scheduled: scheduled ? new Date(scheduleDate) : undefined,
+            scheduled: scheduled && scheduleDate ? scheduleDate : undefined,
             trackOpens: true,
             trackClicks: true,
             tags: ['ultra-email-modal'],

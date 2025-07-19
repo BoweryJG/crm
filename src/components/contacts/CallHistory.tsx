@@ -27,7 +27,7 @@ import {
   PlayArrow as PlayIcon
 } from '@mui/icons-material';
 import { fetchCallHistory } from '../../services/twilio/twilioService';
-import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
+import { formatDistanceToNow } from 'date-fns';
 import { geminiService } from '../../services/ai/geminiService';
 import { ExternalRecordingUpload } from './ExternalRecordingUpload';
 import { supabase } from '../../services/supabase/supabase';

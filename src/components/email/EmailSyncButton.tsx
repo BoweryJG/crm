@@ -21,7 +21,7 @@ import {
 } from '@mui/icons-material';
 import { gmailSyncService } from '../../services/email/gmailSyncService';
 import GmailAuthComponent from '../gmail/GmailAuthComponent';
-import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
+import { formatDistanceToNow } from 'date-fns';
 
 interface EmailSyncButtonProps {
   variant?: 'icon' | 'button';

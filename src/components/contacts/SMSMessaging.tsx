@@ -20,7 +20,7 @@ import {
 import { fetchSMSHistory, sendSMSToContact, SMSHistoryItem } from '../../services/twilio/smsService';
 import { useAuth } from '../../auth';
 import { Contact } from '../../types/models';
-import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
+import { formatDistanceToNow } from 'date-fns';
 
 interface SMSMessagingProps {
   contact: Contact;
