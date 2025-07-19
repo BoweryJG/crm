@@ -611,7 +611,7 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
     if (!autoSave || !open) return;
     
     const saveData = {
-      to, cc, bcc, subject, body, priority, scheduled, scheduleDate?.toISOString()
+      to, cc, bcc, subject, body, priority, scheduled, scheduleDate: scheduleDate?.toISOString()
     };
     
     const saveTimeout = setTimeout(() => {
@@ -947,7 +947,8 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
   };
 
   return (
-    <>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <>
       <UltraGlassDialog
         open={open}
         onClose={!sending ? handleClose : undefined}
@@ -1452,20 +1453,25 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
 
               {/* Schedule Field */}
               {scheduled && (
-                <SmartField
+                <DateTimePicker
                   label="Schedule for"
-                  type="datetime-local"
                   value={scheduleDate}
-                  onChange={(e) => setScheduleDate(e.target.value)}
-                  size="small"
-                  InputLabelProps={{ shrink: true }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <ScheduleIcon sx={{ color: 'text.secondary' }} />
-                      </InputAdornment>
-                    )
-                  }}
+                  onChange={(newValue) => setScheduleDate(newValue)}
+                  renderInput={(params) => (
+                    <SmartField
+                      {...params}
+                      size="small"
+                      InputLabelProps={{ shrink: true }}
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <ScheduleIcon sx={{ color: 'text.secondary' }} />
+                          </InputAdornment>
+                        )
+                      }}
+                    />
+                  )}
                 />
               )}
 
@@ -1681,7 +1687,7 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
                       onOptimalTimeSelected={(dateTime) => {
                         setOptimalSendTime(dateTime);
                         setScheduled(true);
-                        setScheduleDate(dateTime.toISOString().slice(0, 16));
+                        setScheduleDate(dateTime);
                         if (soundEnabled) notificationSound.success();
                       }}
                       onScheduleRecommendation={(recommendation) => {
@@ -1806,7 +1812,8 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
           Email sent successfully!
         </Alert>
       </Snackbar>
-    </>
+      </>
+    </LocalizationProvider>
   );
 };
 
