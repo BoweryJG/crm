@@ -1,6 +1,7 @@
 import { supabase } from '../supabase/supabase';
 import TwilioProvisioningService, { ProvisioningOptions } from './TwilioProvisioningService';
 import BillingReceiptService from '../billing/BillingReceiptService';
+import HybridEmailOnboardingService from '../email/HybridEmailOnboardingService';
 
 export interface RepProfile {
   id: string;
@@ -70,6 +71,8 @@ class RepOnboardingService {
       // Step 7: Send automated billing receipt
       await this.sendBillingReceipt(repProfile, twilioConfig.phone_number);
       console.log(`📧 Sent billing receipt`);
+
+      // Note: Work email setup available in UI when user is ready
 
       const duration = Date.now() - startTime;
       console.log(`✅ Onboarding completed in ${duration}ms`);
