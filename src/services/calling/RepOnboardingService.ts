@@ -445,7 +445,7 @@ class RepOnboardingService {
    * Get actual subscription data from Stripe
    */
   private async getStripeSubscriptionData(email: string): Promise<{
-    plan_type: 'starter' | 'professional' | 'enterprise';
+    plan_type: 'repx1' | 'repx2' | 'repx3' | 'repx4' | 'repx5';
     amount: number;
     billing_period: 'monthly' | 'annual';
     transaction_id?: string;
@@ -478,28 +478,32 @@ class RepOnboardingService {
     } catch (error) {
       console.warn('Failed to get Stripe subscription data, using defaults:', error);
       
-      // Fallback to defaults - likely the $19 starter plan
+      // Fallback to defaults - Rep^x1 plan
       return {
-        plan_type: 'starter',
-        amount: 19.00, // The $19 plan you mentioned
+        plan_type: 'repx1',
+        amount: 39.00,
         billing_period: 'monthly',
       };
     }
   }
 
   /**
-   * Map Stripe plan details to our plan types
+   * Map Stripe plan details to our Rep^x plan types
    */
-  private mapStripePlanToType(planName: string, amountCents: number): 'starter' | 'professional' | 'enterprise' {
+  private mapStripePlanToType(planName: string, amountCents: number): 'repx1' | 'repx2' | 'repx3' | 'repx4' | 'repx5' {
     const amount = amountCents / 100;
     
-    // Map based on amount or plan name
-    if (amount <= 19) {
-      return 'starter';
+    // Map based on amount or plan name to Rep^x tiers
+    if (amount <= 39) {
+      return 'repx1';
     } else if (amount <= 97) {
-      return 'professional';
+      return 'repx2';
+    } else if (amount <= 197) {
+      return 'repx3';
+    } else if (amount <= 397) {
+      return 'repx4';
     } else {
-      return 'enterprise';
+      return 'repx5';
     }
   }
 

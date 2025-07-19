@@ -5,7 +5,7 @@ interface ReceiptData {
   rep_email: string;
   rep_name: string;
   phone_number: string;
-  plan_type: 'starter' | 'professional' | 'enterprise';
+  plan_type: 'repx1' | 'repx2' | 'repx3' | 'repx4' | 'repx5';
   billing_amount: number;
   billing_period: 'monthly' | 'annual';
   transaction_id: string;
@@ -399,8 +399,8 @@ ${this.companyName}
           rep_email: rep.email,
           rep_name: rep.full_name,
           phone_number: config.phone_number,
-          plan_type: 'professional', // Default - would get from subscription
-          billing_amount: 97.00, // Default professional plan price
+          plan_type: 'repx2', // Default Rep^x2 plan
+          billing_amount: 97.00, // Default Rep^x2 plan price
           billing_period: 'monthly',
           transaction_id: `BULK_${Date.now()}_${rep.id.substr(0, 8)}`,
           onboarding_date: config.provisioned_at

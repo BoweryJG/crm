@@ -24,13 +24,13 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { useAppMode } from '../contexts/AppModeContext';
 
 type BillingCycle = 'monthly' | 'annual';
-type SubscriptionTier = 'explorer' | 'professional' | 'growth' | 'enterprise' | 'elite';
+type SubscriptionTier = 'repx1' | 'repx2' | 'repx3' | 'repx4' | 'repx5';
 
 const Subscribe: React.FC = () => {
   const theme = useTheme();
   const { mode } = useAppMode();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
-  const [selectedTier, setSelectedTier] = useState<SubscriptionTier>('professional');
+  const [selectedTier, setSelectedTier] = useState<SubscriptionTier>('repx2');
 
   const handleBillingCycleChange = (
     _event: React.MouseEvent<HTMLElement>,
@@ -45,8 +45,9 @@ const Subscribe: React.FC = () => {
     // Set the selected tier before proceeding to checkout
     setSelectedTier(tier);
     
-    // In a real implementation, we would pass the tier and billing cycle to the API
-    const res = await fetch('/api/create-checkout-session', { 
+    // Use the Render backend for Stripe checkout
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com';
+    const res = await fetch(`${backendUrl}/api/stripe/create-checkout-session`, { 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -64,32 +65,32 @@ const Subscribe: React.FC = () => {
     }
   };
 
-  // Pricing configuration from Stripe CSV
+  // RepX Enhancement Levels Pricing Configuration
   const pricing = {
-    explorer: {
-      monthly: 49,
-      annual: 490,
+    repx1: {
+      monthly: 39,
+      annual: 390,
       priceIds: {
-        monthly: 'price_1RRuqbGRiAPUZqWu3f91wnNx',
+        monthly: 'price_1RRuqbGRiAPUZqWu3f91wnNx', // Will need new Stripe price IDs
         annual: 'price_1RWMXEGRiAPUZqWuPwcgrovN'
       },
       productId: 'prod_SMe8fPX6r65llM',
       features: {
         basic: [
-          'Test the waters with essential market insights',
-          'Access to 25% of dental/aesthetic procedure database',
-          'View market sizes and growth rates (top-level only)',
-          '5 AI Workspace prompts/month',
-          'Basic category descriptions',
-          'Weekly market digest email',
-          'Badge: Explorer Badge in community'
+          'Your Professional Business Line for Life',
+          'AI transcription of every sales call',
+          'Transcriptions sent directly to your CRM',
+          'Professional/personal call separation',
+          'Basic call analytics and history',
+          '100 calls per month',
+          'Eternal professional phone number'
         ],
         premium: []
       }
     },
-    professional: {
-      monthly: 149,
-      annual: 1490,
+    repx2: {
+      monthly: 97,
+      annual: 970,
       priceIds: {
         monthly: 'price_1RRurNGRiAPUZqWuklICsE4P',
         annual: 'price_1RWMWjGRiAPUZqWu6YBZY7o4'
@@ -97,21 +98,20 @@ const Subscribe: React.FC = () => {
       productId: 'prod_SMe9s5P6OirVgP',
       features: {
         basic: [
-          'Everything you need to excel in your territory',
-          'Full access to complete procedure database',
-          'Detailed market insights with growth projections',
-          '50 AI Workspace prompts/month',
-          'Linguistics module: 10 call analyses/month',
-          'Recent news article links',
-          'Export capabilities (PDF/CSV)',
-          'Badge: Professional Badge + priority support'
+          'Everything in Rep<sup>x</sup>1, plus:',
+          'Work email integration (no IT approval needed)',
+          'Basic Market Data access (all procedures)',
+          '200 calls per month',
+          '50 emails per day',
+          '10 Canvas practice scans per day',
+          'Enhanced call analytics and insights'
         ],
         premium: []
       }
     },
-    growth: {
-      monthly: 349,
-      annual: 3490,
+    repx3: {
+      monthly: 197,
+      annual: 1970,
       priceIds: {
         monthly: 'price_1RWMW3GRiAPUZqWuoTA0eLUC',
         annual: 'price_1RRus5GRiAPUZqWup3jk1S8U'
@@ -119,22 +119,21 @@ const Subscribe: React.FC = () => {
       productId: 'prod_SMeAJE1MaklEQi',
       features: {
         basic: [
-          'Scale your success with advanced analytics',
-          'Everything in Professional, plus:',
-          'Unlimited AI Workspace prompts',
-          '50 call analyses/month with coaching insights',
-          'CRM module access (manual entry)',
-          'Custom market reports (3/month)',
-          'Team collaboration features (up to 3 users)',
-          'API access for basic integrations',
-          'Badge: Growth Badge + quarterly strategy call'
+          'Everything in Rep<sup>x</sup>2, plus:',
+          'Full Canvas practice intelligence platform',
+          'Territory mapping and local insights',
+          'Advanced market analytics with trends',
+          '400 calls per month',
+          '100 emails per day',
+          '25 Canvas practice scans per day',
+          'Competitive intelligence reports'
         ],
         premium: []
       }
     },
-    enterprise: {
-      monthly: 749,
-      annual: 7490,
+    repx4: {
+      monthly: 397,
+      annual: 3970,
       priceIds: {
         monthly: 'price_1RRushGRiAPUZqWuIvqueK7h',
         annual: 'price_1RWMT4GRiAPUZqWuqiNhkZfw'
@@ -142,23 +141,21 @@ const Subscribe: React.FC = () => {
       productId: 'prod_SMeBAukl5Fqeeh',
       features: {
         basic: [
-          'Command center for market domination',
-          'Everything in Growth, plus:',
-          'Unlimited call analyses with AI coaching',
-          'Full CRM automation features',
-          'AI-powered workflow automation (5 workflows)',
-          'Custom AI prompt library creation',
-          'White-label reports for clients',
-          'Team access (up to 10 users)',
-          'Priority API access',
-          'Badge: Enterprise Badge + monthly strategy calls'
+          'Everything in Rep<sup>x</sup>3, plus:',
+          'AI coaching insights and recommendations',
+          'Workflow automation (up to 5 workflows)',
+          'Advanced CRM integration and automation',
+          '600 calls per month',
+          '200 emails per day', 
+          '50 Canvas practice scans per day',
+          'Real-time sales performance analytics'
         ],
         premium: []
       }
     },
-    elite: {
-      monthly: 1499,
-      annual: 14990,
+    repx5: {
+      monthly: 697,
+      annual: 6970,
       priceIds: {
         monthly: 'price_1RRutVGRiAPUZqWuDMSAqHsD',
         annual: 'price_1RWMSCGRiAPUZqWu30j19b9G'
@@ -166,19 +163,18 @@ const Subscribe: React.FC = () => {
       productId: 'prod_SMeBmeB7knfARi',
       features: {
         basic: [
-          'Your personal AI-powered sales acceleration team',
-          'Everything in Enterprise, plus:'
+          'Everything in Rep<sup>x</sup>4, plus:',
+          'Real-time AI whisper coaching during live calls',
+          'Unlimited calls, emails, and Canvas scans',
+          'Unlimited workflow automations',
+          'Custom AI agent configuration'
         ],
         premium: [
-          'Unlimited workflow automations',
-          'Custom AI agent configuration',
-          'Done-for-you report generation',
           'Dedicated success manager',
-          'Custom integrations',
-          'Unlimited team members',
-          'Quarterly business reviews',
-          'Early access to new features',
-          'Badge: Elite Badge + weekly check-ins'
+          'Priority support and training',
+          'Custom integrations and setup',
+          'Early access to new AI features',
+          'The complete "Enhanced Rep" experience'
         ]
       }
     }
@@ -198,10 +194,10 @@ const Subscribe: React.FC = () => {
     <Box sx={{ maxWidth: 1400, mx: 'auto', p: 3 }}>
       <Box sx={{ textAlign: 'center', mb: 6 }}>
         <Typography variant="h3" gutterBottom fontWeight="bold">
-          Choose Your Plan
+          Choose Your Rep<sup style={{ fontSize: '0.75em' }}>x</sup> Enhancement Level
         </Typography>
         <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 700, mx: 'auto' }}>
-          Unlock the full potential of SphereOS CRM with a plan that fits your needs
+          Choose your Rep<sup style={{ fontSize: '0.75em' }}>x</sup> Enhancement Level - from professional calling to unlimited AI-powered sales acceleration
         </Typography>
         
         {/* Billing cycle toggle */}
@@ -229,7 +225,7 @@ const Subscribe: React.FC = () => {
       </Box>
 
       <Grid container spacing={3} justifyContent="center">
-        {/* Explorer Plan */}
+        {/* RepX1 Plan */}
         <Grid item xs={12} md={4} lg={2.4}>
           <Paper 
             elevation={3} 
@@ -246,27 +242,27 @@ const Subscribe: React.FC = () => {
             }}
           >
             <Typography variant="h5" fontWeight="bold" gutterBottom>
-              Explorer
+              Rep<sup style={{ fontSize: '0.75em' }}>x</sup>1
             </Typography>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
-              ${pricing.explorer[billingCycle]}
+              ${pricing.repx1[billingCycle]}
               <Typography component="span" variant="body1" color="text.secondary">
                 /{billingCycle === 'monthly' ? 'mo' : 'yr'}
               </Typography>
             </Typography>
             {billingCycle === 'annual' && (
               <Typography variant="body2" color="success.main" sx={{ mb: 2 }}>
-                Save ${getSavings('explorer').savings}/year
+                Save ${getSavings('repx1').savings}/year
               </Typography>
             )}
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
-              Test the waters with essential market insights
+              Your Professional Business Line for Life
             </Typography>
             
             <Divider sx={{ my: 2 }} />
             
             <List dense sx={{ flexGrow: 1 }}>
-              {pricing.explorer.features.basic.map((feature, index) => (
+              {pricing.repx1.features.basic.map((feature, index) => (
                 <ListItem key={index} disableGutters>
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="success" fontSize="small" />
@@ -284,14 +280,14 @@ const Subscribe: React.FC = () => {
               color="primary" 
               fullWidth 
               sx={{ mt: 2 }}
-              onClick={() => handleSubscribe('explorer')}
+              onClick={() => handleSubscribe('repx1')}
             >
               Get Started
             </Button>
           </Paper>
         </Grid>
         
-        {/* Professional Plan */}
+        {/* RepX2 Plan */}
         <Grid item xs={12} md={4} lg={2.4}>
           <Paper 
             elevation={6} 
@@ -323,27 +319,27 @@ const Subscribe: React.FC = () => {
             />
             
             <Typography variant="h5" fontWeight="bold" gutterBottom>
-              Professional
+              Rep<sup style={{ fontSize: '0.75em' }}>x</sup>2
             </Typography>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
-              ${pricing.professional[billingCycle]}
+              ${pricing.repx2[billingCycle]}
               <Typography component="span" variant="body1" color="text.secondary">
                 /{billingCycle === 'monthly' ? 'mo' : 'yr'}
               </Typography>
             </Typography>
             {billingCycle === 'annual' && (
               <Typography variant="body2" color="success.main" sx={{ mb: 2 }}>
-                Save ${getSavings('professional').savings}/year
+                Save ${getSavings('repx2').savings}/year
               </Typography>
             )}
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
-              Everything you need to excel in your territory
+              Professional calling + work email integration
             </Typography>
             
             <Divider sx={{ my: 2 }} />
             
             <List dense sx={{ flexGrow: 1 }}>
-              {pricing.professional.features.basic.map((feature, index) => (
+              {pricing.repx2.features.basic.map((feature, index) => (
                 <ListItem key={index} disableGutters>
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="success" fontSize="small" />
@@ -361,14 +357,14 @@ const Subscribe: React.FC = () => {
               color="primary" 
               fullWidth 
               sx={{ mt: 2 }}
-              onClick={() => handleSubscribe('professional')}
+              onClick={() => handleSubscribe('repx2')}
             >
-              Get Professional
+              Get Rep<sup style={{ fontSize: '0.75em' }}>x</sup>2
             </Button>
           </Paper>
         </Grid>
         
-        {/* Growth Plan */}
+        {/* RepX3 Plan */}
         <Grid item xs={12} md={4} lg={2.4}>
           <Paper 
             elevation={3} 
@@ -387,29 +383,29 @@ const Subscribe: React.FC = () => {
           >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
               <Typography variant="h5" fontWeight="bold" gutterBottom>
-                Growth
+                Rep<sup style={{ fontSize: '0.75em' }}>x</sup>3
               </Typography>
               <StarIcon color="primary" sx={{ ml: 1 }} />
             </Box>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
-              ${pricing.growth[billingCycle]}
+              ${pricing.repx3[billingCycle]}
               <Typography component="span" variant="body1" color="text.secondary">
                 /{billingCycle === 'monthly' ? 'mo' : 'yr'}
               </Typography>
             </Typography>
             {billingCycle === 'annual' && (
               <Typography variant="body2" color="success.main" sx={{ mb: 2 }}>
-                Save ${getSavings('growth').savings}/year
+                Save ${getSavings('repx3').savings}/year
               </Typography>
             )}
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
-              Scale your success with advanced analytics
+              Full Canvas intelligence + territory mapping
             </Typography>
             
             <Divider sx={{ my: 2 }} />
             
             <List dense sx={{ flexGrow: 1 }}>
-              {pricing.growth.features.basic.map((feature, index) => (
+              {pricing.repx3.features.basic.map((feature, index) => (
                 <ListItem key={index} disableGutters>
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="success" fontSize="small" />
@@ -433,14 +429,14 @@ const Subscribe: React.FC = () => {
                   backgroundColor: theme.palette.primary.main,
                 }
               }}
-              onClick={() => handleSubscribe('growth')}
+              onClick={() => handleSubscribe('repx3')}
             >
-              Scale Up
+              Get Rep<sup style={{ fontSize: '0.75em' }}>x</sup>3
             </Button>
           </Paper>
         </Grid>
 
-        {/* Enterprise Plan */}
+        {/* RepX4 Plan */}
         <Grid item xs={12} md={4} lg={2.4}>
           <Paper 
             elevation={3} 
@@ -459,29 +455,29 @@ const Subscribe: React.FC = () => {
           >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
               <Typography variant="h5" fontWeight="bold" gutterBottom>
-                Enterprise
+                Rep<sup style={{ fontSize: '0.75em' }}>x</sup>4
               </Typography>
               <DiamondIcon color="secondary" sx={{ ml: 1 }} />
             </Box>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
-              ${pricing.enterprise[billingCycle]}
+              ${pricing.repx4[billingCycle]}
               <Typography component="span" variant="body1" color="text.secondary">
                 /{billingCycle === 'monthly' ? 'mo' : 'yr'}
               </Typography>
             </Typography>
             {billingCycle === 'annual' && (
               <Typography variant="body2" color="success.main" sx={{ mb: 2 }}>
-                Save ${getSavings('enterprise').savings}/year
+                Save ${getSavings('repx4').savings}/year
               </Typography>
             )}
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
-              Command center for market domination
+              AI coaching insights + workflow automation
             </Typography>
             
             <Divider sx={{ my: 2 }} />
             
             <List dense sx={{ flexGrow: 1 }}>
-              {pricing.enterprise.features.basic.map((feature, index) => (
+              {pricing.repx4.features.basic.map((feature, index) => (
                 <ListItem key={index} disableGutters>
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="success" fontSize="small" />
@@ -499,14 +495,14 @@ const Subscribe: React.FC = () => {
               color="secondary" 
               fullWidth 
               sx={{ mt: 2 }}
-              onClick={() => handleSubscribe('enterprise')}
+              onClick={() => handleSubscribe('repx4')}
             >
-              Go Enterprise
+              Get Rep<sup style={{ fontSize: '0.75em' }}>x</sup>4
             </Button>
           </Paper>
         </Grid>
 
-        {/* Elite Plan */}
+        {/* RepX5 Plan */}
         <Grid item xs={12} md={4} lg={2.4}>
           <Paper 
             elevation={6} 
@@ -540,29 +536,29 @@ const Subscribe: React.FC = () => {
             
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
               <Typography variant="h5" fontWeight="bold" gutterBottom>
-                Elite
+                Rep<sup style={{ fontSize: '0.75em' }}>x</sup>5
               </Typography>
               <EmojiEventsIcon color="warning" sx={{ ml: 1 }} />
             </Box>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
-              ${pricing.elite[billingCycle]}
+              ${pricing.repx5[billingCycle]}
               <Typography component="span" variant="body1" color="text.secondary">
                 /{billingCycle === 'monthly' ? 'mo' : 'yr'}
               </Typography>
             </Typography>
             {billingCycle === 'annual' && (
               <Typography variant="body2" color="success.main" sx={{ mb: 2 }}>
-                Save ${getSavings('elite').savings}/year
+                Save ${getSavings('repx5').savings}/year
               </Typography>
             )}
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
-              Your personal AI-powered sales acceleration team
+              The complete Enhanced Rep experience
             </Typography>
             
             <Divider sx={{ my: 2 }} />
             
             <List dense sx={{ flexGrow: 1 }}>
-              {pricing.elite.features.basic.map((feature, index) => (
+              {pricing.repx5.features.basic.map((feature, index) => (
                 <ListItem key={index} disableGutters>
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="success" fontSize="small" />
@@ -574,9 +570,9 @@ const Subscribe: React.FC = () => {
                 </ListItem>
               ))}
               
-              {pricing.elite.features.premium.length > 0 && (
+              {pricing.repx5.features.premium.length > 0 && (
                 <>
-                  {pricing.elite.features.premium.map((feature, index) => (
+                  {pricing.repx5.features.premium.map((feature, index) => (
                     <ListItem key={`premium-${index}`} disableGutters>
                       <ListItemIcon sx={{ minWidth: 36 }}>
                         <EmojiEventsIcon color="warning" fontSize="small" />
@@ -605,9 +601,9 @@ const Subscribe: React.FC = () => {
                   backgroundColor: theme.palette.warning.dark,
                 }
               }}
-              onClick={() => handleSubscribe('elite')}
+              onClick={() => handleSubscribe('repx5')}
             >
-              Go Elite
+              Get Rep<sup style={{ fontSize: '0.75em' }}>x</sup>5
             </Button>
           </Paper>
         </Grid>
