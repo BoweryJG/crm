@@ -48,6 +48,8 @@ import { RepSpheresAppSwitcher } from '../common/RepSpheresAppSwitcher';
 import ThemeToggle from '../ui/ThemeToggle';
 import { getUserDisplayName, getUserInitials } from '../../utils/userHelpers';
 import SculpturalMenuToggle from './SculpturalMenuToggle';
+import EmailLauncher from '../email/EmailLauncher';
+import { useEmailClient } from '../../hooks/useEmailClient';
 import { useSound } from '../../hooks/useSound';
 import EmailSyncButton from '../email/EmailSyncButton';
 
@@ -369,6 +371,10 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
   const [signupOpen, setSignupOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [unreadCount, setUnreadCount] = useState(mockNotifications.filter(n => n.unread).length);
+  
+  // Email client integration - temporarily disabled for build
+  // const { unreadCount: emailUnreadCount } = useEmailClient();
+  const emailUnreadCount = 0;
   
   const open = Boolean(anchorEl);
   const usesSculpturalDesign = themeMode === 'gallery-dominance' || location.pathname.startsWith('/command-room');
@@ -771,6 +777,18 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
         setSignupOpen(false);
         window.location.reload();
       }} />
+
+    {/* Revolutionary Email Client Launcher */}
+    {user && (
+      <EmailLauncher
+        position="bottom-right"
+        unreadCount={emailUnreadCount}
+        onEmailSent={(emailData) => {
+          console.log('Email sent from header launcher:', emailData);
+          notificationSound.play();
+        }}
+      />
+    )}
     </>
   );
 };

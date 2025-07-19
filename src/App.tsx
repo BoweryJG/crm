@@ -14,6 +14,7 @@ import { SUISProvider } from './suis';
 import { logger } from './utils/logger';
 import { initSentry, Sentry } from './utils/sentry';
 import { SoundProvider } from './contexts/SoundContext';
+import { EmailProvider } from './hooks/useEmailClient';
 import SphereLoadingScreen from './components/common/SphereLoadingScreen';
 import PremiumLoadingScreen from './components/common/PremiumLoadingScreen';
 import StandaloneEliteLoadingScreen from './components/common/StandaloneEliteLoadingScreen';
@@ -124,8 +125,9 @@ const App: React.FC = () => {
       <SoundProvider>
         <ErrorBoundary>
           <AuthProvider>
-            <SUISProvider supabaseUrl={supabaseUrl} supabaseAnonKey={supabaseAnonKey}>
-                <AppModeProvider>
+            <EmailProvider>
+              <SUISProvider supabaseUrl={supabaseUrl} supabaseAnonKey={supabaseAnonKey}>
+                  <AppModeProvider>
                   <NotificationProvider>
                     <DashboardDataProvider>
                       <CssBaseline />
@@ -235,6 +237,7 @@ const App: React.FC = () => {
                   </NotificationProvider>
                 </AppModeProvider>
               </SUISProvider>
+            </EmailProvider>
           </AuthProvider>
         </ErrorBoundary>
       </SoundProvider>

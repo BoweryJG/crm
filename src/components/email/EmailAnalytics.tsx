@@ -42,9 +42,9 @@ import {
   TrendingDown as TrendingDownIcon,
   Email as EmailIcon,
   OpenInNew as OpenIcon,
-  MouseIcon,
-  BounceIcon,
-  ReportIcon,
+  TouchApp as MouseIcon,
+  TrendingUp as BounceIcon,
+  Assessment as ReportIcon,
   Unsubscribe as UnsubscribeIcon,
   Schedule as ScheduleIcon,
   Speed as SpeedIcon,
@@ -84,8 +84,7 @@ import {
   CartesianGrid,
   Tooltip as ChartTooltip,
   Legend,
-  ResponsiveContainer,
-  RechartsTooltip
+  ResponsiveContainer
 } from 'recharts';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useAuth } from '../../auth';
@@ -353,10 +352,10 @@ const EmailAnalytics: React.FC<EmailAnalyticsProps> = ({
 
       const [realTime, campaign, contact, intelligence] = await Promise.all(promises);
 
-      setRealTimeMetrics(realTime);
-      setCampaignAnalytics(campaign);
-      setContactEngagement(contact);
-      setEmailIntelligence(intelligence);
+      setRealTimeMetrics(realTime as RealTimeMetrics | null);
+      setCampaignAnalytics(campaign as CampaignAnalytics | null);
+      setContactEngagement(contact as ContactEngagement | null);
+      setEmailIntelligence(intelligence as EmailIntelligence | null);
 
     } catch (err) {
       console.error('Error loading analytics data:', err);
@@ -1076,7 +1075,7 @@ const EmailAnalytics: React.FC<EmailAnalyticsProps> = ({
                                 <Grid item xs={12} md={4}>
                                   <Box sx={{ textAlign: 'center' }}>
                                     <Typography variant="h4" color="success">
-                                      {emailIntelligence.content_analysis.optimal_length}
+                                      {emailIntelligence.content_analysis.content_length_analysis.optimal_length}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
                                       Optimal Length (words)

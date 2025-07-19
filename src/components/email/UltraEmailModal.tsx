@@ -84,7 +84,11 @@ import {
   VolumeUp as VolumeUpIcon,
   VolumeOff as VolumeOffIcon,
   Vibration as VibrationIcon,
-  FlashOn as FlashOnIcon
+  FlashOn as FlashOnIcon,
+  Insights as InsightsIcon,
+  Public as PublicIcon,
+  AccessTime as AccessTimeIcon,
+  Analytics as AnalyticsIcon
 } from '@mui/icons-material';
 import { keyframes, styled } from '@mui/material/styles';
 import { useThemeContext } from '../../themes/ThemeContext';
@@ -99,6 +103,9 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import SmartComposer from './SmartComposer';
 import InstantTranslator from './InstantTranslator';
+import EmailAnalytics from './EmailAnalytics';
+import GlobalTemplateLibrary from './GlobalTemplateLibrary';
+import SendOptimizer from './SendOptimizer';
 
 // Award-winning floating glass animations
 const ultraFloatingGlass = keyframes`
@@ -417,6 +424,12 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
   const [queuedForRetry, setQueuedForRetry] = useState(false);
   const [backendStatus, setBackendStatus] = useState<'unknown' | 'online' | 'offline'>('unknown');
   const [retryAttempts, setRetryAttempts] = useState(0);
+  
+  // New component states
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showTemplateLibrary, setShowTemplateLibrary] = useState(false);
+  const [showSendOptimizer, setShowSendOptimizer] = useState(false);
+  const [optimalSendTime, setOptimalSendTime] = useState<Date | null>(null);
   
   // Refs
   const modalRef = useRef<HTMLDivElement>(null);
@@ -911,6 +924,10 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
     setIsMinimized(false);
     setShowAdvanced(false);
     setTabValue(0);
+    setOptimalSendTime(null);
+    setShowAnalytics(false);
+    setShowTemplateLibrary(false);
+    setShowSendOptimizer(false);
     if (soundEnabled) secondaryButtonSound.play();
     onClose();
   };
@@ -1034,6 +1051,57 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Templates Quick Access */}
+            <Tooltip title="Global Templates">
+              <IconButton
+                size="small"
+                onClick={() => setTabValue(3)}
+                sx={{
+                  color: tabValue === 3 ? theme.palette.primary.main : 'text.secondary',
+                  backgroundColor: tabValue === 3 ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
+                  border: `1px solid ${tabValue === 3 ? alpha(theme.palette.primary.main, 0.2) : 'transparent'}`,
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <PublicIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+
+            {/* Send Optimizer Quick Access */}
+            <Tooltip title="Send Time Optimizer">
+              <IconButton
+                size="small"
+                onClick={() => setTabValue(4)}
+                sx={{
+                  color: tabValue === 4 ? theme.palette.warning.main : 'text.secondary',
+                  backgroundColor: tabValue === 4 ? alpha(theme.palette.warning.main, 0.1) : 'transparent',
+                  border: `1px solid ${tabValue === 4 ? alpha(theme.palette.warning.main, 0.2) : 'transparent'}`,
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <AccessTimeIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+
+            {/* Analytics Quick Access */}
+            <Tooltip title="Email Analytics">
+              <IconButton
+                size="small"
+                onClick={() => setTabValue(5)}
+                sx={{
+                  color: tabValue === 5 ? theme.palette.info.main : 'text.secondary',
+                  backgroundColor: tabValue === 5 ? alpha(theme.palette.info.main, 0.1) : 'transparent',
+                  border: `1px solid ${tabValue === 5 ? alpha(theme.palette.info.main, 0.2) : 'transparent'}`,
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <AnalyticsIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+
             {/* AI Assistant Toggle */}
             <Tooltip title="AI Assistant (Ctrl+Shift+A)">
               <IconButton
@@ -1398,12 +1466,14 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
                 <Tabs
                   value={tabValue}
                   onChange={(_, newValue) => setTabValue(newValue)}
-                  variant="fullWidth"
+                  variant={isMobile ? 'scrollable' : 'fullWidth'}
+                  scrollButtons="auto"
                   sx={{
                     borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                     '& .MuiTab-root': {
                       borderRadius: '12px 12px 0 0',
-                      margin: '0 4px',
+                      margin: '0 2px',
+                      minWidth: isMobile ? 120 : 'auto',
                       '&.Mui-selected': {
                         backgroundColor: alpha(theme.palette.primary.main, 0.1),
                       }
@@ -1417,12 +1487,27 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
                   />
                   <Tab
                     icon={<SmartToyIcon />}
-                    label="Smart Composer"
+                    label="Smart"
                     sx={{ minHeight: 48 }}
                   />
                   <Tab
                     icon={<TranslateIcon />}
-                    label="Translator"
+                    label="Translate"
+                    sx={{ minHeight: 48 }}
+                  />
+                  <Tab
+                    icon={<PublicIcon />}
+                    label="Templates"
+                    sx={{ minHeight: 48 }}
+                  />
+                  <Tab
+                    icon={<AccessTimeIcon />}
+                    label="Optimizer"
+                    sx={{ minHeight: 48 }}
+                  />
+                  <Tab
+                    icon={<AnalyticsIcon />}
+                    label="Analytics"
                     sx={{ minHeight: 48 }}
                   />
                 </Tabs>
@@ -1556,6 +1641,60 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
                       showQualityIndicators={true}
                       defaultSourceLang="auto"
                       defaultTargetLang="es"
+                    />
+                  </Box>
+                </TabPanel>
+
+                <TabPanel value={tabValue} index={3}>
+                  {/* Global Template Library */}
+                  <Box sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                    <GlobalTemplateLibrary
+                      open={true}
+                      onClose={() => {}}
+                      onSelectTemplate={(template) => {
+                        setSubject(template.subject);
+                        setBody(template.html_content || template.text_content || '');
+                        if (soundEnabled) notificationSound.success();
+                        setTabValue(0); // Switch back to compose tab
+                      }}
+                      selectedCategory={undefined}
+                      selectedCulture={undefined}
+                    />
+                  </Box>
+                </TabPanel>
+
+                <TabPanel value={tabValue} index={4}>
+                  {/* Send Time Optimizer */}
+                  <Box sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                    <SendOptimizer
+                      recipientEmails={[...to, ...cc, ...bcc]}
+                      subject={subject}
+                      content={body}
+                      onOptimalTimeSelected={(dateTime) => {
+                        setOptimalSendTime(dateTime);
+                        setScheduled(true);
+                        setScheduleDate(dateTime.toISOString().slice(0, 16));
+                        if (soundEnabled) notificationSound.success();
+                      }}
+                      onScheduleRecommendation={(recommendation) => {
+                        console.log('Schedule recommendation received:', recommendation);
+                        if (soundEnabled) notificationSound.info();
+                      }}
+                      showAdvancedSettings={true}
+                    />
+                  </Box>
+                </TabPanel>
+
+                <TabPanel value={tabValue} index={5}>
+                  {/* Email Analytics Dashboard */}
+                  <Box sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                    <EmailAnalytics
+                      open={true}
+                      onClose={() => {}}
+                      campaignId={undefined}
+                      contactId={contact?.id}
+                      timeRange="24h"
+                      refreshInterval={30000}
                     />
                   </Box>
                 </TabPanel>
