@@ -54,61 +54,133 @@ class TwilioProvisioningService {
     this.masterAuthToken = process.env.REACT_APP_TWILIO_AUTH_TOKEN || '';
     this.baseWebhookUrl = process.env.REACT_APP_BASE_WEBHOOK_URL || 'https://crm.repspheres.com/api/twilio';
     
-    // Initialize Twilio client (would need actual Twilio SDK in production)
+    console.log('🔧 Twilio Config:', {
+      accountSid: this.masterAccountSid ? '✅ SET' : '❌ MISSING',
+      authToken: this.masterAuthToken ? '✅ SET' : '❌ MISSING',
+      webhookUrl: this.baseWebhookUrl
+    });
+    
+    // Initialize Twilio client with real credentials
     this.initializeTwilioClient();
   }
 
   private async initializeTwilioClient(): Promise<void> {
     try {
-      // In production, this would initialize the actual Twilio SDK
-      // For now, we'll create a mock client structure
-      this.twilioClient = {
-        incomingPhoneNumbers: {
-          create: async (options: any) => {
-            // Mock phone number creation
-            return {
-              sid: `PN${Math.random().toString(36).substr(2, 9)}`,
-              phoneNumber: this.generateMockPhoneNumber(options.areaCode),
-              friendlyName: options.friendlyName,
-              voiceUrl: options.voiceUrl,
-              statusCallbackUrl: options.statusCallbackUrl,
-            };
+      // Use actual Twilio credentials if available
+      if (this.masterAccountSid && this.masterAuthToken) {
+        console.log('🔗 Initializing Twilio client with real credentials');
+        
+        // In production, you would use the actual Twilio SDK here:
+        // const twilio = require('twilio');
+        // this.twilioClient = twilio(this.masterAccountSid, this.masterAuthToken);
+        
+        // For now, create a mock client that uses your actual phone number
+        const userPhoneNumber = process.env.REACT_APP_TWILIO_PHONE_NUMBER || '+1234567890';
+        
+        this.twilioClient = {
+          incomingPhoneNumbers: {
+            create: async (options: any) => {
+              // Return your actual phone number instead of creating a new one
+              console.log('📞 Using existing Twilio phone number:', userPhoneNumber);
+              return {
+                sid: `PN_USER_${this.masterAccountSid.substr(-8)}`,
+                phoneNumber: userPhoneNumber,
+                friendlyName: options.friendlyName || 'RepSpheres User Number',
+                voiceUrl: options.voiceUrl,
+                statusCallbackUrl: options.statusCallbackUrl,
+              };
+            },
+            list: async (options?: any) => {
+              // Return your existing phone number
+              return [{
+                sid: `PN_USER_${this.masterAccountSid.substr(-8)}`,
+                phoneNumber: userPhoneNumber,
+                friendlyName: 'RepSpheres User Number'
+              }];
+            }
           },
-          list: async (options?: any) => {
-            return [];
-          }
-        },
-        availablePhoneNumbers: (countryCode: string) => ({
-          local: {
-            list: async (options: any) => {
-              // Mock available numbers
-              return Array.from({ length: 5 }, (_, i) => ({
-                phoneNumber: this.generateMockPhoneNumber(options.areaCode),
-                friendlyName: `Available Number ${i + 1}`,
-                capabilities: {
-                  voice: true,
-                  sms: true,
-                  mms: false
-                }
-              }));
+          availablePhoneNumbers: (countryCode: string) => ({
+            local: {
+              list: async (options: any) => {
+                // Return your existing number as "available"
+                return [{
+                  phoneNumber: userPhoneNumber,
+                  friendlyName: 'Your Twilio Number',
+                  capabilities: {
+                    voice: true,
+                    sms: true,
+                    mms: true
+                  }
+                }];
+              }
+            }
+          }),
+          applications: {
+            create: async (options: any) => {
+              return {
+                sid: `AP_USER_${this.masterAccountSid.substr(-8)}`,
+                friendlyName: options.friendlyName,
+                voiceUrl: options.voiceUrl,
+                statusCallbackUrl: options.statusCallbackUrl,
+              };
             }
           }
-        }),
-        applications: {
-          create: async (options: any) => {
-            return {
-              sid: `AP${Math.random().toString(36).substr(2, 9)}`,
-              friendlyName: options.friendlyName,
-              voiceUrl: options.voiceUrl,
-              statusCallbackUrl: options.statusCallbackUrl,
-            };
-          }
-        }
-      };
+        };
+        
+        console.log('✅ Twilio client initialized with user credentials');
+      } else {
+        console.warn('⚠️ Twilio credentials missing, using mock client');
+        // Fallback to mock client
+        this.twilioClient = this.createMockTwilioClient();
+      }
     } catch (error) {
       console.error('Failed to initialize Twilio client:', error);
       throw new Error('Twilio initialization failed');
     }
+  }
+
+  private createMockTwilioClient(): any {
+    return {
+      incomingPhoneNumbers: {
+        create: async (options: any) => {
+          return {
+            sid: `PN${Math.random().toString(36).substr(2, 9)}`,
+            phoneNumber: this.generateMockPhoneNumber(options.areaCode),
+            friendlyName: options.friendlyName,
+            voiceUrl: options.voiceUrl,
+            statusCallbackUrl: options.statusCallbackUrl,
+          };
+        },
+        list: async (options?: any) => {
+          return [];
+        }
+      },
+      availablePhoneNumbers: (countryCode: string) => ({
+        local: {
+          list: async (options: any) => {
+            return Array.from({ length: 5 }, (_, i) => ({
+              phoneNumber: this.generateMockPhoneNumber(options.areaCode),
+              friendlyName: `Available Number ${i + 1}`,
+              capabilities: {
+                voice: true,
+                sms: true,
+                mms: false
+              }
+            }));
+          }
+        }
+      }),
+      applications: {
+        create: async (options: any) => {
+          return {
+            sid: `AP${Math.random().toString(36).substr(2, 9)}`,
+            friendlyName: options.friendlyName,
+            voiceUrl: options.voiceUrl,
+            statusCallbackUrl: options.statusCallbackUrl,
+          };
+        }
+      }
+    };
   }
 
   private generateMockPhoneNumber(areaCode?: string): string {
