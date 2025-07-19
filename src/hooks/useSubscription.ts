@@ -186,8 +186,8 @@ export const useSubscription = (): SubscriptionHookReturn => {
       };
 
       data?.forEach(record => {
-        if (usageStats.hasOwnProperty(record.feature_type)) {
-          usageStats[record.feature_type as keyof typeof usageStats] += record.usage_count || 1;
+        if (record.feature_type in usageStats && typeof usageStats[record.feature_type as keyof typeof usageStats] === 'number') {
+          (usageStats[record.feature_type as keyof typeof usageStats] as number) += record.usage_count || 1;
         }
       });
 
