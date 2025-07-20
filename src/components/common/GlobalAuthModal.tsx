@@ -25,7 +25,7 @@ import {
   AutoAwesome,
   Fingerprint
 } from '@mui/icons-material';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { keyframes } from '@mui/system';
 
 // Subtle animations
@@ -65,7 +65,8 @@ export default function GlobalAuthModal({ open, onClose, onSuccess }: GlobalAuth
   const { 
     signInWithEmail, 
     signUpWithEmail,
-    signInWithProvider 
+    signInWithGoogle, 
+    signInWithFacebook 
   } = useAuth();
 
   // Reset state when modal opens/closes
@@ -109,7 +110,11 @@ export default function GlobalAuthModal({ open, onClose, onSuccess }: GlobalAuth
     setError('');
     
     try {
-      await signInWithProvider(provider);
+      if (provider === 'google') {
+        await signInWithGoogle();
+      } else {
+        await signInWithFacebook();
+      }
       onSuccess?.();
       onClose();
     } catch (error: any) {
@@ -146,9 +151,7 @@ export default function GlobalAuthModal({ open, onClose, onSuccess }: GlobalAuth
       <Box
         sx={{
           position: 'relative',
-          background: theme.palette.mode === 'dark' 
-            ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)'
-            : 'linear-gradient(135deg, #f5f5f5 0%, #e3e3e3 100%)',
+          background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
           border: '1px solid',
           borderColor: 'rgba(0, 255, 198, 0.3)',
           borderRadius: 4,
@@ -190,9 +193,7 @@ export default function GlobalAuthModal({ open, onClose, onSuccess }: GlobalAuth
             position: 'absolute',
             top: 16,
             right: 16,
-            color: theme.palette.mode === 'dark' 
-              ? 'rgba(255, 255, 255, 0.7)' 
-              : 'rgba(0, 0, 0, 0.7)',
+            color: 'rgba(255, 255, 255, 0.7)',
             zIndex: 1,
             '&:hover': {
               color: '#00ffc6',
@@ -211,9 +212,9 @@ export default function GlobalAuthModal({ open, onClose, onSuccess }: GlobalAuth
             <Typography 
               variant="h5" 
               sx={{ 
-                color: theme.palette.mode === 'dark' ? '#fff' : '#000',
+                color: '#fff',
                 fontWeight: 700,
-                background: 'linear-gradient(135deg, #00ffc6 0%, #7B42F6 100%)',
+                background: 'linear-gradient(135deg, #fff 0%, #00ffc6 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
@@ -221,16 +222,14 @@ export default function GlobalAuthModal({ open, onClose, onSuccess }: GlobalAuth
                 backgroundSize: '200% 200%',
               }}
             >
-              RepSpheres CRM
+              RepSpheres
             </Typography>
           </Stack>
 
           <Typography 
             variant="body2" 
             sx={{ 
-              color: theme.palette.mode === 'dark' 
-                ? 'rgba(255, 255, 255, 0.8)' 
-                : 'rgba(0, 0, 0, 0.8)',
+              color: 'rgba(255, 255, 255, 0.8)',
               mb: 3
             }}
           >

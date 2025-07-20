@@ -6,6 +6,8 @@ import { logger } from '../utils/logger';
 
 interface AuthContextType extends AuthState {
   signInWithProvider: (provider: AuthProviderType, options?: SignInOptions) => Promise<void>;
+  signInWithGoogle: (intendedPath?: string | null) => Promise<void>;
+  signInWithFacebook: (intendedPath?: string | null) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string, metadata?: any) => Promise<void>;
   signOut: () => Promise<void>;
@@ -118,15 +120,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      // Use local domain for OAuth redirect
-      const redirectUrl = `${window.location.origin}/auth/callback`;
+      // Use RepSpheres central auth for cross-domain functionality
+      const destination = sessionStorage.getItem('intendedDestination') || options?.redirectTo;
+      const redirectUrl = destination 
+        ? `https://repspheres.com/auth/callback?redirect=${encodeURIComponent(destination)}`
+        : `https://repspheres.com/auth/callback`;
       
       logger.debug('OAuth sign in - redirect URL:', redirectUrl);
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: provider as any,
         options: {
-          redirectTo: options?.redirectTo || redirectUrl,
+          redirectTo: redirectUrl,
           scopes: options?.scopes,
           queryParams: options?.queryParams,
         },
@@ -145,6 +150,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       throw error;
     }
   }, []);
+
+  const signInWithGoogle = useCallback(async (intendedPath?: string | null) => {
+    if (intendedPath) {
+      sessionStorage.setItem('intendedDestination', intendedPath);
+    }
+    await signInWithProvider('google');
+  }, [signInWithProvider]);
+
+  const signInWithFacebook = useCallback(async (intendedPath?: string | null) => {
+    if (intendedPath) {
+      sessionStorage.setItem('intendedDestination', intendedPath);
+    }
+    await signInWithProvider('facebook');
+  }, [signInWithProvider]);
 
   const signInWithEmail = useCallback(async (email: string, password: string) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
@@ -296,6 +315,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value: AuthContextType = {
     ...state,
     signInWithProvider,
+    signInWithGoogle,
+    signInWithFacebook,
     signInWithEmail,
     signUpWithEmail,
     signOut,
