@@ -42,7 +42,7 @@ import {
   Zap,
   Award
 } from 'lucide-react';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useSUISFeatures } from '../hooks/useSUISFeatures';
 import { PredictiveInsight, PerformanceMetrics } from '../types';

@@ -36,7 +36,7 @@ import {
 } from '@mui/icons-material';
 import { supabase } from '../../services/supabase/supabase';
 import { callContact, disconnectCall, initializeTwilioDevice, initiateServerCall } from '../../services/twilio/twilioService';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { Contact } from '../../types/models';
 import mockDataService from '../../services/mockData/mockDataService';
 import { useAppMode } from '../../contexts/AppModeContext';

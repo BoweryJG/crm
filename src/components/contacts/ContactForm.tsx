@@ -26,7 +26,7 @@ import {
 import { Contact } from '../../types/models';
 import { validateField, sanitize, ValidationRules } from '../../utils/validation';
 import { supabase } from '../../services/supabase/supabase';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useAppMode } from '../../contexts/AppModeContext';
 import { ValidationFeedback, ValidationSummary } from './ValidationFeedback';
 import { logger } from '../../utils/logger';

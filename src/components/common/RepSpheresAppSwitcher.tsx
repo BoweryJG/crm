@@ -16,7 +16,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import BrushIcon from '@mui/icons-material/Brush';
 import PodcastsIcon from '@mui/icons-material/Podcasts';
 import HomeIcon from '@mui/icons-material/Home';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 
 interface AppItem {
   name: string;

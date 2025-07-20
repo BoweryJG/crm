@@ -1,0 +1,980 @@
+{
+  "debug": [
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/common/AuthDebugCRM.tsx",
+      "line": 20,
+      "content": "console.log('Auth Debug Result:', result);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/middleware/auth.js",
+      "line": 20,
+      "content": "console.log(`[AUTH DEBUG] ${message}`, data || '');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/utils/simpleAuth.js",
+      "line": 117,
+      "content": "console.log('=== Simple Auth Debug ===');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/utils/simpleAuth.js",
+      "line": 123,
+      "content": "console.log('========================');"
+    }
+  ],
+  "info": [
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/scripts/setupApiKeys.ts",
+      "line": 95,
+      "content": "console.log('API keys table setup completed successfully!');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/billing/BillingReceiptService.ts",
+      "line": 60,
+      "content": "console.log(`✅ Receipt sent successfully to ${receiptData.rep_email}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/billing/BillingReceiptService.ts",
+      "line": 422,
+      "content": "console.log(`✅ Bulk receipt sending completed: ${sent} sent, ${failed} failed`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/CallRecordingService.ts",
+      "line": 82,
+      "content": "console.log(`📝 Transcription completed with ${transcriptionResult.segments.length} segments`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/CallRecordingService.ts",
+      "line": 86,
+      "content": "console.log(`🤖 AI analysis completed with ${aiAnalysis.conversion_likelihood}% conversion likelihood`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/CallRecordingService.ts",
+      "line": 111,
+      "content": "console.log(`✅ Call processing completed in ${processingDuration}ms`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 57,
+      "content": "console.log(`📊 Initialized personal dashboard`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 78,
+      "content": "console.log(`✅ Onboarding completed in ${duration}ms`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 250,
+      "content": "console.log(`Data structure setup completed for rep ${userId}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 130,
+      "content": "console.log('✅ Twilio client initialized with user credentials');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 251,
+      "content": "console.log(`🤖 Initialized AI models for rep`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 253,
+      "content": "console.log(`✅ Successfully provisioned rep ${options.rep_id} in ${Date.now()}ms`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/contentTemplates.ts",
+      "line": 416,
+      "content": "console.log('Content templates initialized successfully');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/AutomationEmailBridge.ts",
+      "line": 110,
+      "content": "console.log('🌉 AutomationEmailBridge initialized successfully');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/AutomationEmailBridge.ts",
+      "line": 455,
+      "content": "console.log(`📈 Updated metrics for automation ${automationId}: ${success ? 'success' : 'failure'}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/EmailAutomationEngine.ts",
+      "line": 125,
+      "content": "console.log('🚀 EmailAutomationEngine initialized successfully');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/emailService.ts",
+      "line": 199,
+      "content": "console.log(`Retry successful for email: ${email.subject}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/emailService.ts",
+      "line": 256,
+      "content": "console.log(`Email service initialized with ${this.accounts.length} accounts`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/HybridEmailOnboardingService.ts",
+      "line": 41,
+      "content": "console.log('✅ SMTP setup guided successfully');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/TriggerManager.ts",
+      "line": 88,
+      "content": "console.log('🎯 TriggerManager initialized successfully');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/research/automationService.ts",
+      "line": 47,
+      "content": "console.log(`Successfully triggered automation workflow ${workflowId} for document ${documentId}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/research/automationService.ts",
+      "line": 143,
+      "content": "console.log(`Successfully cancelled automation workflow for document ${documentId}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/twilio/twilioService.ts",
+      "line": 315,
+      "content": "console.log('Successfully obtained token from local development server');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/twilio/twilioService.ts",
+      "line": 335,
+      "content": "console.log('Successfully obtained token from Netlify function');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 13,
+      "content": "console.log('✅ Health check successful:', healthResponse.data);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 22,
+      "content": "console.log('✅ Webhook test successful!');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 28,
+      "content": "console.log('✅ Usage endpoint test successful:', usageResponse.data);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 30,
+      "content": "console.log('\\nAll tests passed! 🎉 Your frontend is successfully connected to the backend.');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/communications/GlobalCallPanel.tsx",
+      "line": 197,
+      "content": "console.log('Call analysis completed');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/contacts/ContactUniverse.tsx",
+      "line": 153,
+      "content": "console.log('Batch created successfully:', batch);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/content/ContentGenerator.tsx",
+      "line": 300,
+      "content": "console.log('Ripple sent successfully:', result.ripple_url);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/email/UltraEmailModal.tsx",
+      "line": 875,
+      "content": "console.log(`Successfully sent ${successCount} emails with tracking enabled`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/hooks/useEmailClient.tsx",
+      "line": 101,
+      "content": "console.log('Email sent successfully:', result);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/TranslationService.tsx",
+      "line": 230,
+      "content": "console.log('Translation service initialized successfully');"
+    }
+  ],
+  "critical": [
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/HybridEmailOnboardingService.ts",
+      "line": 71,
+      "content": "console.log('OAuth silent attempt failed (expected):', error);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/ripple/RippleViewer.tsx",
+      "line": 366,
+      "content": "console.log('Share cancelled or failed');"
+    }
+  ],
+  "temporary": [
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/api/twilioWebhooks.ts",
+      "line": 12,
+      "content": "console.log('Recording webhook received:', req.body);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/api/twilioWebhooks.ts",
+      "line": 62,
+      "content": "console.log('Call status webhook received:', req.body);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/scripts/setupApiKeys.ts",
+      "line": 11,
+      "content": "console.log('Setting up API keys table...');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/analytics/regionalAnalyticsService.ts",
+      "line": 136,
+      "content": "console.log('No companies found in database, using fallback data');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/billing/BillingReceiptService.ts",
+      "line": 36,
+      "content": "console.log(`📧 Sending calling platform receipt to ${receiptData.rep_email}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/billing/BillingReceiptService.ts",
+      "line": 367,
+      "content": "console.log('📧 Starting bulk receipt sending...');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/callAnalysis/callAnalysisService.ts",
+      "line": 30,
+      "content": "console.log('Falling back to mock call analyses data');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/callAnalysis/callAnalysisService.ts",
+      "line": 38,
+      "content": "console.log('Falling back to mock call analyses data');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/CallRecordingService.ts",
+      "line": 67,
+      "content": "console.log(`🎬 Starting call recording processing for ${callSid}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/CallRecordingService.ts",
+      "line": 78,
+      "content": "console.log(`📥 Retrieved recording URL: ${recordingUrl}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/CallRecordingService.ts",
+      "line": 459,
+      "content": "console.log(`🎯 Generated coaching session for rep ${repId}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 34,
+      "content": "console.log(`🚀 Starting automated onboarding for user ${userId}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 39,
+      "content": "console.log(`👤 Created rep profile for ${repProfile.full_name}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 53,
+      "content": "console.log(`📞 Provisioned phone number: ${twilioConfig.phone_number}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 61,
+      "content": "console.log(`🗄️ Set up data structure and permissions`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 65,
+      "content": "console.log(`👋 Created welcome data and tutorials`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 69,
+      "content": "console.log(`📧 Sent welcome notification`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 73,
+      "content": "console.log(`📧 Sent billing receipt`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 302,
+      "content": "console.log('Created sample contacts for new rep');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 378,
+      "content": "console.log(`Welcome notification sent to ${repProfile.email}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 435,
+      "content": "console.log(`✅ Billing receipt sent to ${repProfile.email} for ${subscriptionData.plan_type} plan ($${subscriptionData.amount})`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/RepOnboardingService.ts",
+      "line": 569,
+      "content": "console.log(`🔄 Retrying onboarding for user ${userId}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 57,
+      "content": "console.log('🔧 Twilio Config:', {"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 71,
+      "content": "console.log('🔗 Initializing Twilio client with real credentials');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 84,
+      "content": "console.log('📞 Using existing Twilio phone number:', userPhoneNumber);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 198,
+      "content": "console.log(`🚀 Starting automatic provisioning for rep ${options.rep_id}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 203,
+      "content": "console.log(`✅ Rep ${options.rep_id} already provisioned`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 218,
+      "content": "console.log(`📞 Selected phone number: ${selectedNumber.phoneNumber}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 222,
+      "content": "console.log(`📱 Created TwiML application: ${twimlApp.sid}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 230,
+      "content": "console.log(`💳 Purchased phone number: ${phoneNumberResource.phoneNumber}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 247,
+      "content": "console.log(`💾 Saved rep configuration to database`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 465,
+      "content": "console.log(`📵 Suspended calling for rep ${repId}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/calling/TwilioProvisioningService.ts",
+      "line": 486,
+      "content": "console.log(`📞 Reactivated calling for rep ${repId}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/contentEngagementNotificationService.ts",
+      "line": 598,
+      "content": "console.log('Sending in-app notification:', notification.title);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/contentEngagementNotificationService.ts",
+      "line": 603,
+      "content": "console.log('Sending email notification:', notification.title);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/contentEngagementNotificationService.ts",
+      "line": 608,
+      "content": "console.log('Sending SMS notification:', notification.title);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/contentEngagementNotificationService.ts",
+      "line": 613,
+      "content": "console.log('Sending push notification:', notification.title);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/contentEngagementNotificationService.ts",
+      "line": 651,
+      "content": "console.log('Triggering hot lead automation for:', notification.prospect_info.practice_name);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/AutomationEmailBridge.ts",
+      "line": 445,
+      "content": "console.log('📊 Email tracking recorded:', trackingRecord);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/emailService.ts",
+      "line": 172,
+      "content": "console.log('Email service: Back online, processing retry queue');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/emailService.ts",
+      "line": 177,
+      "content": "console.log('Email service: Offline mode activated');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/emailService.ts",
+      "line": 297,
+      "content": "console.log('Email queued for retry when online');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/emailService.ts",
+      "line": 927,
+      "content": "console.log('Email service cache cleared');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/emailService.ts",
+      "line": 959,
+      "content": "console.log('Daily email counts reset');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/emailService.ts",
+      "line": 968,
+      "content": "console.log('Email service destroyed');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/gmailSyncService.ts",
+      "line": 221,
+      "content": "console.log('Demo mode: Retrieved', messages.length, 'emails');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/HybridEmailOnboardingService.ts",
+      "line": 25,
+      "content": "console.log(`🚀 Starting automated email onboarding for ${workEmail}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/HybridEmailOnboardingService.ts",
+      "line": 30,
+      "content": "console.log('✅ OAuth succeeded - no manual setup needed');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/HybridEmailOnboardingService.ts",
+      "line": 230,
+      "content": "console.log('📧 Created guided setup notification');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/gmail/gmailApiService.ts",
+      "line": 76,
+      "content": "console.log('No authenticated user - skipping token load');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/magicLinkContentService.ts",
+      "line": 459,
+      "content": "console.log('Sending email with magic link:', {"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/rippleContentService.ts",
+      "line": 514,
+      "content": "console.log('Sending Ripple email:', {"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/rippleContentService.ts",
+      "line": 729,
+      "content": "console.log('Triggering Ripple notification:', { rippleId, engagement, temperature });"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/supabase/dashboardService.ts",
+      "line": 49,
+      "content": "console.log(`Calculating dashboard metrics from ${tableName} for user: ${userEmail}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/supabase/dashboardService.ts",
+      "line": 80,
+      "content": "console.log('Found contracts:', contracts?.length || 0);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/supabase/dashboardService.ts",
+      "line": 95,
+      "content": "console.log(`Contract revenue: ${contract.contract_name} - $${monthlyRevenue}/month = $${monthlyRevenue * 12}/year`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/supabase/dashboardService.ts",
+      "line": 118,
+      "content": "console.log('Found Greg Pedro - adding $24,000 annual revenue');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/supabase/dashboardService.ts",
+      "line": 126,
+      "content": "console.log('Found Emmanuel - adding $12,000 estimated revenue');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/supabase/dashboardService.ts",
+      "line": 183,
+      "content": "console.log('Calculated real dashboard metrics:', {"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/supabase/hooks/useMissionStatus.ts",
+      "line": 78,
+      "content": "console.log('Mission status update:', payload);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/supabase/hooks/useMissionStatus.ts",
+      "line": 86,
+      "content": "console.log('Subscription status:', status);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/twilio/twilioService.ts",
+      "line": 318,
+      "content": "console.log('Local token server not available, falling back to Netlify function');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/twilio/twilioService.ts",
+      "line": 350,
+      "content": "console.log('Incoming call from:', call.parameters.From);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/suis/hooks/useSUISFeatures.ts",
+      "line": 154,
+      "content": "console.log('New market intelligence:', data);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/suis/hooks/useSUISSafe.ts",
+      "line": 239,
+      "content": "initializeSystem: async () => { console.log('Demo mode: initializeSystem'); },"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/suis/hooks/useSUISSafe.ts",
+      "line": 240,
+      "content": "updateIntelligenceProfile: async () => { console.log('Demo mode: updateIntelligenceProfile'); },"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/suis/hooks/useSUISSafe.ts",
+      "line": 241,
+      "content": "fetchMarketIntelligence: async () => { console.log('Demo mode: fetchMarketIntelligence'); },"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/suis/hooks/useSUISSafe.ts",
+      "line": 341,
+      "content": "updateTheme: () => { console.log('Demo mode: updateTheme'); },"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/suis/hooks/useSUISSafe.ts",
+      "line": 342,
+      "content": "markNotificationRead: async () => { console.log('Demo mode: markNotificationRead'); },"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/suis/hooks/useSUISSafe.ts",
+      "line": 343,
+      "content": "subscribeToRealtime: () => { console.log('Demo mode: subscribeToRealtime'); },"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/suis/hooks/useSUISSafe.ts",
+      "line": 344,
+      "content": "unsubscribeFromRealtime: () => { console.log('Demo mode: unsubscribeFromRealtime'); }"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/suis/services/suisNotificationService.ts",
+      "line": 26,
+      "content": "console.log('Notification filtered based on user preferences');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 7,
+      "content": "console.log(`Testing connection to backend at: ${BACKEND_URL}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 11,
+      "content": "console.log('\\nTest 1: Checking backend health endpoint...');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 16,
+      "content": "console.log('\\nTest 2: Testing webhook endpoint...');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 23,
+      "content": "console.log('Response data:', JSON.stringify(webhookResponse.data, null, 2));"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 26,
+      "content": "console.log('\\nTest 3: Testing user/usage endpoint...');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 47,
+      "content": "console.log('\\nTroubleshooting tips:');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 48,
+      "content": "console.log('1. Check if the backend is running and accessible');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 49,
+      "content": "console.log('2. Verify the REACT_APP_BACKEND_URL in your .env.local file');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 50,
+      "content": "console.log('3. Check if your network allows connections to the backend URL');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/testBackendConnection.ts",
+      "line": 51,
+      "content": "console.log('4. Look for any CORS issues in the browser console');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/auth/guards.tsx",
+      "line": 33,
+      "content": "console.log('AuthGuard - Storing return path:', window.location.pathname + window.location.search);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/calling/AdvancedCallInterface.tsx",
+      "line": 464,
+      "content": "console.log('DTMF:', button);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/common/PostLoginRedirect.tsx",
+      "line": 12,
+      "content": "console.log('User logged in, redirecting to dashboard');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/common/SimpleAuthGuard.tsx",
+      "line": 39,
+      "content": "console.log('SimpleAuthGuard: Auth check complete', { loggedIn, allowPublic });"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/contacts/ContactImportModal.tsx",
+      "line": 314,
+      "content": "console.log(`Importing to ${tableName} table for user: ${user.email}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/dashboard/LiveActionTicker.tsx",
+      "line": 147,
+      "content": "handler: () => console.log('Calling Dr. Martinez')"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/dashboard/LiveActionTicker.tsx",
+      "line": 169,
+      "content": "handler: () => console.log('Sending quote')"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/dashboard/LiveActionTicker.tsx",
+      "line": 191,
+      "content": "handler: () => console.log('Calling account')"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/dashboard/LiveActionTicker.tsx",
+      "line": 216,
+      "content": "handler: () => console.log('Scheduling demo')"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/dashboard/LiveActionTicker.tsx",
+      "line": 238,
+      "content": "handler: () => console.log('Calling for reorder')"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/dashboard/LiveActionTicker.tsx",
+      "line": 260,
+      "content": "handler: () => console.log('Sending announcement')"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/email/EmailSyncButton.tsx",
+      "line": 95,
+      "content": "console.log('Gmail authenticated:', profile);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/email/SmartComposer.tsx",
+      "line": 475,
+      "content": "console.log('Applying AI suggestion:', suggestion);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/email/UltraEmailModal.tsx",
+      "line": 457,
+      "content": "console.log('Email modal: Back online');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/email/UltraEmailModal.tsx",
+      "line": 471,
+      "content": "console.log('Email modal: Offline mode');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/email/UltraEmailModal.tsx",
+      "line": 947,
+      "content": "console.log('AI assist:', suggestion);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/email/UltraEmailModal.tsx",
+      "line": 1589,
+      "content": "console.log('AI Suggestion applied:', suggestion);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/email/UltraEmailModal.tsx",
+      "line": 1593,
+      "content": "console.log('Voice input received:', text);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/email/UltraEmailModal.tsx",
+      "line": 1635,
+      "content": "console.log('Translation received:', { translation, language });"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/email/UltraEmailModal.tsx",
+      "line": 1638,
+      "content": "console.log('Language detected:', language);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/email/UltraEmailModal.tsx",
+      "line": 1695,
+      "content": "console.log('Schedule recommendation received:', recommendation);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/insights/UrgentInsightsOverlay.tsx",
+      "line": 143,
+      "content": "console.log('Taking action on:', currentInsight);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/layout/Header.tsx",
+      "line": 408,
+      "content": "console.log('Logging out to demo mode');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/layout/Header.tsx",
+      "line": 787,
+      "content": "console.log('Email sent from header launcher:', emailData);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/learning/ThreeDAnatomyViewer.tsx",
+      "line": 214,
+      "content": "console.log('Updating 3D viewer with state:', viewerState);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/market/MarketIntelligenceDashboard.tsx",
+      "line": 222,
+      "content": "console.log('High relevance feed:', feed.title);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/market/MarketIntelligenceDashboard.tsx",
+      "line": 235,
+      "content": "console.log('Critical alert:', alert.title);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/market/MarketIntelligenceDashboard.tsx",
+      "line": 764,
+      "content": "onClick={() => console.log('Action:', action)}"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/ReplacementReality.tsx",
+      "line": 19,
+      "content": "console.log('Autoplay blocked');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/research/ResearchCanvas.tsx",
+      "line": 277,
+      "content": "console.log('Saving document:', doc);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/ripple/RippleViewer.tsx",
+      "line": 351,
+      "content": "console.log('Contact submitted:', contactInfo);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/routing/AuthGuard.tsx",
+      "line": 21,
+      "content": "console.log('AuthGuard - Storing return path:', location.pathname + location.search);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/components/routing/ModuleRouter.tsx",
+      "line": 14,
+      "content": "console.log('ModuleRouter - Current module:', module);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/contexts/DashboardDataContext.tsx",
+      "line": 86,
+      "content": "console.log(`Loading real activities/tasks from ${tableName} for user: ${userEmail}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/contexts/DashboardDataContext.tsx",
+      "line": 103,
+      "content": "console.log('Generated real activities and tasks:', {"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/contexts/DashboardDataContext.tsx",
+      "line": 115,
+      "content": "console.log('No contacts found, using mock activities and tasks');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/hooks/useEmailClient.tsx",
+      "line": 150,
+      "content": "console.log('Saving template:', template);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/hooks/useEmailClient.tsx",
+      "line": 196,
+      "content": "console.log('Email opened:', emailId);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/hooks/useEmailClient.tsx",
+      "line": 205,
+      "content": "console.log('Email clicked:', emailId, linkUrl);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/hooks/useEmailClient.tsx",
+      "line": 215,
+      "content": "console.log('Syncing offline emails...');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/hooks/useEmailClient.tsx",
+      "line": 237,
+      "content": "console.log('Marking as read:', emailId);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/index.tsx",
+      "line": 17,
+      "content": "// to log results (for example: reportWebVitals(console.log))"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/modules/intelligence/components/StrategicCanvasMobile.tsx",
+      "line": 139,
+      "content": "onClick: () => console.log('Save strategy'),"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/modules/intelligence/components/StrategicCanvasMobile.tsx",
+      "line": 145,
+      "content": "onClick: () => console.log('Share strategy'),"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/pages/AuthCallback.tsx",
+      "line": 13,
+      "content": "console.log('Auth callback - Current URL:', window.location.href);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/pages/AuthCallback.tsx",
+      "line": 25,
+      "content": "console.log('Auth callback - Session found:', session.user.email);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/pages/AuthCallback.tsx",
+      "line": 31,
+      "content": "console.log('Auth callback - Returning to:', returnPath);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/pages/AuthCallback.tsx",
+      "line": 38,
+      "content": "console.log('Auth callback - No session found');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/pages/Contacts.tsx",
+      "line": 218,
+      "content": "console.log('Contact distribution:', {"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/pages/Contacts.tsx",
+      "line": 223,
+      "content": "console.log('Sample contacts:', mappedData.slice(0, 5).map(c => ({"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/pages/Contacts.tsx",
+      "line": 239,
+      "content": "console.log(`No data returned from ${tableName}, using mock data`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/pages/Contacts.tsx",
+      "line": 246,
+      "content": "console.log('Exception caught when fetching contacts, falling back to mock data');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/pages/Contacts.tsx",
+      "line": 306,
+      "content": "console.log('Cannot toggle starred status in demo mode');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/pages/SubscribeCancel.tsx",
+      "line": 10,
+      "content": "console.log('User canceled subscription checkout');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/EmailAnalyticsService.tsx",
+      "line": 234,
+      "content": "console.log('Email analytics real-time subscriptions established');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/EmailAnalyticsService.tsx",
+      "line": 301,
+      "content": "console.log(`Email event tracked: ${eventType} for message ${messageId}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/EmailAnalyticsService.tsx",
+      "line": 1035,
+      "content": "console.log('Email analytics service destroyed');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/TranslationService.tsx",
+      "line": 239,
+      "content": "console.log('Translation service: Back online');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/TranslationService.tsx",
+      "line": 244,
+      "content": "console.log('Translation service: Offline mode activated');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/TranslationService.tsx",
+      "line": 883,
+      "content": "console.log('Translation cache cleared');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/services/email/TranslationService.tsx",
+      "line": 988,
+      "content": "console.log('Translation service destroyed');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/suis/components/MarketIntelligenceFeed.tsx",
+      "line": 233,
+      "content": "console.log('API call:', action.payload);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/themes/ThemeContext.tsx",
+      "line": 171,
+      "content": "console.log('🎨 Using sculpture theme:', themeMode);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/themes/ThemeContext.tsx",
+      "line": 175,
+      "content": "console.log('🎯 Theme created from library:', themeMode, themeDefinition.name);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/middleware/auth-example.js",
+      "line": 110,
+      "content": "console.log(`Server running on port ${PORT}`);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/middleware/auth.js",
+      "line": 24,
+      "content": "console.log(`[AUTH INFO] ${message}`, data || '');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/utils/simpleAuth.js",
+      "line": 106,
+      "content": "console.log('Auth reset complete');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/utils/simpleAuth.js",
+      "line": 118,
+      "content": "console.log('Logged in:', loggedIn);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/utils/simpleAuth.js",
+      "line": 119,
+      "content": "console.log('User:', user?.email || 'none');"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/utils/simpleAuth.js",
+      "line": 120,
+      "content": "console.log('Local storage:', !!localAuth);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/utils/simpleAuth.js",
+      "line": 121,
+      "content": "console.log('Current URL:', window.location.href);"
+    },
+    {
+      "file": "/Users/jasonsmacbookpro2022/crm/src/utils/simpleAuth.js",
+      "line": 122,
+      "content": "console.log('Cookies:', document.cookie);"
+    }
+  ]
+}

@@ -28,7 +28,7 @@ import {
   Refresh as RefreshIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { PrivateDataService } from '../../services/privateDataService';
 import { AtRiskAccountData } from '../contacts/AtRiskAccountAlert';
 

@@ -8,7 +8,7 @@ import {
   Brain, Search, Send, Loader, Copy, ThumbsUp, ThumbsDown,
   BookOpen, Target, TrendingUp, AlertCircle, ChevronDown
 } from 'lucide-react';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useAppMode } from '../../contexts/AppModeContext';
 import { generateResearchProjects } from '../../services/mockData/suisIntelligenceMockData';

@@ -32,7 +32,7 @@ import {
   Link as LinkIcon,
   Image as ImageIcon
 } from '@mui/icons-material';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { Contact } from '../../types/models';
 import { emailService } from '../../services/email/emailService';
 import { supabase } from '../../services/supabase/supabase';

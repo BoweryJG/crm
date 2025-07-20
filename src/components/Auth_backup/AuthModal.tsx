@@ -14,7 +14,7 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import EmailIcon from '@mui/icons-material/Email';
 import { useNavigate } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 
 interface AuthModalProps {
   open: boolean;

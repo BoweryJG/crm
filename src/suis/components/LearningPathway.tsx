@@ -9,7 +9,7 @@ import {
   Lock, TrendingUp, Users, Brain, Trophy, ChevronRight,
   Star, BarChart, Target, Zap
 } from 'lucide-react';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useAppMode } from '../../contexts/AppModeContext';
 

@@ -19,7 +19,7 @@ import {
   Close as CloseIcon
 } from '@mui/icons-material';
 import { sendSMSToContact } from '../../services/twilio/smsService';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { Contact } from '../../types/models';
 
 interface SMSButtonProps {

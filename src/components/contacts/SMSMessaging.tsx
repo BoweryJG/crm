@@ -18,7 +18,7 @@ import {
   Sms as SmsIcon
 } from '@mui/icons-material';
 import { fetchSMSHistory, sendSMSToContact, SMSHistoryItem } from '../../services/twilio/smsService';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { Contact } from '../../types/models';
 import { formatDistanceToNow } from 'date-fns';
 

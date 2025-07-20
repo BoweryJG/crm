@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { CircularProgress, Box } from '@mui/material';
 
 interface AuthGuardProps {

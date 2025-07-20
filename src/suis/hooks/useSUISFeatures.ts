@@ -2,7 +2,7 @@
 // Provides easy access to all SUIS intelligent features
 
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { suisService } from '../services/suisService';
 import { suisRealtimeService } from '../services/suisRealtimeService';
 import { 

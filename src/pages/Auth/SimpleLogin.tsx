@@ -8,7 +8,7 @@ import {
   useTheme 
 } from '@mui/material';
 import { Google as GoogleIcon } from '@mui/icons-material';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
 

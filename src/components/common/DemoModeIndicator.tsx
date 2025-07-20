@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppMode } from '../../contexts/AppModeContext';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { Chip, Box, Tooltip } from '@mui/material';
 import ScienceIcon from '@mui/icons-material/Science';
 import LoginIcon from '@mui/icons-material/Login';

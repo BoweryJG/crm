@@ -91,7 +91,7 @@ import {
 } from '@mui/icons-material';
 import { keyframes, styled } from '@mui/material/styles';
 import { useThemeContext } from '../../themes/ThemeContext';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { supabase } from '../../services/supabase/supabase';
 import { useSound, useButtonSound, useNotificationSound } from '../../hooks/useSound';
 

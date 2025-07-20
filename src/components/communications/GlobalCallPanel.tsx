@@ -38,7 +38,7 @@ import {
 } from '@mui/icons-material';
 import { twilioCallService, TwilioCallRecord } from '../../services/twilioCallService';
 import { conversationIntelligenceService } from '../../services/conversationIntelligenceService';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useThemeContext } from '../../themes/ThemeContext';
 
 interface Contact {

@@ -18,7 +18,7 @@ import {
   Email as EmailIcon, 
   LockOutlined as LockIcon 
 } from '@mui/icons-material';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
 

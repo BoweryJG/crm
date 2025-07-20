@@ -45,7 +45,7 @@ import {
 import { useSUIS } from '../../hooks/useSUIS';
 import { IntelligenceProfile } from '../types';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 
 const steps = [
   {

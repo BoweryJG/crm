@@ -87,7 +87,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { useThemeContext } from '../../themes/ThemeContext';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { emailAnalyticsService } from '../../services/email/EmailAnalyticsService';
 import type { 
   RealTimeMetrics, 

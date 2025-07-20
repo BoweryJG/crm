@@ -24,7 +24,7 @@ import {
 } from '@mui/icons-material';
 import { format } from 'date-fns';
 import { supabase } from '../../services/supabase/supabase';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 
 interface EmailHistoryProps {
   contactId: string;

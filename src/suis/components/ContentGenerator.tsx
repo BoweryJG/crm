@@ -12,7 +12,7 @@ import {
   Wand2, Edit3, Save, X
 } from 'lucide-react';
 import { useSUISFeatures } from '../hooks/useSUISFeatures';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useAppMode } from '../../contexts/AppModeContext';
 import { generateContentTemplates } from '../../services/mockData/suisIntelligenceMockData';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppMode } from '../../contexts/AppModeContext';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { 
   Switch, 
   FormControlLabel, 

@@ -46,7 +46,7 @@ import {
   Schedule as ScheduleIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import automationLimitsService, { 
   SubscriptionTier, 
   AutomationLimits, 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 
 export const PostLoginRedirect: React.FC = () => {
   const { user } = useAuth();

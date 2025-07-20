@@ -9,7 +9,7 @@ import {
   Globe, Building, Briefcase, Calendar, ExternalLink,
   ChevronRight, Star, RefreshCw
 } from 'lucide-react';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useAppMode } from '../../contexts/AppModeContext';
 

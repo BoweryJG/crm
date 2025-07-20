@@ -26,7 +26,7 @@ import {
   Phone as PhoneIcon
 } from '@mui/icons-material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
 

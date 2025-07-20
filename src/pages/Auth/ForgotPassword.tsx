@@ -15,7 +15,7 @@ import {
   Email as EmailIcon,
   ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useThemeContext } from '../../themes/ThemeContext';
 

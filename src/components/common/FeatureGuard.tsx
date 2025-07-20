@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useAppMode } from '../../contexts/AppModeContext';
 import { isAdminUser } from '../../config/adminUsers';
 import LockIcon from '@mui/icons-material/Lock';

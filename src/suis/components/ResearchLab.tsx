@@ -50,7 +50,7 @@ import {
   AutoAwesome as AIIcon
 } from '@mui/icons-material';
 import { useSUIS } from './SUISProvider';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { ResearchResponse } from '../types';
 

@@ -37,7 +37,7 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { supabase } from '../../services/supabase/supabase';
 import { Contact } from '../../types/models';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useAppMode } from '../../contexts/AppModeContext';
 import { sanitize, ValidationRules } from '../../utils/validation';
 

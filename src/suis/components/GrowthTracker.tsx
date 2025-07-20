@@ -62,7 +62,7 @@ import {
   BarChart as BarChartIcon
 } from '@mui/icons-material';
 import { useSUIS } from './SUISProvider';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { LearningModule } from '../../services/learningCenterService';
 

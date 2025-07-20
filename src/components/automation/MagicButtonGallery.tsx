@@ -35,7 +35,7 @@ import {
   Settings as ConfigIcon,
   AutoAwesome as MagicIcon
 } from '@mui/icons-material';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import automationService, { WorkflowType, WorkflowStatus } from '../../services/automation/comprehensiveAutomationService';
 import automationLimitsService from '../../services/automation/automationLimitsService';
 

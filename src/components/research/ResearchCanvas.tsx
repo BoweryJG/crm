@@ -29,7 +29,7 @@ import ResearchLibrary from './ResearchLibrary';
 
 import researchService from '../../services/research/researchService';
 import { ResearchProject, ResearchDocument, ResearchTask, ResearchCanvasState } from '../../types/research';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 
 // TabPanel component for tab content
 interface TabPanelProps {

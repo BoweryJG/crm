@@ -40,7 +40,7 @@ import {
   Close as CloseIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AppModeToggle } from '../common/AppModeToggle';
 import GlobalAuthModal from '../common/GlobalAuthModal';

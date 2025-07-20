@@ -38,7 +38,7 @@ import {
   MapPin, Building, Briefcase, DollarSign, Clock,
   ChevronRight, Download, Upload, Brain
 } from 'lucide-react';
-import { useAuth } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useAppMode } from '../../contexts/AppModeContext';
 import { generateContactUniverseData, ContactUniverseData } from '../../services/mockData/suisIntelligenceMockData';
