@@ -8,7 +8,7 @@ export const glassEffects = {
   // Obsidian glass - deep black with subtle reflections
   obsidian: {
     backgroundColor: alpha('#0D0D0D', 0.65),
-    backdropFilter: 'blur(12px) saturate(150%)',
+    backdropFilter: 'blur(5px) saturate(150%)',
     border: `1px solid ${alpha('#D4AF37', 0.08)}`,
     boxShadow: `
       inset 0 1px 0 0 ${alpha('#ECECEC', 0.05)},
@@ -29,7 +29,7 @@ export const glassEffects = {
   // Carbon fiber glass - textured depth
   carbon: {
     backgroundColor: alpha('#1F1F1F', 0.7),
-    backdropFilter: 'blur(10px) saturate(130%)',
+    backdropFilter: 'blur(4px) saturate(130%)',
     border: `1px solid ${alpha('#C0C0C0', 0.1)}`,
     boxShadow: `
       inset 0 1px 0 0 ${alpha('#C0C0C0', 0.08)},
@@ -49,7 +49,7 @@ export const glassEffects = {
   // Museum glass - ultra clear with minimal tint
   museum: {
     backgroundColor: alpha('#1F1F1F', 0.4),
-    backdropFilter: 'blur(8px) saturate(120%) brightness(1.05)',
+    backdropFilter: 'blur(3px) saturate(120%) brightness(1.05)',
     border: `1px solid ${alpha('#ECECEC', 0.05)}`,
     boxShadow: `
       0 0 0 1px ${alpha('#D4AF37', 0.05)},
@@ -60,7 +60,7 @@ export const glassEffects = {
   // Gold-infused glass - premium accent
   goldInfused: {
     backgroundColor: alpha('#1F1F1F', 0.6),
-    backdropFilter: 'blur(12px) saturate(140%)',
+    backdropFilter: 'blur(5px) saturate(140%)',
     border: `2px solid ${alpha('#D4AF37', 0.2)}`,
     boxShadow: `
       inset 0 0 20px 0 ${alpha('#D4AF37', 0.05)},
@@ -84,7 +84,7 @@ export const glassEffects = {
   // Frosted steel - industrial elegance
   frostedSteel: {
     backgroundColor: alpha('#2C2C2C', 0.6),
-    backdropFilter: 'blur(8px) saturate(110%)',
+    backdropFilter: 'blur(3px) saturate(110%)',
     border: `1px solid ${alpha('#C0C0C0', 0.15)}`,
     boxShadow: `
       inset 0 2px 4px 0 ${alpha('#ECECEC', 0.05)},
@@ -192,7 +192,7 @@ export const performanceGlass = {
   
   heavy: {
     backgroundColor: alpha('#1F1F1F', 0.6),
-    backdropFilter: 'blur(12px) saturate(140%)',
+    backdropFilter: 'blur(5px) saturate(140%)',
     border: `1px solid ${alpha('#D4AF37', 0.12)}`,
     transition: 'all 0.3s ease',
   },

@@ -114,7 +114,7 @@ import SendOptimizer from './SendOptimizer';
 const ultraFloatingGlass = keyframes`
   0% {
     transform: translateY(0px) scale(1) rotateX(0deg);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(8px);
     box-shadow: 
       0 25px 50px -12px rgba(0, 0, 0, 0.25),
       0 0 0 1px rgba(255, 255, 255, 0.05),
@@ -122,7 +122,7 @@ const ultraFloatingGlass = keyframes`
   }
   50% {
     transform: translateY(-8px) scale(1.005) rotateX(1deg);
-    backdrop-filter: blur(25px);
+    backdrop-filter: blur(10px);
     box-shadow: 
       0 35px 60px -12px rgba(0, 0, 0, 0.35),
       0 0 0 1px rgba(255, 255, 255, 0.08),
@@ -131,7 +131,7 @@ const ultraFloatingGlass = keyframes`
   }
   100% {
     transform: translateY(0px) scale(1) rotateX(0deg);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(8px);
     box-shadow: 
       0 25px 50px -12px rgba(0, 0, 0, 0.25),
       0 0 0 1px rgba(255, 255, 255, 0.05),
