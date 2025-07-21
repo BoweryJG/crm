@@ -120,11 +120,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      // Use RepSpheres central auth for cross-domain functionality
-      const destination = sessionStorage.getItem('intendedDestination') || options?.redirectTo;
-      const redirectUrl = destination 
-        ? `https://repspheres.com/auth/callback?redirect=${encodeURIComponent(destination)}`
-        : `https://repspheres.com/auth/callback`;
+      // For development, use local callback. For production, use RepSpheres central auth
+      const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const intendedPath = sessionStorage.getItem('intendedDestination') || options?.redirectTo || '/';
+      
+      let redirectUrl: string;
+      
+      if (isDevelopment) {
+        // Direct callback to local CRM in development
+        redirectUrl = `${window.location.origin}/auth/callback`;
+        // Store the intended path for use after callback
+        sessionStorage.setItem('authReturnPath', intendedPath);
+      } else {
+        // For production, use the full CRM URL as the final redirect
+        const crmCallbackUrl = `${window.location.origin}/auth/callback`;
+        redirectUrl = `https://repspheres.com/auth/callback?redirect=${encodeURIComponent(crmCallbackUrl)}&destination=${encodeURIComponent(intendedPath)}`;
+      }
       
       logger.debug('OAuth sign in - redirect URL:', redirectUrl);
       
