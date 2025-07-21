@@ -120,11 +120,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      // Use RepSpheres central auth for cross-domain functionality
-      const destination = sessionStorage.getItem('intendedDestination') || options?.redirectTo;
-      const redirectUrl = destination 
-        ? `https://repspheres.com/auth/callback?redirect=${encodeURIComponent(destination)}`
-        : `https://repspheres.com/auth/callback`;
+      // Store intended destination for after auth
+      const currentPath = window.location.pathname + window.location.search;
+      sessionStorage.setItem('authReturnPath', currentPath);
+      
+      // Use CRM's own callback URL (like Canvas, MarketData, etc.)
+      const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const redirectUrl = isDevelopment 
+        ? 'http://localhost:7003/auth/callback'
+        : 'https://crm.repspheres.com/auth/callback';
       
       logger.debug('OAuth sign in - redirect URL:', redirectUrl);
       
