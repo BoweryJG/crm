@@ -68,6 +68,16 @@ class GmailApiService {
     this.loadStoredTokens();
   }
 
+  /**
+   * Get the Gmail OAuth redirect URI based on current environment
+   */
+  private getRedirectUri(): string {
+    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    return isDevelopment 
+      ? 'http://localhost:7003/auth/google/callback'
+      : 'https://crm.repspheres.com/auth/google/callback';
+  }
+
   private loadStoredTokens(): void {
     try {
       // Get current user ID from Supabase
@@ -147,7 +157,7 @@ class GmailApiService {
     const baseUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
     const params = new URLSearchParams({
       client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID || '',
-      redirect_uri: process.env.REACT_APP_GOOGLE_REDIRECT_URI || 'http://localhost:7003/auth/google/callback',
+      redirect_uri: this.getRedirectUri(),
       response_type: 'code',
       scope: [
         'https://www.googleapis.com/auth/gmail.readonly',
@@ -176,7 +186,7 @@ class GmailApiService {
           client_secret: process.env.REACT_APP_GOOGLE_CLIENT_SECRET || '',
           code,
           grant_type: 'authorization_code',
-          redirect_uri: process.env.REACT_APP_GOOGLE_REDIRECT_URI || 'http://localhost:7003/auth/google/callback'
+          redirect_uri: this.getRedirectUri()
         })
       });
 
