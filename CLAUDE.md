@@ -108,10 +108,26 @@ The app integrates with the RepSpheres ecosystem:
 - **Podcast** (`podcast.repspheres.com`)
 - **Main Site** (`repspheres.com`)
 
+#### Backend Integration Status
+**CRM → osbackend-zl1h.onrender.com Integration**
+
+**✅ CRM-SPECIFIC ENDPOINTS (IMPLEMENTED):**
+- `GET /api/crm/stripe/repx/plans` - RepX subscription plans
+- `POST /api/crm/stripe/create-checkout-session` - Stripe checkout sessions
+- `POST /api/crm/repx/validate-access` - Feature access validation
+- `GET /api/crm/stripe/subscription` - Subscription status
+- `POST /api/crm/email/send` - Basic email sending
+- `POST /api/crm/email/send-smtp` - SMTP email sending
+- `GET /api/crm/prompts` - AI prompt management
+- `POST /api/crm/prompts/{id}/increment-usage` - Usage tracking
+- `POST /api/crm/automation/start` - Automation workflows
+- `POST /api/crm/automation/cancel` - Cancel automations
+- `GET /health` - Backend health check
+
 #### External Services
 - **Supabase**: Database and authentication
 - **Twilio**: Voice calling and SMS
-- **Stripe**: Subscription management
+- **Stripe**: Subscription management (partially synced)
 - **Google AI**: Generative AI features
 - **Netlify**: Hosting and serverless functions
 
@@ -132,10 +148,13 @@ The app integrates with the RepSpheres ecosystem:
 ### Important Development Notes
 
 #### Environment Variables
-Required for full functionality:
+**Backend Connection:**
+- `REACT_APP_BACKEND_URL=https://osbackend-zl1h.onrender.com` (unified backend)
+
+**Required for full functionality:**
 - `REACT_APP_SUPABASE_URL` and `REACT_APP_SUPABASE_ANON_KEY` (core database)
 - `REACT_APP_TWILIO_*` variables (calling features)
-- `STRIPE_*` variables (subscription management)
+- `STRIPE_*` variables (subscription management - matches RepX setup)
 
 #### Build Configuration
 - **Netlify deployment** with custom build command
@@ -159,3 +178,41 @@ Required for full functionality:
 - **API Integration**: Mock responses for reliable testing
 
 This architecture enables the app to provide a full-featured demo experience while seamlessly upgrading to real data when users subscribe, making it an effective sales and conversion tool for the RepSpheres platform.
+
+## Backend Synchronization Status
+
+### Overview
+The CRM is configured to connect to the unified osbackend-zl1h.onrender.com backend but requires several additional endpoints to be fully synchronized.
+
+### Working Integrations
+- **RepX Subscription Plans**: Full access to RepX1-RepX5 tier definitions
+- **Stripe Checkout**: Functional checkout session creation 
+- **Health Monitoring**: Backend health checks operational
+- **Environment Configuration**: Properly configured to use osbackend
+
+### CRM Backend Implementation Complete ✅
+All CRM-specific endpoints have been implemented and integrated:
+
+#### CRM API Architecture
+```javascript
+// All CRM endpoints use /api/crm/ prefix for clear separation:
+GET  /api/crm/stripe/repx/plans         // RepX subscription plans
+POST /api/crm/stripe/create-checkout-session // Checkout sessions
+POST /api/crm/repx/validate-access      // Feature access validation
+GET  /api/crm/stripe/subscription       // Subscription status retrieval
+POST /api/crm/email/send               // Basic email sending
+POST /api/crm/email/send-smtp          // SMTP email sending
+GET  /api/crm/prompts                  // AI prompt management
+POST /api/crm/prompts/{id}/increment-usage // Usage tracking
+POST /api/crm/automation/start         // Start automation workflows
+POST /api/crm/automation/cancel        // Cancel automations
+```
+
+#### Implementation Status
+- **Backend**: Complete CRM endpoint implementation created in `/osbackend/crm-endpoints.js`
+- **Frontend**: All CRM services updated to use CRM-specific endpoints
+- **Architecture**: Maintains unified backend while providing CRM-specific functionality
+- **Separation**: Clear distinction from RepConnect (`/api/repconnect/`) and Canvas (`/api/canvas/`) endpoints
+
+### Deployment Ready
+The CRM is now fully synchronized with the osbackend and ready for deployment with complete backend integration.

@@ -28,7 +28,7 @@ const startAutomationWorkflow = async (
     // Trigger the actual automation workflow through the backend API
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com';
-      const response = await fetch(`${backendUrl}/api/automation/start`, {
+      const response = await fetch(`${backendUrl}/api/crm/automation/start`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ const cancelAutomationWorkflow = async (documentId: string): Promise<{ data: Res
     // Call the backend API to cancel the workflow
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com';
-      const response = await fetch(`${backendUrl}/api/automation/cancel`, {
+      const response = await fetch(`${backendUrl}/api/crm/automation/cancel`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

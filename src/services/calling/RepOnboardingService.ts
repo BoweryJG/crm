@@ -452,7 +452,7 @@ class RepOnboardingService {
   }> {
     try {
       // Call backend to get Stripe subscription data
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com'}/api/stripe/subscription`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com'}/api/crm/stripe/subscription`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
