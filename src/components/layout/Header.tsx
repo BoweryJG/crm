@@ -44,6 +44,7 @@ import { useAuth } from '../../auth/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AppModeToggle } from '../common/AppModeToggle';
 import GlobalAuthModal from '../common/GlobalAuthModal';
+import GlobalLogoutModal from '../common/GlobalLogoutModal';
 import { RepSpheresAppSwitcher } from '../common/RepSpheresAppSwitcher';
 import ThemeToggle from '../ui/ThemeToggle';
 import { getUserDisplayName, getUserInitials } from '../../utils/userHelpers';
@@ -369,6 +370,7 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
   const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
   const [loginOpen, setLoginOpen] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [unreadCount, setUnreadCount] = useState(mockNotifications.filter(n => n.unread).length);
   
@@ -404,10 +406,10 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
     clickSound.play();
   };
   
-  const handleLogout = async () => {
-    console.log('Logging out to demo mode');
-    await signOut();
-    window.location.reload();
+  const handleLogout = () => {
+    setLogoutOpen(true);
+    handleProfileMenuClose();
+    clickSound.play();
   };
 
   const getNotificationColor = (type: string) => {
@@ -777,6 +779,16 @@ const Header: React.FC<HeaderProps> = ({ onSidebarToggle, drawerWidth, mobileOpe
         setSignupOpen(false);
         window.location.reload();
       }} />
+    <GlobalLogoutModal 
+      open={logoutOpen} 
+      onClose={() => setLogoutOpen(false)}
+      onConfirm={async () => {
+        console.log('Logging out to demo mode');
+        await signOut();
+        setLogoutOpen(false);
+        window.location.reload();
+      }}
+    />
 
     {/* Revolutionary Email Client Launcher */}
     {user && (
