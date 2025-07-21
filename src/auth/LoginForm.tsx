@@ -1,16 +1,45 @@
 import React, { useState } from 'react';
 import {
   Dialog,
-  DialogTitle,
-  DialogContent,
   Button,
   Box,
   Typography,
   Alert,
-  IconButton
+  IconButton,
+  Stack,
+  Divider,
+  CircularProgress,
+  Fade,
+  Backdrop,
+  useTheme
 } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import { 
+  Close as CloseIcon,
+  AutoAwesome,
+  Google,
+  Facebook,
+  Email as EmailIcon
+} from '@mui/icons-material';
 import { useAuth } from './AuthContext';
+import { keyframes } from '@mui/system';
+
+// Animations matching GlobalAuthModal
+const shimmer = keyframes`
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+`;
+
+const float = keyframes`
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+`;
+
+const glow = keyframes`
+  0% { box-shadow: 0 0 5px rgba(0, 255, 198, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(0, 255, 198, 0.8), 0 0 30px rgba(0, 255, 198, 0.4); }
+  100% { box-shadow: 0 0 5px rgba(0, 255, 198, 0.5); }
+`;
 
 interface LoginFormProps {
   open: boolean;
@@ -19,6 +48,7 @@ interface LoginFormProps {
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({ open, onClose, onSuccess }) => {
+  const theme = useTheme();
   const { signInWithProvider, loading, error } = useAuth();
   const [isSigningIn, setIsSigningIn] = useState(false);
 
@@ -55,91 +85,205 @@ export const LoginForm: React.FC<LoginFormProps> = ({ open, onClose, onSuccess }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">Sign In to RepSpheres CRM</Typography>
-        <IconButton onClick={onClose} size="small">
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-      
-      <DialogContent>
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error.message}
-          </Alert>
-        )}
+    <Dialog
+      open={open}
+      onClose={onClose}
+      TransitionComponent={Fade}
+      closeAfterTransition
+      BackdropComponent={Backdrop}
+      BackdropProps={{
+        timeout: 500,
+        sx: {
+          backgroundColor: 'rgba(10, 10, 10, 0.8)',
+          backdropFilter: 'blur(8px)',
+        }
+      }}
+      PaperProps={{
+        sx: {
+          borderRadius: 4,
+          overflow: 'hidden',
+          maxWidth: 440,
+          width: '90%',
+          backgroundColor: 'transparent',
+          boxShadow: 'none',
+        }
+      }}
+    >
+      <Box
+        sx={{
+          position: 'relative',
+          background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+          border: '1px solid',
+          borderColor: 'rgba(0, 255, 198, 0.3)',
+          borderRadius: 4,
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: -2,
+            left: -2,
+            right: -2,
+            bottom: -2,
+            background: 'linear-gradient(45deg, #00ffc6, #00a693, #00ffc6)',
+            borderRadius: 4,
+            opacity: 0.3,
+            zIndex: -1,
+            animation: `${glow} 3s ease-in-out infinite`,
+          }
+        }}
+      >
+        {/* Decorative orb */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: -50,
+            right: -50,
+            width: 150,
+            height: 150,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(0, 255, 198, 0.3) 0%, transparent 70%)',
+            filter: 'blur(40px)',
+            animation: `${float} 6s ease-in-out infinite`,
+          }}
+        />
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, py: 2 }}>
-          <Button
-            onClick={handleGoogleLogin}
-            disabled={loading || isSigningIn}
-            variant="outlined"
-            fullWidth
-            size="large"
-            sx={{
-              py: 1.5,
-              textTransform: 'none',
-              fontSize: '16px',
-              fontWeight: 500,
-              borderColor: '#dadce0',
-              color: '#3c4043',
-              backgroundColor: '#fff',
-              '&:hover': {
-                backgroundColor: '#f8f9fa',
-                borderColor: '#dadce0'
-              }
-            }}
-            startIcon={
-              <svg width="20" height="20" viewBox="0 0 48 48">
-                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
-                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-              </svg>
+        {/* Close button */}
+        <IconButton
+          onClick={onClose}
+          sx={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            color: 'rgba(255, 255, 255, 0.7)',
+            zIndex: 1,
+            '&:hover': {
+              color: '#00ffc6',
+              backgroundColor: 'rgba(0, 255, 198, 0.1)',
             }
-          >
-            {loading || isSigningIn ? 'Signing in...' : 'Continue with Google'}
-          </Button>
-
-          <Button
-            onClick={handleFacebookLogin}
-            disabled={loading || isSigningIn}
-            variant="contained"
-            fullWidth
-            size="large"
-            sx={{
-              py: 1.5,
-              textTransform: 'none',
-              fontSize: '16px',
-              fontWeight: 500,
-              backgroundColor: '#1877f2',
-              '&:hover': {
-                backgroundColor: '#166fe5'
-              }
-            }}
-            startIcon={
-              <svg width="20" height="20" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-              </svg>
-            }
-          >
-            {loading || isSigningIn ? 'Signing in...' : 'Continue with Facebook'}
-          </Button>
-        </Box>
-
-        <Typography 
-          variant="caption" 
-          sx={{ 
-            textAlign: 'center', 
-            display: 'block',
-            mt: 3,
-            color: 'text.secondary'
           }}
         >
-          By signing in, you agree to our Terms of Service and Privacy Policy
-        </Typography>
-      </DialogContent>
+          <CloseIcon />
+        </IconButton>
+
+        {/* Content */}
+        <Box sx={{ p: 4, position: 'relative', zIndex: 1 }}>
+          {/* Header */}
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
+            <AutoAwesome sx={{ color: '#00ffc6', fontSize: 28 }} />
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                color: '#fff',
+                fontWeight: 700,
+                background: 'linear-gradient(135deg, #fff 0%, #00ffc6 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                animation: `${shimmer} 3s linear infinite`,
+                backgroundSize: '200% 200%',
+              }}
+            >
+              RepSpheres
+            </Typography>
+          </Stack>
+
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: 'rgba(255, 255, 255, 0.8)',
+              mb: 3
+            }}
+          >
+            Access your intelligent sales universe
+          </Typography>
+
+          {error && (
+            <Alert 
+              severity="error" 
+              sx={{ 
+                mb: 2,
+                backgroundColor: 'rgba(211, 47, 47, 0.1)',
+                color: '#ff6b6b',
+                '& .MuiAlert-icon': {
+                  color: '#ff6b6b'
+                }
+              }}
+            >
+              {error.message}
+            </Alert>
+          )}
+
+          <Stack spacing={2}>
+            {/* Google */}
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleGoogleLogin}
+              disabled={loading || isSigningIn}
+              startIcon={loading || isSigningIn ? <CircularProgress size={20} /> : <Google />}
+              sx={{
+                py: 1.5,
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: '#fff',
+                fontSize: '15px',
+                fontWeight: 500,
+                textTransform: 'none',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  borderColor: '#00ffc6',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 4px 20px rgba(0, 255, 198, 0.3)',
+                }
+              }}
+            >
+              Continue with Google
+            </Button>
+
+            {/* Facebook */}
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleFacebookLogin}
+              disabled={loading || isSigningIn}
+              startIcon={loading || isSigningIn ? <CircularProgress size={20} /> : <Facebook />}
+              sx={{
+                py: 1.5,
+                backgroundColor: 'rgba(24, 119, 242, 0.2)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(24, 119, 242, 0.3)',
+                color: '#fff',
+                fontSize: '15px',
+                fontWeight: 500,
+                textTransform: 'none',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  backgroundColor: 'rgba(24, 119, 242, 0.3)',
+                  borderColor: '#1877F2',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 4px 20px rgba(24, 119, 242, 0.3)',
+                }
+              }}
+            >
+              Continue with Facebook
+            </Button>
+          </Stack>
+
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              textAlign: 'center', 
+              display: 'block',
+              mt: 3,
+              color: 'rgba(255, 255, 255, 0.5)'
+            }}
+          >
+            By signing in, you agree to our Terms of Service and Privacy Policy
+          </Typography>
+        </Box>
+      </Box>
     </Dialog>
   );
 };
