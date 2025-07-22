@@ -30,7 +30,7 @@ exports.handler = async (event, context) => {
   try {
     // Log for debugging (remove in production)
     console.log('Token exchange request:', {
-      client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID ? 'present' : 'missing',
+      client_id: (process.env.GOOGLE_CLIENT_ID || process.env.REACT_APP_GOOGLE_CLIENT_ID) ? 'present' : 'missing',
       client_secret: process.env.GOOGLE_CLIENT_SECRET ? 'present' : 'missing',
       code: code ? 'present' : 'missing',
       redirect_uri
@@ -43,7 +43,7 @@ exports.handler = async (event, context) => {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID || '',
+        client_id: process.env.GOOGLE_CLIENT_ID || process.env.REACT_APP_GOOGLE_CLIENT_ID || '',
         client_secret: process.env.GOOGLE_CLIENT_SECRET || '', // Server-side only
         code,
         grant_type: 'authorization_code',

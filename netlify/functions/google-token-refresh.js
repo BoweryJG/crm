@@ -35,7 +35,7 @@ exports.handler = async (event, context) => {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID || '',
+        client_id: process.env.GOOGLE_CLIENT_ID || process.env.REACT_APP_GOOGLE_CLIENT_ID || '',
         client_secret: process.env.GOOGLE_CLIENT_SECRET || '', // Server-side only
         refresh_token,
         grant_type: 'refresh_token'
