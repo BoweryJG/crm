@@ -104,7 +104,7 @@ class DirectSMTPService {
    */
   async testConnection(credentials: SMTPCredentials): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await fetch(`${this.backendUrl}/api/crm/email/test-smtp`, {
+      const response = await fetch(`${this.backendUrl}/api/email/test-smtp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -234,7 +234,7 @@ class DirectSMTPService {
       }
 
       // Send via backend SMTP service
-      const response = await fetch(`${this.backendUrl}/api/crm/email/send-direct-smtp`, {
+      const response = await fetch(`${this.backendUrl}/api/email/send-direct-smtp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

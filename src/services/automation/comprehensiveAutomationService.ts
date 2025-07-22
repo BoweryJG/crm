@@ -274,7 +274,7 @@ class ComprehensiveAutomationService {
     scheduledAt?: string;
   }): Promise<{ data: any; error: Error | null }> {
     try {
-      const response = await fetch(`${this.backendUrl}/api/crm/email/campaign`, {
+      const response = await fetch(`${this.backendUrl}/api/email/campaign`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -303,7 +303,7 @@ class ComprehensiveAutomationService {
 
   private async triggerBackendWorkflow(workflowId: string): Promise<void> {
     try {
-      const response = await fetch(`${this.backendUrl}/api/crm/automation/trigger`, {
+      const response = await fetch(`${this.backendUrl}/api/automation/trigger`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

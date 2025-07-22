@@ -176,16 +176,13 @@ class GmailApiService {
    */
   async exchangeCodeForTokens(code: string): Promise<boolean> {
     try {
-      const response = await fetch('https://oauth2.googleapis.com/token', {
+      const response = await fetch('/.netlify/functions/google-token-exchange', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: new URLSearchParams({
-          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID || '',
-          client_secret: process.env.REACT_APP_GOOGLE_CLIENT_SECRET || '',
+        body: JSON.stringify({
           code,
-          grant_type: 'authorization_code',
           redirect_uri: this.getRedirectUri()
         })
       });
@@ -212,16 +209,13 @@ class GmailApiService {
       throw new Error('No refresh token available');
     }
 
-    const response = await fetch('https://oauth2.googleapis.com/token', {
+    const response = await fetch('/.netlify/functions/google-token-refresh', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
-      body: new URLSearchParams({
-        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID || '',
-        client_secret: process.env.REACT_APP_GOOGLE_CLIENT_SECRET || '',
-        refresh_token: this.refreshToken,
-        grant_type: 'refresh_token'
+      body: JSON.stringify({
+        refresh_token: this.refreshToken
       })
     });
 

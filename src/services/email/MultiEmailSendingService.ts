@@ -250,7 +250,7 @@ class MultiEmailSendingService {
   private async sendViaSMTP(account: EmailAccount, options: SendEmailOptions): Promise<{ success: boolean; message_id?: string; error?: string }> {
     try {
       // Send via your backend SMTP service
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/crm/email/send-smtp`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/email/send-smtp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

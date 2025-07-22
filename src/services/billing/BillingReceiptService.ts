@@ -261,7 +261,7 @@ ${this.companyName}
     text: string;
   }): Promise<{ success: boolean; message_id?: string; error?: string }> {
     try {
-      const response = await fetch(`${this.backendUrl}/api/crm/email/send`, {
+      const response = await fetch(`${this.backendUrl}/api/email/send`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

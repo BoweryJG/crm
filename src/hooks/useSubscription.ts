@@ -96,7 +96,7 @@ export const useSubscription = (): SubscriptionHookReturn => {
   const fetchPlans = useCallback(async () => {
     setPlansLoading(true);
     try {
-      const response = await fetch(`${BACKEND_URL}/api/crm/stripe/repx/plans`);
+      const response = await fetch(`${BACKEND_URL}/api/stripe/repx/plans`);
       const data = await response.json();
       
       if (data.success) {
@@ -202,7 +202,7 @@ export const useSubscription = (): SubscriptionHookReturn => {
   // Create Stripe checkout session
   const createCheckoutSession = useCallback(async (tier: RepxTier, billingCycle: BillingCycle): Promise<string | null> => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/crm/stripe/create-checkout-session`, {
+      const response = await fetch(`${BACKEND_URL}/api/stripe/create-checkout-session`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -237,7 +237,7 @@ export const useSubscription = (): SubscriptionHookReturn => {
     }
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/crm/repx/validate-access`, {
+      const response = await fetch(`${BACKEND_URL}/api/repx/validate-access`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -409,7 +409,7 @@ class EmailService {
     };
 
     const response = await axios.post(
-      `${this.backendUrl}/api/crm/email/send-orchestrated`,
+      `${this.backendUrl}/api/email/send-orchestrated`,
       requestPayload,
       {
         headers: {
@@ -449,7 +449,7 @@ class EmailService {
     const token = session.data.session?.access_token;
 
     const response = await axios.post(
-      `${this.backendUrl}/api/crm/email/send`,
+      `${this.backendUrl}/api/email/send`,
       {
         ...options,
         userId,
@@ -893,7 +893,7 @@ class EmailService {
     };
 
     const response = await axios.post(
-      `${this.backendUrl}/api/crm/email/send-bulk`,
+      `${this.backendUrl}/api/email/send-bulk`,
       requestPayload,
       {
         headers: {

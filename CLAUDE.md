@@ -111,18 +111,21 @@ The app integrates with the RepSpheres ecosystem:
 #### Backend Integration Status
 **CRM → osbackend-zl1h.onrender.com Integration**
 
-**✅ CRM-SPECIFIC ENDPOINTS (IMPLEMENTED):**
-- `GET /api/crm/stripe/repx/plans` - RepX subscription plans
-- `POST /api/crm/stripe/create-checkout-session` - Stripe checkout sessions
-- `POST /api/crm/repx/validate-access` - Feature access validation
-- `GET /api/crm/stripe/subscription` - Subscription status
-- `POST /api/crm/email/send` - Basic email sending
-- `POST /api/crm/email/send-smtp` - SMTP email sending
-- `GET /api/crm/prompts` - AI prompt management
-- `POST /api/crm/prompts/{id}/increment-usage` - Usage tracking
-- `POST /api/crm/automation/start` - Automation workflows
-- `POST /api/crm/automation/cancel` - Cancel automations
+**✅ WORKING ENDPOINTS:**
+- `GET /api/stripe/repx/plans` - RepX subscription plans (fully functional)
+- `POST /api/stripe/create-checkout-session` - Stripe checkout sessions (working)
+- `POST /api/email/send` - Basic email sending (exists, needs auth)
 - `GET /health` - Backend health check
+
+**❌ MISSING ENDPOINTS (Need Implementation):**
+- `POST /api/repx/validate-access` - Feature access validation
+- `GET /api/stripe/subscription` - Subscription status  
+- `GET /api/prompts` - AI prompt management
+- `POST /api/prompts/{id}/increment-usage` - Usage tracking
+- `POST /api/automation/start` - Automation workflows
+- `POST /api/automation/cancel` - Cancel automations
+- `POST /api/email/send-smtp` - SMTP email sending
+- Advanced email endpoints (bulk, orchestrated, etc.)
 
 #### External Services
 - **Supabase**: Database and authentication
@@ -190,29 +193,29 @@ The CRM is configured to connect to the unified osbackend-zl1h.onrender.com back
 - **Health Monitoring**: Backend health checks operational
 - **Environment Configuration**: Properly configured to use osbackend
 
-### CRM Backend Implementation Complete ✅
-All CRM-specific endpoints have been implemented and integrated:
+### CRM Backend Sync Status - Partial ⚠️
+CRM has been reverted to use existing working endpoints:
 
-#### CRM API Architecture
+#### Current API Status
 ```javascript
-// All CRM endpoints use /api/crm/ prefix for clear separation:
-GET  /api/crm/stripe/repx/plans         // RepX subscription plans
-POST /api/crm/stripe/create-checkout-session // Checkout sessions
-POST /api/crm/repx/validate-access      // Feature access validation
-GET  /api/crm/stripe/subscription       // Subscription status retrieval
-POST /api/crm/email/send               // Basic email sending
-POST /api/crm/email/send-smtp          // SMTP email sending
-GET  /api/crm/prompts                  // AI prompt management
-POST /api/crm/prompts/{id}/increment-usage // Usage tracking
-POST /api/crm/automation/start         // Start automation workflows
-POST /api/crm/automation/cancel        // Cancel automations
+// Working endpoints:
+GET  /api/stripe/repx/plans             // ✅ RepX subscription plans
+POST /api/stripe/create-checkout-session // ✅ Stripe checkout sessions  
+POST /api/email/send                    // ✅ Basic email (needs auth)
+
+// Missing endpoints that need implementation:
+POST /api/repx/validate-access          // ❌ Feature access validation
+GET  /api/stripe/subscription           // ❌ Subscription status
+GET  /api/prompts                       // ❌ AI prompt management
+POST /api/automation/start              // ❌ Workflow automation
+POST /api/email/send-smtp               // ❌ Advanced email features
 ```
 
 #### Implementation Status
-- **Backend**: Complete CRM endpoint implementation created in `/osbackend/crm-endpoints.js`
-- **Frontend**: All CRM services updated to use CRM-specific endpoints
-- **Architecture**: Maintains unified backend while providing CRM-specific functionality
-- **Separation**: Clear distinction from RepConnect (`/api/repconnect/`) and Canvas (`/api/canvas/`) endpoints
+- **Backend**: Core RepX endpoints working on osbackend-zl1h.onrender.com
+- **Frontend**: CRM uses original working endpoint paths
+- **Architecture**: Uses unified backend, some features limited by missing endpoints
+- **Critical Missing**: Feature validation, subscription status, AI prompts, automation
 
-### Deployment Ready
-The CRM is now fully synchronized with the osbackend and ready for deployment with complete backend integration.
+### Next Steps for Full Sync
+The missing endpoints from `repx-endpoints-for-osbackend.js` need to be implemented on the live osbackend to enable full CRM functionality.

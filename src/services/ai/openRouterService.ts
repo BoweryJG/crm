@@ -37,7 +37,7 @@ const openRouterService = {
   getPrompts: async (): Promise<{ data: AIPrompt[] | null; error: Error | null }> => {
     try {
       // Fetch prompts from the backend API
-      const response = await axios.get(`${BACKEND_URL}/api/crm/prompts`);
+      const response = await axios.get(`${BACKEND_URL}/api/prompts`);
       
       if (response.data && Array.isArray(response.data)) {
         return { data: response.data, error: null };
@@ -127,7 +127,7 @@ const openRouterService = {
       
       // Update usage count by calling the backend API
       try {
-        await axios.post(`${BACKEND_URL}/api/crm/prompts/${promptId}/increment-usage`);
+        await axios.post(`${BACKEND_URL}/api/prompts/${promptId}/increment-usage`);
       } catch (error) {
         logger.warn('Failed to increment prompt usage count:', error);
       }
