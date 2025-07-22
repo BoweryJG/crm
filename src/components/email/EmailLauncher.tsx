@@ -301,7 +301,7 @@ const EmailLauncher: React.FC<EmailLauncherProps> = ({
 
         <Box sx={{ px: 2, py: 1 }}>
           <Typography variant="caption" color="text.secondary">
-            🏆 Revolutionary Email Client
+            ⚡ Email Command Center
           </Typography>
           <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5 }}>
             <AIIcon sx={{ fontSize: 16, color: themeColor }} />
