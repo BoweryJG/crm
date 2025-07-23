@@ -1,5 +1,4 @@
-import { LinguisticsAnalysis, CallAnalysis, KeyPhrase, SentimentAnalysis } from '../../types/callAnalysis';
-import { LinguisticsService } from '../linguistics/linguisticsService';
+import { LinguisticsAnalysis, CallAnalysis } from '../../types/callAnalysis';
 import { supabase } from '../supabase/supabase';
 
 export interface AIInsight {
@@ -103,7 +102,6 @@ export class AIInsightsService {
     let actionRequired = '';
 
     // Analyze sentiment patterns
-    const sentimentScore = linguistics.sentiment_analysis?.overall_score || 0;
     const sentimentProgression = linguistics.sentiment_analysis?.progression || [];
     
     // Check for sentiment improvement (re-engagement signal)

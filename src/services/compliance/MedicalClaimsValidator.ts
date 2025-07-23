@@ -494,7 +494,7 @@ export class MedicalClaimsValidator {
     });
 
     // Extract potential indications from content
-    const contentLower = content.toLowerCase();
+    // Content processing handled by extractPotentialUses method
     
     // Check if content discusses uses not in cleared indications
     const potentialUses = this.extractPotentialUses(content);

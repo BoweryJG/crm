@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
@@ -8,12 +8,7 @@ import {
   Divider,
   IconButton,
   Button,
-  LinearProgress,
   Avatar,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   useTheme,
   Collapse,
   Alert
@@ -23,7 +18,6 @@ import {
   AccessTime as DurationIcon,
   Person as PersonIcon,
   Business as BusinessIcon,
-  CalendarToday as CalendarIcon,
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
   TrendingFlat as TrendingFlatIcon,

@@ -1,7 +1,6 @@
 import { supabase } from '../supabase/supabase';
 import TwilioProvisioningService, { ProvisioningOptions } from './TwilioProvisioningService';
 import BillingReceiptService from '../billing/BillingReceiptService';
-import HybridEmailOnboardingService from '../email/HybridEmailOnboardingService';
 
 export interface RepProfile {
   id: string;
@@ -232,18 +231,14 @@ class RepOnboardingService {
       // Initialize AI analysis storage (will be populated by transcription processing)
 
       // For now, we'll just ensure the rep has proper access by creating initial records
-      const initialData = [
-        {
-          table: 'rep_call_records',
-          data: {
-            rep_id: userId,
-            total_calls: 0,
-            total_minutes: 0,
-            setup_completed: true,
-            created_at: new Date().toISOString()
-          }
-        }
-      ];
+      // Initial data structure defined but not used in current implementation
+      const repCallRecord = {
+        rep_id: userId,
+        total_calls: 0,
+        total_minutes: 0,
+        setup_completed: true,
+        created_at: new Date().toISOString()
+      };
 
       // Note: In a real implementation, you might need to execute specific
       // database functions or procedures to set up RLS policies dynamically

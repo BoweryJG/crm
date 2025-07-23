@@ -7,7 +7,6 @@ import {
   CardContent,
   Button,
   Chip,
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -17,8 +16,6 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Switch,
-  FormControlLabel,
   Alert,
   CircularProgress,
   useTheme,
@@ -32,7 +29,6 @@ import {
   WhatshotTwoTone as HotLeadIcon,
   EventTwoTone as MeetingIcon,
   PlayArrow as StartIcon,
-  Settings as ConfigIcon,
   AutoAwesome as MagicIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../auth/AuthContext';

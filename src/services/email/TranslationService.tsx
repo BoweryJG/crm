@@ -1,5 +1,5 @@
 // Enhanced Translation Service with Google Translate API Integration
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { supabase } from '../supabase/supabase';
 
 // Types and Interfaces
@@ -795,7 +795,7 @@ class TranslationService {
         .eq('user_id', targetUserId);
 
       // Get translation memory stats  
-      const { data: memoryData } = await supabase
+      await supabase
         .from('translation_memory')
         .select('*')
         .eq('created_by', targetUserId);

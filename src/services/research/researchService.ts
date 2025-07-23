@@ -5,10 +5,7 @@ import {
   ResearchTask,
   ResearchPrompt,
   ResearchNote,
-  ResearchDataQuery,
-  ResearchProjectStatus,
-  ResearchDocumentType,
-  ResearchTaskStatus
+  ResearchDataQuery
 } from '../../types/research';
 
 // Research Projects

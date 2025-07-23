@@ -143,10 +143,7 @@ class RegionalAnalyticsService {
                         company.name?.toLowerCase().includes('dental') ||
                         company.description?.toLowerCase().includes('dental');
         
-        const isMedSpa = company.industry?.toLowerCase().includes('aesthetic') ||
-                        company.industry?.toLowerCase().includes('medical spa') ||
-                        company.name?.toLowerCase().includes('spa') ||
-                        company.name?.toLowerCase().includes('aesthetic');
+        // Check if medical spa (variable removed as unused)
         
         const isPlasticSurgery = company.industry?.toLowerCase().includes('plastic') ||
                                company.name?.toLowerCase().includes('plastic') ||

@@ -1,5 +1,4 @@
 import { AppMode, FeatureTier, useAppMode } from '../contexts/AppModeContext';
-import * as mockDataService from './mockData/mockDataService';
 import * as mockLinguisticsData from './mockData/mockLinguisticsData';
 import { LinguisticsService } from './linguistics/linguisticsService';
 import { CallAnalysisService } from './callAnalysis/callAnalysisService';

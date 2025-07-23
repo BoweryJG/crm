@@ -1,5 +1,5 @@
 // Global Call Panel - Integrated with Twilio Call Service
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Fab,
   Drawer,
@@ -78,13 +78,35 @@ const GlobalCallPanel: React.FC = () => {
     suggestedResponse?: string;
   } | null>(null);
 
+  // Load recent calls
+  const loadRecentCalls = useCallback(async () => {
+    try {
+      const calls = await twilioCallService.getUserCalls(user?.id || '', {
+        status: 'completed'
+      });
+      setRecentCalls(calls.slice(0, 5));
+    } catch (error) {
+      console.error('Error loading recent calls:', error);
+    }
+  }, [user?.id]);
+
+  // Load contacts (mock data for now)
+  const loadContacts = useCallback(async () => {
+    // In production, this would fetch from your contacts service
+    setContacts([
+      { id: '1', name: 'Dr. Smith', phone: '+1234567890', practice: 'Smith Dental' },
+      { id: '2', name: 'Dr. Johnson', phone: '+0987654321', practice: 'Johnson Aesthetics' },
+      { id: '3', name: 'Dr. Williams', phone: '+1122334455', practice: 'Williams Medical' }
+    ]);
+  }, []);
+
   // Load recent calls and contacts on mount
   useEffect(() => {
     if (user?.id) {
       loadRecentCalls();
       loadContacts();
     }
-  }, [user?.id]);
+  }, [user?.id, loadRecentCalls, loadContacts]);
 
   // Initialize Twilio service
   useEffect(() => {
@@ -99,28 +121,6 @@ const GlobalCallPanel: React.FC = () => {
     };
     initTwilio();
   }, []);
-
-  // Load recent calls
-  const loadRecentCalls = async () => {
-    try {
-      const calls = await twilioCallService.getUserCalls(user?.id || '', {
-        status: 'completed'
-      });
-      setRecentCalls(calls.slice(0, 5));
-    } catch (error) {
-      console.error('Error loading recent calls:', error);
-    }
-  };
-
-  // Load contacts (mock data for now)
-  const loadContacts = async () => {
-    // In production, this would fetch from your contacts service
-    setContacts([
-      { id: '1', name: 'Dr. Smith', phone: '+1234567890', practice: 'Smith Dental' },
-      { id: '2', name: 'Dr. Johnson', phone: '+0987654321', practice: 'Johnson Aesthetics' },
-      { id: '3', name: 'Dr. Williams', phone: '+1122334455', practice: 'Williams Medical' }
-    ]);
-  };
 
   // Toggle the call panel
   const toggleDrawer = () => {

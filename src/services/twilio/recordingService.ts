@@ -1,5 +1,4 @@
 import { supabase } from '../supabase/supabase';
-import { openRouterService } from '../ai/openRouterService';
 
 /**
  * Interface for recording metadata

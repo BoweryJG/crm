@@ -1,7 +1,6 @@
 // Ripple Content Service - Intelligent Content Delivery System with Advanced Tracking
 // Create "Ripples" - trackable, personalized content experiences that notify you when prospects engage
 import { supabase } from './supabase/supabase';
-import { contentGeneratorService } from './contentGeneratorService';
 
 // Ripple Content Types
 export interface RippleContent {

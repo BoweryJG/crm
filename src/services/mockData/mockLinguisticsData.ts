@@ -1,6 +1,5 @@
 // @ts-ignore
 import { v4 as uuidv4 } from 'uuid';
-import mockDataService from './mockDataService';
 
 /**
  * Generates multiple mock linguistics analysis data for testing

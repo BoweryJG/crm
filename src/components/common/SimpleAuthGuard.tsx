@@ -40,7 +40,7 @@ export const SimpleAuthGuard: React.FC<SimpleAuthGuardProps> = ({
     };
 
     checkAuth();
-  }, []);
+  }, [allowPublic]);
 
   if (checking) {
     return <>{fallback}</>;

@@ -442,44 +442,39 @@ class MarketIntelligenceService {
     };
     talking_points: string[];
   }> {
-    try {
-      // In production, this would use AI analysis
-      // For now, return mock analysis
-      return {
-        key_insights: [
-          'New regulatory requirements may increase compliance costs',
-          'Opportunity to differentiate through compliance expertise',
-          'Smaller competitors may struggle with implementation'
+    // In production, this would use AI analysis
+    // For now, return mock analysis
+    return {
+      key_insights: [
+        'New regulatory requirements may increase compliance costs',
+        'Opportunity to differentiate through compliance expertise',
+        'Smaller competitors may struggle with implementation'
+      ],
+      impact_assessment: {
+        sales_impact: 'positive',
+        competitive_impact: 'advantage',
+        market_position: 'strengthen'
+      },
+      recommended_actions: {
+        immediate: [
+          'Update sales materials with compliance messaging',
+          'Schedule training on new regulations'
         ],
-        impact_assessment: {
-          sales_impact: 'positive',
-          competitive_impact: 'advantage',
-          market_position: 'strengthen'
-        },
-        recommended_actions: {
-          immediate: [
-            'Update sales materials with compliance messaging',
-            'Schedule training on new regulations'
-          ],
-          short_term: [
-            'Develop compliance consultation service',
-            'Create educational content for prospects'
-          ],
-          long_term: [
-            'Consider compliance software integration',
-            'Build strategic partnerships with compliance vendors'
-          ]
-        },
-        talking_points: [
-          'We help practices navigate complex regulatory requirements',
-          'Our solution ensures automatic compliance with latest standards',
-          'Reduce compliance risk while focusing on patient care'
+        short_term: [
+          'Develop compliance consultation service',
+          'Create educational content for prospects'
+        ],
+        long_term: [
+          'Consider compliance software integration',
+          'Build strategic partnerships with compliance vendors'
         ]
-      };
-    } catch (error) {
-      console.error('Error analyzing market feed:', error);
-      throw error;
-    }
+      },
+      talking_points: [
+        'We help practices navigate complex regulatory requirements',
+        'Our solution ensures automatic compliance with latest standards',
+        'Reduce compliance risk while focusing on patient care'
+      ]
+    };
   }
 
   // Generate market intelligence summary

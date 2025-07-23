@@ -1,5 +1,4 @@
 import { supabase } from '../supabase/supabase';
-import { LinguisticsService } from './linguisticsService';
 
 export interface PsychologicalProfile {
   personalityType: 'analytical' | 'driver' | 'expressive' | 'amiable';
@@ -505,7 +504,7 @@ class AdvancedLinguisticsService {
     const allText = segments.map(s => s.text).join(' ').toLowerCase();
     
     if (allText.includes('let me tell you about') || allText.includes('our solution')) return 'presentation';
-    if (allText.includes('price') || allText.includes('cost') && allText.includes('concerned')) return 'objection_handling';
+    if ((allText.includes('price') || allText.includes('cost')) && allText.includes('concerned')) return 'objection_handling';
     if (allText.includes('ready to move forward') || allText.includes('when can we start')) return 'closing';
     if (allText.includes('tell me about') || allText.includes('what are your')) return 'discovery';
     

@@ -335,13 +335,12 @@ describe('Analytics Integration Tests', () => {
       expect(recommendations).toBeDefined();
       expect(Array.isArray(recommendations)).toBe(true);
       
-      if (recommendations.length > 0) {
-        const firstRec = recommendations[0];
-        expect(firstRec.templateId).toBeDefined();
-        expect(firstRec.recommendationType).toBeDefined();
-        expect(firstRec.suggestedTest).toBeDefined();
-        expect(firstRec.priority).toBeDefined();
-      }
+      // Test the first recommendation if any exist
+      const firstRec = recommendations[0];
+      expect(recommendations.length === 0 || firstRec.templateId !== undefined).toBe(true);
+      expect(recommendations.length === 0 || firstRec.recommendationType !== undefined).toBe(true);
+      expect(recommendations.length === 0 || firstRec.suggestedTest !== undefined).toBe(true);
+      expect(recommendations.length === 0 || firstRec.priority !== undefined).toBe(true);
     });
   });
 
@@ -385,11 +384,9 @@ describe('Analytics Integration Tests', () => {
       expect(Array.isArray(predictiveRecs)).toBe(true);
 
       // May or may not have recommendations based on data
-      if (predictiveRecs.length > 0) {
-        const firstPrediction = predictiveRecs[0];
-        expect(firstPrediction.type).toBeDefined();
-        expect(firstPrediction.impact.confidenceLevel).toBeDefined();
-      }
+      const firstPrediction = predictiveRecs[0];
+      expect(predictiveRecs.length === 0 || firstPrediction?.type !== undefined).toBe(true);
+      expect(predictiveRecs.length === 0 || firstPrediction?.impact?.confidenceLevel !== undefined).toBe(true);
     });
 
     it('should export recommendations in different formats', async () => {

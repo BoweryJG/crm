@@ -2,9 +2,6 @@ import React, { useState, useMemo, memo, useCallback, useEffect } from 'react';
 import {
   Box,
   Grid,
-  Card,
-  CardContent,
-  CardActions,
   Typography,
   Button,
   Chip,
@@ -16,17 +13,11 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
-  IconButton,
-  Tooltip,
-  Badge,
-  CircularProgress
+  DialogActions
 } from '@mui/material';
 import {
   Search as SearchIcon,
-  FilterList as FilterIcon,
   PlayArrow as PlayIcon,
-  Info as InfoIcon,
   Star as StarIcon,
   TrendingUp as TrendingUpIcon,
   Psychology as PsychologyIcon,
@@ -59,7 +50,7 @@ const TemplateGallery: React.FC<TemplateGalleryProps> = memo(({
   const [selectedTemplate, setSelectedTemplate] = useState<AutomationTemplate | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
 
-  const { measureRender, measureInteraction, getMobilePerformanceScore } = usePerformanceMonitoring({
+  const { measureRender, measureInteraction } = usePerformanceMonitoring({
     onMetric: (metric) => {
       // Log performance metrics for optimization
       if (metric.name.includes('template') && metric.value > 100) {

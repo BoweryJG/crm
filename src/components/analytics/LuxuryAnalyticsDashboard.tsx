@@ -6,17 +6,15 @@ import {
   Card,
   CardContent,
   CardHeader,
-  useTheme,
   Paper,
   Chip
 } from '@mui/material';
 import {
-  TrendingUp as TrendingUpIcon,
   Analytics as AnalyticsIcon,
   Psychology as PsychologyIcon,
   Public as PublicIcon
 } from '@mui/icons-material';
-import { AviationDashboard, MarketSentimentGauge } from '../gauges/AviationGauges';
+import { AviationDashboard } from '../gauges/AviationGauges';
 import { useThemeContext } from '../../themes/ThemeContext';
 
 interface LuxuryAnalyticsDashboardProps {
@@ -43,7 +41,6 @@ interface LuxuryAnalyticsDashboardProps {
 }
 
 const LuxuryAnalyticsDashboard: React.FC<LuxuryAnalyticsDashboardProps> = ({ data }) => {
-  const theme = useTheme();
   const { themeMode } = useThemeContext();
 
   if (themeMode !== 'luxury') {

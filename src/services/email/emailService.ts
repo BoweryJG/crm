@@ -1,7 +1,7 @@
 // Enhanced Email Service for CRM with Backend Integration
 import { supabase } from '../supabase/supabase';
 import { gmailSyncService } from './gmailSyncService';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 
 // Types and Interfaces
 interface EmailAccount {
@@ -310,7 +310,7 @@ class EmailService {
       }
 
       // Convert single recipients to arrays for consistency
-      const recipients = this.normalizeRecipients(options);
+      this.normalizeRecipients(options);
       
       // Try backend orchestration first if available (highest priority)
       const backendAccount = this.accounts.find(acc => acc.provider === 'backend');

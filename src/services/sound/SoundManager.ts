@@ -1,6 +1,6 @@
 // The Omnisensory Experience Engine™ - Core Sound Manager
 import { SoundCache } from './SoundCache';
-import { getLuxurySound, LUXURY_SOUNDS } from './luxurySounds';
+import { getLuxurySound } from './luxurySounds';
 
 export type SoundCategory = 
   | 'ui-primary' 

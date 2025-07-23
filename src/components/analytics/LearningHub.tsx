@@ -11,22 +11,16 @@ import {
   Avatar,
   LinearProgress,
   useTheme,
-  Badge,
   Tooltip
 } from '@mui/material';
 import {
   School as LearnIcon,
-  TrendingUp as TrendingIcon,
   PlayCircle as VideoIcon,
   Quiz as QuizIcon,
   EmojiEvents as CertificateIcon,
-  Star as StarIcon,
-  Timeline as ProgressIcon,
   LocalFireDepartment as HotIcon,
-  Lightbulb as TipIcon,
   Psychology as InsightIcon
 } from '@mui/icons-material';
-import { useThemeContext } from '../../themes/ThemeContext';
 
 interface LearningHubProps {
   type: 'dental' | 'aesthetic';
@@ -35,7 +29,6 @@ interface LearningHubProps {
 
 const LearningHub: React.FC<LearningHubProps> = ({ type, procedureCount }) => {
   const theme = useTheme();
-  const { themeMode } = useThemeContext();
   const [learningProgress] = useState(Math.floor(Math.random() * 100));
 
   const educationalSections = [

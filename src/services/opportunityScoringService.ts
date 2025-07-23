@@ -1,7 +1,6 @@
 // Market Opportunity Scoring Service - Advanced opportunity identification and prioritization
-import { supabase } from './supabase/supabase';
-import { marketIntelligenceService, MarketOpportunity, MarketTrend } from './marketIntelligenceService';
-import { trendAnalysisService, TrendSignal } from './trendAnalysisService';
+import { marketIntelligenceService, MarketOpportunity } from './marketIntelligenceService';
+import { TrendSignal } from './trendAnalysisService';
 
 export interface OpportunityScore {
   opportunity_id: string;

@@ -1,6 +1,6 @@
 // Research module types for RepSpheres CRM
 import { BaseModel } from './models';
-import { AIPrompt, AIGeneratedAsset } from './ai';
+import { AIGeneratedAsset } from './ai';
 
 // Research Project Status
 export enum ResearchProjectStatus {

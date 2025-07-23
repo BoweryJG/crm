@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useMemo, ReactNode, useEffect } from 'react';
+import React, { createContext, useState, useContext, useMemo, ReactNode, useEffect, useCallback } from 'react';
 import { ThemeProvider as MUIThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import spaceTheme from './spaceTheme';
@@ -107,7 +107,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   }, [userPreferences]);
 
   // Toggle between favorite themes or library themes
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     const favoriteIds = userPreferences.favoriteThemes;
     const allThemes = favoriteIds.length > 0 ? favoriteIds : ['cartier-gold', 'boeing-cockpit', 'cyber-neon'];
     
@@ -117,7 +117,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     
     logger.debug('🔄 Theme toggled from', themeMode, 'to', nextTheme);
     setThemeMode(nextTheme);
-  };
+  }, [themeMode, userPreferences.favoriteThemes, setThemeMode]);
 
   // Theme management functions
   const toggleFavoriteTheme = (themeId: string) => {
@@ -143,13 +143,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }));
   };
 
-  const getAllAvailableThemes = () => {
+  const getAllAvailableThemes = useCallback(() => {
     return [...allThemes, ...userPreferences.customThemes];
-  };
+  }, [userPreferences.customThemes]);
 
-  const getCurrentTheme = () => {
+  const getCurrentTheme = useCallback(() => {
     return getAllAvailableThemes().find(theme => theme.id === themeMode) || null;
-  };
+  }, [getAllAvailableThemes, themeMode]);
 
   // Memoize the current theme to prevent unnecessary re-renders
   const currentTheme = useMemo(() => {
@@ -179,7 +179,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     // Fallback to luxury theme
     console.warn('Theme not found, falling back to luxury:', themeMode);
     return luxuryTheme;
-  }, [themeMode, userPreferences.customThemes]);
+  }, [themeMode, getCurrentTheme]);
 
   // Create the context value
   const contextValue = useMemo(
@@ -197,7 +197,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       getCurrentTheme,
       currentTheme: getCurrentTheme(),
     }),
-    [themeMode, userPreferences]
+    [themeMode, userPreferences, toggleTheme, getAllAvailableThemes, getCurrentTheme]
   );
 
   return (

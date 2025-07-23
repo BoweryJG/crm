@@ -1,7 +1,7 @@
 // Automation Email Bridge - Connects AutomationHub to UltraEmailModal
 // Provides seamless integration between automation workflows and email execution
 
-import { emailAutomationEngine, EmailAutomation, WorkflowStep } from './EmailAutomationEngine';
+import { emailAutomationEngine } from './EmailAutomationEngine';
 import { EventEmitter } from 'events';
 import { emailService } from './emailService';
 import { supabase } from '../supabase/supabase';

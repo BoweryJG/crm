@@ -1,5 +1,4 @@
-// Import something to make this a module
-import React from 'react';
+// Type definitions for data models
 
 // Base model for all database entities
 export interface BaseModel {

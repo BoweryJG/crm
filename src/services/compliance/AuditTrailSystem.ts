@@ -512,7 +512,7 @@ export class AuditTrailSystem extends EventEmitter {
   // Real-time monitoring
   private setupRealtimeMonitoring() {
     // Monitor for specific patterns
-    const subscription = supabase
+    supabase
       .channel('audit-monitoring')
       .on('postgres_changes', {
         event: 'INSERT',
@@ -533,8 +533,8 @@ export class AuditTrailSystem extends EventEmitter {
   }
 
   private requiresImmediateAction(event: AuditEvent): boolean {
-    return event.event_type === 'data_modification' && 
-           event.entity_type === 'clinical_data' ||
+    return (event.event_type === 'data_modification' && 
+            event.entity_type === 'clinical_data') ||
            this.HIGH_RISK_ACTIONS.includes(event.action);
   }
 
@@ -639,7 +639,7 @@ export class AuditTrailSystem extends EventEmitter {
 
   private async archiveOldRecords(retentionYears: number, cutoffDate: Date): Promise<void> {
     // Move records to archive
-    const { data, error } = await supabase
+    const { data, error: _error } = await supabase
       .from('audit_trail')
       .select('*')
       .eq('retention_years', retentionYears)

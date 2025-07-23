@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient, Session, User, AuthChangeEvent } from '@supabase/supabase-js';
+import { SupabaseClient, Session, User, AuthChangeEvent } from '@supabase/supabase-js';
 import { logger } from '../../utils/logger';
 import {
   generateMockContacts,
@@ -11,9 +11,7 @@ import {
   generateMockResearchDataQueries
 } from '../mockData/mockDataService';
 import { 
-  enhanceMockDataWithLinguistics,
-  generateMultipleMockLinguisticsAnalyses,
-  generateMultipleMockCallAnalysesWithLinguistics 
+  enhanceMockDataWithLinguistics
 } from '../mockData/mockLinguisticsData';
 
 // Environment variables for Supabase

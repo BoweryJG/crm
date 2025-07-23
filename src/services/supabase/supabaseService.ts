@@ -2,12 +2,9 @@ import { supabase } from './supabase';
 import {
   Contact,
   Practice,
-  Procedure,
-  Company,
   SalesActivity,
   Task,
-  MarketIntelligence,
-  UserProfile
+  MarketIntelligence
 } from '../../types/models';
 
 // Interface for call activity data

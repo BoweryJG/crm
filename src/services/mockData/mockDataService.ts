@@ -1,5 +1,5 @@
 import { Contact } from '../../types/models';
-import { Practice, PracticeSize } from '../../types/practices';
+import { Practice } from '../../types/practices';
 import {
   ResearchProject,
   ResearchDocument,
@@ -95,7 +95,6 @@ const getRandomPercentageChange = (min: number = -15, max: number = 25): number 
 
 // Generate a list of random contacts for dental and aesthetic industries across the country
 export const generateMockContacts = (count: number = 20): Contact[] => {
-  const titles = ['Dr.', 'Dr.', 'Dr.', 'Ms.', 'Mr.'];
   
   const firstNames = [
     'Sarah', 'John', 'Michael', 'Emily', 'David', 'Jessica', 'Robert', 'Jennifer', 

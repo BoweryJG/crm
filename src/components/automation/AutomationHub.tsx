@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  Select,
-  MenuItem,
-  FormControl,
   Chip,
   IconButton,
   Button,
@@ -15,13 +12,11 @@ import {
   useMediaQuery,
   alpha,
   Fade,
-  LinearProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   TextField,
-  Link as MuiLink,
   CircularProgress,
 } from '@mui/material';
 import {
@@ -34,16 +29,13 @@ import {
   Pause as PauseIcon,
   Settings as ConfigIcon,
   Add as AddIcon,
-  TrendingUp as AnalyticsIcon,
   CheckCircle as ActiveIcon,
-  Cancel as InactiveIcon,
   Link as LinkIcon,
   Mic as RecordingIcon,
   Article as PRIcon,
   ContentCopy as CopyIcon,
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
-import glassEffects from '../../themes/glassEffects';
 import { getThemeAccents, getThemeGlass } from '../dashboard/ThemeAwareComponents';
 import automationService, { 
   WorkflowType, 

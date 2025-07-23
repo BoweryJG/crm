@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { useAuth } from '../../auth/AuthContext';
 import './GlobalAuthModal.css';
@@ -115,18 +115,7 @@ export default function GlobalLogoutModal({ open, onClose, onConfirm }: GlobalLo
     };
   }, [open]);
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) {
-        handleClose();
-      }
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [open]);
-
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (!modalRef.current) return;
     
     gsap.to(modalRef.current, {
@@ -140,7 +129,18 @@ export default function GlobalLogoutModal({ open, onClose, onConfirm }: GlobalLo
         onClose();
       }
     });
-  };
+  }, [onClose]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && open) {
+        handleClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [open, handleClose]);
 
   const handleConfirm = async () => {
     setIsLoading(true);

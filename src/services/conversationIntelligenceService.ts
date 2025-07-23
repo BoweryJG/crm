@@ -1,6 +1,5 @@
 // Conversation Intelligence Service - AI-powered call insights
 import { supabase } from './supabase/supabase';
-import { twilioCallService, CallAnalysis } from './twilioCallService';
 
 export interface ConversationInsight {
   id: string;

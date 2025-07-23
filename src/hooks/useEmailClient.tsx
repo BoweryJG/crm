@@ -181,13 +181,8 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
 
   // Analytics
   const getEmailStats = useCallback(async () => {
-    try {
-      // Placeholder analytics
-      return { sent: 0, delivered: 0, opened: 0, clicked: 0, unreadCount: 0, pendingCount: 0 };
-    } catch (error) {
-      console.error('Failed to get email stats:', error);
-      throw error;
-    }
+    // Placeholder analytics
+    return { sent: 0, delivered: 0, opened: 0, clicked: 0, unreadCount: 0, pendingCount: 0 };
   }, []);
 
   const trackEmailOpen = useCallback(async (emailId: string) => {

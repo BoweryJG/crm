@@ -6,7 +6,7 @@ import {
   ResearchDocumentType,
   ResearchProject
 } from '../../types/research';
-import { AIGeneratedAsset, AIResponse } from '../../types/ai';
+import { AIGeneratedAsset } from '../../types/ai';
 
 // Extract variables from research data
 const extractResearchVariables = (

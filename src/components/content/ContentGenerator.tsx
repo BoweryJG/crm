@@ -1,5 +1,5 @@
 // Content Generator Component - AI-Powered Sales Content with Socratic & Challenger Sales Methodology
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -196,42 +196,34 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ userId = 'demo-user
     { value: 'solution_construction', label: 'Solution Construction - Build together' }
   ];
 
-  // Load data on mount
-  useEffect(() => {
-    loadTemplates();
-    loadGeneratedContent();
-    loadRippleContent();
-    loadNotifications();
-  }, [userId]);
-
-  const loadTemplates = async () => {
+  const loadTemplates = useCallback(async () => {
     try {
       const templateData = await contentGeneratorService.getTemplates();
       setTemplates(templateData);
     } catch (error) {
       console.error('Error loading templates:', error);
     }
-  };
+  }, []);
 
-  const loadGeneratedContent = async () => {
+  const loadGeneratedContent = useCallback(async () => {
     try {
       const contentData = await contentGeneratorService.getUserContent(userId);
       setGeneratedContent(contentData);
     } catch (error) {
       console.error('Error loading generated content:', error);
     }
-  };
+  }, [userId]);
 
-  const loadRippleContent = async () => {
+  const loadRippleContent = useCallback(async () => {
     try {
       const rippleData = await rippleContentService.getUserRipples(userId);
       setRipples(rippleData);
     } catch (error) {
       console.error('Error loading ripple content:', error);
     }
-  };
+  }, [userId]);
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     try {
       const notificationData = await contentEngagementNotificationService.getUserNotifications(userId, {
         unread_only: false,
@@ -241,7 +233,15 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ userId = 'demo-user
     } catch (error) {
       console.error('Error loading notifications:', error);
     }
-  };
+  }, [userId]);
+
+  // Load data on mount
+  useEffect(() => {
+    loadTemplates();
+    loadGeneratedContent();
+    loadRippleContent();
+    loadNotifications();
+  }, [userId, loadTemplates, loadGeneratedContent, loadRippleContent, loadNotifications]);
 
   const generateContent = async () => {
     if (!selectedTemplate || !generationRequest.target_practice?.practice_name) {

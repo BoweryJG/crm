@@ -376,7 +376,7 @@ export class EmailAutomationEngine extends EventEmitter {
     const contactData = await this.getContactData(execution.contact_id);
 
     // Evaluate conditions
-    const conditionMet = await this.evaluateConditions(
+    await this.evaluateConditions(
       config.condition_rules || [],
       contactData,
       execution

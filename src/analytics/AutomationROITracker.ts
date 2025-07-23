@@ -407,7 +407,7 @@ export class AutomationROITracker {
       if (opp.status !== 'closed_won') continue;
 
       // Get first touchpoint for this opportunity
-      const { data: firstTouchData, error } = await supabase
+      const { data: firstTouchData, error: _error } = await supabase
         .from('automation_logs')
         .select('created_at')
         .eq('metadata->>accountId', opp.accountId)

@@ -1,6 +1,6 @@
 // Competitive Response Service - Strategic response generation and tracking
 import { supabase } from './supabase/supabase';
-import { marketIntelligenceService, CompetitorActivity } from './marketIntelligenceService';
+import { CompetitorActivity } from './marketIntelligenceService';
 
 export interface CompetitiveResponse {
   id: string;
@@ -975,20 +975,15 @@ class CompetitiveResponseService {
     startDate: string,
     endDate: string
   ): Promise<CompetitiveResponse['impact_measurement']> {
-    try {
-      // In production, this would pull real metrics
-      // For now, return mock data
-      return {
-        win_rate_change: 12.5,
-        market_share_change: 1.8,
-        revenue_impact: 2500000,
-        customer_retention: 96.5,
-        competitive_wins: 45
-      };
-    } catch (error) {
-      console.error('Error measuring response impact:', error);
-      throw error;
-    }
+    // In production, this would pull real metrics
+    // For now, return mock data
+    return {
+      win_rate_change: 12.5,
+      market_share_change: 1.8,
+      revenue_impact: 2500000,
+      customer_retention: 96.5,
+      competitive_wins: 45
+    };
   }
 }
 

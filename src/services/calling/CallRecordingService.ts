@@ -1,18 +1,6 @@
 import { supabase } from '../supabase/supabase';
 
-// Twilio Recording Types
-interface TwilioRecording {
-  sid: string;
-  accountSid: string;
-  callSid: string;
-  uri: string;
-  dateCreated: string;
-  dateUpdated: string;
-  duration: string;
-  status: 'processing' | 'completed' | 'absent' | 'failed';
-  channels: number;
-  source: 'DialVerb' | 'Conference' | 'OutboundAPI' | 'Trunking' | 'RecordVerb';
-}
+// Twilio Recording Types (interface kept for future use)
 
 // AI Transcription Types
 interface TranscriptionSegment {

@@ -247,7 +247,7 @@ export class PredictiveTimingEngine extends EventEmitter {
 
   private startPatternLearning() {
     // Set up real-time learning from engagement data
-    const subscription = supabase
+    supabase
       .channel('engagement-learning')
       .on('postgres_changes', {
         event: 'INSERT',

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
   Card,
   CardContent,
-  CardMedia,
   CardActionArea,
   Chip,
   Grid,
@@ -12,13 +11,11 @@ import {
   InputAdornment,
   ToggleButton,
   ToggleButtonGroup,
-  Button,
   IconButton,
   Avatar,
   Badge,
   Paper,
   LinearProgress,
-  Tooltip,
   Fab,
   Zoom,
   useTheme
@@ -29,25 +26,18 @@ import {
   ViewList as ListViewIcon,
   Bookmark as BookmarkIcon,
   BookmarkBorder as BookmarkBorderIcon,
-  PlayCircle as PlayIcon,
   School as LearnIcon,
-  TrendingUp as TrendingIcon,
   LocalHospital as MedicalIcon,
   Psychology as AestheticIcon,
   Star as StarIcon,
-  FilterList as FilterIcon,
-  Sort as SortIcon,
   Favorite as FavoriteIcon,
   FavoriteBorder as FavoriteBorderIcon,
-  Share as ShareIcon,
-  Download as DownloadIcon,
   Quiz as QuizIcon,
   EmojiEvents as CertificateIcon,
   VideoLibrary as VideoIcon,
   MenuBook as GuideIcon,
   Timeline as ProgressIcon
 } from '@mui/icons-material';
-import { useThemeContext } from '../../themes/ThemeContext';
 import { DentalProcedure, AestheticProcedure } from '../../types';
 import LearningHub from './LearningHub';
 
@@ -63,14 +53,13 @@ const ProcedureLibrary: React.FC<ProcedureLibraryProps> = ({
   onProcedureClick
 }) => {
   const theme = useTheme();
-  const { themeMode } = useThemeContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'name' | 'growth' | 'market' | 'popularity'>('popularity');
   const [bookmarkedProcedures, setBookmarkedProcedures] = useState<Set<string>>(new Set());
   const [favoriteProcedures, setFavoriteProcedures] = useState<Set<string>>(new Set());
-  const [completedProcedures, setCompletedProcedures] = useState<Set<string>>(new Set());
+  const [completedProcedures] = useState<Set<string>>(new Set());
 
   // Get unique categories
   const categories = ['all', ...Array.from(new Set(procedures.map(p => p.category).filter(Boolean)))];

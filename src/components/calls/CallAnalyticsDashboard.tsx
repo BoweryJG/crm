@@ -1,5 +1,5 @@
 // Call Analytics Dashboard - AI-powered call insights and performance tracking
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Grid,
@@ -121,11 +121,7 @@ const CallAnalyticsDashboard: React.FC<CallAnalyticsDashboardProps> = ({ userId 
   const [currentTab, setCurrentTab] = useState(0);
   const [analysisDialogOpen, setAnalysisDialogOpen] = useState(false);
 
-  useEffect(() => {
-    loadCallData();
-  }, [userId, timeframe]);
-
-  const loadCallData = async () => {
+  const loadCallData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -141,7 +137,11 @@ const CallAnalyticsDashboard: React.FC<CallAnalyticsDashboardProps> = ({ userId 
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId, timeframe]);
+
+  useEffect(() => {
+    loadCallData();
+  }, [userId, timeframe, loadCallData]);
 
   const loadCallAnalysis = async (call: TwilioCallRecord) => {
     try {

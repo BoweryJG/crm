@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -67,32 +67,7 @@ const CommunicationsHub: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
   const [isOnboarding, setIsOnboarding] = useState(false);
 
-  useEffect(() => {
-    loadCommunicationsData();
-  }, []);
-
-  const loadCommunicationsData = async () => {
-    try {
-      setLoading(true);
-      
-      // Check onboarding status
-      const status = await RepOnboardingService.getOnboardingStatus('current-user-id');
-      setOnboardingStatus(status);
-      
-      if (status.completed && status.phone_number) {
-        setPhoneNumber(status.phone_number);
-        
-        // Load calling stats and recent calls
-        await loadCallingData();
-      }
-    } catch (error) {
-      console.error('Failed to load communications data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadCallingData = async () => {
+  const loadCallingData = useCallback(async () => {
     // Mock data for now - would integrate with real calling service
     setCallingStats({
       total_calls: 47,
@@ -137,7 +112,32 @@ const CommunicationsHub: React.FC = () => {
         ai_analysis: { conversion_likelihood: 92 }
       }
     ]);
-  };
+  }, []);
+
+  const loadCommunicationsData = useCallback(async () => {
+    try {
+      setLoading(true);
+      
+      // Check onboarding status
+      const status = await RepOnboardingService.getOnboardingStatus('current-user-id');
+      setOnboardingStatus(status);
+      
+      if (status.completed && status.phone_number) {
+        setPhoneNumber(status.phone_number);
+        
+        // Load calling stats and recent calls
+        await loadCallingData();
+      }
+    } catch (error) {
+      console.error('Failed to load communications data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [loadCallingData]);
+
+  useEffect(() => {
+    loadCommunicationsData();
+  }, [loadCommunicationsData]);
 
   const handleStartOnboarding = async () => {
     try {

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, memo, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useMemo, memo, useCallback } from 'react';
 import {
   Box,
   Grid,
@@ -23,7 +23,6 @@ import {
 } from '@mui/material';
 import {
   Search as SearchIcon,
-  FilterList as FilterIcon,
   PlayArrow as PlayIcon,
   Info as InfoIcon,
   Star as StarIcon,

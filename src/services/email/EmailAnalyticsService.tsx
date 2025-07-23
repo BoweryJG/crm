@@ -1,5 +1,4 @@
 // Enhanced Email Analytics Service with Tracking and Intelligence
-import axios from 'axios';
 import { supabase } from '../supabase/supabase';
 
 // Types and Interfaces
@@ -187,25 +186,6 @@ interface A_BTestResult {
   recommendation: string;
 }
 
-interface HeatmapData {
-  email_id: string;
-  click_coordinates: Array<{
-    x: number;
-    y: number;
-    element_type: string;
-    element_text: string;
-    click_count: number;
-  }>;
-  scroll_depth: Array<{
-    percentage: number;
-    user_count: number;
-  }>;
-  time_spent_reading: number; // average seconds
-  mobile_vs_desktop: {
-    mobile: { clicks: number; time_spent: number };
-    desktop: { clicks: number; time_spent: number };
-  };
-}
 
 class EmailAnalyticsService {
   private backendUrl: string;
@@ -221,7 +201,7 @@ class EmailAnalyticsService {
   // Real-time subscriptions for live analytics
   private setupRealTimeSubscriptions(): void {
     // Subscribe to email events for real-time updates
-    const subscription = supabase
+    supabase
       .channel('email_analytics')
       .on('postgres_changes', 
         { event: 'INSERT', schema: 'public', table: 'email_events' },

@@ -81,7 +81,7 @@ const QuickCallWidget: React.FC = () => {
         clearInterval(durationInterval);
       }
     };
-  }, [user]);
+  }, [user, callStatus, durationInterval]);
 
   // Format duration from seconds to MM:SS
   const formatDuration = (seconds: number): string => {

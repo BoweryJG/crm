@@ -1,6 +1,6 @@
 // Smart Sound Caching System with Fallback Support
 import { SoundConfig, ThemeSoundPack } from './SoundManager';
-import { getSoundUrl, getFirstAvailableSound, CORE_SOUNDS } from './soundMappings';
+import { getSoundUrl, CORE_SOUNDS } from './soundMappings';
 
 export class SoundCache {
   private cache: Map<string, AudioBuffer> = new Map();

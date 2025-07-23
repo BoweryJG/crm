@@ -57,16 +57,12 @@ export class OptimizationRecommendations {
     // Get comprehensive analytics data
     const [
       templateMetrics,
-      roiData,
       stakeholderEngagement,
-      channelPerformance,
-      testRecommendations
+      channelPerformance
     ] = await Promise.all([
       templateAnalytics.getAllTemplateMetrics(timeRange),
-      automationROITracker.getROIDashboardData(timeRange),
       engagementAnalytics.getStakeholderEngagement(undefined, timeRange),
-      engagementAnalytics.getChannelPerformance(timeRange),
-      abTestingEngine.getTestRecommendations(5)
+      engagementAnalytics.getChannelPerformance(timeRange)
     ]);
 
     // Template performance recommendations
@@ -444,8 +440,6 @@ export class OptimizationRecommendations {
 
     // Analyze each content type
     for (const [type, contents] of Object.entries(contentTypes)) {
-      const avgOpenRate = contents.reduce((sum, c) => sum + c.openRate, 0) / contents.length;
-      const avgClickRate = contents.reduce((sum, c) => sum + c.clickRate, 0) / contents.length;
       const avgConversionRate = contents.reduce((sum, c) => sum + c.conversionRate, 0) / contents.length;
 
       // Find top performers

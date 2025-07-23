@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Box, Button, Typography, Paper, List, ListItem, ListItemText, Chip, Alert } from '@mui/material';
 import { useSound } from '../../hooks/useSound';
 import { useSoundContext } from '../../contexts/SoundContext';
@@ -20,17 +20,27 @@ const AudioDebugger: React.FC = () => {
   ];
   
   // Pre-load all sounds at component level
-  const sounds = {
-    'ui-click-primary': useSound('ui-click-primary'),
-    'ui-click-secondary': useSound('ui-click-secondary'),
-    'ui-hover': useSound('ui-hover'),
-    'ui-toggle': useSound('ui-toggle'),
-    'notification-success': useSound('notification-success'),
-    'notification-error': useSound('notification-error'),
-    'navigation-forward': useSound('navigation-forward'),
-    'navigation-back': useSound('navigation-back'),
-    'gauge-tick': useSound('gauge-tick'),
-  };
+  const uiClickPrimary = useSound('ui-click-primary');
+  const uiClickSecondary = useSound('ui-click-secondary');
+  const uiHover = useSound('ui-hover');
+  const uiToggle = useSound('ui-toggle');
+  const notificationSuccess = useSound('notification-success');
+  const notificationError = useSound('notification-error');
+  const navigationForward = useSound('navigation-forward');
+  const navigationBack = useSound('navigation-back');
+  const gaugeTick = useSound('gauge-tick');
+  
+  const sounds = useMemo(() => ({
+    'ui-click-primary': uiClickPrimary,
+    'ui-click-secondary': uiClickSecondary,
+    'ui-hover': uiHover,
+    'ui-toggle': uiToggle,
+    'notification-success': notificationSuccess,
+    'notification-error': notificationError,
+    'navigation-forward': navigationForward,
+    'navigation-back': navigationBack,
+    'gauge-tick': gaugeTick,
+  }), [uiClickPrimary, uiClickSecondary, uiHover, uiToggle, notificationSuccess, notificationError, navigationForward, navigationBack, gaugeTick]);
   
   const testSound = useCallback((soundName: string) => {
     const sound = sounds[soundName as keyof typeof sounds];
@@ -62,7 +72,7 @@ const AudioDebugger: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 500)); // Small delay between sounds
       testSound(soundName);
     }
-  }, [testSound]);
+  }, [testSound, soundsToTest]);
   
   return (
     <Paper sx={{ p: 3, m: 2 }}>

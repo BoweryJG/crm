@@ -6,11 +6,11 @@ export const ValidationRules = {
     message: 'Please enter a valid email address'
   },
   phone: {
-    pattern: /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{4,6}$/,
+    pattern: /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{4,6}$/,
     message: 'Please enter a valid phone number'
   },
   url: {
-    pattern: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+    pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
     message: 'Please enter a valid URL'
   },
   required: {

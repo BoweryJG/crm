@@ -285,7 +285,6 @@ class MultiEmailSendingService {
    * Build Gmail message in RFC 2822 format
    */
   private buildGmailMessage(fromEmail: string, options: SendEmailOptions): string {
-    const boundary = `boundary_${Date.now()}_${Math.random()}`;
     
     let message = `From: ${fromEmail}\r\n`;
     message += `To: ${options.to.join(', ')}\r\n`;

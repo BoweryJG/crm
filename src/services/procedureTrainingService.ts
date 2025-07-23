@@ -6,10 +6,8 @@ import {
   QuizQuestion, 
   SimulationConfig,
   CaseStudy,
-  PatientProfile,
   TreatmentPlan,
   Product,
-  InjectionPoint,
   Resource
 } from './learningCenterService';
 

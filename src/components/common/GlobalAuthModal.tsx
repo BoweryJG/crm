@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { useAuth } from '../../auth/AuthContext';
 import './GlobalAuthModal.css';
@@ -173,18 +173,7 @@ export default function GlobalAuthModal({ open, onClose, onSuccess, mode = 'logi
     }
   }, [open, mode]);
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) {
-        handleClose();
-      }
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [open]);
-
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (!modalRef.current) return;
     
     gsap.to(modalRef.current, {
@@ -198,7 +187,18 @@ export default function GlobalAuthModal({ open, onClose, onSuccess, mode = 'logi
         onClose();
       }
     });
-  };
+  }, [onClose]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && open) {
+        handleClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [open, handleClose]);
 
   const handleEmailAuth = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -392,15 +392,15 @@ export default function GlobalAuthModal({ open, onClose, onSuccess, mode = 'logi
 
               {/* Email Option */}
               <div className="email-option">
-                <a href="#" className="email-link" onClick={(e) => { e.preventDefault(); handleEmailAuth(); }}>
+                <button type="button" className="email-link" onClick={handleEmailAuth}>
                   {isSignUp ? 'Create Account with Email' : 'Advanced Access with Email'}
-                </a>
+                </button>
               </div>
 
               {/* Terms */}
               <div className="terms">
                 By continuing, you agree to our<br/>
-                <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                <button type="button" className="link-button">Terms of Service</button> and <button type="button" className="link-button">Privacy Policy</button>
               </div>
             </>
           ) : (

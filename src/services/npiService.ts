@@ -403,7 +403,6 @@ class NPIService {
   // Helper methods
   private getLocationTypeFromAddress(address: NPIAddress): string {
     const city = address.city?.toLowerCase() || '';
-    const state = address.state?.toLowerCase() || '';
     
     // Major metropolitan areas
     const majorCities = ['new york', 'los angeles', 'chicago', 'houston', 'philadelphia', 'phoenix', 'san antonio', 'san diego', 'dallas', 'san jose'];
@@ -470,11 +469,8 @@ class NPIService {
     const allProviders: NPIProvider[] = [];
 
     for (const specialty of specialties) {
-      const searchParams: NPISearchParams = {
-        state: territory.state,
-        limit: Math.floor(limit / specialties.length),
-        taxonomy_description: specialty
-      };
+      // Search parameters prepared for NPI query
+      const searchLimit = Math.floor(limit / specialties.length);
 
       // If specific cities provided, search each
       if (territory.cities && territory.cities.length > 0) {

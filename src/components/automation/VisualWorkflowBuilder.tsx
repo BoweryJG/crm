@@ -29,8 +29,6 @@ import {
   Grid,
   Switch,
   FormControlLabel,
-  Slider,
-  Alert,
   Fab
 } from '@mui/material';
 import {
@@ -42,12 +40,10 @@ import {
   Settings as ActionIcon,
   Save as SaveIcon,
   PlayCircle as PlayIcon,
-  Pause as PauseIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
   ContentCopy as CopyIcon,
   Visibility as PreviewIcon,
-  Timeline as AnalyticsIcon
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { WorkflowStep, EmailAutomation, AutomationTrigger } from '../../services/email/EmailAutomationEngine';
@@ -71,7 +67,7 @@ const WorkflowCanvas = styled(Box)(({ theme }) => ({
   }
 }));
 
-const WorkflowStep = styled(Paper)<{ stepType: string; selected: boolean }>(({ theme, stepType, selected }) => {
+const WorkflowStepComponent = styled(Paper)<{ stepType: string; selected: boolean }>(({ theme, stepType, selected }) => {
   const getStepColor = (type: string) => {
     switch (type) {
       case 'trigger': return theme.palette.success.main;
@@ -326,7 +322,7 @@ const VisualWorkflowBuilder: React.FC<VisualWorkflowBuilderProps> = ({
 
     setSteps(prev => [...prev, newStep]);
     setDraggedStepType(null);
-  }, [draggedStepType, steps.length]);
+  }, [draggedStepType, steps.length, stepTemplates]);
 
   // Step Selection
   const handleStepClick = useCallback((stepId: string) => {
@@ -455,7 +451,7 @@ const VisualWorkflowBuilder: React.FC<VisualWorkflowBuilderProps> = ({
     };
 
     onPreview(workflowAutomation);
-  }, [automationName, automationDescription, steps, onPreview]);
+  }, [automationName, automationDescription, steps, onPreview, automation?.id]);
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
@@ -591,7 +587,7 @@ const VisualWorkflowBuilder: React.FC<VisualWorkflowBuilderProps> = ({
 
           {/* Workflow Steps */}
           {steps.map((step) => (
-            <WorkflowStep
+            <WorkflowStepComponent
               key={step.id}
               stepType={step.type}
               selected={step.selected || false}
@@ -655,7 +651,7 @@ const VisualWorkflowBuilder: React.FC<VisualWorkflowBuilderProps> = ({
                 size="small"
                 sx={{ mt: 1 }}
               />
-            </WorkflowStep>
+            </WorkflowStepComponent>
           ))}
 
           {/* Empty State */}

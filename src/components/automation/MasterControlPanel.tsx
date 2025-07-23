@@ -19,10 +19,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
-  Paper,
-  Switch,
-  FormControlLabel
+  TableRow
 } from '@mui/material';
 import {
   Email as EmailIcon,
@@ -31,9 +28,7 @@ import {
   AutoAwesome as AIIcon,
   Link as MagicLinkIcon,
   People as ContactsIcon,
-  Settings as SettingsIcon,
   Upgrade as UpgradeIcon,
-  Dashboard as DashboardIcon,
   Security as SecurityIcon,
   PlayArrow as PlayIcon,
   Pause as PauseIcon,
@@ -58,7 +53,6 @@ import { triggerManager } from '../../services/email/TriggerManager';
 
 const MasterControlPanel: React.FC = () => {
   const theme = useTheme();
-  const { themeMode } = useThemeContext();
   const { user } = useAuth();
   
   const [userTier, setUserTier] = useState<SubscriptionTier>(SubscriptionTier.FREE);
@@ -67,9 +61,7 @@ const MasterControlPanel: React.FC = () => {
   const [loading, setLoading] = useState(true);
   
   // Email Automation System State
-  const [automations, setAutomations] = useState<EmailAutomation[]>([]);
   const [activeExecutions, setActiveExecutions] = useState<AutomationExecution[]>([]);
-  const [automationMetrics, setAutomationMetrics] = useState<any>({});
   const [queueStatus, setQueueStatus] = useState<any>({});
   const [systemStatus, setSystemStatus] = useState<'healthy' | 'warning' | 'error'>('healthy');
 
@@ -98,11 +90,6 @@ const MasterControlPanel: React.FC = () => {
       // Load active executions
       const executions = emailAutomationEngine.getActiveExecutions();
       setActiveExecutions(executions);
-      
-      // Load automation metrics
-      const metrics = {};
-      // Would load metrics for each automation
-      setAutomationMetrics(metrics);
       
       // Get queue status
       const status = automationEmailBridge.getQueueStatus();
@@ -163,18 +150,6 @@ const MasterControlPanel: React.FC = () => {
     };
   }, [user, loadControlPanelData, loadAutomationData, setupAutomationListeners]);
 
-  const handleToggleAutomation = async (automationId: string, active: boolean) => {
-    try {
-      if (active) {
-        await emailAutomationEngine.resumeAutomation(automationId);
-      } else {
-        await emailAutomationEngine.pauseAutomation(automationId);
-      }
-      await loadAutomationData();
-    } catch (error) {
-      console.error('Error toggling automation:', error);
-    }
-  };
 
   const getTierColor = (tier: SubscriptionTier) => {
     switch (tier) {

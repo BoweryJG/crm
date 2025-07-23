@@ -25,7 +25,6 @@ import {
   Analytics as AnalyticsIcon,
   Save as SaveIcon,
   CheckCircle as CheckIcon,
-  Error as ErrorIcon,
   Schedule as DurationIcon,
   Label as TopicIcon,
   Assignment as ActionIcon
@@ -56,13 +55,6 @@ const AudioCallProcessor: React.FC<AudioCallProcessorProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [saving, setSaving] = useState(false);
-
-  const steps = [
-    'Upload Audio File',
-    'Process & Analyze',
-    'Review Results',
-    'Save to CRM'
-  ];
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];

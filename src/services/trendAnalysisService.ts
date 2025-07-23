@@ -402,7 +402,6 @@ class TrendAnalysisService {
     velocity: number, 
     momentum: TrendSignal['momentum']
   ): TrendSignal['predictions'] {
-    const baseGrowth = trend.growth_rate;
     const momentumFactor = {
       accelerating: 1.3,
       steady: 1.0,

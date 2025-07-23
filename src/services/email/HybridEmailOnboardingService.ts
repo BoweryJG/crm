@@ -174,7 +174,6 @@ class HybridEmailOnboardingService {
     const provider = DirectSMTPService.detectProvider(workEmail);
     
     // Auto-detect all settings
-    const smtpSettings = DirectSMTPService.getProviderSettings(provider);
     const instructions = DirectSMTPService.getSetupInstructions(provider);
 
     // Create guided setup notification

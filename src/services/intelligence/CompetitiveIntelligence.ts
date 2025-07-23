@@ -214,7 +214,7 @@ export class CompetitiveIntelligence extends EventEmitter {
     if (this.monitoringActive) return;
 
     // Monitor competitor activities
-    const activitySubscription = supabase
+    supabase
       .channel('competitor-activities')
       .on('postgres_changes', {
         event: '*',
@@ -226,7 +226,7 @@ export class CompetitiveIntelligence extends EventEmitter {
       .subscribe();
 
     // Monitor market intelligence updates
-    const marketSubscription = supabase
+    supabase
       .channel('market-intelligence')
       .on('postgres_changes', {
         event: '*',
@@ -610,7 +610,6 @@ export class CompetitiveIntelligence extends EventEmitter {
 
   // Market intelligence analysis
   async analyzeMarketChanges(update: any): Promise<any> {
-    const significantChange = false;
     const insights: string[] = [];
     const recommendations: string[] = [];
 
