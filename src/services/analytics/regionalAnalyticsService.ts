@@ -610,4 +610,5 @@ class RegionalAnalyticsService {
   }
 }
 
-export default new RegionalAnalyticsService();
+const regionalAnalyticsService = new RegionalAnalyticsService();
+export default regionalAnalyticsService;

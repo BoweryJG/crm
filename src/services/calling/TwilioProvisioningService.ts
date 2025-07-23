@@ -523,4 +523,5 @@ class TwilioProvisioningService {
   }
 }
 
-export default new TwilioProvisioningService();
+const twilioProvisioningService = new TwilioProvisioningService();
+export default twilioProvisioningService;

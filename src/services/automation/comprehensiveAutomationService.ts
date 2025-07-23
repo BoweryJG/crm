@@ -320,4 +320,5 @@ class ComprehensiveAutomationService {
   }
 }
 
-export default new ComprehensiveAutomationService();
+const comprehensiveAutomationService = new ComprehensiveAutomationService();
+export default comprehensiveAutomationService;

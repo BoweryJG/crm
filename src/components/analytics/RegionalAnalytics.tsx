@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Card,
@@ -67,11 +67,7 @@ const RegionalAnalytics: React.FC<RegionalAnalyticsProps> = ({
     { city: 'Dallas', state: 'TX' }
   ];
 
-  useEffect(() => {
-    fetchRegionalData();
-  }, [selectedCity, selectedState]);
-
-  const fetchRegionalData = async () => {
+  const fetchRegionalData = useCallback(async () => {
     setLoading(true);
     try {
       const data = await regionalAnalyticsService.getRegionalAnalytics(selectedCity, selectedState);
@@ -81,7 +77,11 @@ const RegionalAnalytics: React.FC<RegionalAnalyticsProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCity, selectedState]);
+
+  useEffect(() => {
+    fetchRegionalData();
+  }, [selectedCity, selectedState, fetchRegionalData]);
 
   const getTrendIcon = (trend: MarketTrend['trend']) => {
     switch (trend) {

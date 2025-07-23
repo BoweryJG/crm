@@ -13,7 +13,7 @@ import { NotificationProvider } from './contexts/NotificationContext';
 import { cleanupPerformance, isLowPerformanceDevice } from './utils/performance';
 import { SUISProvider } from './suis';
 import { logger } from './utils/logger';
-import { initSentry, Sentry } from './utils/sentry';
+import { initSentry } from './utils/sentry';
 import { SoundProvider } from './contexts/SoundContext';
 import { EmailProvider } from './hooks/useEmailClient';
 import SphereLoadingScreen from './components/common/SphereLoadingScreen';
@@ -76,8 +76,6 @@ const SUISDemo = lazy(() => import('./components/demo/SUISDemo'));
 const IntelligenceDashboard = lazy(() => import('./suis/components/IntelligenceDashboard'));
 const IntelligenceProfileSetup = lazy(() => import('./suis/components/IntelligenceProfileSetup'));
 const ContactUniverse = lazy(() => import('./suis/components/ContactUniverse'));
-const ContentGenerator = lazy(() => import('./suis/components/ContentGenerator'));
-const ResearchAssistant = lazy(() => import('./suis/components/ResearchAssistant'));
 const MarketIntelligenceFeed = lazy(() => import('./suis/components/MarketIntelligenceFeed'));
 const LearningPathway = lazy(() => import('./suis/components/LearningPathway'));
 

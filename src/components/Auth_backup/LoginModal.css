@@ -440,6 +440,10 @@
     text-decoration: none;
     transition: all 0.3s ease;
     position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
 }
 
 .email-link:hover {
@@ -459,6 +463,12 @@
 
 .email-link:hover::after {
     width: 100%;
+}
+
+.email-link:focus {
+    outline: 2px solid var(--gem-shift);
+    outline-offset: 2px;
+    border-radius: 2px;
 }
 
 /* Footer */
@@ -522,14 +532,29 @@
     line-height: 1.6;
 }
 
-.terms a {
+.terms a,
+.terms-link {
     color: var(--gem-shift);
     text-decoration: none;
     transition: color 0.3s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0;
+    margin: 0;
 }
 
-.terms a:hover {
+.terms a:hover,
+.terms-link:hover {
     color: var(--gem-impossible);
+}
+
+.terms-link:focus {
+    outline: 2px solid var(--gem-shift);
+    outline-offset: 1px;
+    border-radius: 2px;
 }
 
 /* Loading State */

@@ -746,10 +746,12 @@ export const getAPIManager = (config?: SUISAPIConfig): SUISAPIManager => {
   return apiManager;
 };
 
-export default {
+const suisApiExports = {
   Sphere1AClient,
   OpenRouterClient,
   TwilioClient,
   SUISAPIManager,
   getAPIManager
 };
+
+export default suisApiExports;

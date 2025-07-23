@@ -1,5 +1,4 @@
 import { supabase } from '../services/supabase/supabase';
-import type { AutomationLog, AutomationTemplate } from '../db/schema';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface ABTestVariant {
@@ -550,7 +549,6 @@ export class ABTestingEngine {
     });
 
     const best = sorted[0];
-    const second = sorted[1];
 
     // Check if difference is statistically significant
     if (best.metrics!.confidenceLevel >= confidenceThreshold) {

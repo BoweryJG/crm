@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
@@ -17,19 +17,14 @@ import {
   ListItemIcon,
   ListItemText,
   Paper,
-  Divider,
   Grid,
   Avatar,
   IconButton,
-  Collapse,
-  TextField
+  Collapse
 } from '@mui/material';
 import {
   CloudUpload as UploadIcon,
   AudioFile as AudioIcon,
-  Transcribe as TranscribeIcon,
-  Analytics as AnalyzeIcon,
-  Save as SaveIcon,
   CheckCircle as CheckIcon,
   ExpandMore as ExpandIcon,
   AttachMoney as MoneyIcon,
@@ -44,7 +39,6 @@ const LiveCallProcessingDemo: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
-  const [showAnalysis, setShowAnalysis] = useState(false);
 
   const audioFile = {
     name: 'Cindi Pedro how do organize urls 2025-06-19_09_38_42.mp3',
@@ -52,24 +46,6 @@ const LiveCallProcessingDemo: React.FC = () => {
     duration: '24:18'
   };
 
-  const processSteps = [
-    {
-      label: 'Upload Audio File',
-      description: 'Select call recording for processing'
-    },
-    {
-      label: 'Transcribe Audio',
-      description: 'Convert speech to text using AI'
-    },
-    {
-      label: 'Analyze Conversation',
-      description: 'Extract insights and key information'
-    },
-    {
-      label: 'Save to CRM',
-      description: 'Store analysis and create follow-up tasks'
-    }
-  ];
 
   const transcriptSnippet = `
 CINDI: "Hey, good morning. We're just driving in. I wanted to ask you about current website stuff that we're trying to manage. You know how we're all over the place with About Face..."

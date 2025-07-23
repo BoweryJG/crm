@@ -1,5 +1,4 @@
 import { supabase } from '../services/supabase/supabase';
-import type { AutomationLog, AutomationTemplate } from '../db/schema';
 
 export interface ROIMetrics {
   revenue: number;

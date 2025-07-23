@@ -325,7 +325,7 @@ export const createStagger = (
 });
 
 // Export all animations as a single object
-export default {
+const animationsExports = {
   easings,
   durations,
   entrance: entranceAnimations,
@@ -340,3 +340,5 @@ export default {
     createStagger,
   },
 };
+
+export default animationsExports;

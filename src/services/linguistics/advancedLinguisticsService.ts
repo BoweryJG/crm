@@ -717,4 +717,5 @@ class AdvancedLinguisticsService {
   }
 }
 
-export default new AdvancedLinguisticsService();
+const advancedLinguisticsService = new AdvancedLinguisticsService();
+export default advancedLinguisticsService;

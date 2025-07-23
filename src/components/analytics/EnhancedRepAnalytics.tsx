@@ -1,5 +1,5 @@
 // Enhanced Rep Analytics Component with SUIS Integration
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -23,14 +23,9 @@ import {
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
   AttachMoney as MoneyIcon,
   Psychology as AIIcon,
-  Analytics as AnalyticsIcon,
-  LocationOn as LocationIcon,
-  CompareArrows as CompareIcon,
   Insights as InsightsIcon,
-  Speed as SpeedIcon,
   EmojiEvents as TrophyIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
@@ -265,7 +260,7 @@ const EnhancedRepAnalytics: React.FC<EnhancedRepAnalyticsProps> = ({ userId }) =
                   Tracked Procedures
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
-                  <AnalyticsIcon sx={{ color: 'primary.main', mr: 0.5 }} />
+                  <InsightsIcon sx={{ color: 'primary.main', mr: 0.5 }} />
                   <Typography variant="caption" color="primary">Live Data</Typography>
                 </Box>
               </Card>
@@ -459,7 +454,7 @@ const EnhancedRepAnalytics: React.FC<EnhancedRepAnalyticsProps> = ({ userId }) =
             <Tab 
               label={
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <AnalyticsIcon />
+                  <InsightsIcon />
                   Market Intelligence
                   <Badge badgeContent={procedures.length} color="primary" />
                 </Box>

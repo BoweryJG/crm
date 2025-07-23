@@ -11,13 +11,10 @@ import {
   ListItemIcon,
   ListItemText,
   Alert,
-  Divider,
   Paper,
-  LinearProgress,
   Avatar,
   AvatarGroup,
   Button,
-  IconButton,
   Tooltip
 } from '@mui/material';
 import {
@@ -32,16 +29,12 @@ import {
 import {
   TrendingDown as LostRevenueIcon,
   Web as WebsiteIcon,
-  BugReport as BugIcon,
   Analytics as AnalyticsIcon,
   Warning as WarningIcon,
   CheckCircle as CheckIcon,
-  AttachMoney as MoneyIcon,
-  People as PeopleIcon,
   Email as EmailIcon,
   Phone as PhoneIcon,
   Psychology as InsightIcon,
-  Speed as UrgencyIcon,
   Construction as SolutionIcon,
   Domain as DomainIcon,
   Security as SecurityIcon,

@@ -218,9 +218,6 @@ export const handler: Handler = async (event: HandlerEvent) => {
     TWILIO_ACCOUNT_SID, 
     TWILIO_AUTH_TOKEN, 
     TWILIO_PHONE_NUMBER: rawTwilioPhoneNumber,
-    TWILIO_API_KEY,
-    TWILIO_API_SECRET,
-    TWILIO_TWIML_APP_SID,
     NETLIFY_SITE_URL
   } = process.env;
 
@@ -252,7 +249,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
     };
   }
 
-  const { to, from: fromFrontend, contactId, practiceId, userId } = requestBody;
+  const { to } = requestBody;
 
   if (!to) {
     return {

@@ -280,7 +280,7 @@ export const applyGlass = (effect: keyof typeof glassEffects = 'obsidian') => ({
 });
 
 // Export all effects as a single object for easy importing
-export default {
+const glassEffectsExports = {
   effects: glassEffects,
   hover: glassHoverEffects,
   performance: performanceGlass,
@@ -289,3 +289,5 @@ export default {
   apply: applyGlass,
   create: createGlassEffect,
 };
+
+export default glassEffectsExports;

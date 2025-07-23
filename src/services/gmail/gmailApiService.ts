@@ -455,4 +455,5 @@ class GmailApiService {
   }
 }
 
-export default new GmailApiService();
+const gmailApiService = new GmailApiService();
+export default gmailApiService;

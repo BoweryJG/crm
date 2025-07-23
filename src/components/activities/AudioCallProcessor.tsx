@@ -17,8 +17,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Paper,
-  IconButton
+  Paper
 } from '@mui/material';
 import {
   CloudUpload as UploadIcon,
@@ -27,7 +26,6 @@ import {
   Save as SaveIcon,
   CheckCircle as CheckIcon,
   Error as ErrorIcon,
-  Mic as MicIcon,
   Schedule as DurationIcon,
   Label as TopicIcon,
   Assignment as ActionIcon

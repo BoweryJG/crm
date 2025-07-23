@@ -335,7 +335,7 @@ export const NegativeSpace: React.FC<NegativeSpaceProps> = ({
   );
 };
 
-export default {
+const GalleryLayout = {
   Container: GalleryContainer,
   Grid: ExhibitionGrid,
   Row: SculptureRow,
@@ -343,3 +343,5 @@ export default {
   Float: FloatingDisplay,
   Space: NegativeSpace,
 };
+
+export default GalleryLayout;

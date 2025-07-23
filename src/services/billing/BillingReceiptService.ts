@@ -472,4 +472,5 @@ ${this.companyName}
   }
 }
 
-export default new BillingReceiptService();
+const billingReceiptService = new BillingReceiptService();
+export default billingReceiptService;

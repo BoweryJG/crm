@@ -3,7 +3,6 @@ import { automationROITracker } from './AutomationROITracker';
 import { engagementAnalytics } from './EngagementAnalytics';
 import { abTestingEngine } from './ABTestingEngine';
 import { supabase } from '../services/supabase/supabase';
-import type { AutomationLog, AutomationTemplate, Contact, Account } from '../db/schema';
 
 export interface Recommendation {
   id: string;

@@ -49,7 +49,8 @@ const LazyTemplateCard = memo<LazyTemplateCardProps>(({
 
   // Intersection Observer for lazy loading
   useEffect(() => {
-    if (!cardRef.current) return;
+    const currentCardRef = cardRef.current;
+    if (!currentCardRef) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -65,11 +66,11 @@ const LazyTemplateCard = memo<LazyTemplateCardProps>(({
       }
     );
 
-    observer.observe(cardRef.current);
+    observer.observe(currentCardRef);
 
     return () => {
-      if (cardRef.current) {
-        observer.unobserve(cardRef.current);
+      if (currentCardRef) {
+        observer.unobserve(currentCardRef);
       }
     };
   }, [isLoaded]);

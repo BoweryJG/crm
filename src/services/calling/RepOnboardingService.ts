@@ -579,4 +579,5 @@ class RepOnboardingService {
   }
 }
 
-export default new RepOnboardingService();
+const repOnboardingService = new RepOnboardingService();
+export default repOnboardingService;

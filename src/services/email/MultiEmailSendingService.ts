@@ -415,4 +415,5 @@ class MultiEmailSendingService {
   }
 }
 
-export default new MultiEmailSendingService();
+const multiEmailSendingService = new MultiEmailSendingService();
+export default multiEmailSendingService;

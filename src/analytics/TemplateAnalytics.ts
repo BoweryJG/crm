@@ -1,5 +1,4 @@
 import { supabase } from '../services/supabase/supabase';
-import type { AutomationLog, AutomationTemplate, Contact, Account } from '../db/schema';
 
 export interface TemplateMetrics {
   templateId: string;

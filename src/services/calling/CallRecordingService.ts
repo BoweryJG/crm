@@ -595,4 +595,5 @@ class CallRecordingService {
   }
 }
 
-export default new CallRecordingService();
+const callRecordingService = new CallRecordingService();
+export default callRecordingService;

@@ -269,4 +269,5 @@ class AutomationLimitsService {
   }
 }
 
-export default new AutomationLimitsService();
+const automationLimitsService = new AutomationLimitsService();
+export default automationLimitsService;

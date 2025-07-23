@@ -452,4 +452,5 @@ class DirectSMTPService {
   }
 }
 
-export default new DirectSMTPService();
+const directSMTPService = new DirectSMTPService();
+export default directSMTPService;

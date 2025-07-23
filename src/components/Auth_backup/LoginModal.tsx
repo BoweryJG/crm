@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import './LoginModal.css';
 
@@ -128,18 +128,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onGoogleAuth, 
     };
   }, [isOpen]);
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        handleClose();
-      }
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
-
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     gsap.to(modalRef.current, {
       duration: 0.4,
       scale: 0.8,
@@ -149,7 +138,18 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onGoogleAuth, 
         onClose();
       }
     });
-  };
+  }, [onClose]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        handleClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, handleClose]);
 
   const handleGoogleAuth = async () => {
     setIsLoading(true);
@@ -294,15 +294,19 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onGoogleAuth, 
 
           {/* Email Option */}
           <div className="email-option">
-            <a href="#" className="email-link" onClick={(e) => { e.preventDefault(); handleEmailAuth(); }}>
+            <button className="email-link" onClick={handleEmailAuth}>
               Advanced Access with Email
-            </a>
+            </button>
           </div>
 
           {/* Terms */}
           <div className="terms">
             By continuing, you agree to our<br/>
-            <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+            <button className="terms-link" onClick={() => window.open('/terms', '_blank')} aria-label="Open Terms of Service in new tab">
+              Terms of Service
+            </button> and <button className="terms-link" onClick={() => window.open('/privacy', '_blank')} aria-label="Open Privacy Policy in new tab">
+              Privacy Policy
+            </button>
           </div>
 
           {/* Footer */}

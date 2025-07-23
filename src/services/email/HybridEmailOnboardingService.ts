@@ -344,4 +344,5 @@ class HybridEmailOnboardingService {
   }
 }
 
-export default new HybridEmailOnboardingService();
+const hybridEmailOnboardingService = new HybridEmailOnboardingService();
+export default hybridEmailOnboardingService;

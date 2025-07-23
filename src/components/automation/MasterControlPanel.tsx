@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -73,22 +73,7 @@ const MasterControlPanel: React.FC = () => {
   const [queueStatus, setQueueStatus] = useState<any>({});
   const [systemStatus, setSystemStatus] = useState<'healthy' | 'warning' | 'error'>('healthy');
 
-  useEffect(() => {
-    if (user?.id) {
-      loadControlPanelData();
-      loadAutomationData();
-      setupAutomationListeners();
-    }
-    
-    return () => {
-      // Cleanup listeners
-      emailAutomationEngine.removeAllListeners();
-      automationEmailBridge.removeAllListeners();
-      triggerManager.removeAllListeners();
-    };
-  }, [user]);
-
-  const loadControlPanelData = async () => {
+  const loadControlPanelData = useCallback(async () => {
     if (!user?.id) return;
     
     setLoading(true);
@@ -106,9 +91,9 @@ const MasterControlPanel: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id]);
 
-  const loadAutomationData = async () => {
+  const loadAutomationData = useCallback(async () => {
     try {
       // Load active executions
       const executions = emailAutomationEngine.getActiveExecutions();
@@ -135,9 +120,9 @@ const MasterControlPanel: React.FC = () => {
       console.error('Error loading automation data:', error);
       setSystemStatus('error');
     }
-  };
+  }, []);
 
-  const setupAutomationListeners = () => {
+  const setupAutomationListeners = useCallback(() => {
     // Listen for automation events
     emailAutomationEngine.on('automation_started', (data) => {
       setActiveExecutions(prev => [...prev, data.execution]);
@@ -161,7 +146,22 @@ const MasterControlPanel: React.FC = () => {
       // Refresh data when triggers activate
       loadAutomationData();
     });
-  };
+  }, [loadAutomationData]);
+
+  useEffect(() => {
+    if (user?.id) {
+      loadControlPanelData();
+      loadAutomationData();
+      setupAutomationListeners();
+    }
+    
+    return () => {
+      // Cleanup listeners
+      emailAutomationEngine.removeAllListeners();
+      automationEmailBridge.removeAllListeners();
+      triggerManager.removeAllListeners();
+    };
+  }, [user, loadControlPanelData, loadAutomationData, setupAutomationListeners]);
 
   const handleToggleAutomation = async (automationId: string, active: boolean) => {
     try {

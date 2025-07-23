@@ -1467,7 +1467,7 @@ export interface PredictiveInsight {
 // EXPORT DEFAULTS
 // ==================================================================
 
-export default {
+const suisTypesExports = {
   // Type guards
   isValidIntelligenceSource: (source: string): source is IntelligenceSource => {
     return ['sphere1a', 'market_feed', 'competitor', 'news', 'regulatory'].includes(source);
@@ -1522,3 +1522,5 @@ export default {
     }
   })
 };
+
+export default suisTypesExports;
