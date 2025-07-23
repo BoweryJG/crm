@@ -94,7 +94,7 @@ const TemplateGallery: React.FC<TemplateGalleryProps> = ({
         template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         template.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         template.psychology.toLowerCase().includes(searchTerm.toLowerCase())
-      ));
+      );
     }
 
     return filtered;
