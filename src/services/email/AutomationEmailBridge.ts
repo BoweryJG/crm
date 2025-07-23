@@ -2,8 +2,9 @@
 // Provides seamless integration between automation workflows and email execution
 
 import { emailAutomationEngine, EmailAutomation, WorkflowStep } from './EmailAutomationEngine';
-import { triggerManager } from './TriggerManager';
 import { EventEmitter } from 'events';
+import { emailService } from './emailService';
+import { supabase } from '../supabase/supabase';
 
 // Bridge Interface Types
 export interface AutomationEmailRequest {
@@ -388,29 +389,58 @@ export class AutomationEmailBridge extends EventEmitter {
   // Send email (integrates with UltraEmailModal or direct service)
   private async sendEmail(emailData: any): Promise<EmailSendResult> {
     try {
-      // This would integrate with your actual email sending service
-      // For now, we'll simulate the sending
-      
       if (emailData.send_options.send_immediately) {
-        // Send immediately
-        const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        
-        // Emit event for UltraEmailModal integration
-        this.emit('trigger_ultra_email_modal', {
-          mode: 'automation',
-          email_data: emailData,
-          auto_send: true
-        });
-
-        return {
-          success: true,
-          message_id: messageId,
-          tracking_pixel_url: `https://crm.repspheres.com/api/email/track/open/${emailData.tracking_data.execution_id}`,
-          unsubscribe_url: `https://crm.repspheres.com/unsubscribe/${emailData.tracking_data.contact_id}`
+        // Send immediately via emailService
+        const emailOptions = {
+          to: emailData.to,
+          cc: emailData.cc,
+          bcc: emailData.bcc,
+          subject: emailData.subject,
+          html: emailData.body,
+          text: emailData.body.replace(/<[^>]*>/g, ''), // Strip HTML for text version
+          contactId: emailData.tracking_data.contact_id,
+          priority: emailData.send_options.priority || 'normal',
+          trackOpens: emailData.send_options.delivery_tracking || true,
+          trackClicks: emailData.send_options.delivery_tracking || true,
+          tags: [...(emailData.tracking_data.tags || []), 'automation'],
+          metadata: {
+            automation_id: emailData.tracking_data.automation_id,
+            execution_id: emailData.tracking_data.execution_id,
+            step_id: emailData.tracking_data.step_id,
+            campaign_name: emailData.tracking_data.campaign_name,
+            source: 'email-automation-bridge'
+          }
         };
+
+        // Use emailService for actual sending
+        const result = await emailService.sendEmail(emailOptions);
+        
+        if (result.success) {
+          return {
+            success: true,
+            message_id: result.messageId || `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            tracking_pixel_url: `https://crm.repspheres.com/api/email/track/open/${emailData.tracking_data.execution_id}`,
+            unsubscribe_url: `https://crm.repspheres.com/unsubscribe/${emailData.tracking_data.contact_id}`
+          };
+        } else {
+          // If direct send fails, emit event for UltraEmailModal integration
+          this.emit('trigger_ultra_email_modal', {
+            mode: 'automation',
+            email_data: emailData,
+            auto_send: false // Don't auto-send since direct send failed
+          });
+          
+          return {
+            success: false,
+            error: result.error || 'Email service failed, triggered modal fallback'
+          };
+        }
       } else {
         // Schedule for later
         const scheduledId = `sched_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        // TODO: Implement actual scheduling via emailService
+        console.log('⏰ Email scheduled for:', emailData.send_options.schedule_datetime);
         
         return {
           success: true,
@@ -418,6 +448,15 @@ export class AutomationEmailBridge extends EventEmitter {
         };
       }
     } catch (error) {
+      console.error('❌ Error sending automation email:', error);
+      
+      // Emit event for UltraEmailModal as fallback
+      this.emit('trigger_ultra_email_modal', {
+        mode: 'automation',
+        email_data: emailData,
+        auto_send: false
+      });
+      
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -457,14 +496,48 @@ export class AutomationEmailBridge extends EventEmitter {
 
   // Helper methods
   private async getContactData(contactId: string): Promise<any> {
-    // Mock contact data - would fetch from Supabase
-    return {
-      id: contactId,
-      first_name: 'John',
-      last_name: 'Doe',
-      email: 'john.doe@example.com',
-      company: 'Example Corp'
-    };
+    // Fetch real contact data from Supabase
+    try {
+      // Try contacts table first
+      const { data: contact } = await supabase
+        .from('contacts')
+        .select('*')
+        .eq('id', contactId)
+        .single();
+      
+      if (contact) {
+        return contact;
+      }
+      
+      // Fallback to public_contacts
+      const { data: publicContact } = await supabase
+        .from('public_contacts')
+        .select('*')
+        .eq('id', contactId)
+        .single();
+      
+      if (publicContact) {
+        return publicContact;
+      }
+      
+      // Return mock data if contact not found
+      return {
+        id: contactId,
+        first_name: 'Unknown',
+        last_name: 'Contact',
+        email: 'unknown@example.com',
+        company: 'Unknown Company'
+      };
+    } catch (error) {
+      console.error('Error fetching contact data:', error);
+      return {
+        id: contactId,
+        first_name: 'Error',
+        last_name: 'Contact',
+        email: 'error@example.com',
+        company: 'Error Company'
+      };
+    }
   }
 
   // Public API methods

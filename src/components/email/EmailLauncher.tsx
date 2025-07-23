@@ -24,11 +24,18 @@ import {
   Analytics as AnalyticsIcon,
   Translate as TranslateIcon,
   SmartToy as AIIcon,
-  Campaign as CampaignIcon
+  Campaign as CampaignIcon,
+  AutoAwesome as AutomationIcon,
+  PlayArrow as TriggerIcon,
+  Timeline as WorkflowIcon,
+  Dashboard as DashboardIcon,
+  ViewModule as GalleryIcon
 } from '@mui/icons-material';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useSound } from '../../hooks/useSound';
 import UltraEmailModal from './UltraEmailModal';
+import { emailAutomationEngine } from '../../services/email/EmailAutomationEngine';
+import { automationEmailBridge } from '../../services/email/AutomationEmailBridge';
 
 interface EmailLauncherProps {
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
@@ -131,6 +138,23 @@ const EmailLauncher: React.FC<EmailLauncherProps> = ({
         break;
       case 'analytics':
         // Open analytics tab
+        setEmailMode('compose');
+        setIsModalOpen(true);
+        break;
+      case 'automation':
+        // Open automation hub
+        setEmailMode('compose');
+        setIsModalOpen(true);
+        break;
+      case 'trigger-automation':
+        // Trigger a test automation
+        emailAutomationEngine.triggerAutomation('test', 'test-contact-id', {
+          test: true,
+          triggered_from: 'email-launcher'
+        });
+        break;
+      case 'workflow':
+        // Open workflow builder
         setEmailMode('compose');
         setIsModalOpen(true);
         break;
@@ -294,6 +318,38 @@ const EmailLauncher: React.FC<EmailLauncherProps> = ({
           <ListItemText
             primary="Analytics"
             secondary="Email insights"
+          />
+        </MenuItem>
+
+        <Divider sx={{ my: 1 }} />
+
+        <MenuItem onClick={() => handleMenuAction('automation')}>
+          <ListItemIcon>
+            <AutomationIcon sx={{ color: theme.palette.secondary.main }} />
+          </ListItemIcon>
+          <ListItemText
+            primary="Automation Hub"
+            secondary="Create & manage automations"
+          />
+        </MenuItem>
+
+        <MenuItem onClick={() => handleMenuAction('trigger-automation')}>
+          <ListItemIcon>
+            <TriggerIcon sx={{ color: theme.palette.warning.main }} />
+          </ListItemIcon>
+          <ListItemText
+            primary="Test Automation"
+            secondary="Trigger test automation"
+          />
+        </MenuItem>
+
+        <MenuItem onClick={() => handleMenuAction('workflow')}>
+          <ListItemIcon>
+            <WorkflowIcon sx={{ color: theme.palette.info.main }} />
+          </ListItemIcon>
+          <ListItemText
+            primary="Workflow Builder"
+            secondary="Design email workflows"
           />
         </MenuItem>
 

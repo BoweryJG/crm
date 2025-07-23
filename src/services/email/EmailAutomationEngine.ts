@@ -122,7 +122,7 @@ export class EmailAutomationEngine extends EventEmitter {
       await this.loadActiveExecutions();
       this.startProcessingQueue();
       
-      console.log('🚀 EmailAutomationEngine initialized successfully');
+      // EmailAutomationEngine initialized successfully
       this.emit('engine_ready');
     } catch (error) {
       console.error('❌ Failed to initialize EmailAutomationEngine:', error);
@@ -382,8 +382,15 @@ export class EmailAutomationEngine extends EventEmitter {
       execution_data: eventData
     };
 
-    // Save to database
-    await supabase.from('automation_executions').insert(execution);
+    // Save to database with proper error handling
+    const { error: insertError } = await supabase
+      .from('automation_executions')
+      .insert(execution);
+    
+    if (insertError) {
+      console.error('Failed to save automation execution:', insertError);
+      // Continue execution in memory even if DB save fails
+    }
 
     // Add to active executions and queue
     this.activeExecutions.set(execution.id, execution);
@@ -427,21 +434,53 @@ export class EmailAutomationEngine extends EventEmitter {
   }
 
   private async getContactEmail(contactId: string): Promise<string> {
-    const { data } = await supabase
+    // Try regular contacts table first
+    let { data } = await supabase
       .from('contacts')
       .select('email')
       .eq('id', contactId)
       .single();
-    return data?.email || '';
+    
+    if (data?.email) {
+      return data.email;
+    }
+    
+    // Fallback to public_contacts if not found
+    const { data: publicContact } = await supabase
+      .from('public_contacts')
+      .select('email')
+      .eq('id', contactId)
+      .single();
+    
+    return publicContact?.email || '';
   }
 
   private async getContactData(contactId: string): Promise<any> {
-    const { data } = await supabase
+    // Try regular contacts table first
+    let { data } = await supabase
       .from('contacts')
       .select('*')
       .eq('id', contactId)
       .single();
-    return data || {};
+    
+    if (data) {
+      return data;
+    }
+    
+    // Fallback to public_contacts if not found
+    const { data: publicContact } = await supabase
+      .from('public_contacts')
+      .select('*')
+      .eq('id', contactId)
+      .single();
+    
+    return publicContact || {
+      id: contactId,
+      first_name: 'Unknown',
+      last_name: 'Contact',
+      email: 'unknown@example.com',
+      company: 'Unknown Company'
+    };
   }
 
   private async updateExecution(executionId: string, updates: Partial<AutomationExecution>): Promise<void> {
@@ -485,15 +524,107 @@ export class EmailAutomationEngine extends EventEmitter {
   }
 
   private async addContactTag(contactId: string, tag: string): Promise<void> {
-    // Implement tag addition
+    try {
+      // Add tag to contact's tags array
+      const contactData = await this.getContactData(contactId);
+      const currentTags = contactData.tags || [];
+      
+      if (!currentTags.includes(tag)) {
+        const updatedTags = [...currentTags, tag];
+        
+        // Try to update contacts table first
+        const { error: contactError } = await supabase
+          .from('contacts')
+          .update({ tags: updatedTags, updated_at: new Date().toISOString() })
+          .eq('id', contactId);
+        
+        if (contactError) {
+          // Fallback to public_contacts
+          await supabase
+            .from('public_contacts')
+            .update({ tags: updatedTags, updated_at: new Date().toISOString() })
+            .eq('id', contactId);
+        }
+        
+        console.log(`\ud83c\udff7 Added tag '${tag}' to contact ${contactId}`);
+      }
+    } catch (error) {
+      console.error('Failed to add contact tag:', error);
+    }
   }
 
   private async updateContactProperty(contactId: string, property: string, value: any): Promise<void> {
-    // Implement property update
+    try {
+      const updateData = {
+        [property]: value,
+        updated_at: new Date().toISOString()
+      };
+      
+      // Try to update contacts table first
+      const { error: contactError } = await supabase
+        .from('contacts')
+        .update(updateData)
+        .eq('id', contactId);
+      
+      if (contactError) {
+        // Fallback to public_contacts
+        await supabase
+          .from('public_contacts')
+          .update(updateData)
+          .eq('id', contactId);
+      }
+      
+      console.log(`\ud83d\udcdd Updated contact ${contactId} property '${property}' to:`, value);
+    } catch (error) {
+      console.error('Failed to update contact property:', error);
+    }
   }
 
   private async createTask(contactId: string, taskData: any): Promise<void> {
-    // Implement task creation
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      const task = {
+        user_id: user.id,
+        contact_id: contactId,
+        title: taskData.title || 'Automation Task',
+        description: taskData.description || 'Task created by email automation',
+        due_date: taskData.due_date,
+        priority: taskData.priority || 'normal',
+        status: 'pending',
+        category: 'automation',
+        tags: ['email-automation'],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      // Try to insert into tasks table (if it exists)
+      const { error } = await supabase
+        .from('tasks')
+        .insert(task);
+      
+      if (error) {
+        // Fallback: create a note in sales_activities
+        await supabase
+          .from('sales_activities')
+          .insert({
+            user_id: user.id,
+            contact_id: contactId,
+            activity_type: 'task',
+            title: task.title,
+            description: task.description,
+            scheduled_date: task.due_date,
+            status: 'scheduled',
+            source: 'automation',
+            created_at: new Date().toISOString()
+          });
+      }
+      
+      console.log(`\u2705 Created automation task for contact ${contactId}:`, task.title);
+    } catch (error) {
+      console.error('Failed to create automation task:', error);
+    }
   }
 
   private async handleExecutionError(execution: AutomationExecution, error: any): Promise<void> {
@@ -512,8 +643,14 @@ export class EmailAutomationEngine extends EventEmitter {
       updated_at: new Date().toISOString()
     };
 
-    const { error } = await supabase.from('email_automations').insert(newAutomation);
-    if (error) throw error;
+    const { error } = await supabase
+      .from('email_automations')
+      .insert(newAutomation);
+    
+    if (error) {
+      console.error('Failed to save automation to database:', error);
+      throw error;
+    }
 
     this.automations.set(newAutomation.id, newAutomation);
     return newAutomation;
@@ -523,7 +660,14 @@ export class EmailAutomationEngine extends EventEmitter {
     const automation = this.automations.get(automationId);
     if (automation) {
       automation.active = false;
-      await supabase.from('email_automations').update({ active: false }).eq('id', automationId);
+      const { error } = await supabase
+        .from('email_automations')
+        .update({ active: false, updated_at: new Date().toISOString() })
+        .eq('id', automationId);
+      
+      if (error) {
+        console.error('Failed to pause automation:', error);
+      }
     }
   }
 
@@ -531,7 +675,14 @@ export class EmailAutomationEngine extends EventEmitter {
     const automation = this.automations.get(automationId);
     if (automation) {
       automation.active = true;
-      await supabase.from('email_automations').update({ active: true }).eq('id', automationId);
+      const { error } = await supabase
+        .from('email_automations')
+        .update({ active: true, updated_at: new Date().toISOString() })
+        .eq('id', automationId);
+      
+      if (error) {
+        console.error('Failed to resume automation:', error);
+      }
     }
   }
 
