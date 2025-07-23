@@ -452,7 +452,8 @@ export class CompetitiveIntelligence extends EventEmitter {
     // Simplified similarity - in production, use proper NLP
     const words1 = new Set(text1.toLowerCase().split(/\s+/));
     const words2 = new Set(text2.toLowerCase().split(/\s+/));
-    const intersection = new Set([...words1].filter(x => words2.has(x)));
+    const words1Array = Array.from(words1);
+    const intersection = new Set(words1Array.filter(x => words2.has(x)));
     return intersection.size / Math.max(words1.size, words2.size);
   }
 

@@ -158,6 +158,9 @@ const MemoizedVirtualizedList = memo(VirtualizedList) as <T>(
   props: VirtualizedListProps<T>
 ) => React.ReactElement;
 
-MemoizedVirtualizedList.displayName = 'VirtualizedList';
+// Set display name using Object.defineProperty for better TypeScript compatibility
+Object.defineProperty(MemoizedVirtualizedList, 'displayName', {
+  value: 'VirtualizedList'
+});
 
 export default MemoizedVirtualizedList;

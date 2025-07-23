@@ -59,41 +59,75 @@ export class ComplianceIntegration {
   }
 
   private interceptEmailSending() {
-    // Override email engine's send method to add compliance checks
-    const originalSend = this.emailEngine.sendEmail.bind(this.emailEngine);
-    
-    this.emailEngine.sendEmail = async (emailData: any) => {
-      // Check compliance before sending
-      const complianceResult = await this.checkEmailCompliance(emailData);
-      
-      if (complianceResult.overall_status === 'violations' && emailData.block_on_violation !== false) {
-        // Block sending and request approval
-        await this.requestComplianceApproval(emailData, complianceResult);
-        throw new Error('Email blocked due to compliance violations. Approval required.');
+    // Listen for email sending events and add compliance checks
+    this.emailEngine.on('send_automation_email', async (emailData: any) => {
+      try {
+        // Check compliance before sending
+        const complianceResult = await this.checkEmailCompliance(emailData);
+        
+        if (complianceResult.overall_status === 'violations' && emailData.block_on_violation !== false) {
+          // Block sending and request approval
+          await this.requestComplianceApproval(emailData, complianceResult);
+          
+          // Emit error event to notify the email engine
+          this.emailEngine.emit('email_compliance_blocked', {
+            emailData,
+            complianceResult,
+            message: 'Email blocked due to compliance violations. Approval required.'
+          });
+          return;
+        }
+        
+        // Add compliance metadata
+        emailData.compliance_check_id = complianceResult.id;
+        emailData.compliance_status = complianceResult.overall_status;
+        
+        // Emit event to proceed with sending
+        this.emailEngine.emit('email_compliance_approved', emailData);
+      } catch (error) {
+        console.error('Error in compliance check:', error);
+        this.emailEngine.emit('email_compliance_error', { emailData, error });
       }
-      
-      // Add compliance metadata
-      emailData.compliance_check_id = complianceResult.id;
-      emailData.compliance_status = complianceResult.overall_status;
-      
-      // Proceed with sending
-      return originalSend(emailData);
-    };
+    });
   }
 
   private setupWorkflowCompliance() {
-    // Add compliance step to all workflows
-    this.emailEngine.on('workflow-step-execute', async (step: any) => {
-      if (step.type === 'email') {
-        // Add compliance check to the step
-        step.pre_actions = step.pre_actions || [];
-        step.pre_actions.push({
-          type: 'compliance_check',
-          config: {
-            checks: ['fda_advertising', 'medical_claims', 'off_label'],
-            block_on_violation: true,
-            auto_fix: false
-          }
+    // Listen for workflow step execution events
+    // Note: The EmailAutomationEngine doesn't emit 'workflow-step-execute' event
+    // Instead, we'll intercept at the email sending stage via 'send_automation_email'
+    
+    // Monitor automation starts to ensure compliance is configured
+    this.emailEngine.on('automation_started', async ({ automation, execution, contactId }) => {
+      console.log(`🔍 Compliance monitoring activated for automation: ${automation.name}`);
+      
+      // Store compliance requirements for this automation
+      await supabase
+        .from('compliance_automation_config')
+        .upsert({
+          automation_id: automation.id,
+          compliance_checks: ['fda_advertising', 'medical_claims', 'off_label'],
+          block_on_violation: true,
+          auto_fix_enabled: false,
+          created_at: new Date().toISOString()
+        });
+    });
+    
+    // Monitor automation completions for compliance reporting
+    this.emailEngine.on('automation_completed', async (execution) => {
+      console.log(`✅ Automation ${execution.automation_id} completed with compliance checks`);
+    });
+    
+    // Monitor automation errors
+    this.emailEngine.on('automation_error', async ({ execution, error }) => {
+      console.error(`❌ Automation ${execution.automation_id} failed:`, error);
+      
+      // Check if it was a compliance-related error
+      if (error.message?.includes('compliance')) {
+        await this.notifyComplianceTeam({
+          type: 'automation_blocked',
+          automation_id: execution.automation_id,
+          contact_id: execution.contact_id,
+          error: error.message
         });
       }
     });
@@ -318,6 +352,37 @@ export class ComplianceIntegration {
           paused_reason: null
         })
         .contains('workflow_steps', [{ config: { template_id: approval.content_id } }]);
+
+      // Resume paused executions
+      const { data: pausedExecutions } = await supabase
+        .from('automation_executions')
+        .select('*')
+        .eq('status', 'paused')
+        .contains('execution_data', { paused_reason: 'compliance_violation' });
+
+      if (pausedExecutions) {
+        for (const execution of pausedExecutions) {
+          // Check if this execution is related to the approved content
+          if (execution.execution_data?.compliance_check_id === approval.compliance_check_id) {
+            // Resume the execution
+            await supabase
+              .from('automation_executions')
+              .update({ 
+                status: 'active',
+                execution_data: {
+                  ...execution.execution_data,
+                  paused_reason: null,
+                  compliance_approved: true,
+                  approval_id: approvalId
+                }
+              })
+              .eq('id', execution.id);
+
+            // Emit event to resume processing
+            this.emailEngine.emit('resume_automation_execution', execution);
+          }
+        }
+      }
     }
   }
 

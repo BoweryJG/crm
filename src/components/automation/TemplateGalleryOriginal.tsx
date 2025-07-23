@@ -67,7 +67,7 @@ const TemplateGallery: React.FC<TemplateGalleryProps> = ({
     'Risk & Protection': <SecurityIcon />,
     'Social & Digital': <TrendingUpIcon />,
     'Education & Influence': <SchoolIcon />
-  }), []);
+  } as Record<string, React.ReactElement>), []);
 
   // Difficulty colors
   const getDifficultyColor = useCallback((level: string) => {
@@ -113,8 +113,9 @@ const TemplateGallery: React.FC<TemplateGalleryProps> = ({
     }
   }, [onQuickStart]);
 
-  const TemplateCard = memo(({ template }: { template: AutomationTemplate }) => (
-    <Card 
+  const TemplateCard = memo(({ template }: { template: AutomationTemplate }) => {
+    return (
+      <Card 
       sx={{ 
         height: '100%', 
         display: 'flex', 
@@ -137,17 +138,17 @@ const TemplateGallery: React.FC<TemplateGalleryProps> = ({
     >
       <CardContent sx={{ flexGrow: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          {categoryIcons[template.category]}
+          {categoryIcons[template.category] || <TrendingUpIcon />}
           <Typography variant="h6" component="h3" sx={{ ml: 1, flexGrow: 1 }}>
             {template.name}
           </Typography>
-          <Tooltip title="Popular template">
-            {popularTemplates.some(p => p.id === template.id) && (
+          {popularTemplates.some(p => p.id === template.id) && (
+            <Tooltip title="Popular template">
               <Badge color="secondary" variant="dot">
                 <StarIcon color="primary" fontSize="small" />
               </Badge>
-            )}
-          </Tooltip>
+            </Tooltip>
+          )}
         </Box>
 
         <Chip
@@ -207,7 +208,8 @@ const TemplateGallery: React.FC<TemplateGalleryProps> = ({
         </Button>
       </CardActions>
     </Card>
-  );
+    );
+  });
 
   return (
     <Box>

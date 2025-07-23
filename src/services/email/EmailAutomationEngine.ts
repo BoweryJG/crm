@@ -50,6 +50,7 @@ export interface StepConfig {
   subject?: string;
   body?: string;
   send_optimization?: boolean;
+  block_on_violation?: boolean;
   
   // Delay step config
   delay_amount?: number;
@@ -121,6 +122,7 @@ export class EmailAutomationEngine extends EventEmitter {
       await this.loadTriggers();
       await this.loadActiveExecutions();
       this.startProcessingQueue();
+      this.setupComplianceHandlers();
       
       // EmailAutomationEngine initialized successfully
       this.emit('engine_ready');
@@ -188,6 +190,65 @@ export class EmailAutomationEngine extends EventEmitter {
     }, 5000); // Process every 5 seconds
   }
 
+  // Setup compliance event handlers
+  private setupComplianceHandlers(): void {
+    // Handle compliance approved emails
+    this.on('email_compliance_approved', async (emailData: any) => {
+      try {
+        // Actually send the email via UltraEmailModal integration
+        this.emit('send_approved_email', emailData);
+      } catch (error) {
+        console.error('Error sending compliance-approved email:', error);
+      }
+    });
+
+    // Handle compliance blocked emails
+    this.on('email_compliance_blocked', async ({ emailData, complianceResult, message }) => {
+      console.error(`⚠️ Email blocked for compliance: ${message}`);
+      
+      // Mark the execution as paused
+      if (emailData.execution_id) {
+        await this.updateExecution(emailData.execution_id, { 
+          status: 'paused',
+          execution_data: { 
+            ...emailData,
+            paused_reason: 'compliance_violation',
+            compliance_result: complianceResult
+          }
+        });
+      }
+    });
+
+    // Handle compliance errors
+    this.on('email_compliance_error', async ({ emailData, error }) => {
+      console.error('Compliance check error:', error);
+      
+      // Continue with sending but log the error
+      if (emailData.execution_id) {
+        await this.updateExecution(emailData.execution_id, {
+          execution_data: {
+            ...emailData,
+            compliance_error: error.message
+          }
+        });
+      }
+      
+      // Still send the email (fail open)
+      this.emit('send_approved_email', emailData);
+    });
+
+    // Handle resumed executions after compliance approval
+    this.on('resume_automation_execution', async (execution: AutomationExecution) => {
+      console.log(`▶️ Resuming automation execution ${execution.id} after compliance approval`);
+      
+      // Add back to active executions
+      this.activeExecutions.set(execution.id, execution);
+      
+      // Add to processing queue
+      this.executionQueue.push(execution);
+    });
+  }
+
   // Process automation execution queue
   private async processExecutionQueue(): Promise<void> {
     if (this.executionQueue.length === 0) return;
@@ -246,14 +307,48 @@ export class EmailAutomationEngine extends EventEmitter {
       template_id: config.template_id,
       automation_id: execution.automation_id,
       execution_id: execution.id,
-      send_optimization: config.send_optimization || false
+      send_optimization: config.send_optimization || false,
+      step_id: step.id,
+      block_on_violation: config.block_on_violation !== false // Default to true
     };
 
-    // Emit event for UltraEmailModal to handle
+    // Store the current step info for potential compliance handling
+    execution.execution_data = {
+      ...execution.execution_data,
+      current_email_step: step
+    };
+
+    // Emit event for compliance check and sending
+    // ComplianceIntegration will intercept this event
     this.emit('send_automation_email', emailData);
 
-    // Move to next step
-    await this.moveToNextStep(execution, step);
+    // Set up one-time listeners for this specific email
+    const handleApproved = async () => {
+      // Email was approved, move to next step
+      await this.moveToNextStep(execution, step);
+      cleanup();
+    };
+
+    const handleBlocked = () => {
+      // Email was blocked, execution is already paused by compliance handler
+      cleanup();
+    };
+
+    const cleanup = () => {
+      this.off('email_compliance_approved', handleApproved);
+      this.off('email_compliance_blocked', handleBlocked);
+    };
+
+    // Listen for the result
+    this.once('email_compliance_approved', handleApproved);
+    this.once('email_compliance_blocked', handleBlocked);
+
+    // Set a timeout to prevent hanging
+    setTimeout(() => {
+      cleanup();
+      // If no response after 30 seconds, move to next step anyway
+      this.moveToNextStep(execution, step);
+    }, 30000);
   }
 
   // Process delay step

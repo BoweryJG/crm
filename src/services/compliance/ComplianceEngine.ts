@@ -180,12 +180,12 @@ export class ComplianceEngine {
     const results: ComplianceResult[] = [];
     
     // Run all active rules
-    for (const [ruleId, rule] of this.rules) {
-      if (!rule.active) continue;
+    this.rules.forEach((rule, ruleId) => {
+      if (!rule.active) return;
       
       const result = this.evaluateRule(content, rule);
       results.push(result);
-    }
+    });
 
     // Determine overall status
     const hasViolations = results.some(r => r.severity === 'violation' && r.status === 'fail');

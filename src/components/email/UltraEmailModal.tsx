@@ -874,15 +874,16 @@ const UltraEmailModal: React.FC<UltraEmailModalProps> = ({
         const successCount = results.filter(r => r.success).length;
         console.log(`Successfully sent ${successCount} emails with tracking enabled`);
         
+        // TODO: Add automation mode support
         // Notify automation system if in automation mode
-        if (automationMode && automationData) {
-          automationEmailBridge.emit('automation_email_completed', {
-            automation_data: automationData,
-            success_count: successCount,
-            total_count: results.length,
-            results
-          });
-        }
+        // if (automationMode && automationData) {
+        //   automationEmailBridge.emit('automation_email_completed', {
+        //     automation_data: automationData,
+        //     success_count: successCount,
+        //     total_count: results.length,
+        //     results
+        //   });
+        // }
         
         setTimeout(() => {
           handleClose();

@@ -69,7 +69,7 @@ export interface BusyPeriod {
 
 export interface CommunicationPreference {
   preference_type: string;
-  value: any;
+  value: unknown;
   source: 'stated' | 'observed' | 'inferred';
   confidence: number;
 }
@@ -105,6 +105,57 @@ export interface ModelFeature {
   feature_name: string;
   importance: number;
   type: 'categorical' | 'numerical' | 'temporal';
+}
+
+interface IndividualPattern {
+  hasPattern: boolean;
+  consistency: number;
+  peakTimes?: PeakTime[];
+  totalEngagements?: number;
+}
+
+interface PeakTime {
+  day: number;
+  hour: number;
+  score: number;
+  count: number;
+}
+
+interface PracticeScheduleAnalysis {
+  hasSchedule: boolean;
+  availableWindows?: TimeWindowWithReason[];
+  preferredTimes?: string[];
+  avoidTimes?: BusyPeriod[];
+}
+
+interface TimeWindowWithReason extends TimeWindow {
+  reason: string;
+}
+
+interface SpecialtyNorm {
+  bestDays: string[];
+  bestTimes: { start: string; end: string; score: number }[];
+  avoidTimes: { start: string; end: string; score: number }[];
+  responseWindow: number;
+  specialty?: string;
+}
+
+interface DayEngagementStat {
+  day: string;
+  engagement_rate: number;
+  total_engagements: number;
+}
+
+interface TimeEngagementStat {
+  hour: string;
+  engagement_rate: number;
+  total_engagements: number;
+}
+
+interface ChannelPerformanceDetail {
+  engagement_rate: number;
+  avg_response_time: number | null;
+  total_interactions: number;
 }
 
 export class PredictiveTimingEngine extends EventEmitter {
@@ -268,7 +319,7 @@ export class PredictiveTimingEngine extends EventEmitter {
   }
 
   // Analyze individual engagement patterns
-  private analyzeIndividualPattern(history: EngagementHistory[]): any {
+  private analyzeIndividualPattern(history: EngagementHistory[]): IndividualPattern {
     if (history.length === 0) {
       return { hasPattern: false, consistency: 0 };
     }
@@ -285,7 +336,7 @@ export class PredictiveTimingEngine extends EventEmitter {
     });
 
     // Find peak engagement times
-    const peakTimes: any[] = [];
+    const peakTimes: PeakTime[] = [];
     dayHourMap.forEach((scores, key) => {
       const [day, hour] = key.split('-').map(Number);
       const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
@@ -306,7 +357,7 @@ export class PredictiveTimingEngine extends EventEmitter {
     };
   }
 
-  private calculatePatternConsistency(peakTimes: any[]): number {
+  private calculatePatternConsistency(peakTimes: PeakTime[]): number {
     if (peakTimes.length < 2) return 0;
 
     // Calculate variance in top engagement times
@@ -319,13 +370,13 @@ export class PredictiveTimingEngine extends EventEmitter {
   }
 
   // Analyze practice schedule
-  private analyzePracticeSchedule(pattern: PracticePattern | undefined): any {
+  private analyzePracticeSchedule(pattern: PracticePattern | undefined): PracticeScheduleAnalysis {
     if (!pattern) {
       return { hasSchedule: false };
     }
 
     const schedule = pattern.typical_schedule;
-    const availableWindows: TimeWindow[] = [];
+    const availableWindows: TimeWindowWithReason[] = [];
 
     schedule.office_hours.forEach(daySchedule => {
       if (!daySchedule.is_open) return;
@@ -359,16 +410,18 @@ export class PredictiveTimingEngine extends EventEmitter {
     patientHours: { start: string; end: string },
     busyPeriods: BusyPeriod[],
     lunchBreak: { start: string; end: string }
-  ): any[] {
-    const windows: any[] = [];
+  ): TimeWindowWithReason[] {
+    const windows: TimeWindowWithReason[] = [];
     
     // Morning window (before patient hours)
     if (this.timeToMinutes(daySchedule.open) < this.timeToMinutes(patientHours.start)) {
       windows.push({
-        start: daySchedule.open,
-        end: patientHours.start,
+        start: this.timeStringToDate(daySchedule.open),
+        end: this.timeStringToDate(patientHours.start),
         score: 0.8,
-        reason: 'Before patient hours'
+        reason: 'Before patient hours',
+        day_of_week: daySchedule.day,
+        time_zone: 'America/New_York'
       });
     }
 
@@ -376,33 +429,42 @@ export class PredictiveTimingEngine extends EventEmitter {
     const lunchDuration = this.timeToMinutes(lunchBreak.end) - this.timeToMinutes(lunchBreak.start);
     if (lunchDuration > 45) {
       windows.push({
-        start: this.addMinutes(lunchBreak.start, 15),
-        end: this.addMinutes(lunchBreak.end, -15),
+        start: this.timeStringToDate(this.addMinutes(lunchBreak.start, 15)),
+        end: this.timeStringToDate(this.addMinutes(lunchBreak.end, -15)),
         score: 0.6,
-        reason: 'During extended lunch'
+        reason: 'During extended lunch',
+        day_of_week: daySchedule.day,
+        time_zone: 'America/New_York'
       });
     }
 
     // End of day window
     if (this.timeToMinutes(patientHours.end) < this.timeToMinutes(daySchedule.close)) {
       windows.push({
-        start: patientHours.end,
-        end: daySchedule.close,
+        start: this.timeStringToDate(patientHours.end),
+        end: this.timeStringToDate(daySchedule.close),
         score: 0.9,
-        reason: 'After patient hours'
+        reason: 'After patient hours',
+        day_of_week: daySchedule.day,
+        time_zone: 'America/New_York'
       });
     }
 
     // Filter out busy periods
     return windows.filter(window => {
-      return !busyPeriods.some(busy => 
-        busy.avoid_contact && this.windowsOverlap(window, busy.times)
-      );
+      return !busyPeriods.some(busy => {
+        // Convert Date objects back to time strings for comparison
+        const windowTimeStrings = {
+          start: this.dateToTimeString(window.start),
+          end: this.dateToTimeString(window.end)
+        };
+        return busy.avoid_contact && this.windowsOverlap(windowTimeStrings, busy.times);
+      });
     });
   }
 
   // Get specialty-specific norms
-  private getSpecialtyNorms(specialty: string): any {
+  private getSpecialtyNorms(specialty: string): SpecialtyNorm {
     const norms = this.DEFAULT_PATTERNS[specialty as keyof typeof this.DEFAULT_PATTERNS] 
       || this.DEFAULT_PATTERNS.medical;
 
@@ -478,7 +540,7 @@ export class PredictiveTimingEngine extends EventEmitter {
     return preferences;
   }
 
-  private consolidateBestTimes(times: any[]): TimeWindow[] {
+  private consolidateBestTimes(times: { day: number; hour: number; score: number }[]): TimeWindow[] {
     // Group similar times and average scores
     const consolidated: TimeWindow[] = [];
     
@@ -511,9 +573,9 @@ export class PredictiveTimingEngine extends EventEmitter {
 
   // Calculate optimal time combining all factors
   private calculateOptimalTime(
-    individualPattern: any,
-    practiceSchedule: any,
-    specialtyNorms: any,
+    individualPattern: IndividualPattern,
+    practiceSchedule: PracticeScheduleAnalysis,
+    specialtyNorms: SpecialtyNorm,
     urgency: string
   ): Date {
     const now = new Date();
@@ -565,16 +627,16 @@ export class PredictiveTimingEngine extends EventEmitter {
 
   private scoreCandidate(
     time: Date,
-    individualPattern: any,
-    practiceSchedule: any,
-    specialtyNorms: any
+    individualPattern: IndividualPattern,
+    practiceSchedule: PracticeScheduleAnalysis,
+    specialtyNorms: SpecialtyNorm
   ): number {
     let score = 0.5; // Base score
 
     // Individual pattern scoring
     if (individualPattern.hasPattern) {
       const dayHour = `${time.getDay()}-${time.getHours()}`;
-      const match = individualPattern.peakTimes.find((p: any) => 
+      const match = individualPattern.peakTimes?.find((p) => 
         `${p.day}-${p.hour}` === dayHour
       );
       if (match) {
@@ -587,9 +649,12 @@ export class PredictiveTimingEngine extends EventEmitter {
       const timeStr = `${time.getHours()}:00`;
       const dayName = this.dayNumberToName(time.getDay());
       
-      const inAvailableWindow = practiceSchedule.availableWindows.some((w: any) =>
+      const inAvailableWindow = practiceSchedule.availableWindows?.some((w) =>
         w.day_of_week === dayName && 
-        this.isTimeInWindow(timeStr, w)
+        this.isTimeInWindow(timeStr, {
+          start: this.dateToTimeString(w.start),
+          end: this.dateToTimeString(w.end)
+        })
       );
       
       if (inAvailableWindow) {
@@ -597,7 +662,7 @@ export class PredictiveTimingEngine extends EventEmitter {
       }
       
       // Avoid busy periods
-      const inBusyPeriod = practiceSchedule.avoidTimes.some((busy: any) =>
+      const inBusyPeriod = practiceSchedule.avoidTimes?.some((busy) =>
         busy.days.includes(dayName) &&
         this.isTimeInWindow(timeStr, busy.times)
       );
@@ -614,14 +679,14 @@ export class PredictiveTimingEngine extends EventEmitter {
     }
 
     const timeStr = `${time.getHours()}:00`;
-    const inBestTime = specialtyNorms.bestTimes.some((t: any) =>
+    const inBestTime = specialtyNorms.bestTimes.some((t) =>
       this.isTimeInWindow(timeStr, t)
     );
     if (inBestTime) {
       score += 0.2;
     }
 
-    const inAvoidTime = specialtyNorms.avoidTimes.some((t: any) =>
+    const inAvoidTime = specialtyNorms.avoidTimes.some((t) =>
       this.isTimeInWindow(timeStr, t)
     );
     if (inAvoidTime) {
@@ -633,9 +698,9 @@ export class PredictiveTimingEngine extends EventEmitter {
 
   // Generate timing reasoning
   private generateTimingReasoning(
-    individualPattern: any,
-    practiceSchedule: any,
-    specialtyNorms: any,
+    individualPattern: IndividualPattern,
+    practiceSchedule: PracticeScheduleAnalysis,
+    specialtyNorms: SpecialtyNorm,
     channelPreferences: ChannelPreference[]
   ): TimingReasoning[] {
     const reasoning: TimingReasoning[] = [];
@@ -685,7 +750,7 @@ export class PredictiveTimingEngine extends EventEmitter {
   // Find alternative time windows
   private findAlternativeWindows(
     optimalTime: Date,
-    practiceSchedule: any,
+    practiceSchedule: PracticeScheduleAnalysis,
     urgency: string
   ): TimeWindow[] {
     const alternatives: TimeWindow[] = [];
@@ -808,7 +873,19 @@ export class PredictiveTimingEngine extends EventEmitter {
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
   }
 
-  private windowsOverlap(window1: any, window2: any): boolean {
+  private timeStringToDate(timeStr: string): Date {
+    // Create a date object for today with the given time
+    const today = new Date();
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const date = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hours, minutes, 0, 0);
+    return date;
+  }
+
+  private dateToTimeString(date: Date): string {
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  }
+
+  private windowsOverlap(window1: { start: string; end: string }, window2: { start: string; end: string }): boolean {
     const start1 = this.timeToMinutes(window1.start);
     const end1 = this.timeToMinutes(window1.end);
     const start2 = this.timeToMinutes(window2.start);
@@ -817,7 +894,7 @@ export class PredictiveTimingEngine extends EventEmitter {
     return start1 < end2 && start2 < end1;
   }
 
-  private isTimeInWindow(time: string, window: any): boolean {
+  private isTimeInWindow(time: string, window: { start: string; end: string }): boolean {
     const timeMinutes = this.timeToMinutes(time);
     const startMinutes = this.timeToMinutes(window.start);
     const endMinutes = this.timeToMinutes(window.end);
@@ -922,7 +999,13 @@ export class PredictiveTimingEngine extends EventEmitter {
   }
 
   // Get timing insights for a practice
-  async getPracticeTimingInsights(practiceId: string): Promise<any> {
+  async getPracticeTimingInsights(practiceId: string): Promise<{
+    status?: string;
+    bestDays?: DayEngagementStat[];
+    bestTimes?: TimeEngagementStat[];
+    channelPerformance?: Record<string, ChannelPerformanceDetail>;
+    recommendations?: string[];
+  }> {
     const pattern = this.practicePatterns.get(practiceId);
     if (!pattern) {
       return { status: 'No pattern data available' };
@@ -947,7 +1030,7 @@ export class PredictiveTimingEngine extends EventEmitter {
     return insights;
   }
 
-  private analyzeBestDays(engagements: EngagementHistory[]): any[] {
+  private analyzeBestDays(engagements: EngagementHistory[]): DayEngagementStat[] {
     const dayStats = new Map<number, { total: number; positive: number }>();
 
     engagements.forEach(e => {
@@ -957,7 +1040,7 @@ export class PredictiveTimingEngine extends EventEmitter {
       dayStats.set(e.day_of_week, stats);
     });
 
-    const results: any[] = [];
+    const results: DayEngagementStat[] = [];
     dayStats.forEach((stats, day) => {
       results.push({
         day: this.dayNumberToName(day),
@@ -969,7 +1052,7 @@ export class PredictiveTimingEngine extends EventEmitter {
     return results.sort((a, b) => b.engagement_rate - a.engagement_rate);
   }
 
-  private analyzeBestTimes(engagements: EngagementHistory[]): any[] {
+  private analyzeBestTimes(engagements: EngagementHistory[]): TimeEngagementStat[] {
     const hourStats = new Map<number, { total: number; positive: number }>();
 
     engagements.forEach(e => {
@@ -979,7 +1062,7 @@ export class PredictiveTimingEngine extends EventEmitter {
       hourStats.set(e.hour_of_day, stats);
     });
 
-    const results: any[] = [];
+    const results: TimeEngagementStat[] = [];
     hourStats.forEach((stats, hour) => {
       results.push({
         hour: `${hour}:00`,
@@ -991,7 +1074,7 @@ export class PredictiveTimingEngine extends EventEmitter {
     return results.sort((a, b) => b.engagement_rate - a.engagement_rate).slice(0, 5);
   }
 
-  private analyzeChannelPerformance(engagements: EngagementHistory[]): any {
+  private analyzeChannelPerformance(engagements: EngagementHistory[]): Record<string, ChannelPerformanceDetail> {
     const channelStats = new Map<string, any>();
 
     engagements.forEach(e => {
@@ -1006,7 +1089,7 @@ export class PredictiveTimingEngine extends EventEmitter {
       channelStats.set(e.interaction_type, stats);
     });
 
-    const results: any = {};
+    const results: Record<string, ChannelPerformanceDetail> = {};
     channelStats.forEach((stats, channel) => {
       results[channel] = {
         engagement_rate: stats.positive / stats.total,
@@ -1047,7 +1130,7 @@ export class PredictiveTimingEngine extends EventEmitter {
     // Channel recommendations
     const channelPerf = this.analyzeChannelPerformance(engagements);
     const bestChannel = Object.entries(channelPerf)
-      .sort((a: any, b: any) => b[1].engagement_rate - a[1].engagement_rate)[0];
+      .sort((a, b) => b[1].engagement_rate - a[1].engagement_rate)[0];
     
     if (bestChannel) {
       recommendations.push(`${bestChannel[0]} shows highest engagement rate at ${(bestChannel[1].engagement_rate * 100).toFixed(0)}%`);

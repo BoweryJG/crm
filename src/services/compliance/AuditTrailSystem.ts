@@ -18,7 +18,7 @@ export interface AuditEvent {
   user_agent?: string;
   session_id?: string;
   changes?: ChangeRecord[];
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   compliance_relevant: boolean;
   retention_years: number;
 }
@@ -38,8 +38,8 @@ export type AuditEventType =
 
 export interface ChangeRecord {
   field: string;
-  old_value: any;
-  new_value: any;
+  old_value: unknown;
+  new_value: unknown;
   change_type: 'create' | 'update' | 'delete';
 }
 
@@ -63,7 +63,7 @@ export interface AuditReport {
   generated_by: string;
   generated_at: string;
   summary: AuditSummary;
-  details: any;
+  details: Record<string, unknown>;
   export_format?: 'pdf' | 'csv' | 'json';
   file_url?: string;
 }
@@ -87,10 +87,34 @@ export interface ComplianceRequirement {
   review_frequency: 'daily' | 'weekly' | 'monthly' | 'quarterly';
 }
 
+interface UserActivityDetail {
+  user_id: string;
+  user_email: string;
+  user_role: string;
+  total_actions: number;
+  actions_by_type: Record<string, number>;
+  last_activity: string;
+}
+
+interface DataAccessDetail {
+  total_accesses: number;
+  by_entity_type: Record<string, number>;
+  sensitive_data_access: AuditEvent[];
+  bulk_access: AuditEvent[];
+}
+
+interface SecurityDetail {
+  authentication_events: AuditEvent[];
+  authorization_failures: AuditEvent[];
+  high_risk_actions: AuditEvent[];
+  after_hours_access: AuditEvent[];
+  new_ip_addresses: { ip_address: string; first_seen: string; user: string }[];
+}
+
 export class AuditTrailSystem extends EventEmitter {
   private static instance: AuditTrailSystem;
   private buffer: AuditEvent[] = [];
-  private flushInterval: NodeJS.Timeout;
+  private flushInterval!: NodeJS.Timeout; // Using definite assignment assertion
   private complianceRequirements: Map<string, ComplianceRequirement> = new Map();
   
   // Retention policies by regulation
@@ -182,7 +206,7 @@ export class AuditTrailSystem extends EventEmitter {
     entityId: string,
     action: string,
     userId: string,
-    metadata?: any,
+    metadata?: Record<string, unknown>,
     changes?: ChangeRecord[]
   ): Promise<void> {
     // Get user details
@@ -205,9 +229,9 @@ export class AuditTrailSystem extends EventEmitter {
       user_email: userDetails.email,
       user_role: userDetails.role,
       timestamp: new Date().toISOString(),
-      ip_address: metadata?.ip_address,
-      user_agent: metadata?.user_agent,
-      session_id: metadata?.session_id,
+      ip_address: metadata?.ip_address as string | undefined,
+      user_agent: metadata?.user_agent as string | undefined,
+      session_id: metadata?.session_id as string | undefined,
       changes,
       metadata,
       compliance_relevant: complianceRelevant,
@@ -227,7 +251,7 @@ export class AuditTrailSystem extends EventEmitter {
     await this.checkForAnomalies(auditEvent);
   }
 
-  private async getUserDetails(userId: string): Promise<any> {
+  private async getUserDetails(userId: string): Promise<{ email: string; role: string }> {
     const { data } = await supabase
       .from('users')
       .select('email, role')
@@ -300,18 +324,18 @@ export class AuditTrailSystem extends EventEmitter {
     }
   }
 
-  private async encryptSensitiveData(events: AuditEvent[]): Promise<AuditEvent[]> {
+  private async encryptSensitiveData(events: AuditEvent[]): Promise<any[]> {
     // In production, implement proper encryption
     // This is a placeholder for the encryption logic
     return events.map(event => ({
       ...event,
-      // Encrypt sensitive fields
-      metadata: event.metadata ? this.encryptField(event.metadata) : null,
-      changes: event.changes ? this.encryptField(event.changes) : null
+      // Encrypt sensitive fields and store as encrypted objects
+      metadata: event.metadata ? this.encryptField(event.metadata) : undefined,
+      changes: event.changes ? this.encryptField(event.changes) : undefined
     }));
   }
 
-  private encryptField(data: any): any {
+  private encryptField(data: unknown): { encrypted: boolean; data: string } {
     // Placeholder for encryption
     // In production, use proper encryption library
     return {
@@ -377,9 +401,16 @@ export class AuditTrailSystem extends EventEmitter {
   private decryptAuditEvents(events: any[]): AuditEvent[] {
     return events.map(event => ({
       ...event,
-      metadata: event.metadata?.encrypted ? JSON.parse(event.metadata.data) : event.metadata,
-      changes: event.changes?.encrypted ? JSON.parse(event.changes.data) : event.changes
+      metadata: this.decryptIfEncrypted(event.metadata),
+      changes: this.decryptIfEncrypted(event.changes)
     }));
+  }
+
+  private decryptIfEncrypted(data: any): any {
+    if (data && typeof data === 'object' && 'encrypted' in data && data.encrypted) {
+      return JSON.parse(data.data);
+    }
+    return data;
   }
 
   // Anomaly detection
@@ -496,12 +527,12 @@ export class AuditTrailSystem extends EventEmitter {
 
   private handleRealtimeAuditEvent(event: any) {
     // Check for immediate action items
-    if (this.requiresImmediateAction(event)) {
+    if (this.requiresImmediateAction(event as AuditEvent)) {
       this.emit('immediate-action-required', event);
     }
   }
 
-  private requiresImmediateAction(event: any): boolean {
+  private requiresImmediateAction(event: AuditEvent): boolean {
     return event.event_type === 'data_modification' && 
            event.entity_type === 'clinical_data' ||
            this.HIGH_RISK_ACTIONS.includes(event.action);
@@ -572,7 +603,7 @@ export class AuditTrailSystem extends EventEmitter {
     return day >= 1 && day <= 5 && hour >= 8 && hour <= 18;
   }
 
-  private async checkForTampering(): Promise<any> {
+  private async checkForTampering(): Promise<{ modified_records: number; records: any[] } | null> {
     // Check for direct database modifications bypassing the audit system
     const { data } = await supabase
       .from('audit_trail')
@@ -601,9 +632,9 @@ export class AuditTrailSystem extends EventEmitter {
     });
     
     // Move to archive table
-    for (const [years, cutoff] of cutoffDates) {
+    cutoffDates.forEach(async (cutoff, years) => {
       await this.archiveOldRecords(years, cutoff);
-    }
+    });
   }
 
   private async archiveOldRecords(retentionYears: number, cutoffDate: Date): Promise<void> {
@@ -700,22 +731,22 @@ export class AuditTrailSystem extends EventEmitter {
   private async generateDetailedReport(
     reportType: AuditReport['report_type'],
     events: AuditEvent[]
-  ): Promise<any> {
+  ): Promise<Record<string, unknown>> {
     switch (reportType) {
       case 'compliance':
         return this.generateComplianceDetails(events);
       case 'user_activity':
-        return this.generateUserActivityDetails(events);
+        return { users: this.generateUserActivityDetails(events) };
       case 'data_access':
-        return this.generateDataAccessDetails(events);
+        return { access: this.generateDataAccessDetails(events) };
       case 'security':
-        return this.generateSecurityDetails(events);
+        return { security: this.generateSecurityDetails(events) };
       default:
         return {};
     }
   }
 
-  private generateComplianceDetails(events: AuditEvent[]): any {
+  private generateComplianceDetails(events: AuditEvent[]): Record<string, unknown> {
     const complianceEvents = events.filter(e => e.compliance_relevant);
     
     return {
@@ -727,9 +758,9 @@ export class AuditTrailSystem extends EventEmitter {
     };
   }
 
-  private groupByRegulation(events: AuditEvent[]): any {
+  private groupByRegulation(events: AuditEvent[]): Record<string, { count: number; percentage: number }> {
     // Group events by applicable regulations
-    const grouped: any = {
+    const grouped: Record<string, AuditEvent[]> = {
       HIPAA: events.filter(e => e.entity_type.includes('patient') || e.entity_type.includes('health')),
       FDA: events.filter(e => e.entity_type.includes('device') || e.entity_type.includes('clinical')),
       SOC2: events.filter(e => e.event_type === 'authentication' || e.event_type === 'authorization')
@@ -737,15 +768,15 @@ export class AuditTrailSystem extends EventEmitter {
     
     return Object.entries(grouped).reduce((acc, [reg, evts]) => {
       acc[reg] = {
-        count: evts.length,
-        percentage: (evts.length / events.length) * 100
+        count: (evts as AuditEvent[]).length,
+        percentage: ((evts as AuditEvent[]).length / events.length) * 100
       };
       return acc;
-    }, {} as any);
+    }, {} as Record<string, { count: number; percentage: number }>);
   }
 
-  private generateUserActivityDetails(events: AuditEvent[]): any {
-    const userActivity = new Map<string, any>();
+  private generateUserActivityDetails(events: AuditEvent[]): UserActivityDetail[] {
+    const userActivity = new Map<string, UserActivityDetail>();
     
     events.forEach(event => {
       if (!userActivity.has(event.user_id)) {
@@ -772,7 +803,7 @@ export class AuditTrailSystem extends EventEmitter {
       .sort((a, b) => b.total_actions - a.total_actions);
   }
 
-  private generateDataAccessDetails(events: AuditEvent[]): any {
+  private generateDataAccessDetails(events: AuditEvent[]): DataAccessDetail {
     const dataAccessEvents = events.filter(e => e.event_type === 'data_access');
     
     return {
@@ -789,14 +820,14 @@ export class AuditTrailSystem extends EventEmitter {
     };
   }
 
-  private groupByEntityType(events: AuditEvent[]): any {
+  private groupByEntityType(events: AuditEvent[]): Record<string, number> {
     return events.reduce((acc, event) => {
       acc[event.entity_type] = (acc[event.entity_type] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
   }
 
-  private generateSecurityDetails(events: AuditEvent[]): any {
+  private generateSecurityDetails(events: AuditEvent[]): SecurityDetail {
     return {
       authentication_events: events.filter(e => e.event_type === 'authentication'),
       authorization_failures: events.filter(e => 

@@ -155,7 +155,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <p>While you've been the established leader in {{city}}, new players are making moves:</p>
           <p><strong>Market Reality Check:</strong></p>
           <ul>
-          <li>{{competitor_practice}} just invested ${{investment_amount}} in new equipment</li>
+          <li>{{competitor_practice}} just invested &dollar;{{investment_amount}} in new equipment</li>
           <li>They're marketing "most advanced {{procedure}} in {{city}}"</li>
           <li>Google searches show patients comparing your practices</li>
           </ul>
@@ -280,8 +280,8 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <p>Our analysis of {{specialty}} practices in {{city}} shows concerning trends:</p>
           <h3>Market Benchmarking:</h3>
           <ul>
-          <li>Average {{specialty}} practice revenue: ${{market_average}}</li>
-          <li>Top-performing practices: ${{top_performer_revenue}}</li>
+          <li>Average {{specialty}} practice revenue: &dollar;{{market_average}}</li>
+          <li>Top-performing practices: &dollar;{{top_performer_revenue}}</li>
           <li>Growth practices common factor: {{growth_factor}}</li>
           </ul>
           <h3>Revenue Recovery Projection for {{practice_name}}:</h3>
@@ -311,18 +311,18 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <p>I've prepared a custom recovery plan for {{practice_name}}:</p>
           <h3>Phase 1: Immediate Revenue (Months 1-3)</h3>
           <ul>
-          <li>Add {{procedure_1}} services: +${{immediate_revenue}}/month</li>
+          <li>Add {{procedure_1}} services: +&dollar;{{immediate_revenue}}/month</li>
           <li>Optimize existing {{procedure_2}} efficiency: +{{efficiency_gain}}%</li>
           <li>Patient retention improvement: +{{retention_increase}}%</li>
           </ul>
           <h3>Phase 2: Growth Acceleration (Months 4-12)</h3>
           <ul>
-          <li>Market expansion opportunities: +${{expansion_revenue}}/month</li>
+          <li>Market expansion opportunities: +&dollar;{{expansion_revenue}}/month</li>
           <li>Premium service positioning</li>
           <li>Insurance reimbursement optimization</li>
           </ul>
-          <p><strong>Total Projected Recovery: ${{total_recovery}} in Year 1</strong></p>`,
-          body_text: 'Dr. {{last_name}}, Custom recovery plan projects ${{total_recovery}} increase in Year 1.',
+          <p><strong>Total Projected Recovery: &dollar;{{total_recovery}} in Year 1</strong></p>`,
+          body_text: 'Dr. {{last_name}}, Custom recovery plan projects &dollar;{{total_recovery}} increase in Year 1.',
           personalization_tags: ['last_name', 'practice_name', 'procedure_1', 'immediate_revenue', 'total_recovery']
         }
       }
@@ -512,7 +512,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <p>Exclusive intelligence for select {{specialty}} practitioners:</p>
           <h3>Inside Information:</h3>
           <ul>
-          <li>{{major_competitor}} planning ${{investment}}M expansion in {{region}}</li>
+          <li>{{major_competitor}} planning &dollar;{{investment}}M expansion in {{region}}</li>
           <li>{{insurance_company}} quietly changing {{procedure}} reimbursement rates</li>
           <li>{{regulatory_body}} considering new {{device_category}} standards</li>
           <li>Patient demand for {{treatment_type}} up {{percentage}}% (unreported)</li>
@@ -618,7 +618,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <li><strong>Marketing:</strong> Launch campaigns {{timing}} before peak demand</li>
           <li><strong>Scheduling:</strong> Optimize appointment slots for {{patient_type}} patients</li>
           </ul>
-          <p><strong>ROI Projection:</strong> ${{roi_projection}} additional revenue in first 6 months</p>`,
+          <p><strong>ROI Projection:</strong> &dollar;{{roi_projection}} additional revenue in first 6 months</p>`,
           body_text: 'Dr. {{last_name}}, Capacity planning guide for {{procedure}} surge at {{practice_name}}.',
           personalization_tags: ['last_name', 'practice_name', 'procedure', 'device_name', 'projected_volume', 'roi_projection']
         }
@@ -664,7 +664,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <li>{{regulatory_body}} drafting new {{device_category}} standards</li>
           <li>Expected publication: {{publication_date}}</li>
           <li>Implementation deadline: {{compliance_deadline}}</li>
-          <li>Estimated compliance cost: ${{compliance_cost}} per practice</li>
+          <li>Estimated compliance cost: &dollar;{{compliance_cost}} per practice</li>
           </ul>
           <h3>Impact Assessment:</h3>
           <p>Practices using {{current_technology}} will need to upgrade or face {{consequences}}.</p>`,
@@ -918,7 +918,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <li><strong>Speaker Bureau:</strong> International conference circuit</li>
           <li><strong>Publication Support:</strong> Editorial assistance and co-authorship opportunities</li>
           </ul>
-          <p><strong>Benefits:</strong> ${{annual_compensation}} annual compensation plus research funding.</p>`,
+          <p><strong>Benefits:</strong> &dollar;{{annual_compensation}} annual compensation plus research funding.</p>`,
           body_text: 'Dr. {{last_name}}, Comprehensive KOL development program for {{specialty}}.',
           personalization_tags: ['last_name', 'specialty', 'research_topic', 'company_name', 'annual_compensation']
         }
@@ -1507,7 +1507,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <li><strong>Events:</strong> Invitation-only annual summit</li>
           <li><strong>Research:</strong> Priority access to new innovations</li>
           </ul>
-          <p><strong>Annual Investment:</strong> ${{membership_cost}} (exclusive to Excellence Club)</p>`,
+          <p><strong>Annual Investment:</strong> &dollar;{{membership_cost}} (exclusive to Excellence Club)</p>`,
           body_text: 'Dr. {{last_name}}, Excellence Club membership benefits overview.',
           personalization_tags: ['last_name', 'device_name', 'membership_cost']
         }
@@ -1623,12 +1623,12 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <p>I've analyzed {{practice_name}}'s potential for cash flow optimization:</p>
           <h3>Cash Flow Analysis:</h3>
           <ul>
-          <li><strong>Current Monthly Revenue:</strong> ${{current_revenue}}</li>
-          <li><strong>Revenue Optimization Potential:</strong> +${{optimization_potential}}/month</li>
-          <li><strong>Equipment Investment:</strong> ${{equipment_cost}} ({{device_name}})</li>
-          <li><strong>Financing Options:</strong> ${{monthly_payment}}/month</li>
+          <li><strong>Current Monthly Revenue:</strong> &dollar;{{current_revenue}}</li>
+          <li><strong>Revenue Optimization Potential:</strong> +&dollar;{{optimization_potential}}/month</li>
+          <li><strong>Equipment Investment:</strong> &dollar;{{equipment_cost}} ({{device_name}})</li>
+          <li><strong>Financing Options:</strong> &dollar;{{monthly_payment}}/month</li>
           </ul>
-          <p><strong>Net Cash Flow Impact:</strong> +${{net_positive_flow}}/month after financing</p>`,
+          <p><strong>Net Cash Flow Impact:</strong> +&dollar;{{net_positive_flow}}/month after financing</p>`,
           body_text: 'Dr. {{last_name}}, Cash flow optimization analysis for {{practice_name}}.',
           personalization_tags: ['last_name', 'practice_name', 'current_revenue', 'optimization_potential', 'device_name', 'net_positive_flow']
         }
@@ -1649,9 +1649,9 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <p>I've arranged multiple financing options for {{device_name}}:</p>
           <h3>Financing Solutions:</h3>
           <ul>
-          <li><strong>Option 1:</strong> ${{option_1_payment}}/month ({{option_1_term}} months, {{option_1_apr}}% APR)</li>
-          <li><strong>Option 2:</strong> ${{option_2_payment}}/month ({{option_2_term}} months, {{option_2_apr}}% APR)</li>
-          <li><strong>Option 3:</strong> Lease-to-own ${{option_3_payment}}/month</li>
+          <li><strong>Option 1:</strong> &dollar;{{option_1_payment}}/month ({{option_1_term}} months, {{option_1_apr}}% APR)</li>
+          <li><strong>Option 2:</strong> &dollar;{{option_2_payment}}/month ({{option_2_term}} months, {{option_2_apr}}% APR)</li>
+          <li><strong>Option 3:</strong> Lease-to-own &dollar;{{option_3_payment}}/month</li>
           <li><strong>Cash Discount:</strong> {{cash_discount}}% off for full payment</li>
           </ul>
           <p><strong>Recommended:</strong> Option 2 provides best cash flow optimization.</p>`,
@@ -1696,10 +1696,10 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <p>Significant tax advantages available for {{device_name}} purchase before {{deadline}}:</p>
           <h3>Tax Benefits Analysis:</h3>
           <ul>
-          <li><strong>Section 179 Deduction:</strong> Up to ${{section_179_limit}} immediate deduction</li>
+          <li><strong>Section 179 Deduction:</strong> Up to &dollar;{{section_179_limit}} immediate deduction</li>
           <li><strong>Bonus Depreciation:</strong> {{bonus_percentage}}% first-year depreciation</li>
-          <li><strong>Total Tax Savings:</strong> ${{total_tax_savings}} ({{tax_bracket}}% bracket)</li>
-          <li><strong>Effective Cost:</strong> ${{effective_cost}} after tax benefits</li>
+          <li><strong>Total Tax Savings:</strong> &dollar;{{total_tax_savings}} ({{tax_bracket}}% bracket)</li>
+          <li><strong>Effective Cost:</strong> &dollar;{{effective_cost}} after tax benefits</li>
           </ul>
           <p><strong>Act Before {{deadline}}:</strong> These benefits expire soon.</p>`,
           body_text: 'Dr. {{last_name}}, {{tax_year}} tax advantages for {{device_name}} purchase.',
@@ -1727,7 +1727,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <li><strong>CPA Coordination:</strong> I'll work with {{cpa_name}} if needed</li>
           <li><strong>Multi-Year Planning:</strong> Additional equipment considerations</li>
           </ul>
-          <p><strong>Total Benefit:</strong> ${{total_benefit}} in tax savings + business growth</p>`,
+          <p><strong>Total Benefit:</strong> &dollar;{{total_benefit}} in tax savings + business growth</p>`,
           body_text: 'Dr. {{last_name}}, Tax optimization strategy implementation for {{practice_name}}.',
           personalization_tags: ['last_name', 'practice_name', 'optimal_date', 'cpa_name', 'total_benefit']
         }
@@ -1771,9 +1771,9 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <ul>
           <li><strong>Service Addition:</strong> {{new_service}} procedures</li>
           <li><strong>Patient Volume:</strong> {{patient_volume}} procedures/month</li>
-          <li><strong>Average Fee:</strong> ${{average_fee}} per procedure</li>
-          <li><strong>Monthly Revenue:</strong> ${{monthly_revenue}}</li>
-          <li><strong>Annual Profit:</strong> ${{annual_profit}} (after all expenses)</li>
+          <li><strong>Average Fee:</strong> &dollar;{{average_fee}} per procedure</li>
+          <li><strong>Monthly Revenue:</strong> &dollar;{{monthly_revenue}}</li>
+          <li><strong>Annual Profit:</strong> &dollar;{{annual_profit}} (after all expenses)</li>
           </ul>
           <p><strong>ROI Timeline:</strong> Full investment recovery in {{roi_months}} months</p>`,
           body_text: 'Dr. {{last_name}}, {{device_name}} profit center projections for {{practice_name}}.',
@@ -1845,7 +1845,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <h3>Liability Risk Assessment:</h3>
           <ul>
           <li><strong>{{specialty}} Claims:</strong> Up {{percentage}}% in {{time_period}}</li>
-          <li><strong>Average Settlement:</strong> ${{average_settlement}} ({{year}})</li>
+          <li><strong>Average Settlement:</strong> &dollar;{{average_settlement}} ({{year}})</li>
           <li><strong>Common Causes:</strong> {{common_cause_1}}, {{common_cause_2}}, {{common_cause_3}}</li>
           <li><strong>Technology Factor:</strong> {{tech_protection_stat}}% fewer claims with advanced technology</li>
           </ul>
@@ -2094,7 +2094,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <li><strong>Curriculum Development:</strong> {{course_name}} certification program</li>
           <li><strong>Training Delivery:</strong> In-person and virtual training options</li>
           <li><strong>Certification Authority:</strong> Become recognized {{device_name}} expert</li>
-          <li><strong>Revenue Stream:</strong> ${{education_revenue}} annual education income potential</li>
+          <li><strong>Revenue Stream:</strong> &dollar;{{education_revenue}} annual education income potential</li>
           </ul>
           <p><strong>Legacy Impact:</strong> Train the next generation of {{specialty}} leaders</p>`,
           body_text: 'Dr. {{last_name}}, Medical education platform development for {{specialty}}.',
@@ -2140,7 +2140,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <ul>
           <li><strong>Multi-center Study:</strong> Lead {{study_name}} clinical trial</li>
           <li><strong>Publication Target:</strong> {{target_journal}} (Impact Factor: {{impact_factor}})</li>
-          <li><strong>Research Funding:</strong> ${{funding_amount}} available through {{funding_source}}</li>
+          <li><strong>Research Funding:</strong> &dollar;{{funding_amount}} available through {{funding_source}}</li>
           <li><strong>Co-investigators:</strong> {{collaborator_1}}, {{collaborator_2}}, {{collaborator_3}}</li>
           </ul>
           <p>This research could establish new standards of care in {{specialty}}.</p>`,
@@ -2214,7 +2214,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <li><strong>{{conference_1}}:</strong> Keynote slot available ({{attendees_1}} attendees)</li>
           <li><strong>{{conference_2}}:</strong> Featured speaker opportunity ({{attendees_2}} attendees)</li>
           <li><strong>{{conference_3}}:</strong> Panel moderator position ({{attendees_3}} attendees)</li>
-          <li><strong>Speaking Fee:</strong> ${{speaking_fee}} per engagement</li>
+          <li><strong>Speaking Fee:</strong> &dollar;{{speaking_fee}} per engagement</li>
           </ul>
           <p>Your presentation on {{topic}} would draw significant attention.</p>`,
           body_text: 'Dr. {{last_name}}, Keynote speaking opportunities in {{specialty}}.',
@@ -2240,7 +2240,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <li><strong>Content Development:</strong> {{device_name}} case study presentations</li>
           <li><strong>Speaking Training:</strong> Professional presentation coaching</li>
           <li><strong>Speaker Bureau:</strong> Join {{company_name}} speaker network</li>
-          <li><strong>Annual Revenue:</strong> ${{annual_speaking_revenue}} speaking income potential</li>
+          <li><strong>Annual Revenue:</strong> &dollar;{{annual_speaking_revenue}} speaking income potential</li>
           </ul>
           <p><strong>Platform Impact:</strong> Reach {{total_audience}} professionals annually</p>`,
           body_text: 'Dr. {{last_name}}, Speaker development program for {{specialty}}.',
@@ -2284,7 +2284,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <p>Your expertise with {{device_name}} creates valuable consulting opportunities:</p>
           <h3>Consulting Opportunities:</h3>
           <ul>
-          <li><strong>Device Companies:</strong> Clinical advisory positions (${{advisory_rate}}/hour)</li>
+          <li><strong>Device Companies:</strong> Clinical advisory positions (&dollar;{{advisory_rate}}/hour)</li>
           <li><strong>Practice Consulting:</strong> Help other practices implement {{device_name}}</li>
           <li><strong>Training Services:</strong> Corporate training programs</li>
           <li><strong>Expert Testimony:</strong> Legal and regulatory consulting</li>
@@ -2312,7 +2312,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <ul>
           <li><strong>Service Offerings:</strong> {{service_1}}, {{service_2}}, {{service_3}}</li>
           <li><strong>Client Development:</strong> {{target_clients}} potential clients identified</li>
-          <li><strong>Revenue Projections:</strong> ${{consulting_revenue}} annual consulting income</li>
+          <li><strong>Revenue Projections:</strong> &dollar;{{consulting_revenue}} annual consulting income</li>
           <li><strong>Business Structure:</strong> {{business_entity}} entity setup</li>
           </ul>
           <p><strong>Consulting Launch:</strong> First clients within {{timeline}} months</p>`,
@@ -2358,7 +2358,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <p>I've analyzed {{practice_name}}'s insurance relationships and coverage optimization opportunities:</p>
           <h3>Insurance Optimization Analysis:</h3>
           <ul>
-          <li><strong>Current Premiums:</strong> ${{current_premiums}} annually</li>
+          <li><strong>Current Premiums:</strong> &dollar;{{current_premiums}} annually</li>
           <li><strong>Coverage Gaps:</strong> {{gap_1}}, {{gap_2}}, {{gap_3}}</li>
           <li><strong>Technology Discount:</strong> {{device_name}} users get {{discount}}% premium reduction</li>
           <li><strong>Risk Score:</strong> Improved by {{risk_improvement}} with advanced technology</li>
@@ -2384,7 +2384,7 @@ export const MEDICAL_AUTOMATION_TEMPLATES: AutomationTemplate[] = [
           <p>Your comprehensive insurance optimization strategy:</p>
           <h3>Insurance Optimization Plan:</h3>
           <ul>
-          <li><strong>Premium Reduction:</strong> Save ${{annual_savings}} annually</li>
+          <li><strong>Premium Reduction:</strong> Save &dollar;{{annual_savings}} annually</li>
           <li><strong>Coverage Enhancement:</strong> Better protection with {{improved_coverage}}</li>
           <li><strong>Carrier Relations:</strong> Preferred provider status opportunities</li>
           <li><strong>Risk Management:</strong> {{device_name}} reduces liability exposure</li>

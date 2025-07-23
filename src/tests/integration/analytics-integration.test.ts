@@ -1,13 +1,10 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { db } from '../../db';
-import { sql } from 'drizzle-orm';
+import { db, sql } from '../../db';
 import { 
   automationTemplates, 
   automationLogs, 
   contacts, 
   accounts, 
-  opportunities,
-  users 
+  opportunities
 } from '../../db/schema';
 import { templateAnalytics } from '../../analytics/TemplateAnalytics';
 import { automationROITracker } from '../../analytics/AutomationROITracker';
@@ -26,7 +23,7 @@ const testOpportunityId = uuidv4();
 describe('Analytics Integration Tests', () => {
   beforeAll(async () => {
     // Setup test data
-    await db.insert(users).values({
+    await db.from('users').insert({
       id: testUserId,
       email: 'analytics-test@example.com',
       name: 'Analytics Test User',
@@ -35,7 +32,7 @@ describe('Analytics Integration Tests', () => {
       updatedAt: new Date()
     });
 
-    await db.insert(accounts).values({
+    await db.from('accounts').insert({
       id: testAccountId,
       name: 'Test Medical Center',
       industry: 'Healthcare',
@@ -45,7 +42,7 @@ describe('Analytics Integration Tests', () => {
       updatedAt: new Date()
     });
 
-    await db.insert(contacts).values([
+    await db.from('contacts').insert([
       {
         id: testContactIds[0],
         accountId: testAccountId,
@@ -81,7 +78,7 @@ describe('Analytics Integration Tests', () => {
       }
     ]);
 
-    await db.insert(automationTemplates).values([
+    await db.from('automation_templates').insert([
       {
         id: testTemplateIds[0],
         name: 'Product Introduction',
@@ -108,7 +105,7 @@ describe('Analytics Integration Tests', () => {
       }
     ]);
 
-    await db.insert(opportunities).values({
+    await db.from('opportunities').insert({
       id: testOpportunityId,
       accountId: testAccountId,
       name: 'Medical Device Sale',
@@ -155,21 +152,17 @@ describe('Analytics Integration Tests', () => {
       });
     }
 
-    await db.insert(automationLogs).values(logs);
+    await db.from('automation_logs').insert(logs);
   });
 
   afterAll(async () => {
     // Cleanup test data
-    await db.delete(automationLogs).where(
-      sql`${automationLogs.metadata}->>'accountId' = ${testAccountId}`
-    );
-    await db.delete(opportunities).where(sql`${opportunities.id} = ${testOpportunityId}`);
-    await db.delete(automationTemplates).where(
-      sql`${automationTemplates.id} IN (${testTemplateIds[0]}, ${testTemplateIds[1]})`
-    );
-    await db.delete(contacts).where(sql`${contacts.accountId} = ${testAccountId}`);
-    await db.delete(accounts).where(sql`${accounts.id} = ${testAccountId}`);
-    await db.delete(users).where(sql`${users.id} = ${testUserId}`);
+    await db.from('automation_logs').delete().eq('metadata->>accountId', testAccountId);
+    await db.from('opportunities').delete().eq('id', testOpportunityId);
+    await db.from('automation_templates').delete().in('id', testTemplateIds);
+    await db.from('contacts').delete().eq('accountId', testAccountId);
+    await db.from('accounts').delete().eq('id', testAccountId);
+    await db.from('users').delete().eq('id', testUserId);
   });
 
   describe('Template Analytics Integration', () => {

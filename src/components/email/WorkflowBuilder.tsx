@@ -33,7 +33,7 @@ import {
   PlayArrow as PlayIcon,
   Schedule as ScheduleIcon,
   Email as EmailIcon,
-  FilterBranches as ConditionIcon,
+  AccountTree as ConditionIcon,
   Pause as DelayIcon,
   Psychology as SocraticIcon,
   TrendingUp as ChallengerIcon,

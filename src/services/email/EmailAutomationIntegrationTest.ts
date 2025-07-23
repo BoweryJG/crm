@@ -322,8 +322,8 @@ export const testAutomationFlow = (contactId?: string) => {
 
 // Auto-run connectivity test in development
 if (process.env.NODE_ENV === 'development') {
-  EmailAutomationIntegrationTest.runQuickConnectivity()
-    .then(result => {
+  EmailAutomationIntegrationTest.runQuickConnectivityTest()
+    .then((result: boolean) => {
       if (result) {
         console.log('🎉 Email automation system is properly connected!');
       } else {
