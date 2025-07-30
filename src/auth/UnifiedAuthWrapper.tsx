@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
-import { UnifiedAuthProvider } from '../../../repconnect/shared/auth/UnifiedAuthContext';
-import { AuthContext as UnifiedAuthContext } from '../../../repconnect/shared/auth/UnifiedAuthContext';
-import { supabase, getRedirectUrl } from '../../../repconnect/shared/auth/unifiedSupabase';
-import type { AuthContextType } from '../../../repconnect/shared/auth/AuthContextType';
+import { UnifiedAuthProvider } from '../unified-auth/src/UnifiedAuthContext';
+import { AuthContext as UnifiedAuthContext } from '../unified-auth/src/UnifiedAuthContext';
+import { supabase, getRedirectUrl } from '../unified-auth/src/unifiedSupabase';
+import type { AuthContextType } from '../unified-auth/src/types';
 
 // Re-export the unified auth context
 export const AuthContext = UnifiedAuthContext;
