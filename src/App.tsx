@@ -10,6 +10,7 @@ import { AuthGuard } from './auth/guards';
 import { AppModeProvider } from './contexts/AppModeContext';
 import { DashboardDataProvider } from './contexts/DashboardDataContext';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { UnifiedAuthProvider } from './contexts/UnifiedAuthContext_20250730';
 import { cleanupPerformance, isLowPerformanceDevice } from './utils/performance';
 import { SUISProvider } from './suis';
 import { logger } from './utils/logger';
@@ -124,11 +125,12 @@ const App: React.FC = () => {
       <SoundProvider>
         <ErrorBoundary>
           <AuthProvider>
-            <EmailProvider>
-              <SUISProvider supabaseUrl={supabaseUrl} supabaseAnonKey={supabaseAnonKey}>
-                  <AppModeProvider>
-                  <NotificationProvider>
-                    <DashboardDataProvider>
+            <UnifiedAuthProvider>
+              <EmailProvider>
+                <SUISProvider supabaseUrl={supabaseUrl} supabaseAnonKey={supabaseAnonKey}>
+                    <AppModeProvider>
+                    <NotificationProvider>
+                      <DashboardDataProvider>
                       <CssBaseline />
                     <BrowserRouter>
               <Routes>
@@ -232,11 +234,12 @@ const App: React.FC = () => {
             <FeatureUpgradeModal />
             <DemoModeIndicator />
           </BrowserRouter>
-                    </DashboardDataProvider>
-                  </NotificationProvider>
-                </AppModeProvider>
-              </SUISProvider>
-            </EmailProvider>
+                      </DashboardDataProvider>
+                    </NotificationProvider>
+                  </AppModeProvider>
+                </SUISProvider>
+              </EmailProvider>
+            </UnifiedAuthProvider>
           </AuthProvider>
         </ErrorBoundary>
       </SoundProvider>

@@ -1,0 +1,158 @@
+{
+  "created_at": "2025-07-30T21:23:19.927Z",
+  "environment": "LIVE",
+  "repx_tiers": {
+    "repx1": {
+      "productId": "prod_SmFydoxW9fhX9i",
+      "monthlyPriceId": "price_1RqhStGRiAPUZqWutwNBJlnr",
+      "annualPriceId": "price_1RqhStGRiAPUZqWu8eRYprp6",
+      "features": {
+        "login": true,
+        "email": false,
+        "phone": false,
+        "gmail": false,
+        "agentMinutes": 1,
+        "apps": [
+          "crm",
+          "canvas",
+          "market-data",
+          "repconnect",
+          "global"
+        ]
+      }
+    },
+    "repx2": {
+      "productId": "prod_SmFyc5CAmyVXyc",
+      "monthlyPriceId": "price_1RqhSuGRiAPUZqWu29dIsVGz",
+      "annualPriceId": "price_1RqhSuGRiAPUZqWu0nHKxkmp",
+      "features": {
+        "login": true,
+        "email": true,
+        "phone": false,
+        "gmail": false,
+        "agentMinutes": 5,
+        "smtpProvider": "vultr",
+        "emailLimit": "unlimited",
+        "apps": [
+          "crm",
+          "canvas",
+          "market-data",
+          "repconnect",
+          "global"
+        ]
+      }
+    },
+    "repx3": {
+      "productId": "prod_SmFy6tnJYDJfIo",
+      "monthlyPriceId": "price_1RqhSvGRiAPUZqWuygjxykuG",
+      "annualPriceId": "price_1RqhSvGRiAPUZqWuuvRB2q20",
+      "features": {
+        "login": true,
+        "email": true,
+        "phone": true,
+        "gmail": false,
+        "agentMinutes": 15,
+        "twilioProvisioning": true,
+        "dedicatedPhoneNumber": true,
+        "apps": [
+          "crm",
+          "canvas",
+          "market-data",
+          "repconnect",
+          "global"
+        ]
+      }
+    },
+    "repx4": {
+      "productId": "prod_SmFy5G44rm0zAh",
+      "monthlyPriceId": "price_1RqhSvGRiAPUZqWu6YlhyKE2",
+      "annualPriceId": "price_1RqhSwGRiAPUZqWuJmTnpUXw",
+      "features": {
+        "login": true,
+        "email": true,
+        "phone": true,
+        "gmail": true,
+        "agentMinutes": 30,
+        "gmailScopes": [
+          "readonly",
+          "send",
+          "compose",
+          "modify"
+        ],
+        "advancedAnalytics": true,
+        "apps": [
+          "crm",
+          "canvas",
+          "market-data",
+          "repconnect",
+          "global"
+        ]
+      }
+    },
+    "repx5": {
+      "productId": "prod_SmFy5is3MQHaKb",
+      "monthlyPriceId": "price_1RqhSwGRiAPUZqWuAJzj4tw5",
+      "annualPriceId": "price_1RqhSwGRiAPUZqWump7raV5n",
+      "features": {
+        "login": true,
+        "email": true,
+        "phone": true,
+        "gmail": true,
+        "agentMinutes": "custom",
+        "whiteLabel": true,
+        "customIntegrations": true,
+        "dedicatedSupport": true,
+        "apps": [
+          "crm",
+          "canvas",
+          "market-data",
+          "repconnect",
+          "global"
+        ]
+      }
+    }
+  },
+  "app_entry_points": {
+    "crm": {
+      "starter": {
+        "monthly": 9700,
+        "annual": 97000
+      },
+      "pro": {
+        "monthly": 29700,
+        "annual": 297000
+      }
+    },
+    "canvas": {
+      "starter": {
+        "monthly": 9700,
+        "annual": 97000
+      },
+      "pro": {
+        "monthly": 19700,
+        "annual": 197000
+      }
+    },
+    "market-data": {
+      "free": {
+        "monthly": 0,
+        "annual": 0
+      },
+      "pro": {
+        "monthly": 19700,
+        "annual": 197000
+      }
+    },
+    "repconnect": {
+      "starter": {
+        "monthly": 9700,
+        "annual": 97000
+      },
+      "pro": {
+        "monthly": 29700,
+        "annual": 297000
+      }
+    }
+  },
+  "stripe_account": "sk_****_hidden"
+}

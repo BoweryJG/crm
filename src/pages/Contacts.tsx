@@ -46,6 +46,8 @@ import { useNotification } from '../contexts/NotificationContext';
 import { useAppMode } from '../contexts/AppModeContext';
 import { logger } from '../utils/logger';
 import { useAuth } from '../auth';
+import DemoModeUpgradePrompt from '../components/common/DemoModeUpgradePrompt';
+import { getDemoModeConfig } from '../services/demoModeService';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -668,6 +670,9 @@ const Contacts: React.FC = () => {
           }
         }}
       />
+      
+      {/* Demo Mode Upgrade Prompt */}
+      <DemoModeUpgradePrompt context="contacts" />
     </Box>
   );
 };

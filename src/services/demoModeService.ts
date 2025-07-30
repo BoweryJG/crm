@@ -89,6 +89,18 @@ export const getDemoModeConfig = (user: any): DemoModeConfig => {
     };
   }
   
+  // Check user metadata for demo_mode flag
+  if (user?.user_metadata?.demo_mode === true) {
+    return {
+      isDemo: true,
+      canWrite: false,
+      dataLimit: 40, // Show only public_contacts (40 mock records)
+      features: 'readonly',
+      showUpgradePrompts: true,
+      mockDataEnabled: true
+    };
+  }
+  
   // Authenticated non-admin users
   if (user) {
     return {
@@ -101,7 +113,7 @@ export const getDemoModeConfig = (user: any): DemoModeConfig => {
     };
   }
   
-  // Public/Demo users
+  // Public/Demo users (not logged in)
   return {
     isDemo: true,
     canWrite: false,

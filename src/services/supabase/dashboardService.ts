@@ -39,10 +39,11 @@ class DashboardService {
       // First check if user should access personal_contacts table
       const { data: userData } = await supabase.auth.getUser();
       const userEmail = userData?.user?.email;
+      const isDemoMode = userData?.user?.user_metadata?.demo_mode === true;
       
-      // Determine which table to query based on user email
+      // Determine which table to query based on user email and demo mode
       let tableName = 'public_contacts';
-      if (userEmail === 'jasonwilliamgolden@gmail.com' || userEmail === 'jgolden@bowerycreativeagency.com') {
+      if (!isDemoMode && (userEmail === 'jasonwilliamgolden@gmail.com' || userEmail === 'jgolden@bowerycreativeagency.com')) {
         tableName = 'personal_contacts';
       }
       

@@ -40,6 +40,8 @@ import { twilioCallService, TwilioCallRecord } from '../../services/twilioCallSe
 import { conversationIntelligenceService } from '../../services/conversationIntelligenceService';
 import { useAuth } from '../../auth/AuthContext';
 import { useThemeContext } from '../../themes/ThemeContext';
+import { useUnifiedAuth } from '../../contexts/UnifiedAuthContext_20250730';
+import { FeatureGate, TierBadge, UpgradePrompt, RepXTier } from '@repspheres/unified-auth';
 
 interface Contact {
   id: string;
@@ -52,6 +54,7 @@ const GlobalCallPanel: React.FC = () => {
   const theme = useTheme();
   const { themeMode } = useThemeContext();
   const { user } = useAuth();
+  const { tier, features, checkFeature, canMakePhoneCalls, agentTimeLimit, agentDisplayTime } = useUnifiedAuth();
   
   // UI State
   const [open, setOpen] = useState(false);
@@ -70,6 +73,7 @@ const GlobalCallPanel: React.FC = () => {
   const [recentCalls, setRecentCalls] = useState<TwilioCallRecord[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   // Real-time Intelligence
   const [liveInsights, setLiveInsights] = useState<{
@@ -139,6 +143,12 @@ const GlobalCallPanel: React.FC = () => {
   // Handle making a call
   const handleCall = async () => {
     if (!phoneNumber && !selectedContact) return;
+    
+    // Check if user has phone access
+    if (!canMakePhoneCalls()) {
+      setShowUpgradeModal(true);
+      return;
+    }
     
     setLoading(true);
     try {
@@ -231,6 +241,20 @@ const GlobalCallPanel: React.FC = () => {
 
   return (
     <>
+      <FeatureGate 
+        feature="phoneAccess"
+        fallback={
+          <Box sx={{ position: 'fixed', bottom: 20, right: 20 }}>
+            <Fab
+              color="primary"
+              onClick={() => setShowUpgradeModal(true)}
+              sx={{ opacity: 0.7 }}
+            >
+              <PhoneIcon />
+            </Fab>
+          </Box>
+        }
+      >
       {/* Floating call button */}
       <Fab
         color="primary"
@@ -278,9 +302,12 @@ const GlobalCallPanel: React.FC = () => {
         }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6">
-            {callInProgress ? 'Call in Progress' : 'Sphere Call Center'}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="h6">
+              {callInProgress ? 'Call in Progress' : 'Sphere Call Center'}
+            </Typography>
+            <TierBadge tier={tier} />
+          </Box>
           {!callInProgress && (
             <IconButton onClick={toggleDrawer} edge="end">
               <CloseIcon />
@@ -311,6 +338,21 @@ const GlobalCallPanel: React.FC = () => {
               <Typography variant="h3" sx={{ fontFamily: 'monospace', my: 2 }}>
                 {formatDuration(callDuration)}
               </Typography>
+              
+              {/* Agent Time Limit Display */}
+              {agentTimeLimit > 0 && (
+                <Alert severity="info" sx={{ mt: 1, py: 0.5 }}>
+                  <Typography variant="caption">
+                    Agent conversation limit: {agentDisplayTime}
+                  </Typography>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={(callDuration / agentTimeLimit) * 100} 
+                    sx={{ mt: 0.5 }}
+                    color={callDuration > agentTimeLimit * 0.8 ? "warning" : "primary"}
+                  />
+                </Alert>
+              )}
             </Box>
 
             {/* Call Controls */}
@@ -429,6 +471,7 @@ const GlobalCallPanel: React.FC = () => {
               placeholder="Enter phone number"
               disabled={!!selectedContact}
               sx={{ mb: 2 }}
+              helperText={features.phoneNumberLimit > 0 ? `${features.phoneNumberLimit} phone number${features.phoneNumberLimit === 1 ? '' : 's'} available` : ''}
             />
             
             {/* Call Button */}
@@ -525,6 +568,19 @@ const GlobalCallPanel: React.FC = () => {
           }
         `}
       </style>
+      </FeatureGate>
+      
+      {showUpgradeModal && (
+        <UpgradePrompt
+          currentTier={tier}
+          requiredTier={RepXTier.Rep2}
+          feature="Phone Calling"
+          onUpgrade={() => {
+            window.location.href = 'https://osbackend-zl1h.onrender.com/upgrade?feature=phone&from=' + tier;
+          }}
+          onCancel={() => setShowUpgradeModal(false)}
+        />
+      )}
     </>
   );
 };
