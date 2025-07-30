@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { UnifiedAuthProvider } from '../unified-auth/src/UnifiedAuthContext';
 import { AuthContext as UnifiedAuthContext } from '../unified-auth/src/UnifiedAuthContext';
 import { supabase, getRedirectUrl } from '../unified-auth/src/unifiedSupabase';
-import type { AuthContextType } from '../unified-auth/src/types';
+import type { AuthContextType } from '../unified-auth/src/UnifiedAuthContext';
 
 // Re-export the unified auth context
 export const AuthContext = UnifiedAuthContext;
