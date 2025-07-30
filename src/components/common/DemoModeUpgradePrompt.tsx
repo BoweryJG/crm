@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AlertCircle, Zap, ChevronRight, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../auth/AuthContext';
 import { getDemoModeConfig } from '../../services/demoModeService';
 
 interface DemoModeUpgradePromptProps {
