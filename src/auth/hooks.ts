@@ -3,6 +3,9 @@ import { useAuth } from './AuthContext';
 import { supabase } from './supabase';
 // import type { User } from './types';
 
+// Re-export useAuth for components that import from hooks
+export { useAuth };
+
 /**
  * Hook to get the current user
  */
