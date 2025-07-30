@@ -91,7 +91,7 @@ const EmailButton_20250730: React.FC<EmailButtonProps> = ({
         color={canSendEmails() ? "primary" : "inherit"}
       >
         Send Email
-        {!canSendEmails() && <TierBadge tier={tier} size="small" sx={{ ml: 1 }} />}
+        {!canSendEmails() && <TierBadge tier={tier} style={{ marginLeft: 8 }} />}
       </Button>
       <EmailComposer
         open={composerOpen}
