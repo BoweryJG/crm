@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.14.0",
-    "@repspheres/unified-auth": "file:../globalrepspheres/packages/unified-auth",
     "@emotion/styled": "^11.14.0",
     "@google/generative-ai": "^0.24.1",
     "@modelcontextprotocol/sdk": "^1.12.0",

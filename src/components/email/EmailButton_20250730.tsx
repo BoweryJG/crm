@@ -4,7 +4,7 @@ import { Email as EmailIcon } from '@mui/icons-material';
 import EmailComposer from './EmailComposer';
 import { Contact } from '../../types/models';
 import { useUnifiedAuth } from '../../contexts/UnifiedAuthContext_20250730';
-import { TierBadge, UpgradePrompt, RepXTier } from '@repspheres/unified-auth';
+import { TierBadge, UpgradePrompt, RepXTier } from '../../unified-auth';
 
 interface EmailButtonProps {
   contact?: Contact;

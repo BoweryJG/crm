@@ -10,7 +10,7 @@ import {
   Chip
 } from '@mui/material';
 import { Phone as PhoneIcon } from '@mui/icons-material';
-import { FeatureGate, TierBadge, UpgradePrompt, RepXTier } from '@repspheres/unified-auth';
+import { FeatureGate, TierBadge, UpgradePrompt, RepXTier } from '../../unified-auth';
 import { useUnifiedAuth } from '../../contexts/UnifiedAuthContext_20250730';
 
 export const PhoneDialer_20250730: React.FC = () => {

@@ -41,7 +41,7 @@ import { conversationIntelligenceService } from '../../services/conversationInte
 import { useAuth } from '../../auth/AuthContext';
 import { useThemeContext } from '../../themes/ThemeContext';
 import { useUnifiedAuth } from '../../contexts/UnifiedAuthContext_20250730';
-import { FeatureGate, TierBadge, UpgradePrompt, RepXTier } from '@repspheres/unified-auth';
+import { FeatureGate, TierBadge, UpgradePrompt, RepXTier } from '../../unified-auth';
 
 interface Contact {
   id: string;

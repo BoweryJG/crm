@@ -14,7 +14,7 @@ import {
   RepXTier,
   FeatureAccess,
   UserSubscription 
-} from '@repspheres/unified-auth';
+} from '../unified-auth';
 import { useAuth } from '../auth';
 
 interface UnifiedAuthContextType {

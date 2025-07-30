@@ -17,7 +17,7 @@ import {
 import { Delete as DeleteIcon, Mail as MailIcon, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import { useAuth } from '../../auth/hooks';
 import { useUnifiedAuth } from '../../contexts/UnifiedAuthContext_20250730';
-import { FeatureGate, TierBadge, UpgradePrompt, RepXTier } from '@repspheres/unified-auth';
+import { FeatureGate, TierBadge, UpgradePrompt, RepXTier } from '../../unified-auth';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://osbackend-zl1h.onrender.com';
 
