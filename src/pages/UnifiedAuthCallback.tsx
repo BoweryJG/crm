@@ -27,7 +27,9 @@ const UnifiedAuthCallback: React.FC = () => {
           // Cross-domain SSO is now handled by the auth context
           
           // Store user email for Gmail token isolation
-          localStorage.setItem('crm_user_email', session.user.email);
+          if (session.user.email) {
+            localStorage.setItem('crm_user_email', session.user.email);
+          }
           
           // Get the return path from sessionStorage (more secure for redirects)
           const returnPath = sessionStorage.getItem('authReturnPath') || 
