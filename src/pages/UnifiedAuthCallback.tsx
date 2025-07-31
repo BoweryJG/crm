@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CircularProgress, Box, Typography } from '@mui/material';
-import { supabase, initializeCrossDomainSSO } from '../../../repconnect/shared/auth/unifiedSupabase';
+import { supabase } from '../unified-auth/src/unifiedSupabase';
 
 const UnifiedAuthCallback: React.FC = () => {
   const navigate = useNavigate();
@@ -24,8 +24,7 @@ const UnifiedAuthCallback: React.FC = () => {
         if (session) {
           console.log('Auth callback - Session found:', session.user.email);
           
-          // Initialize cross-domain SSO
-          await initializeCrossDomainSSO();
+          // Cross-domain SSO is now handled by the auth context
           
           // Store user email for Gmail token isolation
           localStorage.setItem('crm_user_email', session.user.email);
