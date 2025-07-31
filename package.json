@@ -83,6 +83,9 @@
     "extends": [
       "react-app",
       "react-app/jest"
+    ],
+    "ignorePatterns": [
+      "src/unified-auth/dist/**/*"
     ]
   },
   "browserslist": {
