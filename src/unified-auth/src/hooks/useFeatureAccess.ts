@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useRepXTier } from './useRepXTier';
 import type { FeatureAccess, FeatureCheckResult } from '../types';
-import { TIER_FEATURES, TIER_NAMES, BACKEND_URL } from '../constants';
+import { TIER_FEATURES, TIER_NAMES, DEFAULT_BACKEND_URL } from '../constants';
 
 interface UseFeatureAccessResult {
   features: FeatureAccess;
@@ -38,7 +38,7 @@ export function useFeatureAccess(userId?: string): UseFeatureAccessResult {
       allowed: false,
       reason: `This feature requires ${requiredTier ? TIER_NAMES[requiredTier] : 'a higher tier'}`,
       requiredTier: requiredTier || undefined,
-      upgradeUrl: `${BACKEND_URL}/upgrade?feature=${feature}&from=${tier}`,
+      upgradeUrl: `${DEFAULT_BACKEND_URL}/upgrade?feature=${feature}&from=${tier}`,
     };
   };
 

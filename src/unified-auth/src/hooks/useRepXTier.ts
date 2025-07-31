@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { RepXTier } from '../types';
 import type { UserSubscription } from '../types';
-import { BACKEND_URL } from '../constants';
+import { DEFAULT_BACKEND_URL } from '../constants';
 
 interface UseRepXTierResult {
   tier: RepXTier;
@@ -27,7 +27,7 @@ export function useRepXTier(userId?: string): UseRepXTierResult {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${BACKEND_URL}/api/repx/subscription`, {
+      const response = await fetch(`${DEFAULT_BACKEND_URL}/api/repx/subscription`, {
         credentials: 'include',
         headers: {
           'Accept': 'application/json',
