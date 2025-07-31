@@ -31,6 +31,9 @@ export const getSupabase = (): SupabaseClient => {
   return supabaseClient;
 };
 
+// Alias for compatibility
+export const getSupabaseClient = getSupabase;
+
 // For backward compatibility
 export const supabase = new Proxy({} as SupabaseClient, {
   get(target, prop) {
