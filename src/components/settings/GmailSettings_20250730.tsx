@@ -15,7 +15,7 @@ import {
   Chip
 } from '@mui/material';
 import { Delete as DeleteIcon, Mail as MailIcon, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
-import { useAuth } from '../../auth/hooks';
+import { useAuth } from '../../auth/UnifiedAuthWrapper';
 import { useUnifiedAuth } from '../../contexts/UnifiedAuthContext_20250730';
 import { FeatureGate, TierBadge, UpgradePrompt, RepXTier } from '../../unified-auth';
 

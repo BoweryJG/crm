@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { initializeUnifiedAuth } from './auth/initializeUnifiedAuth';
+
+// Initialize unified auth with CRM environment variables
+initializeUnifiedAuth();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
