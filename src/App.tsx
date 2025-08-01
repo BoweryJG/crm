@@ -31,6 +31,7 @@ import GlobalCallPanel from './components/communications/GlobalCallPanel';
 import { SubscriptionUpgradeModal } from './components/common/SubscriptionUpgradeModal';
 import { FeatureUpgradeModal } from './components/common/FeatureUpgradeModal';
 import { DemoModeIndicator } from './components/common/DemoModeIndicator';
+import { AuthDebugPanel } from './components/debug/AuthDebugPanel';
 
 // CSS baseline reset
 import CssBaseline from '@mui/material/CssBaseline';
@@ -233,6 +234,9 @@ const App: React.FC = () => {
             <SubscriptionUpgradeModal />
             <FeatureUpgradeModal />
             <DemoModeIndicator />
+            
+            {/* Debug Panel - Only in development */}
+            {process.env.NODE_ENV === 'development' && <AuthDebugPanel />}
           </BrowserRouter>
                       </DashboardDataProvider>
                     </NotificationProvider>

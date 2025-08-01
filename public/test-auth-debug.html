@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Debug Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        h1 {
+            color: #00ffc6;
+            margin-bottom: 30px;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .status.ok {
+            background: #4caf50;
+            color: #fff;
+        }
+        .status.error {
+            background: #f44336;
+            color: #fff;
+        }
+        .status.warning {
+            background: #ff9800;
+            color: #fff;
+        }
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        button {
+            background: #00ffc6;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #00e6b3;
+        }
+        input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .log {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-left: 3px solid transparent;
+        }
+        .log-entry.info {
+            border-left-color: #2196f3;
+        }
+        .log-entry.success {
+            border-left-color: #4caf50;
+        }
+        .log-entry.error {
+            border-left-color: #f44336;
+        }
+        .log-entry.warning {
+            border-left-color: #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RepSpheres CRM - Auth Debug Tool</h1>
+        
+        <div class="section">
+            <h2>Environment Check</h2>
+            <div id="env-status"></div>
+        </div>
+
+        <div class="section">
+            <h2>Current Auth Status</h2>
+            <div id="auth-status"></div>
+        </div>
+
+        <div class="section">
+            <h2>Test Authentication</h2>
+            <div>
+                <input type="email" id="test-email" placeholder="test@example.com" value="test@example.com">
+                <input type="password" id="test-password" placeholder="password" value="testpassword123">
+                <button onclick="testSignIn()">Test Sign In</button>
+                <button onclick="testGoogleOAuth()">Test Google OAuth</button>
+                <button onclick="clearSession()">Clear Session</button>
+                <button onclick="refreshStatus()">Refresh Status</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Debug Log</h2>
+            <div id="debug-log" class="log"></div>
+        </div>
+
+        <div class="section">
+            <h2>Quick Actions</h2>
+            <button onclick="window.location.href='/login'">Go to Login Page</button>
+            <button onclick="window.location.href='/'">Go to Dashboard</button>
+            <button onclick="checkSupabaseConnection()">Test Supabase Connection</button>
+            <button onclick="checkBackendConnection()">Test Backend Connection</button>
+        </div>
+    </div>
+
+    <script>
+        const log = (message, type = 'info') => {
+            const logDiv = document.getElementById('debug-log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.insertBefore(entry, logDiv.firstChild);
+        };
+
+        const checkEnvironment = () => {
+            const envDiv = document.getElementById('env-status');
+            const vars = {
+                'REACT_APP_SUPABASE_URL': localStorage.getItem('REACT_APP_SUPABASE_URL') || 'Check .env file',
+                'REACT_APP_SUPABASE_ANON_KEY': localStorage.getItem('REACT_APP_SUPABASE_ANON_KEY') ? 'SET' : 'Check .env file',
+                'REACT_APP_BACKEND_URL': localStorage.getItem('REACT_APP_BACKEND_URL') || 'Check .env file',
+                'NODE_ENV': 'production',
+                'Current URL': window.location.origin
+            };
+
+            let html = '<table style="width: 100%">';
+            for (const [key, value] of Object.entries(vars)) {
+                const status = value === 'Check .env file' ? 'warning' : 'ok';
+                html += `<tr>
+                    <td style="padding: 5px">${key}:</td>
+                    <td><code>${value}</code></td>
+                    <td><span class="status ${status}">${status.toUpperCase()}</span></td>
+                </tr>`;
+            }
+            html += '</table>';
+            envDiv.innerHTML = html;
+            log('Environment checked', 'info');
+        };
+
+        const checkAuthStatus = async () => {
+            const statusDiv = document.getElementById('auth-status');
+            
+            try {
+                // Check localStorage for auth token
+                const authToken = localStorage.getItem('sb-cbopynuvhcymbumjnvay-auth-token');
+                
+                if (authToken) {
+                    const parsed = JSON.parse(authToken);
+                    statusDiv.innerHTML = `
+                        <p><strong>Session Found:</strong> <span class="status ok">ACTIVE</span></p>
+                        <p><strong>User:</strong> ${parsed.user?.email || 'Unknown'}</p>
+                        <p><strong>Provider:</strong> ${parsed.user?.app_metadata?.provider || 'Unknown'}</p>
+                        <p><strong>Expires:</strong> ${parsed.expires_at ? new Date(parsed.expires_at * 1000).toLocaleString() : 'Unknown'}</p>
+                    `;
+                    log('Active session found', 'success');
+                } else {
+                    statusDiv.innerHTML = '<p><strong>Session:</strong> <span class="status error">NOT AUTHENTICATED</span></p>';
+                    log('No active session', 'warning');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<p><strong>Error:</strong> <span class="status error">${error.message}</span></p>`;
+                log(`Auth check error: ${error.message}`, 'error');
+            }
+        };
+
+        const testSignIn = async () => {
+            const email = document.getElementById('test-email').value;
+            const password = document.getElementById('test-password').value;
+            
+            log(`Testing sign in with email: ${email}`, 'info');
+            
+            // This is a placeholder - in a real implementation, you'd use Supabase client
+            log('Direct sign-in test requires Supabase client integration', 'warning');
+            log('Please use the actual login page for testing authentication', 'info');
+        };
+
+        const testGoogleOAuth = () => {
+            log('Testing Google OAuth redirect...', 'info');
+            
+            // Construct the OAuth URL
+            const redirectUrl = `${window.location.origin}/auth/callback`;
+            log(`Redirect URL: ${redirectUrl}`, 'info');
+            
+            // This would normally be done through Supabase client
+            log('OAuth test requires Supabase client integration', 'warning');
+            log('Please use the actual login page for OAuth testing', 'info');
+        };
+
+        const clearSession = () => {
+            localStorage.removeItem('sb-cbopynuvhcymbumjnvay-auth-token');
+            log('Session cleared from localStorage', 'success');
+            checkAuthStatus();
+        };
+
+        const refreshStatus = () => {
+            log('Refreshing status...', 'info');
+            checkEnvironment();
+            checkAuthStatus();
+        };
+
+        const checkSupabaseConnection = async () => {
+            log('Checking Supabase connection...', 'info');
+            
+            try {
+                // This is a basic connectivity test
+                const supabaseUrl = 'https://cbopynuvhcymbumjnvay.supabase.co';
+                const response = await fetch(`${supabaseUrl}/rest/v1/`, {
+                    method: 'HEAD',
+                    headers: {
+                        'apikey': 'dummy-key-for-test'
+                    }
+                });
+                
+                if (response.status === 401) {
+                    log('Supabase URL is reachable (401 is expected without valid key)', 'success');
+                } else {
+                    log(`Supabase responded with status: ${response.status}`, 'warning');
+                }
+            } catch (error) {
+                log(`Supabase connection error: ${error.message}`, 'error');
+            }
+        };
+
+        const checkBackendConnection = async () => {
+            log('Checking backend connection...', 'info');
+            
+            try {
+                const backendUrl = 'https://osbackend-zl1h.onrender.com';
+                const response = await fetch(`${backendUrl}/health`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`Backend is healthy: ${JSON.stringify(data)}`, 'success');
+                } else {
+                    log(`Backend responded with status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`Backend connection error: ${error.message}`, 'error');
+            }
+        };
+
+        // Initialize on load
+        window.onload = () => {
+            log('Auth Debug Tool initialized', 'info');
+            checkEnvironment();
+            checkAuthStatus();
+        };
+    </script>
+</body>
+</html>
